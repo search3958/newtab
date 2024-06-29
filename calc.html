@@ -1,0 +1,135 @@
+
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<style>
+
+body {
+       font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+margIN:0px;
+    }
+    .calculator {
+        width: 290px;
+        border: none;
+        border-radius: 10px;
+        margin: 0px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 5px;
+      background:#ffffff;
+    }
+    input[type="button"] {
+             font-family: "Inter", sans-serif;
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+        border: none;
+        border-radius: 55px;
+        cursor: pointer;
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+        margin:3px;
+    }
+    input[type="text"] {
+             font-family: "Inter", sans-serif;
+        width: 100v;
+        font-size: 35px;
+        grid-column: 1 / -1;
+      background:f1f1f1;
+      border: none;
+padding:30px 20px;
+      color:#000;
+      border-radius:10px 10px 20px 20px;
+      text-align: right;
+    }
+
+
+
+.TC{
+  background:#185af2;color:#ffffff;
+}
+.SC{
+  background:#185af2;color:#ffffff;
+}
+.PC{
+  background:#185af2;color:#ffffff;
+}
+
+.SCH{
+  background:#sss;s;color:#000000;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .calculator{
+  background:#000;
+}
+
+  .SCH{
+  background:#222;s;color:#fff;
+}
+     input[type="text"] {
+   color:#fff;    
+       background:#222;
+  }
+  
+  
+}
+  </style>
+<script>
+      function addToDisplay(value) {
+        document.getElementById('display').value += value;
+    }
+
+    function clearDisplay() {
+        document.getElementById('display').value = '';
+    }
+
+    function calculate() {
+        try {
+            document.getElementById('display').value = eval(document.getElementById('display').value);
+        } catch(error) {
+            document.getElementById('display').value = 'Error';
+        }
+    }
+</script>
+<body>
+
+<div class="calculator">
+    <input type="text" id="display" disabled>
+
+    <input type="button" value="AC" onclick="clearDisplay()" class="TC">
+    <input type="button" value="()" onclick="addToDisplay('(')" class="SC">
+    <input type="button" value="%" onclick="addToDisplay('%')" class="SC">
+    <input type="button" value="÷" onclick="addToDisplay('/')" class="SC">
+    <input type="button" value="7" onclick="addToDisplay('7')" class="SCH">
+    <input type="button" value="8" onclick="addToDisplay('8')" class="SCH">
+    <input type="button" value="9" onclick="addToDisplay('9')" class="SCH">
+    <input type="button" value="×" onclick="addToDisplay('*')" class="SC">
+    <input type="button" value="4" onclick="addToDisplay('4')" class="SCH">
+    <input type="button" value="5" onclick="addToDisplay('5')" class="SCH">
+    <input type="button" value="6" onclick="addToDisplay('6')" class="SCH">
+    <input type="button" value="-" onclick="addToDisplay('-')" class="SC">
+    <input type="button" value="1" onclick="addToDisplay('1')" class="SCH">
+    <input type="button" value="2" onclick="addToDisplay('2')" class="SCH">
+    <input type="button" value="3" onclick="addToDisplay('3')" class="SCH">
+    <input type="button" value="+" onclick="addToDisplay('+')" class="SC">
+    <input type="button" value="0" onclick="addToDisplay('0')" class="SCH">
+    <input type="button" value="・" onclick="addToDisplay('.')" class="SCH">
+    <input type="button" value="C" onclick="clearDisplay()" class="SCH">
+    <input type="button" value="=" onclick="calculate()"  class="PC">
+    </div>
+
+</body>
+  
