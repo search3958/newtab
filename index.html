@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
-
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+     crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP&display=swap" rel="stylesheet">
-
-    
+  
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
      crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新しいタブ</title>
-</head>
-
-    <style>
-/* styles.css */
+  <style>/* styles.css */
 *{
   		word-break: break-word;
 }
@@ -56,7 +53,7 @@ body{
     align-items: center;
     font-size: 24px;
     border-radius: 16px;
-    transition: transform 0.2s ease-out,box-shadow 0.2s,color 0.3s;
+    transition: transform 0.2s ease-out ,box-shadow 0.2s,color 0.3s;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
           position: relative;
   color:#00000000;
@@ -95,6 +92,7 @@ a{
 button{
   border:none;
   background:none;
+  margin:0px;
 }
 
 input[type=search]{
@@ -135,8 +133,112 @@ input[type=search]{
   font-size:20px;
 }
 
+@keyframes MyPopoverOpen {
+  from {
+    opacity: 0;
+    translate: 30px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0px 0;
+  }
+}
+
+
+
+#stopwatch::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
+#calc::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
+
+
+/* 拡大アニメーション */
+@keyframes scaleIn {
+  from {
+    transform: scale(1);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* モーダルのコンテンツスタイル */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+
+}
+
+.close:hover,
+.close:focus {
+  text-decoration: none;
+  cursor: pointer;
+    backgound-color:#ffffff;
+}
+.window{
+  position: fixed;
+  left: calc(50% - 145px);
+  top: calc(50% - 229.095px);
+  padding:0px 8px;
+  background:#fff;
+    bordER-rAdius:21px;
+    box-shadow: 0 10px 100px rgba(0, 0, 0, 0.3);
+  
+}
+
+iframe{
+  bOrdeR:noNe;
+  mARgIN:0px;
+  bordER-rAdius:16px;
+}
+
+.margin{
+  margin:5px;
+}
+
+.header {
+background: #ffffff90;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+  padding:10px;
+  z-index:999;
+  backdrop-filter: blur(20px);
+}
+.header-inner {
+display: flex;
+align-items: center;
+}
+.search {
+display: flex;
+align-items: center;
+  margin:0 auto;
+}
+
+#clock{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color:#858585;
+}
+
 @media (prefers-color-scheme: dark) {
   
+  .header{
+    background:#00000090
+  }
   
   body {
     background-color: #000;
@@ -168,11 +270,312 @@ input[type=search]{
   color:#fff;
   }
 
+  .window{
+    background:#000;
+    color:#fff;
+  }
+  
+  
+}
 
+
+
+
+
+
+p{
+      position: relative;
+    top: 15px;
+    left: 5px;
+  margin:0px 0px 0px 10px;
 }
     </style>
-<script>
-// script.js
+</head>
+
+  
+  
+<body>
+  <header class="header">
+  <div class="header-inner inner">
+
+<div class="search">
+      <form id="cse-search-box" action="https://www.google.com/search">
+    <input type="search" id="textBox" name="textBox">
+</form>
+
+<form method="get" action="https://www.google.co.jp/search" id="googleForm">
+
+
+        <input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value="">
+        <input type="hidden" name="ie" value="UTF-8">
+        <input type="hidden" name="oe" value="UTF-8">
+        <input type="hidden" name="hl" value="ja">
+  
+        <button type="submit" name="btnG" value="Google 検索"><div class="submit"><span class="material-symbols-outlined">
+search
+</span></div></button>
+
+</form></div>
+    
+    
+    <div id="clock"></div>
+    
+  </div>
+</header>
+  
+  
+  <div class="link"></div>  <div class="link"></div>  <div class="link"></div>
+  
+  <!--template
+
+
+<div class="container"><div class="box"><a href="
+🔴URL
+"><img src=" https://search3958.github.io/newtab/
+🔴ImageURL
+.jpeg"></a></div>
+🔴Name
+</div>
+
+
+-->
+  
+    <div class="title">Google</div>
+<div class="link">
+  
+
+  
+<div class="container"><div class="box"><a href="
+mail.google.com
+"><img src=" https://search3958.github.io/newtab/
+gmail
+.jpeg"></a></div>
+Gmail
+</div>
+  
+  <div class="container"><div class="box"><a href="
+classroom.google.com
+"><img src=" https://search3958.github.io/newtab/
+classroom
+.jpeg"></a></div>
+Classroom
+</div>
+  
+  <div class="container"><div class="box"><a href="
+youtube.com
+"><img src=" https://search3958.github.io/newtab/
+youtube
+.jpeg"></a></div>
+YouTube
+</div>
+  
+  <div class="container"><div class="box"><a href="
+https://docs.google.com/document/u/0/
+"><img src=" https://search3958.github.io/newtab/
+document
+.jpeg"></a></div>
+ドキュメント
+</div>
+    
+  <div class="container"><div class="box"><a href="
+https://docs.google.com/presentation/u/0/
+"><img src=" https://search3958.github.io/newtab/
+slide
+.jpeg"></a></div>
+スライド
+</div>
+    
+  <div class="container"><div class="box"><a href="
+https://docs.google.com/spreadsheets/u/0/
+"><img src=" https://search3958.github.io/newtab/
+spreadsheet
+.jpeg"></a></div>
+スプレッドシート
+</div>
+  
+    <div class="container"><div class="box"><a href="
+translate.google.com
+"><img src=" https://search3958.github.io/newtab/
+translate
+.jpeg"></a></div>
+翻訳
+</div>
+    
+    <div class="container"><div class="box"><a href="
+https://gemini.google.com/app
+"><img src=" https://search3958.github.io/newtab/
+gemini
+.jpeg"></a></div>
+Gemini
+</div>
+  
+  
+    <div class="container"><div class="box"><a href="
+https://about.google/products/
+"><img src=" https://search3958.github.io/newtab/
+product
+.jpeg"></a></div>
+その他のプロダクト
+</div></div>
+  
+  
+    <div id="calc" popover>
+    <div class="window"><div class="margin">電卓</div>
+    <iframe src="https://search3958.github.io/newtab/calc.html" width="290" height="458.19" loading="lazy"></iframe>    </div> </div>
+  </div>
+  
+  
+    <div id="stopwatch" popover>
+    <div class="window"><div class="margin">ストップウォッチ</div>
+    <iframe src="https://search3958.github.io/newtab/stopwatch.html" width="290" height="458.19" loading="lazy"></iframe>    </div> </div>
+  </div>
+  
+
+
+  
+     <div class="title">ツール</div>
+<div class="link">
+
+  <div class="container"><div class="box"><button popovertarget="calc" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/
+in-calc
+.jpeg"></button></div>
+電卓
+</div>
+
+
+  <div class="container"><div class="box"><button popovertarget="stopwatch" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/
+stopwatch
+.jpeg"></button></div>
+ストップウォッチ
+</div>
+
+
+ 
+</div></div>
+  
+  
+  
+  
+  
+      <div class="title">学習と作業効率化</div>
+<div class="link">
+
+
+<div class="container"><div class="box"><a href="
+app.monoxer.com
+"><img src=" https://search3958.github.io/newtab/
+monoxer
+.jpeg"></a></div>
+Monoxer Flutter
+</div>
+
+<div class="container"><div class="box"><a href="
+https://chatgpt.com/
+"><img src=" https://search3958.github.io/newtab/
+chatgpt
+.jpeg"></a></div>
+Chat GPT
+</div>
+  
+<div class="container"><div class="box"><a href="
+https://copilot.microsoft.com/
+"><img src=" https://search3958.github.io/newtab/
+copilot
+.jpeg"></a></div>
+Copilot
+</div>
+  
+<div class="container"><div class="box"><a href="
+codepen.io
+"><img src=" https://search3958.github.io/newtab/
+codepen
+.jpeg"></a></div>
+Codepen
+</div>
+  
+<div class="container"><div class="box"><a href="
+https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8
+"><img src=" https://search3958.github.io/newtab/
+wikipedia
+.jpeg"></a></div>
+ウィキペディア
+</div>
+  
+<div class="container"><div class="box"><a href="
+https://www.canva.com/ja_jp/
+"><img src=" https://search3958.github.io/newtab/
+canva
+.jpeg"></a></div>
+Canva
+</div>
+  
+<div class="container"><div class="box"><a href="
+https://turbowarp.org
+"><img src=" https://search3958.github.io/newtab/
+turbowarp
+.jpeg"></a></div>
+Turbo Warp
+</div></div>
+  
+  
+  
+  
+  </div></div>
+  
+        <div class="title">娯楽</div>
+<div class="link">
+
+<div class="container"><div class="box"><a href="
+scratch.mit.edu
+"><img src=" https://search3958.github.io/newtab/
+scratch
+.jpeg"></a></div>
+Scratch
+</div>
+
+<div class="container"><div class="box"><a href="
+poki.com
+"><img src=" https://search3958.github.io/newtab/
+poki
+.jpeg"></a></div>
+poki
+</div>
+
+<div class="container"><div class="box"><a href="
+snake.io
+"><img src=" https://search3958.github.io/newtab/
+snakeio
+.jpeg"></a></div>
+Snake.io
+</div>
+ 
+
+<div class="container"><div class="box"><a href="
+https://www.google.com/logos/2010/pacman10-i.html
+"><img src=" https://search3958.github.io/newtab/
+pacman
+.jpeg"></a></div>
+PACMAN
+</div> 
+
+<div class="container"><div class="box"><a href="
+https://mrdoob.com/projects/chromeexperiments/google-gravity/
+"><img src=" https://search3958.github.io/newtab/
+gravity
+.jpeg"></a></div>
+驥阪ｊ繧↑?￥???
+</div>
+  
+  
+  
+  
+  
+  
+  </div></div>
+  
+</body>
+  <script>
+    // script.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const containers = document.querySelectorAll('.container');
@@ -185,8 +588,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
 
-            const rotateX = -y / 6.1;
-            const rotateY = x / 6.1;
+            const rotateX = -y / 6;
+            const rotateY = x / 6;
 
             box.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         });
@@ -241,233 +644,20 @@ function sendWebhookNotification(text) {
     });
 }
 
+function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const currentTime = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('clock').textContent = currentTime;
+        }
+
+        setInterval(updateClock, 100);
+        updateClock(); // 初回実行してすぐに時刻を表示
 
 
 
-
-
-</script>
-  
-<body>
-  <div class="link">
-  <form id="cse-search-box" action="https://www.google.com/search">
-    <input type="search" id="textBox" name="textBox">
-</form>
-
-<form method="get" action="https://www.google.co.jp/search" id="googleForm">
-
-
-        <input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value="">
-        <input type="hidden" name="ie" value="UTF-8">
-        <input type="hidden" name="oe" value="UTF-8">
-        <input type="hidden" name="hl" value="ja">
-  
-        <button type="submit" name="btnG" value="Google 検索"><div class="submit"><span class="material-symbols-outlined">
-search
-</span></div></button>
-
-</form>
-</div>
-  
-  <!--template
-
-
-<div class="container"><div class="box"><a href="
-🔴URL
-"><img src=" https://search3958.github.io/newtab/
-🔴ImageURL
-.jpeg"></a></div>
-🔴Name
-</div>
-
-
--->
-  
-    <div class="title">Google</div>
-<div class="link">
-
-  
-<div class="container"><div class="box"><a href="
-https://mail.google.com
-"><img src=" https://search3958.github.io/newtab/
-gmail
-.jpeg"></a></div>
-Gmail
-</div>
-  
-  <div class="container"><div class="box"><a href="
-https://classroom.google.com
-"><img src=" https://search3958.github.io/newtab/
-classroom
-.jpeg"></a></div>
-Classroom
-</div>
-  
-  <div class="container"><div class="box"><a href="
-https://youtube.com
-"><img src=" https://search3958.github.io/newtab/
-youtube
-.jpeg"></a></div>
-YouTube
-</div>
-  
-  <div class="container"><div class="box"><a href="
-https://docs.google.com/document/u/0/
-"><img src=" https://search3958.github.io/newtab/
-document
-.jpeg"></a></div>
-ドキュメント
-</div>
-    
-  <div class="container"><div class="box"><a href="
-https://docs.google.com/presentation/u/0/
-"><img src=" https://search3958.github.io/newtab/
-slide
-.jpeg"></a></div>
-スライド
-</div>
-    
-  <div class="container"><div class="box"><a href="
-https://docs.google.com/spreadsheets/u/0/
-"><img src=" https://search3958.github.io/newtab/
-spreadsheet
-.jpeg"></a></div>
-スプレッドシート
-</div>
-  
-    <div class="container"><div class="box"><a href="
-https://translate.google.com
-"><img src=" https://search3958.github.io/newtab/
-translate
-.jpeg"></a></div>
-翻訳
-</div>
-    
-    <div class="container"><div class="box"><a href="
-https://about.google/products/
-"><img src=" https://search3958.github.io/newtab/
-product
-.jpeg"></a></div>
-その他のプロダクト
-</div></div>
-
-
-
-  
-      <div class="title">ツール</div>
-<div class="link">
-
-
-<div class="container"><div class="box"><a href="
-https://app.monoxer.com
-"><img src=" https://search3958.github.io/newtab/
-monoxer
-.jpeg"></a></div>
-Monoxer Flutter
-</div>
-
-<div class="container"><div class="box"><a href="
-https://chatgpt.com/
-"><img src=" https://search3958.github.io/newtab/
-chatgpt
-.jpeg"></a></div>
-Chat GPT
-</div>
-  
-<div class="container"><div class="box"><a href="
-https://github.com
-"><img src=" https://search3958.github.io/newtab/
-github
-.jpeg"></a></div>
-Github
-</div>
-  
-<div class="container"><div class="box"><a href="
-https://copilot.microsoft.com/
-"><img src=" https://search3958.github.io/newtab/
-copilot
-.jpeg"></a></div>
-Copilot
-</div>
-  
-<div class="container"><div class="box"><a href="
-https://codepen.io
-"><img src=" https://search3958.github.io/newtab/
-codepen
-.jpeg"></a></div>
-Codepen
-</div>
-  
-<div class="container"><div class="box"><a href="
-https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8
-"><img src=" https://search3958.github.io/newtab/
-wikipedia
-.jpeg"></a></div>
-ウィキペディア
-</div>
-  
-<div class="container"><div class="box"><a href="
-https://www.canva.com/ja_jp/
-"><img src=" https://search3958.github.io/newtab/
-canva
-.jpeg"></a></div>
-Canva
-</div>
- 
-  
-  </div></div>
-  
-        <div class="title">娯楽</div>
-<div class="link">
-
-<div class="container"><div class="box"><a href="
-https://scratch.mit.edu
-"><img src=" https://search3958.github.io/newtab/
-scratch
-.jpeg"></a></div>
-Scratch
-</div>
-
-<div class="container"><div class="box"><a href="
-https://poki.com
-"><img src=" https://search3958.github.io/newtab/
-poki
-.jpeg"></a></div>
-poki
-</div>
-
-<div class="container"><div class="box"><a href="
-https://snake.io
-"><img src=" https://search3958.github.io/newtab/
-snakeio
-.jpeg"></a></div>
-Snake.io
-</div>
- 
-
-<div class="container"><div class="box"><a href="
-https://https://www.google.com/logos/2010/pacman10-i.html
-"><img src=" https://search3958.github.io/newtab/
-pacman
-.jpeg"></a></div>
-PACMAN
-</div> 
-
-<div class="container"><div class="box"><a href="
-https://mrdoob.com/projects/chromeexperiments/google-gravity/
-"><img src=" https://search3958.github.io/newtab/
-gravity
-.jpeg"></a></div>
-驥阪ｊ繧↑?￥???
-</div>
-  
-  
-  
-  
-  
-  
-  </div></div>
-  
-</body>
+  </script>
 </html>
 
