@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイマー</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .timer {
+            font-size: 2em;
+            margin: 20px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        .controls button {
+            padding: 10px 20px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .time-inputs input {
+            width: 60px;
+            text-align: center;
+            font-size: 1.3em;
+            border-radius:10px;
+            border: #858585 solid 1px;
+            transition: all 0.5s ease-out;
+        }
+        #startStopButton{        
+            background:#185af2;
+            color:#fff;
+            border-radius:100px;
+            border:none;
+        }
+        #resetButton{        
+            background:#eee;
+            color:#fff;
+            border-radius:100px;
+            border:none;
+            color:#000;
+        }
+            @media (prefers-color-scheme: dark) {
+              body{
+                background:#000;
+                color:#fff;
+              }       
+              .time-inputs input {
+                background:#000;
+                color:#fff;
+              }
+              #resetButton{      
+                background:#222;
+                color:#fff;
+              }
+      }
+    </style>
+</head>
+<body>
+    <div class="timer">
+        <div class="time-inputs">
+            <input type="text" id="hoursInput" value="00"> :
+            <input type="text" id="minutesInput" value="00"> :
+            <input type="text" id="secondsInput" value="00">
+        </div>
+    </div>
+    <div class="controls">
+        <button id="startStopButton"><span class="material-icons">play_arrow</span>開始</button>
+        <button id="resetButton"><span class="material-icons">refresh</span>リセット</button>
+    </div>
+
+    <script>
+        let timerInterval;
+        let timeRemaining = 0;
+        let timerRunning = false;
+
+        const hoursInput = document.getElementById('hoursInput');
+        const minutesInput = document.getElementById('minutesInput');
+        const secondsInput = document.getElementById('secondsInput');
+        const startStopButton = document.getElementById('startStopButton');
+        const resetButton = document.getElementById('resetButton');
+
+        function updateTimeDisplay() {
+            const hours = Math.floor(timeRemaining / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((timeRemaining % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
+            hoursInput.value = hours;
+            minutesInput.value = minutes;
+            secondsInput.value = seconds;
+        }
+
+        function startTimer() {
+            if (timerRunning) return;
+            timerRunning = true;
+            const hours = parseInt(hoursInput.value, 10);
+            const minutes = parseInt(minutesInput.value, 10);
+            const seconds = parseInt(secondsInput.value, 10);
+            timeRemaining = (hours * 3600) + (minutes * 60) + seconds;
+            timerInterval = setInterval(() => {
+                if (timeRemaining > 0) {
+                    timeRemaining--;
+                    updateTimeDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                    startStopButton.innerHTML = '<span class="material-icons">play_arrow</span>開始';
+                }
+            }, 1000);
+            startStopButton.innerHTML = '<span class="material-icons">pause</span>停止';
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            startStopButton.innerHTML = '<span class="material-icons">play_arrow</span>開始';
+        }
+
+        function toggleTimer() {
+            if (timerRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function resetTimer() {
+            stopTimer();
+            timeRemaining = 0;
+            updateTimeDisplay();
+        }
+
+        startStopButton.addEventListener('click', toggleTimer);
+        resetButton.addEventListener('click', resetTimer);
+
+        [hoursInput, minutesInput, secondsInput].forEach(input => {
+            input.addEventListener('input', () => {
+                if (!timerRunning) {
+                    const hours = parseInt(hoursInput.value, 10) || 0;
+                    const minutes = parseInt(minutesInput.value, 10) || 0;
+                    const seconds = parseInt(secondsInput.value, 10) || 0;
+                    timeRemaining = (hours * 3600) + (minutes * 60) + seconds;
+                }
+            });
+        });
+
+        updateTimeDisplay();
+    </script>
+</body>
+</html>
