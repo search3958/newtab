@@ -162,6 +162,10 @@ input[type=search]{
   background: rgba(0, 0, 0, 0.5);
   animation: scaleIn 0.1s linear;
 }
+#timer::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
 
 
 /* 拡大アニメーション */
@@ -362,13 +366,13 @@ function updateClock() {
 
 <div class="search">
       <form id="cse-search-box" action="https://www.google.com/search">
-    <input type="search" id="textBox" name="textBox">
+    <input type="search" id="textBox" name="textBox"　autofocus>
 </form>
 
 <form method="get" action="https://www.google.co.jp/search" id="googleForm">
 
 
-        <input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value="">
+        <input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value=""　>
         <input type="hidden" name="ie" value="UTF-8">
         <input type="hidden" name="oe" value="UTF-8">
         <input type="hidden" name="hl" value="ja">
@@ -493,6 +497,12 @@ product
   </div>
   
 
+    <div id="timer" popover>
+    <div class="window"><div class="margin">タイマー</div>
+    <iframe src="https://search3958.github.io/newtab/timer.html" width="320" height="458.19" loading="lazy"></iframe>    </div> </div>
+  </div>
+  
+
 
   
      <div class="title">ツール</div>
@@ -509,6 +519,13 @@ in-calc
 stopwatch
 .png"></button></div>
 ストップウォッチ
+</div>
+
+
+  <div class="container"><div class="box"><button popovertarget="timer" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/
+timer
+.png"></button></div>
+タイマー
 </div>
 
 
