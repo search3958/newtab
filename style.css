@@ -1,0 +1,169 @@
+.background-on {
+  background-color: var(--element-dark);
+  border-radius:32px;
+}
+  
+img:hover{box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);}
+
+a{
+  text-decoration: none;
+  margin:0px;
+  padding:0px;
+}
+
+@keyframes MyPopoverOpen {
+  from {
+    opacity: 0;
+    translate: 30px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0px 0;
+  }
+}
+
+#stopwatch::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
+#calc::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
+#timer::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
+#color::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.1s linear;
+}
+
+  
+input[type="color" i] {
+  width: 100px;
+  vertical-align: -3px;
+  border:none;
+  border-radius:4px;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(1);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+}
+
+.close:hover,
+.close:focus {
+  text-decoration: none;
+  cursor: pointer;
+  backgound-color:#ffffff;
+}
+.window{
+  position: fixed;
+  left: calc(50% - 145px);
+  top: calc(50% - 229.095px);
+  padding:0px 8px;
+  background:#fff;
+  border-radius:21px;
+  box-shadow: 0 10px 100px rgba(0, 0, 0, 0.3);
+}
+
+iframe{
+  border:noNe;
+  margin:0px;
+  border-radius:16px;
+}
+
+.margin{
+    margin:5px;
+}
+  
+.size{
+  width:320px;
+  height:458.19px;
+}
+
+.bg {
+  background-color: var(--background-light);
+  padding: 20px;
+  border-radius: 8px;
+  margin:0px;
+}
+.icon{
+  background-color: var(--element-dark);
+  color:var(--text-dark);
+  padding: 20px;
+  border-radius: 100px;
+}
+  
+.bgdark {
+  background-color: var(--background-dark);
+  padding: 20px;
+  border-radius: 8px;
+}
+  
+.icondark{
+  background-color: var(--element-light);
+  color:var(--text-light);
+  padding: 20px;
+  border-radius: 100px;
+}
+  
+
+.color-picker-container {
+  padding: 10px;
+  border-radius:100px;
+}
+
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius:100px;
+}
+
+.color-picker label {
+  margin-bottom: 5px;
+}
+
+.button-container {
+  padding-left: 10px;
+}
+
+button {
+  padding: 0px;
+  cursor: pointer;
+}
+  
+img:hover{
+  box-shadow: 0 0px 30px rgba(255, 255, 255, 0.3);
+}
+
+.window{
+  background:#000;
+  color:#fff;
+  }
+}
+
+p{
+  position: relative;
+  top: 15px;
+  left: 5px;
+  margin:0px 0px 0px 10px;
+}
