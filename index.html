@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+<script src="https://search3958.github.io/newtab/script.js" defer></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"　crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,11 +22,6 @@
   color:#000000d0;
 }
 .container:hover{color:#00000040;}
-  
-.background-on {
-  background-color: var(--element-dark);
-  border-radius:32px;
-}
   
 .box {
     width: 190px;
@@ -54,8 +50,6 @@ img{
   background:#ffffff;
   fill: #000000;
 }
-  
-img:hover{box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);}
 
 .txt-i{
   position: absolute;
@@ -68,12 +62,7 @@ img:hover{box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);}
   margin:0;
   font-size:25px;
 }
-a{
-  text-decoration: none;
-  margin:0px;
-  padding:0px;
-}
-
+  
 button{
   border:none;
   background:none;
@@ -118,92 +107,11 @@ input[type=search]{
   margin:16px 8px 8px 8px;
   font-size:20px;
 }
-
-@keyframes MyPopoverOpen {
-  from {
-    opacity: 0;
-    translate: 30px 0;
-  }
-  to {
-    opacity: 1;
-    translate: 0px 0;
-  }
-}
-
-#stopwatch::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-  animation: scaleIn 0.1s linear;
-}
-#calc::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-  animation: scaleIn 0.1s linear;
-}
-#timer::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-  animation: scaleIn 0.1s linear;
-}
-#color::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-  animation: scaleIn 0.1s linear;
-}
-
+  
 a{
   color:#000;
 }
-  
-input[type="color" i] {
-  width: 100px;
-  vertical-align: -3px;
-  border:none;
-  border-radius:4px;
-}
 
-@keyframes scaleIn {
-  from {
-    transform: scale(1);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-}
-
-.close:hover,
-.close:focus {
-  text-decoration: none;
-  cursor: pointer;
-  backgound-color:#ffffff;
-}
-.window{
-  position: fixed;
-  left: calc(50% - 145px);
-  top: calc(50% - 229.095px);
-  padding:0px 8px;
-  background:#fff;
-  border-radius:21px;
-  box-shadow: 0 10px 100px rgba(0, 0, 0, 0.3);
-}
-
-iframe{
-  border:noNe;
-  margin:0px;
-  border-radius:16px;
-}
-
-.margin{
-  margin:5px;
-}
 
 .header {
   background: #ffffff90;
@@ -247,74 +155,9 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
 }
-.size{
-  width:320px;
-  height:458.19px;
-}
 
-.bg {
-  background-color: var(--background-light);
-  padding: 20px;
-  border-radius: 8px;
-  margin:0px;
-}
-.icon{
-  background-color: var(--element-dark);
-  color:var(--text-dark);
-  padding: 20px;
-  border-radius: 100px;
-}
-  
-.bgdark {
-  background-color: var(--background-dark);
-  padding: 20px;
-  border-radius: 8px;
-}
-  
-.icondark{
-  background-color: var(--element-light);
-  color:var(--text-light);
-  padding: 20px;
-  border-radius: 100px;
-}
-  
+@media (prefers-color-scheme: dark) {body {background-color: var(--background-dark);}
 
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {body {background-color: var(--background-dark);}}
-
-/* Add color picker styling */
-.color-picker-container {
-  padding: 10px;
-  border-radius:100px;
-}
-
-.color-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-radius:100px;
-}
-
-.color-picker label {
-  margin-bottom: 5px;
-}
-
-.button-container {
-  padding-left: 10px;
-}
-
-button {
-  padding: 0px;
-  cursor: pointer;
-}
-  
-svg path {
-  filter: invert(0%) sepia(100%) saturate(14%) hue-rotate(273deg) brightness(99%) contrast(104%);
-}
-@media (prefers-color-scheme: dark) {
-svg path {
-  filter: invert(99%) sepia(29%) saturate(2%) hue-rotate(286deg) brightness(112%) contrast(101%);
-}
 .submit{
   background-color: var(--element-light);
   color: var(--text-light);
@@ -331,39 +174,20 @@ img{
   box-shadow: 0 0px 25px rgba(255, 255, 255, 0.1);
   background:#000000;
 }  
-img:hover{
-  box-shadow: 0 0px 30px rgba(255, 255, 255, 0.3);
-}
 
 input[type=search]{
   background:#303030;
   color:#fff;
 }
 
-.window{
-  background:#000;
-  color:#fff;
-  }
-}
 
-p{
-  position: relative;
-  top: 15px;
-  left: 5px;
-  margin:0px 0px 0px 10px;
-}
 }
     
 
 </style>
 <body>
   <header class="header"><div class="header-inner inner"><div class="search"><form id="cse-search-box" action="https://www.google.com/search"><input type="search" id="textBox" name="textBox"　autofocus></form><form method="get" action="https://www.google.co.jp/search" id="googleForm"><input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value=""　><input type="hidden" name="ie" value="UTF-8"><input type="hidden" name="oe" value="UTF-8"><input type="hidden" name="hl" value="ja"><button type="submit" name="btnG" value="Google 検索"><div class="submit"><span class="material-symbols-outlined">search</span></div></button></form></div><div id="clock"></div></div></header>
-  
-<!--template
-
-<div class="container"><div class="box"><a href="🔴URL"><img src=" https://search3958.github.io/newtab/🔴ImageURL.png"></a></div>🔴Name</div>
-
---><div class="link"></div><div class="link"></div><div class="link"></div><div class="link"></div> <div class="link"></div><div class="link"></div>
+  <div class="link"></div><div class="link"></div><div class="link"></div><div class="link"></div> <div class="link"></div><div class="link"></div>
   
 
 <div class="title">Google</div>
@@ -449,7 +273,7 @@ p{
 
 <div class="container"><div class="box"><a href="https://www.google.com/logos/2010/pacman10-i.html"><img src=" https://search3958.github.io/newtab/pacman.png"></a></div>PACMAN</div> 
 
-<div class="container"><div class="box"><a href="#"><img src=" https://search3958.github.io/newtab/gravity.png"></a></div>驥阪ｊ繧↑?￥???</div>
+<div class="container"><div class="box"><a href="#"><img src="https://search3958.github.io/newtab/gravity.png"></a></div>驥阪ｊ繧↑?￥???</div>
 
 </div></div>
 
@@ -461,30 +285,6 @@ p{
 </body>
 
 <script>
-      document.addEventListener('DOMContentLoaded', () => {
-    const containers = document.querySelectorAll('.container');
-
-    containers.forEach(container => {
-        const box = container.querySelector('.box');
-        
-        container.addEventListener('mousemove', (e) => {
-            const rect = box.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-
-            const rotateX = -y / 6;
-            const rotateY = x / 6;
-
-            box.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-
-        container.addEventListener('mouseleave', () => {
-            box.style.transform = 'rotateX(0) rotateY(0)';
-        });
-    });
-});
-
-
 document.addEventListener('DOMContentLoaded', (event) => {
     const textBox = document.getElementById('textBox');
     const googleInput = document.getElementById('googleInput');
@@ -504,194 +304,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
-function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const currentTime = `${hours}:${minutes}:${seconds}`;
-            document.getElementById('clock').textContent = currentTime;
-        }
-
-        setInterval(updateClock, 100);
-        updateClock(); // 初回実行してすぐに時刻を表示
-    
-    
-    
-    
-        // Function to lighten color for light mode
-        function lightenColor(color, amount) {
-            let r = parseInt(color.slice(1, 3), 16);
-            let g = parseInt(color.slice(3, 5), 16);
-            let b = parseInt(color.slice(5, 7), 16);
-
-            r = Math.min(255, Math.floor(r + (255 - r) * amount));
-            g = Math.min(255, Math.floor(g + (255 - g) * amount));
-            b = Math.min(255, Math.floor(b + (255 - b) * amount));
-
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
-
-        // Function to lighten color for light mode
-        function lightenColor(color, amount) {
-            let r = parseInt(color.slice(1, 3), 16);
-            let g = parseInt(color.slice(3, 5), 16);
-            let b = parseInt(color.slice(5, 7), 16);
-
-            r = Math.min(255, Math.floor(r + (255 - r) * amount));
-            g = Math.min(255, Math.floor(g + (255 - g) * amount));
-            b = Math.min(255, Math.floor(b + (255 - b) * amount));
-
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
-
-        // Function to darken color for dark mode
-        function darkenColor(color, amount) {
-            let r = parseInt(color.slice(1, 3), 16);
-            let g = parseInt(color.slice(3, 5), 16);
-            let b = parseInt(color.slice(5, 7), 16);
-
-            r = Math.max(0, Math.floor(r * (1 - amount)));
-            g = Math.max(0, Math.floor(g * (1 - amount)));
-            b = Math.max(0, Math.floor(b * (1 - amount)));
-
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
-
-      
-        // Function to lighten color for light mode
-        function lightenColor(color, amount) {
-            let r = parseInt(color.slice(1, 3), 16);
-            let g = parseInt(color.slice(3, 5), 16);
-            let b = parseInt(color.slice(5, 7), 16);
-
-            r = Math.min(255, Math.floor(r + (255 - r) * amount));
-            g = Math.min(255, Math.floor(g + (255 - g) * amount));
-            b = Math.min(255, Math.floor(b + (255 - b) * amount));
-
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
-
-        // Function to darken color for dark mode
-        function darkenColor(color, amount) {
-            let r = parseInt(color.slice(1, 3), 16);
-            let g = parseInt(color.slice(3, 5), 16);
-            let b = parseInt(color.slice(5, 7), 16);
-
-            r = Math.max(0, Math.floor(r * (1 - amount)));
-            g = Math.max(0, Math.floor(g * (1 - amount)));
-            b = Math.max(0, Math.floor(b * (1 - amount)));
-
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
-
-        // Function to update CSS variables based on base color
-        function updateColors() {
-            const baseColor = document.getElementById('base-color').value;
-
-            // Light mode colors based on the base color
-            const lightBackground = lightenColor(baseColor, 0.8); // Make it closer to white
-            const lightElement = lightenColor(baseColor, 0.5);
-            const lightTextColor = darkenColor(baseColor, 0.8); // Darker text for contrast
-
-            // Dark mode colors based on the base color
-            const darkBackground = darkenColor(baseColor, 0.9); // Make it closer to black
-            const darkElement = darkenColor(baseColor, 0.4);
-            const darkTextColor = lightenColor(baseColor, 0.9); // White text for dark mode
-
-            document.documentElement.style.setProperty('--background-light', lightBackground);
-            document.documentElement.style.setProperty('--element-light', lightElement);
-            document.documentElement.style.setProperty('--text-light', lightTextColor);
-            document.documentElement.style.setProperty('--background-dark', darkBackground);
-            document.documentElement.style.setProperty('--element-dark', darkElement);
-            document.documentElement.style.setProperty('--text-dark', darkTextColor);
-
-            // Save the base color and theme state to localStorage
-            localStorage.setItem('baseColor', baseColor);
-            localStorage.setItem('themeDisabled', 'false');
-        }
-
-        // Function to apply default colors for disabling Material 3
-        function applyDefaultColors() {
-            document.documentElement.style.setProperty('--background-light', '#f0f0f0');
-            document.documentElement.style.setProperty('--element-light', '#185af2');
-            document.documentElement.style.setProperty('--background-dark', '#000000');
-            document.documentElement.style.setProperty('--element-dark', '#185af2');
-            document.documentElement.style.setProperty('--text-light', '#ffffff');
-            document.documentElement.style.setProperty('--text-dark', '#ffffff');
-
-            // Save the theme disabled state to localStorage
-            localStorage.setItem('themeDisabled', 'true');
-        }
-
-        // Load saved color settings from localStorage
-        function loadColors() {
-            const savedColor = localStorage.getItem('baseColor');
-            const themeDisabled = localStorage.getItem('themeDisabled');
-
-            if (themeDisabled === 'true') {
-                // Apply default colors if Material 3 is disabled
-                applyDefaultColors();
-            } else {
-                if (savedColor) {
-                    document.getElementById('base-color').value = savedColor;
-                    updateColors();
-                } else {
-                    // Initialize with default color (Material 3 disabled state)
-                    applyDefaultColors();
-                }
-            }
-        }
-
-        // Event listener for the base color picker
-        document.getElementById('base-color').addEventListener('input', updateColors);
-
-        // Event listener for the "Material 3を無効" button
-        document.getElementById('disable-material3').addEventListener('click', applyDefaultColors);
-
-        // Load colors and theme state on page load
-        loadColors();
-      
- // スイッチの状態を保存する関数
-        function saveSwitchState(isChecked) {
-            localStorage.setItem('switchState', isChecked ? 'on' : 'off');
-        }
-
-        // スイッチの状態に応じて画像のスタイルを変更する関数
-        function toggleImages() {
-            const switchControl = document.getElementById('switch');
-            const images = document.querySelectorAll('img');
-
-            images.forEach(img => {
-                const src = img.src;
-                if (switchControl.checked) {
-                    img.src = src.replace('.png', '.svg'); // pngからsvgに切り替え
-                    img.classList.add('background-on'); // 背景色を変更
-                } else {
-                    img.src = src.replace('.svg', '.png'); // svgからpngに戻す
-                    img.classList.remove('background-on'); // 背景色を元に戻す
-                }
-            });
-
-            saveSwitchState(switchControl.checked); // 状態を保存
-        }
-
-        // ページ読み込み時にスイッチの状態を復元する
-        function restoreSwitchState() {
-            const savedState = localStorage.getItem('switchState');
-            const switchControl = document.getElementById('switch');
-            if (savedState === 'on') {
-                switchControl.checked = true;
-            } else {
-                switchControl.checked = false;
-            }
-            toggleImages(); // 保存された状態に応じて画像を切り替える
-        }
-
-        document.getElementById('switch').addEventListener('change', toggleImages);
-
-        // ページが読み込まれたときに状態を復元
-        window.addEventListener('load', restoreSwitchState);
     </script>
+
+<link rel="stylesheet" href="https://search3958.github.io/newtab/style.css">
 </body>
 </html>
