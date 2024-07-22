@@ -85,7 +85,7 @@ input[type="color" i] {
 }
 
 iframe{
-  border:noNe;
+  border:none;
   margin:0px;
   border-radius:16px;
 }
@@ -155,7 +155,8 @@ img:hover{
   box-shadow: 0 0px 30px rgba(255, 255, 255, 0.3);
 }
 
-.window{
+@media (prefers-color-scheme: dark) {
+  .window{
   background:#000;
   color:#fff;
   }
