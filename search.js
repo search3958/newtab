@@ -1,3 +1,13 @@
+document.addEventListener("DOMContentLoaded", function() {
+  const containers = document.querySelectorAll('.container');
+  
+  containers.forEach((container, index) => {
+    setTimeout(() => {
+      container.classList.add('show');
+    }, index * 50); // 0.05秒ごとに次の要素を表示
+  });
+});
+
 function changeLanguage(select) {
   const locale = select.value;
   MachML.setLocale(locale);
