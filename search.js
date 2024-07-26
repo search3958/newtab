@@ -1,3 +1,8 @@
+function changeLanguage(select) {
+  const locale = select.value;
+  MachML.setLocale(locale);
+}
+
 document.addEventListener('DOMContentLoaded', (event) => {
     const textBox = document.getElementById('textBox');
     const googleInput = document.getElementById('googleInput');
