@@ -116,7 +116,7 @@ function updateClock() {
             // Dark mode colors based on the base color
             const darkBackground = darkenColor(baseColor, 0.9); // Make it closer to black
             const darkElement = darkenColor(baseColor, 0.4);
-            const darkTextColor = darkenColor(baseColor, 0.6); // White text for dark mode
+            const darkTextColor = darkenColor(baseColor, 0.7); // White text for dark mode
 
             document.documentElement.style.setProperty('--background-light', lightBackground);
             document.documentElement.style.setProperty('--element-light', lightElement);
