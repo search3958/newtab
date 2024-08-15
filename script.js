@@ -111,12 +111,12 @@ function updateClock() {
             // Light mode colors based on the base color
             const lightBackground = lightenColor(baseColor, 0.8); // Make it closer to white
             const lightElement = lightenColor(baseColor, 0.5);
-            const lightTextColor = darkenColor(baseColor, 0.8); // Darker text for contrast
+            const lightTextColor = lightenColor(baseColor, 0.7); // Darker text for contrast
 
             // Dark mode colors based on the base color
             const darkBackground = darkenColor(baseColor, 0.9); // Make it closer to black
             const darkElement = darkenColor(baseColor, 0.4);
-            const darkTextColor = lightenColor(baseColor, 0.9); // White text for dark mode
+            const darkTextColor = darkenColor(baseColor, 0.8); // White text for dark mode
 
             document.documentElement.style.setProperty('--background-light', lightBackground);
             document.documentElement.style.setProperty('--element-light', lightElement);
