@@ -215,6 +215,10 @@ class CustomBox extends HTMLElement {
     constructor() {
         super();
     }
+class CustomBox extends HTMLElement {
+    constructor() {
+        super();
+    }
 
     connectedCallback() {
         const container = document.createElement('div');
