@@ -137,7 +137,7 @@ function updateClock() {
             document.documentElement.style.setProperty('--background-dark', '#000000');
             document.documentElement.style.setProperty('--element-dark', '#185af2');
             document.documentElement.style.setProperty('--text-light', '#ffffff');
-            document.documentElement.style.setProperty('--text-dark', '#ffffff');
+            document.documentElement.style.setProperty('--text-dark', '#1c1c1c');
 
             // Save the theme disabled state to localStorage
             localStorage.setItem('themeDisabled', 'true');
