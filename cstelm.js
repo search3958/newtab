@@ -1,5 +1,3 @@
-
-<script>
 class CustomBox extends HTMLElement {
     constructor() {
         super();
@@ -36,5 +34,3 @@ class CustomBox extends HTMLElement {
 
 // カスタム要素を定義
 customElements.define('custom-box', CustomBox);
-
-</script>
