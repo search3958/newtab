@@ -67,7 +67,10 @@ function darkenColor(color, amount) {
 
 // Function to update CSS variables based on base color
 function updateColors() {
-    const baseColor = document.getElementById('base-color').value;
+    let baseColor = document.getElementById('base-color').value;
+    if (!baseColor) {
+        baseColor = '#2196f3'; // Default color if no baseColor is specified
+    }
 
     // Light mode colors based on the base color
     const lightBackground = lightenColor(baseColor, 0.8);
@@ -128,6 +131,7 @@ document.getElementById('disable-material3').addEventListener('click', applyDefa
 
 // Load colors and theme state on page load
 loadColors();
+
 
       
  // スイッチの状態を保存する関数
