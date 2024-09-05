@@ -67,10 +67,7 @@ function darkenColor(color, amount) {
 
 // Function to update CSS variables based on base color
 function updateColors() {
-    let baseColor = document.getElementById('base-color').value;
-    if (!baseColor) {
-        baseColor = '#2196f3'; // Default color if no baseColor is specified
-    }
+    const baseColor = document.getElementById('base-color').value;
 
     // Light mode colors based on the base color
     const lightBackground = lightenColor(baseColor, 0.8);
@@ -114,12 +111,9 @@ function loadColors() {
     if (themeDisabled === 'true') {
         applyDefaultColors();
     } else {
-        if (savedColor) {
-            document.getElementById('base-color').value = savedColor;
-            updateColors();
-        } else {
-            applyDefaultColors();
-        }
+        let baseColor = savedColor || '#2196f3'; // Default color
+        document.getElementById('base-color').value = baseColor;
+        updateColors();
     }
 }
 
@@ -131,6 +125,7 @@ document.getElementById('disable-material3').addEventListener('click', applyDefa
 
 // Load colors and theme state on page load
 loadColors();
+
 
 
       
