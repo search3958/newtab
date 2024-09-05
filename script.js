@@ -88,6 +88,9 @@ function updateColors() {
 
     // Save the base color to localStorage to share across pages
     localStorage.setItem('baseColor', baseColor);
+
+    // Trigger the "disable-material3" button click event programmatically
+    document.getElementById('disable-material3').click();
 }
 
 // Function to apply default colors for disabling Material 3
@@ -125,6 +128,7 @@ document.getElementById('disable-material3').addEventListener('click', applyDefa
 
 // Load colors and theme state on page load
 loadColors();
+
 
 
 
