@@ -115,9 +115,6 @@ function loadColors() {
             document.getElementById('base-color').value = savedColor;
             updateColors();
         } else {
-            // Set baseColor to #2196f3 and apply default colors
-            document.getElementById('base-color').value = '#2196f3';
-            updateColors();
             applyDefaultColors();
         }
     }
@@ -131,10 +128,6 @@ document.getElementById('disable-material3').addEventListener('click', applyDefa
 
 // Load colors and theme state on page load
 loadColors();
-
-
-
-
 
       
  // スイッチの状態を保存する関数
