@@ -39,96 +39,137 @@ function updateClock() {
     
     
         // Function to lighten color for light mode
-// Function to lighten color for light mode
-function lightenColor(color, amount) {
-    let r = parseInt(color.slice(1, 3), 16);
-    let g = parseInt(color.slice(3, 5), 16);
-    let b = parseInt(color.slice(5, 7), 16);
+        function lightenColor(color, amount) {
+            let r = parseInt(color.slice(1, 3), 16);
+            let g = parseInt(color.slice(3, 5), 16);
+            let b = parseInt(color.slice(5, 7), 16);
 
-    r = Math.min(255, Math.floor(r + (255 - r) * amount));
-    g = Math.min(255, Math.floor(g + (255 - g) * amount));
-    b = Math.min(255, Math.floor(b + (255 - b) * amount));
+            r = Math.min(255, Math.floor(r + (255 - r) * amount));
+            g = Math.min(255, Math.floor(g + (255 - g) * amount));
+            b = Math.min(255, Math.floor(b + (255 - b) * amount));
 
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
-
-// Function to darken color for dark mode
-function darkenColor(color, amount) {
-    let r = parseInt(color.slice(1, 3), 16);
-    let g = parseInt(color.slice(3, 5), 16);
-    let b = parseInt(color.slice(5, 7), 16);
-
-    r = Math.max(0, Math.floor(r * (1 - amount)));
-    g = Math.max(0, Math.floor(g * (1 - amount)));
-    b = Math.max(0, Math.floor(b * (1 - amount)));
-
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
-
-// Function to update CSS variables based on base color
-function updateColors() {
-    const baseColor = document.getElementById('base-color').value;
-
-    // Light mode colors based on the base color
-    const lightBackground = lightenColor(baseColor, 0.8);
-    const lightElement = lightenColor(baseColor, 0.5);
-    const lightTextColor = lightenColor(baseColor, 0.7);
-
-    // Dark mode colors based on the base color
-    const darkBackground = darkenColor(baseColor, 0.9);
-    const darkElement = darkenColor(baseColor, 0.4);
-    const darkTextColor = darkenColor(baseColor, 0.7);
-
-    document.documentElement.style.setProperty('--background-light', lightBackground);
-    document.documentElement.style.setProperty('--element-light', lightElement);
-    document.documentElement.style.setProperty('--text-light', lightTextColor);
-    document.documentElement.style.setProperty('--background-dark', darkBackground);
-    document.documentElement.style.setProperty('--element-dark', darkElement);
-    document.documentElement.style.setProperty('--text-dark', darkTextColor);
-
-    // Save the base color to localStorage to share across pages
-    localStorage.setItem('baseColor', baseColor);
-}
-
-// Function to apply default colors for disabling Material 3
-function applyDefaultColors() {
-    document.documentElement.style.setProperty('--background-light', '#f0f0f0');
-    document.documentElement.style.setProperty('--element-light', '#185af2');
-    document.documentElement.style.setProperty('--background-dark', '#000000');
-    document.documentElement.style.setProperty('--element-dark', '#185af2');
-    document.documentElement.style.setProperty('--text-light', '#ffffff');
-    document.documentElement.style.setProperty('--text-dark', '#1c1c1c');
-
-    // Save the theme disabled state to localStorage
-    localStorage.setItem('themeDisabled', 'true');
-}
-
-// Load saved color settings from localStorage and share across pages
-function loadColors() {
-    const savedColor = localStorage.getItem('baseColor');
-    const themeDisabled = localStorage.getItem('themeDisabled');
-
-    if (themeDisabled === 'true') {
-        applyDefaultColors();
-    } else {
-        if (savedColor) {
-            document.getElementById('base-color').value = savedColor;
-            updateColors();
-        } else {
-            applyDefaultColors();
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
-    }
-}
 
-// Event listener for the base color picker
-document.getElementById('base-color').addEventListener('input', updateColors);
+        // Function to lighten color for light mode
+        function lightenColor(color, amount) {
+            let r = parseInt(color.slice(1, 3), 16);
+            let g = parseInt(color.slice(3, 5), 16);
+            let b = parseInt(color.slice(5, 7), 16);
 
-// Event listener for the "Material 3を無効" button
-document.getElementById('disable-material3').addEventListener('click', applyDefaultColors);
+            r = Math.min(255, Math.floor(r + (255 - r) * amount));
+            g = Math.min(255, Math.floor(g + (255 - g) * amount));
+            b = Math.min(255, Math.floor(b + (255 - b) * amount));
 
-// Load colors and theme state on page load
-loadColors();
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
 
+        // Function to darken color for dark mode
+        function darkenColor(color, amount) {
+            let r = parseInt(color.slice(1, 3), 16);
+            let g = parseInt(color.slice(3, 5), 16);
+            let b = parseInt(color.slice(5, 7), 16);
+
+            r = Math.max(0, Math.floor(r * (1 - amount)));
+            g = Math.max(0, Math.floor(g * (1 - amount)));
+            b = Math.max(0, Math.floor(b * (1 - amount)));
+
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+      
+        // Function to lighten color for light mode
+        function lightenColor(color, amount) {
+            let r = parseInt(color.slice(1, 3), 16);
+            let g = parseInt(color.slice(3, 5), 16);
+            let b = parseInt(color.slice(5, 7), 16);
+
+            r = Math.min(255, Math.floor(r + (255 - r) * amount));
+            g = Math.min(255, Math.floor(g + (255 - g) * amount));
+            b = Math.min(255, Math.floor(b + (255 - b) * amount));
+
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        // Function to darken color for dark mode
+        function darkenColor(color, amount) {
+            let r = parseInt(color.slice(1, 3), 16);
+            let g = parseInt(color.slice(3, 5), 16);
+            let b = parseInt(color.slice(5, 7), 16);
+
+            r = Math.max(0, Math.floor(r * (1 - amount)));
+            g = Math.max(0, Math.floor(g * (1 - amount)));
+            b = Math.max(0, Math.floor(b * (1 - amount)));
+
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        // Function to update CSS variables based on base color
+        function updateColors() {
+            const baseColor = document.getElementById('base-color').value;
+
+            // Light mode colors based on the base color
+            const lightBackground = lightenColor(baseColor, 0.8); // Make it closer to white
+            const lightElement = lightenColor(baseColor, 0.5);
+            const lightTextColor = lightenColor(baseColor, 0.7); // Darker text for contrast
+
+            // Dark mode colors based on the base color
+            const darkBackground = darkenColor(baseColor, 0.9); // Make it closer to black
+            const darkElement = darkenColor(baseColor, 0.4);
+            const darkTextColor = darkenColor(baseColor, 0.7); // White text for dark mode
+
+            document.documentElement.style.setProperty('--background-light', lightBackground);
+            document.documentElement.style.setProperty('--element-light', lightElement);
+            document.documentElement.style.setProperty('--text-light', lightTextColor);
+            document.documentElement.style.setProperty('--background-dark', darkBackground);
+            document.documentElement.style.setProperty('--element-dark', darkElement);
+            document.documentElement.style.setProperty('--text-dark', darkTextColor);
+
+            // Save the base color and theme state to localStorage
+            localStorage.setItem('baseColor', baseColor);
+            localStorage.setItem('themeDisabled', 'false');
+        }
+
+        // Function to apply default colors for disabling Material 3
+        function applyDefaultColors() {
+            document.documentElement.style.setProperty('--background-light', '#f0f0f0');
+            document.documentElement.style.setProperty('--element-light', '#185af2');
+            document.documentElement.style.setProperty('--background-dark', '#000000');
+            document.documentElement.style.setProperty('--element-dark', '#185af2');
+            document.documentElement.style.setProperty('--text-light', '#ffffff');
+            document.documentElement.style.setProperty('--text-dark', '#1c1c1c');
+
+            // Save the theme disabled state to localStorage
+            localStorage.setItem('themeDisabled', 'true');
+        }
+
+        // Load saved color settings from localStorage
+        function loadColors() {
+            const savedColor = localStorage.getItem('baseColor');
+            const themeDisabled = localStorage.getItem('themeDisabled');
+
+            if (themeDisabled === 'true') {
+                // Apply default colors if Material 3 is disabled
+                applyDefaultColors();
+            } else {
+                if (savedColor) {
+                    document.getElementById('base-color').value = savedColor;
+                    updateColors();
+                } else {
+                    // Initialize with default color (Material 3 disabled state)
+                    applyDefaultColors();
+                }
+            }
+        }
+
+        // Event listener for the base color picker
+        document.getElementById('base-color').addEventListener('input', updateColors);
+
+        // Event listener for the "Material 3を無効" button
+        document.getElementById('disable-material3').addEventListener('click', applyDefaultColors);
+
+        // Load colors and theme state on page load
+        loadColors();
       
  // スイッチの状態を保存する関数
         function saveSwitchState(isChecked) {
