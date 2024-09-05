@@ -40,6 +40,7 @@ function updateClock() {
     
         // Function to lighten color for light mode
 // Function to lighten color for light mode
+
 function lightenColor(color, amount) {
     let r = parseInt(color.slice(1, 3), 16);
     let g = parseInt(color.slice(3, 5), 16);
@@ -88,9 +89,6 @@ function updateColors() {
 
     // Save the base color to localStorage to share across pages
     localStorage.setItem('baseColor', baseColor);
-
-    // Trigger the "disable-material3" button click event programmatically
-    document.getElementById('disable-material3').click();
 }
 
 // Function to apply default colors for disabling Material 3
@@ -117,6 +115,11 @@ function loadColors() {
         let baseColor = savedColor || '#2196f3'; // Default color
         document.getElementById('base-color').value = baseColor;
         updateColors();
+        
+        // Execute "disable-material3" only on the initial load
+        if (!savedColor) {
+            document.getElementById('disable-material3').click();
+        }
     }
 }
 
