@@ -98,13 +98,29 @@ function applyDefaultColors() {
     localStorage.setItem('themeDisabled', 'true');
 }
 
+// Function to check if current CSS variables match default values
+function isDefaultColors() {
+    const defaultColors = {
+        '--background-light': '#ffffff',
+        '--background-dark': '#000000',
+        '--element-light': '#185af2',
+        '--element-dark': '#185af2',
+        '--text-light': '#ffffff',
+        '--text-dark': '#1c1c1c'
+    };
+
+    return Object.keys(defaultColors).every(key => {
+        return getComputedStyle(document.documentElement).getPropertyValue(key).trim() === defaultColors[key];
+    });
+}
+
 // Load saved color settings from localStorage
 function loadColors() {
     const savedColor = localStorage.getItem('baseColor');
     const themeDisabled = localStorage.getItem('themeDisabled');
 
-    if (!savedColor) {
-        // If baseColor is not found, apply default colors (only on first load)
+    if (!savedColor || isDefaultColors()) {
+        // If baseColor is not found or CSS variables are at default values, apply default colors (only on first load)
         applyDefaultColors();
     } else {
         if (themeDisabled === 'true') {
