@@ -37,7 +37,7 @@ function updateClock() {
     
     
     
-    
+    // Function to lighten color
 function lightenColor(color, amount) {
     let r = parseInt(color.slice(1, 3), 16);
     let g = parseInt(color.slice(3, 5), 16);
@@ -47,10 +47,10 @@ function lightenColor(color, amount) {
     g = Math.min(255, Math.floor(g + (255 - g) * amount));
     b = Math.min(255, Math.floor(b + (255 - b) * amount));
 
-    return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-// Function to darken color for dark mode
+// Function to darken color
 function darkenColor(color, amount) {
     let r = parseInt(color.slice(1, 3), 16);
     let g = parseInt(color.slice(3, 5), 16);
@@ -60,7 +60,7 @@ function darkenColor(color, amount) {
     g = Math.max(0, Math.floor(g * (1 - amount)));
     b = Math.max(0, Math.floor(b * (1 - amount)));
 
-    return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
 // Function to update CSS variables based on base color
@@ -118,6 +118,12 @@ function loadColors() {
     }
 }
 
+// Function to set base color from external sources and update the color picker
+function setBaseColor(color) {
+    document.getElementById('base-color').value = color;  // Update the color picker's value
+    updateColors();
+}
+
 // Event listener for the base color picker
 document.getElementById('base-color').addEventListener('input', updateColors);
 
@@ -126,6 +132,9 @@ document.getElementById('disable-material3').addEventListener('click', applyDefa
 
 // Load colors and theme state on page load
 loadColors();
+
+
+
       
  // スイッチの状態を保存する関数
         function saveSwitchState(isChecked) {
