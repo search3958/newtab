@@ -33,7 +33,7 @@ function updateClock() {
 setInterval(updateClock, 100);
 updateClock(); // 初回実行してすぐに時刻を表示
 
-// Color manipulation functions
+// Function to lighten color
 function lightenColor(color, amount) {
     let r = parseInt(color.slice(1, 3), 16);
     let g = parseInt(color.slice(3, 5), 16);
@@ -46,6 +46,7 @@ function lightenColor(color, amount) {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
+// Function to darken color
 function darkenColor(color, amount) {
     let r = parseInt(color.slice(1, 3), 16);
     let g = parseInt(color.slice(3, 5), 16);
@@ -62,32 +63,75 @@ function darkenColor(color, amount) {
 function updateColors() {
     const baseColor = document.getElementById('base-color').value;
 
-    const lightBackground = lightenColor(baseColor, 0.8); // Lighter color for background
+    // Light mode colors based on the base color
+    const lightBackground = lightenColor(baseColor, 0.8); // Make it closer to white
     const lightElement = lightenColor(baseColor, 0.5);
-    const darkBackground = darkenColor(baseColor, 0.9); // Darker color for background
+    const lightTextColor = lightenColor(baseColor, 0.7); // Darker text for contrast
+
+    // Dark mode colors based on the base color
+    const darkBackground = darkenColor(baseColor, 0.9); // Make it closer to black
     const darkElement = darkenColor(baseColor, 0.4);
+    const darkTextColor = darkenColor(baseColor, 0.7); // White text for dark mode
 
     document.documentElement.style.setProperty('--background-light', lightBackground);
     document.documentElement.style.setProperty('--element-light', lightElement);
+    document.documentElement.style.setProperty('--text-light', lightTextColor);
     document.documentElement.style.setProperty('--background-dark', darkBackground);
     document.documentElement.style.setProperty('--element-dark', darkElement);
+    document.documentElement.style.setProperty('--text-dark', darkTextColor);
 
+    // Save the base color and theme state to localStorage
     localStorage.setItem('baseColor', baseColor);
+    localStorage.setItem('themeDisabled', 'false');
 }
 
-// Apply default base color if not already saved
-function applyDefaultBaseColor() {
+// Function to apply default colors for disabling Material 3
+function applyDefaultColors() {
+    document.documentElement.style.setProperty('--background-light', '#f0f0f0');
+    document.documentElement.style.setProperty('--element-light', '#185af2');
+    document.documentElement.style.setProperty('--background-dark', '#000000');
+    document.documentElement.style.setProperty('--element-dark', '#185af2');
+    document.documentElement.style.setProperty('--text-light', '#ffffff');
+    document.documentElement.style.setProperty('--text-dark', '#1c1c1c');
+
+    // Save the theme disabled state to localStorage
+    localStorage.setItem('themeDisabled', 'true');
+}
+
+// Load saved color settings from localStorage
+function loadColors() {
     const savedColor = localStorage.getItem('baseColor');
+    const themeDisabled = localStorage.getItem('themeDisabled');
+
     if (!savedColor) {
-        const defaultColor = '#2196f3'; // Set baseColor to #2196f3
-        document.getElementById('base-color').value = defaultColor;
-        updateColors();
-        document.getElementById('switch').checked = true; // Trigger switch action
-        toggleImages(); // Execute switch action
+        // If baseColor is not found, apply default colors (only on first load)
+        applyDefaultColors();
+    } else {
+        if (themeDisabled === 'true') {
+            // Apply default colors if Material 3 is disabled
+            applyDefaultColors();
+        } else {
+            document.getElementById('base-color').value = savedColor;
+            updateColors();
+        }
     }
 }
 
-// Function to toggle image formats based on switch state
+// Event listener for the base color picker
+document.getElementById('base-color').addEventListener('input', updateColors);
+
+// Event listener for the "Material 3を無効" button
+document.getElementById('disable-material3').addEventListener('click', applyDefaultColors);
+
+// Load colors and theme state on page load
+loadColors();
+
+// Function to save switch state
+function saveSwitchState(isChecked) {
+    localStorage.setItem('switchState', isChecked ? 'on' : 'off');
+}
+
+// Function to toggle images based on switch state
 function toggleImages() {
     const switchControl = document.getElementById('switch');
     const images = document.querySelectorAll('img');
@@ -95,16 +139,18 @@ function toggleImages() {
     images.forEach(img => {
         const src = img.src;
         if (switchControl.checked) {
-            img.src = src.replace('.png', '.svg'); // Switch from PNG to SVG
+            img.src = src.replace('.png', '.svg'); // pngからsvgに切り替え
+            img.classList.add('background-on'); // 背景色を変更
         } else {
-            img.src = src.replace('.svg', '.png'); // Switch from SVG back to PNG
+            img.src = src.replace('.svg', '.png'); // svgからpngに戻す
+            img.classList.remove('background-on'); // 背景色を元に戻す
         }
     });
 
-    localStorage.setItem('switchState', switchControl.checked ? 'on' : 'off');
+    saveSwitchState(switchControl.checked); // 状態を保存
 }
 
-// Restore switch state from localStorage
+// Function to restore switch state on page load
 function restoreSwitchState() {
     const savedState = localStorage.getItem('switchState');
     const switchControl = document.getElementById('switch');
@@ -113,13 +159,10 @@ function restoreSwitchState() {
     } else {
         switchControl.checked = false;
     }
-    toggleImages();
+    toggleImages(); // 保存された状態に応じて画像を切り替える
 }
 
-document.getElementById('base-color').addEventListener('input', updateColors);
 document.getElementById('switch').addEventListener('change', toggleImages);
 
-window.addEventListener('load', () => {
-    restoreSwitchState();
-    applyDefaultBaseColor(); // Apply baseColor if not saved
-});
+// Page load event to restore switch state
+window.addEventListener('load', restoreSwitchState);
