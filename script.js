@@ -75,7 +75,50 @@ function updateClock() {
             b = Math.max(0, Math.floor(b * (1 - amount)));
 
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
+
+
 
       
         // Function to lighten color for light mode
