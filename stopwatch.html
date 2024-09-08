@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ストップウォッチ</title>
     <style>
-            :root{
+      :root{
             --background-light: #ffffff;
     --background-dark: #000000;
     --element-light: #185af2;
@@ -27,7 +27,8 @@
   font-optical-sizing: auto;
   font-weight: <weight>;
   font-style: normal;
-          background:var(--background-light);
+          margin:0px;
+          background-color:var(--background-light)
         }
         .container {
             text-align: center;
@@ -57,14 +58,14 @@
         border-radius:100px;
       }
       .stop{
-        background:#eee;
-        color:#000;
+        background:var(--text-light);
+        color:var(--element-dark);
         padding:10px;
         border-radius:100px;
       }
       .reset{
         background:var(--text-light);
-        color:#000;
+        color:var(--element-dark);
         padding:14.5px;
         border-radius:100px;
         transform: translate(0px,-2.5px)
@@ -72,26 +73,89 @@
       
       @media (prefers-color-scheme: dark) {
         body{
-          background:var(--background-dark);
-        }
-        .start{
-          background:var(--element-light);
-          color:#000;
+          background:#000;
         }
         .time{
           color:#fff;
         } 
+        .start{
+          background:var(--element-light);
+        color:var(--background-dark);
+        }
         .reset,.stop{
           background:var(--text-dark);
-          color:var(--element-light);
+        color:var(--element-light);
         }
         
         
         
       }
     </style>
-  <script>
-        function addToDisplay(value) {
+  
+</head>
+<body>
+    <div class="container">
+        <div class="time" id="display">00:00:00</div>
+        <div class="buttons">
+            <button id="startPause">
+              <div class="start">
+                <span class="material-symbols-rounded">play_arrow</span>
+                開始
+                </div>
+            </button>
+            <button id="reset"><div class="reset"><span class="material-symbols-rounded">
+restart_alt
+</span></div></button>
+        </div>
+    </div>
+
+
+    <script>
+        let startPauseButton = document.getElementById('startPause');
+        let resetButton = document.getElementById('reset');
+        let display = document.getElementById('display');
+
+        let timer;
+        let startTime;
+        let elapsedTime = 0;
+        let isRunning = false;
+
+        function updateTime() {
+            const now = Date.now();
+            const time = new Date(now - startTime + elapsedTime);
+
+            const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(time.getUTCSeconds()).padStart(2, '0');
+            const milliseconds = String(Math.floor(time.getUTCMilliseconds() / 10)).padStart(2, '0');
+
+            display.textContent = `${minutes}:${seconds}:${milliseconds}`;
+        }
+
+        function startPause() {
+            if (isRunning) {
+                clearInterval(timer);
+                elapsedTime += Date.now() - startTime;
+                startPauseButton.innerHTML = '              <div class="start"><span class="material-symbols-rounded">play_arrow</span>開始</div>';
+            } else {
+                startTime = Date.now();
+                timer = setInterval(updateTime, 10);
+                startPauseButton.innerHTML = '<div class="stop"><span class="material-symbols-rounded">pause</span>一時停止</div>';
+            }
+            isRunning = !isRunning;
+        }
+
+        function reset() {
+            clearInterval(timer);
+            elapsedTime = 0;
+            isRunning = false;
+            display.textContent = '00:00:00';
+            startPauseButton.innerHTML = '<div class="start"><span class="material-symbols-rounded">play_arrow</span>開始</div>';
+        }
+
+        startPauseButton.addEventListener('click', startPause);
+        resetButton.addEventListener('click', reset);
+      
+      function addToDisplay(value) {
         document.getElementById('display').value += value;
     }
 
@@ -162,69 +226,6 @@ function darkenColor(color, amount) {
 
 // Apply the stored base color when the page loads
 window.addEventListener('DOMContentLoaded', applyStoredColor);
-  </script>
-</head>
-<body>
-    <div class="container">
-        <div class="time" id="display">00:00:00</div>
-        <div class="buttons">
-            <button id="startPause">
-              <div class="start">
-                <span class="material-symbols-rounded">play_arrow</span>
-                開始
-                </div>
-            </button>
-            <button id="reset"><div class="reset"><span class="material-symbols-rounded">
-restart_alt
-</span></div></button>
-        </div>
-    </div>
-
-
-    <script>
-        let startPauseButton = document.getElementById('startPause');
-        let resetButton = document.getElementById('reset');
-        let display = document.getElementById('display');
-
-        let timer;
-        let startTime;
-        let elapsedTime = 0;
-        let isRunning = false;
-
-        function updateTime() {
-            const now = Date.now();
-            const time = new Date(now - startTime + elapsedTime);
-
-            const minutes = String(time.getUTCMinutes()).padStart(2, '0');
-            const seconds = String(time.getUTCSeconds()).padStart(2, '0');
-            const milliseconds = String(Math.floor(time.getUTCMilliseconds() / 10)).padStart(2, '0');
-
-            display.textContent = `${minutes}:${seconds}:${milliseconds}`;
-        }
-
-        function startPause() {
-            if (isRunning) {
-                clearInterval(timer);
-                elapsedTime += Date.now() - startTime;
-                startPauseButton.innerHTML = '              <div class="start"><span class="material-symbols-rounded">play_arrow</span>開始</div>';
-            } else {
-                startTime = Date.now();
-                timer = setInterval(updateTime, 10);
-                startPauseButton.innerHTML = '<div class="stop"><span class="material-symbols-rounded">pause</span>一時停止</div>';
-            }
-            isRunning = !isRunning;
-        }
-
-        function reset() {
-            clearInterval(timer);
-            elapsedTime = 0;
-            isRunning = false;
-            display.textContent = '00:00:00';
-            startPauseButton.innerHTML = '<div class="start"><span class="material-symbols-rounded">play_arrow</span>開始</div>';
-        }
-
-        startPauseButton.addEventListener('click', startPause);
-        resetButton.addEventListener('click', reset);
     </script>
 </body>
 
