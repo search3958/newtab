@@ -7,49 +7,47 @@
   font-weight: 400;
   font-style: normal;
   }
-         body {
-            background-color: var(--background-color, #ffffff);
-            color: var(--text-color, #000000);
-            transition: background-color 0.3s, color 0.3s;
+        body {
+            background: #fff;
+            color: #000;
+            transition: background 0.3s, color 0.3s; /* スムーズな切り替え効果 */
         }
 
-        .dark-mode {
-            --background-color: #333333;
-            --text-color: #ffffff;
+        /* チェックボックスがオンの時に適用されるスタイル */
+        input[type="checkbox"]:checked ~ body {
+            background: #000;
+            color: #fff;
         }
 
-        .light-mode {
-            --background-color: #ffffff;
-            --text-color: #000000;
-        }
-
-        #darkModeToggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+        /* チェックボックス自体のスタイル（画面上に見えなくする） */
+        .toggle {
+            display: none;
         }
 </style>
 <script>
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const body = document.body;
-
-        darkModeToggle.addEventListener('change', () => {
-            if (darkModeToggle.checked) {
-                body.classList.add('dark-mode');
-                body.classList.remove('light-mode');
+        // チェックボックスの状態に応じてbodyのスタイルを切り替える関数
+        function toggleTheme() {
+            const checkbox = document.getElementById('themeToggle');
+            if (checkbox.checked) {
+                document.body.style.background = '#000';
+                document.body.style.color = '#fff';
             } else {
-                body.classList.add('light-mode');
-                body.classList.remove('dark-mode');
+                document.body.style.background = '#fff';
+                document.body.style.color = '#000';
             }
-        });
+        }
+
+        // チェックボックスの状態が変わったときにテーマを切り替えるイベントを追加
+        document.getElementById('themeToggle').addEventListener('change', toggleTheme);
+
+        // ページが読み込まれた時に現在の状態に応じてテーマを適用
+        toggleTheme();
     </script>
-<body class="light-mode">
-<div>
-        <label for="darkModeToggle">
-            <input type="checkbox" id="darkModeToggle">
-            ダークモードにする
-        </label>
-    </div>
+<body>
+<input type="checkbox" id="themeToggle" class="toggle">
+    <label for="themeToggle">テーマ切り替え</label>
+
+ 
 <h1>JPY75955 Intel Core i7</h1>
 
 <h2>CPU</h2>
