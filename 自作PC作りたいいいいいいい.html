@@ -20,25 +20,7 @@
         }
 
 </style>
-<script>
-        // チェックボックスの状態に応じてbodyのスタイルを切り替える関数
-        function toggleTheme() {
-            const checkbox = document.getElementById('themeToggle');
-            if (checkbox.checked) {
-                document.body.style.background = '#000';
-                document.body.style.color = '#fff';
-            } else {
-                document.body.style.background = '#fff';
-                document.body.style.color = '#000';
-            }
-        }
 
-        // チェックボックスの状態が変わったときにテーマを切り替えるイベントを追加
-        document.getElementById('themeToggle').addEventListener('change', toggleTheme);
-
-        // ページが読み込まれた時に現在の状態に応じてテーマを適用
-        toggleTheme();
-    </script>
 <body>
 <input type="checkbox" id="themeToggle" class="toggle">
     <label for="themeToggle">テーマ切り替え</label>
@@ -175,4 +157,23 @@ ZALMAN T3 PLUS
 <a href="https://www.amazon.co.jp/dp/B0CBYYY937">https://www.amazon.co.jp/dp/B0CBYYY937</a>
 
 Created By ジサログ(<a href="https://zisalog.com/tool/">https://zisalog.com/tool/</a>)
-</body>body
+ <script>
+        // チェックボックスの状態に応じてbodyのスタイルを切り替える関数
+        function toggleTheme() {
+            const checkbox = document.getElementById('themeToggle');
+            if (checkbox.checked) {
+                document.body.style.background = '#000';
+                document.body.style.color = '#fff';
+            } else {
+                document.body.style.background = '#fff';
+                document.body.style.color = '#000';
+            }
+        }
+
+        // チェックボックスの状態が変わったときにテーマを切り替えるイベントを追加
+        document.getElementById('themeToggle').addEventListener('change', toggleTheme);
+
+        // ページが読み込まれた時に現在の状態に応じてテーマを適用
+        toggleTheme();
+    </script>
+</body>
