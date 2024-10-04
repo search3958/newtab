@@ -17,7 +17,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     textBox.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            const text = textBox.value.trim();
+            let text = textBox.value.trim();
+            
+            // URLが含まれていない場合は自動で追加
+            if (!text.startsWith('http://') && !text.startsWith('https://')) {
+                text = 'http://' + text; // httpを追加
+            }
+            
             if (isValidURL(text)) {
                 // URLが有効な場合、そのURLに遷移
                 window.location.href = text;
