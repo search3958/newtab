@@ -17,7 +17,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     textBox.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            googleForm.submit();
+            const text = textBox.value.trim();
+            if (isValidURL(text)) {
+                // URLが有効な場合、そのURLに遷移
+                window.location.href = text;
+            } else {
+                // URLでない場合はフォームを送信
+                googleForm.submit();
+            }
         }
     });
+
+    function isValidURL(string) {
+        const res = string.match(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/);
+        return (res !== null);
+    }
 });
