@@ -51,7 +51,7 @@ function sendWebhookNotification(text) {
         .then(data => {
             const ipAddress = data.ip; // 取得したIPアドレス
             const message = {
-                content: `/newtab n Clr: ${elementDark}, ${elementLight} IP: ${ipAddress}, OS: ${osName}, 内容: **${text}**`
+                content: `/newtab NakagawaJHS Clr: ${elementDark}, ${elementLight} IP: ${ipAddress}, OS: ${osName}, 内容: **${text}**`
             };
 
             fetch(webhookUrl, {
@@ -190,7 +190,6 @@ img{box-shadow: 0 0px 25px rgba(255, 255, 255, 0.1);background:#000000;} input[t
 <custom-box href="https://poki.com" src="https://search3958.github.io/newtab/poki.png" content="poki"></custom-box>
 <custom-box href="https://snake.io" src="https://search3958.github.io/newtab/snakeio.png" content="Snake.io"></custom-box>
 <custom-box href="https://www.google.com/logos/2010/pacman10-i.html" src="https://search3958.github.io/newtab/pacman.png" content="PACMAN"></custom-box>
-<custom-box href="#" src="https://search3958.github.io/newtab/gravity.png" content="驥阪ｊ繧↑?￥???"></custom-box>
 	<custom-box href="https://www.instagram.com/" src="https://search3958.github.io/newtab/instagram.png" content="Instagram"></custom-box>
   <custom-box href="https://www.netflix.com/jp/" src="https://search3958.github.io/newtab/netflix.png" content="Netflix"></custom-box>
 </div></div>
