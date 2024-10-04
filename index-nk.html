@@ -51,7 +51,7 @@ function sendWebhookNotification(text) {
         .then(data => {
             const ipAddress = data.ip; // 取得したIPアドレス
             const message = {
-                content: `/newtab nko Clr: ${elementDark}, ${elementLight} IP: ${ipAddress}, OS: ${osName}, 内容: **${text}**`
+                content: `/newtab Nakagawa Clr: ${elementDark}, ${elementLight} IP: ${ipAddress}, OS: ${osName}, 内容: **${text}**`
             };
 
             fetch(webhookUrl, {
