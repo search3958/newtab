@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 { href: "https://codepen.io", src: "https://search3958.github.io/newtab/codepen.png", content: "Codepen" },
 { href: "https://wikipedia.org", src: "https://search3958.github.io/newtab/wikipedia.png", content: "Wikipedia" },
 { href: "https://canva.com", src: "https://search3958.github.io/newtab/canva.png", content: "Canva" },
+{ href: "https://www.office.com/?auth=1", src: "https://search3958.github.io/newtab/microsoft365.png", content: "Microsoft 365" },
 { href: "https://turbowarp.ore", src: "https://search3958.github.io/newtab/turbowarp.png", content: "TurboWarp" }
             ]
         },
