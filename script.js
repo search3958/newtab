@@ -143,25 +143,21 @@ function updateClock() {
             localStorage.setItem('switchState', isChecked ? 'on' : 'off');
         }
         // スイッチの状態に応じて画像のスタイルを変更する関数
-function toggleImages() {
-    const switchControl = document.getElementById('switch');
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        const src = img.src;
-        const isSvg = src.endsWith('.svg');
-        const isPng = src.endsWith('.png');
-        
-        if (switchControl.checked && !isSvg) {  // SVGが設定されていない場合のみ切り替え
-            img.src = src.replace('.png', '.svg'); // pngからsvgに切り替え
-            img.classList.add('background-on'); // 背景色を変更
-        } else if (!switchControl.checked && !isPng) {  // PNGが設定されていない場合のみ切り替え
-            img.src = src.replace('.svg', '.png'); // svgからpngに戻す
-            img.classList.remove('background-on'); // 背景色を元に戻す
+        function toggleImages() {
+            const switchControl = document.getElementById('switch');
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                const src = img.src;
+                if (switchControl.checked) {
+                    img.src = src.replace('.png', '.svg'); // pngからsvgに切り替え
+                    img.classList.add('background-on'); // 背景色を変更
+                } else {
+                    img.src = src.replace('.svg', '.png'); // svgからpngに戻す
+                    img.classList.remove('background-on'); // 背景色を元に戻す
+                }
+            });
+            saveSwitchState(switchControl.checked); // 状態を保存
         }
-    });
-    saveSwitchState(switchControl.checked); // 状態を保存
-}
-
         // ページ読み込み時にスイッチの状態を復元する
         function restoreSwitchState() {
             const savedState = localStorage.getItem('switchState');
@@ -176,8 +172,3 @@ function toggleImages() {
         document.getElementById('switch').addEventListener('change', toggleImages);
         // ページが読み込まれたときに状態を復元
         window.addEventListener('load', restoreSwitchState);
-}
-
-document.getElementById('switch').addEventListener('change', toggleImages);
-// ページが読み込まれたときに状態を復元
-window.addEventListener('load', restoreSwitchState);
