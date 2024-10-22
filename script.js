@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const containers = document.querySelectorAll('.container');
-
     containers.forEach(container => {
         const box = container.querySelector('.box');
 
@@ -27,8 +26,8 @@ function updateClock() {
         }
         setInterval(updateClock, 100);
         updateClock(); // 初回実行してすぐに時刻を表示
-    
-    
+
+
     
     
         // Function to lighten color for light mode
