@@ -155,12 +155,12 @@ img:hover{
   background:#000;
   color:#fff;
   }
-}
+
 
 img:hover{
-  box-shadow: 0 0px 30px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0px 30px rgba(255, 255, 255, 0);
 }
-
+}
 p{
   position: relative;
   top: 15px;
