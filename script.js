@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         container.addEventListener('mouseleave', () => {
             box.style.transform = 'rotateX(0) rotateY(0)';
-        });
+         });
     });
 });
 function updateClock() {
@@ -22,7 +22,7 @@ function updateClock() {
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            const currentTime = ${hours}:${minutes}:${seconds};
+            const currentTime = `${hours}:${minutes}:${seconds}`;
             document.getElementById('clock').textContent = currentTime;
         }
         setInterval(updateClock, 100);
@@ -39,7 +39,7 @@ function updateClock() {
             r = Math.min(255, Math.floor(r + (255 - r) * amount));
             g = Math.min(255, Math.floor(g + (255 - g) * amount));
             b = Math.min(255, Math.floor(b + (255 - b) * amount));
-            return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
         // Function to lighten color for light mode
         function lightenColor(color, amount) {
@@ -49,7 +49,7 @@ function updateClock() {
             r = Math.min(255, Math.floor(r + (255 - r) * amount));
             g = Math.min(255, Math.floor(g + (255 - g) * amount));
             b = Math.min(255, Math.floor(b + (255 - b) * amount));
-            return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
         // Function to darken color for dark mode
         function darkenColor(color, amount) {
@@ -59,7 +59,7 @@ function updateClock() {
             r = Math.max(0, Math.floor(r * (1 - amount)));
             g = Math.max(0, Math.floor(g * (1 - amount)));
             b = Math.max(0, Math.floor(b * (1 - amount)));
-            return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
       
         // Function to lighten color for light mode
@@ -70,7 +70,7 @@ function updateClock() {
             r = Math.min(255, Math.floor(r + (255 - r) * amount));
             g = Math.min(255, Math.floor(g + (255 - g) * amount));
             b = Math.min(255, Math.floor(b + (255 - b) * amount));
-            return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
         // Function to darken color for dark mode
         function darkenColor(color, amount) {
@@ -80,7 +80,7 @@ function updateClock() {
             r = Math.max(0, Math.floor(r * (1 - amount)));
             g = Math.max(0, Math.floor(g * (1 - amount)));
             b = Math.max(0, Math.floor(b * (1 - amount)));
-            return #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')};
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
         // Function to update CSS variables based on base color
         function updateColors() {
