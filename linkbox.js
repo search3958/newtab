@@ -25,8 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 { href: "https://wikipedia.org", src: "https://search3958.github.io/newtab/wikipedia.png", content: "Wikipedia" },
 { href: "https://canva.com", src: "https://search3958.github.io/newtab/canva.png", content: "Canva" },
 { href: "https://www.office.com/?auth=1", src: "https://search3958.github.io/newtab/microsoft365.png", content: "Microsoft 365" },
-{ href: "https://turbowarp.ore", src: "https://search3958.github.io/newtab/turbowarp.png", content: "TurboWarp" },
-{ href: "https://kahoot.it/", src: "https://search3958.github.io/newtab/kahoot.png", content: "Kahoot" }
+{ href: "https://turbowarp.ore", src: "https://search3958.github.io/newtab/turbowarp.png", content: "TurboWarp" }
         },
       
               {
@@ -56,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 言語設定（デフォルトは 'en' とする）
     const userLang = navigator.language || navigator.userLanguage; // ブラウザの言語設定を取得
-    const lang = (userLang.includes('ja')) ? 'ja-jp' : (userLang.includes('zh')) ? 'zh-cn' : 'en';
+    const lang = (userLang.includes('ja')) ? 'ja-jp' : (userLang.includes('zh')) ? 'zh-cn' : 'ja-jp';
 
     // 特定のコンテナに要素を追加する
     const container = document.getElementById('shortcut-container');
