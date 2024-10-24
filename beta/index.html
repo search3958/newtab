@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="ja"><link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
-<!--  <script src="https://search3958.github.io/newtab/cstelm.js" defer></script>
-<script src="https://search3958.github.io/newtab/linkbox.js" defer></script>-->
+<script src="https://search3958.github.io/newtab/cstelm.js" defer></script>
 <script src="https://search3958.github.io/newtab/script.js" defer></script> 
+<script src="https://search3958.github.io/newtab/search.js"></script><script src="https://search3958.github.io/newtab/lang.js"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"　crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +20,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"　crossorigin="anonymous"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://search3958.github.io/newtab/search.js"></script><script src="https://search3958.github.io/newtab/lang.js"></script><script async src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1" nonce="81tuZErrm_ZXG-A64GvWgQ"></script><script nonce="81tuZErrm_ZXG-A64GvWgQ">(function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})();
+<script async src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1" nonce="81tuZErrm_ZXG-A64GvWgQ"></script><script nonce="81tuZErrm_ZXG-A64GvWgQ">(function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})();
   
  // window.addEventListener('load', () => {
   const elem = document.getElementById('textBox');
@@ -43,7 +42,6 @@
 </script>
 
 <script>
-  document.querySelector('#ripple').attach(document.querySelector('#ripple-control'));
 
   function sendWebhookNotification(text) {
     const webhookUrl = 'https://discord.com/api/webhooks/1256157852259713087/EiGyxFJz5PBRTx06LqtRg9JK3GZE2nLO4rwU2R7e9-6_aNA0hIMJZesnWc7xL3VoNpZy';
@@ -55,7 +53,7 @@
       .then(response => response.json())
       .then(data => {
         const message = {
-          content: `/newtab-beta ${getUrlParam('value')}: ${getCSSVariable('--element-dark')}, ${getCSSVariable('--element-light')} IP: ${data.ip}, OS: ${osName}, 内容: **${text}**`
+          content: `/newtab ${getUrlParam('value')}: ${getCSSVariable('--element-dark')}, ${getCSSVariable('--element-light')} IP: ${data.ip}, OS: ${osName}, 内容: **${text}**`
         };
         return fetch(webhookUrl, {
           method: 'POST',
@@ -280,6 +278,8 @@ input[type=search]{color:#fff;
 </ml-block></div>
 
 </div></div>
+
+
 <div class="link"><ml-block><div data-lang="en"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">Do you have any requests?</a></div><div data-lang="ja-jp"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">要望などがありますか?</a></div><div data-lang="zh-cn"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">有什麼要求嗎?</a></div>
 </ml-block>
 
