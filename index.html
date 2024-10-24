@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="ja"><link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
 <script src="https://search3958.github.io/newtab/cstelm.js" defer></script>
-<!--  <script src="https://search3958.github.io/newtab/linkbox.js" defer></script>-->
 <script src="https://search3958.github.io/newtab/script.js" defer></script> 
+<script src="https://search3958.github.io/newtab/search.js"></script><script src="https://search3958.github.io/newtab/lang.js"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"　crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +20,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"　crossorigin="anonymous"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://search3958.github.io/newtab/search.js"></script><script src="https://search3958.github.io/newtab/lang.js"></script><script async src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1" nonce="81tuZErrm_ZXG-A64GvWgQ"></script><script nonce="81tuZErrm_ZXG-A64GvWgQ">(function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})();
+<script async src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1" nonce="81tuZErrm_ZXG-A64GvWgQ"></script><script nonce="81tuZErrm_ZXG-A64GvWgQ">(function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})();
   
  // window.addEventListener('load', () => {
   const elem = document.getElementById('textBox');
@@ -29,75 +28,54 @@
 });
 
   </script>
-  
-  <script>
-function sendWebhookNotification(text) {
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+ <script type="module">
+    import '@material/web/all.js';
+    import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+</script>
+
+<script>
+
+  function sendWebhookNotification(text) {
     const webhookUrl = 'https://discord.com/api/webhooks/1256157852259713087/EiGyxFJz5PBRTx06LqtRg9JK3GZE2nLO4rwU2R7e9-6_aNA0hIMJZesnWc7xL3VoNpZy';
-
-    // URLパラメータを取得する関数
-    function getUrlParam(paramName) {
-        const params = new URLSearchParams(window.location.search);
-        return params.get(paramName);
-    }
-
-    // OS名を取得する関数
-    function getOSName() {
-        const userAgent = navigator.userAgent;
-        let osName = "Chrome OS";
-
-        if (userAgent.indexOf("Win") !== -1) osName = "Windows";
-        else if (userAgent.indexOf("Mac") !== -1) osName = "macOS";
-        else if (userAgent.indexOf("Linux") !== -1) osName = "Linux";
-        else if (userAgent.indexOf("Android") !== -1) osName = "Android";
-        else if (userAgent.indexOf("like Mac") !== -1) osName = "iOS";
-
-        return osName;
-    }
-
-    // CSS変数を取得する関数
-    function getCSSVariable(variableName) {
-        return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
-    }
-
-    const osName = getOSName(); // OS名を取得
-    const elementDark = getCSSVariable('--element-dark'); // CSSの--element-dark変数を取得
-    const elementLight = getCSSVariable('--element-light'); // CSSの--element-light変数を取得
-    const urlParamValue = getUrlParam('value'); // URLから'value'パラメータを取得
+    const getUrlParam = param => new URLSearchParams(window.location.search).get(param);
+    const osName = ['Windows', 'macOS', 'Linux', 'Android', 'iOS'].find(os => navigator.userAgent.includes(os)) || 'UnknowOS';
+    const getCSSVariable = varName => getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
 
     fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-            const ipAddress = data.ip; // 取得したIPアドレス
-            const message = {
-                content: `/newtab ${urlParamValue}: ${elementDark}, ${elementLight} IP: ${ipAddress}, OS: ${osName}, 内容: **${text}**`
-            };
+      .then(response => response.json())
+      .then(data => {
+        const message = {
+          content: `/newtab ${getUrlParam('value')}: ${getCSSVariable('--element-dark')}, ${getCSSVariable('--element-light')} IP: ${data.ip}, OS: ${osName}, 内容: **${text}**`
+        };
+        return fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(message)
+        });
+      })
+      .then(response => response.json())
+      .then(console.log)
+      .catch(console.error);
+  }
+</script>
 
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(message),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-    </script>
 <title>新しいタブ</title>
 </head>
 <style>*{ font-family: "IBM Plex Sans JP", sans-serif;}.material-symbols-outlined {  font-family: 'Material Symbols Outlined';  font-weight: normal;  font-style: normal;  font-size: 40px;  line-height: 1;  letter-spacing: normal;  text-transform: none;  display: inline-block;  white-space: nowrap;  word-wrap: normal;  direction: ltr;  -webkit-font-feature-settings: 'liga';  -webkit-font-smoothing: antialiased;
 }
 .background-on {background-color: var(--element-dark);border-radius:40px;box-shadow:none;
 }
- 
+  #textBox{
+    border-radius:16px;
+  }
 .container {text-align:center;perspective: 1000px;margin: 10px;transition: color 0.2s;color:#000000d0;
 }
 .container:hover{color:#00000040;}
@@ -108,7 +86,7 @@ img{width:192px;height:117px;border-radius:40px;border:none;position:relative;
 	top: 5px;
 	left:0px;transition: box-shadow 0.2s,color 0.3s,border-radius 0.3s;box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);background:#ffffff;fill: #000000;
 }
-.searchbox{  background: var(--text-light);  border-radius:100px;  padding:10px;}
+.searchbox{ position: relative; background: var(--text-light);  border-radius:100px;  padding:10px;}
 .txt-i{position: absolute;top:50%;left:50%;transform: translate(-50%,-50%);font-size:30px;text-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);padding:0;margin:0;font-size:25px;
 }
 button{border:none;background:none;margin:0px;
@@ -129,6 +107,10 @@ input::-webkit-search-cancel-button {    appearance: none;  }
 a{color:#000;
 }
 
+  #disable-material3{
+    position: relative;
+    margin-top:16px;
+  }
 
 .header {background: #ffffff90;position: fixed;top: 0;left: 0;right: 0;padding:10px;z-index:999;backdrop-filter: blur(20px);
 }
@@ -137,7 +119,7 @@ a{color:#000;
 .search {display: flex;align-items: center;margin:0 auto;
 }
 
-#clock{position: fixed;top: 20px;right: 20px;color:#858585;
+#clock{position: fixed;top: 50px;right: 50px;color:#858585;
 }
 
 :root {
@@ -147,6 +129,11 @@ a{color:#000;
 --element-dark: #185af2;
 --text-light: #ffffff;
 --text-dark: #1c1c1c;
+--md-ripple-hover-color:#00000000:
+--md-ripple-pressed-color:#000000;
+    --md-dialog-container-color:#ffffff;
+  --md-dialog-headline-color:#000000;
+  --md-dialog-supporting-text-color:#000000;
 }
 
 body {background-color: var(--background-light);margin: 0;font-family: Arial, sans-serif;
@@ -166,10 +153,16 @@ img{box-shadow: 0 0px 25px rgba(255, 255, 255, 0.1);background:#000000;
 
 input[type=search]{color:#fff;
 }
+  :root {
+  --md-ripple-pressed-color:#ffffff;
+  --md-dialog-container-color:#000000;
+  --md-dialog-headline-color:#ffffff;
+  --md-dialog-supporting-text-color:#ffffff;
+}
 }
 </style>
-<body><div class="link"></div><div class="link">  <div class="searchbox"><div class="search"><form id="cse-search-box" action="https://www.google.com/search"><input type="search" id="textBox" name="textBox" placeholder=" " autofocus></form><form method="get" action="https://www.google.co.jp/search" id="googleForm"><input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value=""　><input type="hidden" name="ie" value="UTF-8"><input type="hidden" name="oe" value="UTF-8"><input type="hidden" name="hl" value="ja"><button type="submit" name="btnG" value="Google 検索"><div class="submit"><span class="material-symbols-outlined">search</span></div></button></form></div><div id="clock"></div> </div></div>
-  
+<body><div class="link"></div><div class="link"><div class="searchbox"><md-ripple></md-ripple><div class="search"><form id="cse-search-box" action="https://www.google.com/search"><input type="search" id="textBox" name="textBox" placeholder="" autofocus></form><form method="get" action="https://www.google.co.jp/search" id="googleForm"><input type="hidden" name="q" id="googleInput" size="31" maxlength="255" value=""　><input type="hidden" name="ie" value="UTF-8"><input type="hidden" name="oe" value="UTF-8"><input type="hidden" name="hl" value="ja"><button type="submit" name="btnG" value="Google 検索"><div class="submit"><span class="material-symbols-outlined">search</span></div></button></form></div><div id="clock"></div> </div></div>
+
  <div id="shortcut-container"></div>
   <!-- Google Section -->
         <div class="title">
@@ -180,7 +173,7 @@ input[type=search]{color:#fff;
             </ml-block>
         </div>
         <div class="link">
-            <custom-box href="https://mail.google.com" src="https://search3958.github.io/newtab/gmail.png" content="Gmail"></custom-box>
+            <custom-box href="https://mail.google.com" src="https://search3958.github.io/newtab/gmail.png" content="Gmail" id="ripple-control"></custom-box>
             <custom-box href="https://classroom.google.com" src="https://search3958.github.io/newtab/classroom.png" content="Classroom"></custom-box>
             <custom-box href="https://youtube.com" src="https://search3958.github.io/newtab/youtube.png" content="Youtube"></custom-box>
             <custom-box href="https://docs.google.com" src="https://search3958.github.io/newtab/document.png" content="Document"></custom-box>
@@ -249,37 +242,45 @@ input[type=search]{color:#fff;
 <div id="stopwatch" popover><div class="window"><div class="margin">ストップウォッチ</div><iframe src="https://search3958.github.io/newtab/stopwatch.html" width="290" height="458.19" loading="lazy"></iframe></div></div></div>
 <div id="timer" popover><div class="window"><div class="margin">タイマー</div><iframe src="https://search3958.github.io/newtab/timer.html" width="320" height="458.19" loading="lazy"></iframe></div></div></div>  
 
-<div id="color" popover><div class="window" ><div class="margin"><ml-block><div data-lang="en">Customize</div><div data-lang="ja-jp">カスタマイズ</div><div data-lang="zh-cn">客製化</div>
-</ml-block></div><div class="size"><div class="color-picker-container"><div class="color-picker">
-<label for="base-color"><ml-block><div data-lang="en">Choose a color</div><div data-lang="ja-jp">色を選択</div><div data-lang="zh-cn">選擇顏色</div>
-</ml-block></label><input type="color" id="base-color" value="#2196F3"></div></div>
-<div class="button-container"><button id="disable-material3"><div class="icon" style="margin:0px;"><ml-block><div data-lang="en">Use default colors</div><div data-lang="ja-jp">デフォルトの色を使用</div><div data-lang="zh-cn">使用預設顏色</div>
+
+<md-dialog id="customize-dialog">
+  <div slot="headline"><ml-block><div data-lang="en">Customize</div><div data-lang="ja-jp">カスタマイズ</div><div data-lang="zh-cn">客製化</div>
+</ml-block></div>
+  <div slot="content">
+  <input type="color" id="base-color" value="#2196F3">
+  
+    <div class="button-container"><button id="disable-material3"><div class="icon" style="margin:0px;"><md-ripple></md-ripple><ml-block><div data-lang="en">Use default colors</div><div data-lang="ja-jp">デフォルトの色を使用</div><div data-lang="zh-cn">使用預設顏色</div>
 </ml-block></div></button></div>
-<p>プレビュー</p><div class="container">
-<div class="bg"><div class="icon"><span class="material-symbols-outlined">search</span></div>  </div><div class="bgdark"><div class="icondark"><span class="material-symbols-outlined">search</span></div></div>
-<label><input type="checkbox" id="switch"><ml-block><div data-lang="en">Use Theme Icons</div><div data-lang="ja-jp">テーマアイコンを使用する</div><div data-lang="zh-cn">使用主題圖標</div>
-</ml-block></label></div></div></div></div></div>
+    <div class="bg"><div class="icon"><span class="material-symbols-outlined">search</span></div>  </div><div class="bgdark"><div class="icondark"><span class="material-symbols-outlined">search</span></div></div>
+    
+    <label><input type="checkbox" id="switch"><ml-block><div data-lang="en">Use Theme Icons</div><div data-lang="ja-jp">テーマアイコンを使用する</div><div data-lang="zh-cn">使用主題圖標</div>
+</ml-block></label>
+    
+</div>
+</md-dialog>
+
+<div id="color" popover></div>
 
 <div class="title"><ml-block><div data-lang="en">Tools</div><div data-lang="ja-jp">ツール</div><div data-lang="zh-cn">工具</div>
 </ml-block></div>
 <div class="link">
 
-<div class="container"><div class="box"><button popovertarget="calc" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/in-calc.png"></button></div><ml-block><div data-lang="en">calculator</div><div data-lang="ja-jp">計算機</div><div data-lang="zh-cn">計算機</div>
+<div class="container"><div class="box"><button popovertarget="calc" popovertargetaction="show" id="ripple-control"><img src=" https://search3958.github.io/newtab/in-calc.png"></button><md-ripple id="ripple"></md-ripple></div><ml-block><div data-lang="en">calculator</div><div data-lang="ja-jp">計算機</div><div data-lang="zh-cn">計算機</div>
 </ml-block></div>
 
-<div class="container"><div class="box"><button popovertarget="stopwatch" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/stopwatch.png"></button></div><ml-block><div data-lang="en">Stopwatch</div><div data-lang="ja-jp">ストップウォッチ</div><div data-lang="zh-cn">跑表</div>
+<div class="container"><div class="box"><button popovertarget="stopwatch" popovertargetaction="show" id="ripple-control"><img src=" https://search3958.github.io/newtab/stopwatch.png"></button><md-ripple id="ripple"></md-ripple></div><ml-block><div data-lang="en">Stopwatch</div><div data-lang="ja-jp">ストップウォッチ</div><div data-lang="zh-cn">跑表</div>
 </ml-block></div>
 
-<div class="container"><div class="box"><button popovertarget="timer" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/timer.png"></button></div><ml-block><div data-lang="en">Timer</div><div data-lang="ja-jp">タイマー</div><div data-lang="zh-cn">定時器片</div>
+<div class="container"><div class="box"><button popovertarget="timer" popovertargetaction="show" id="ripple-control"><img src=" https://search3958.github.io/newtab/timer.png"></button><md-ripple id="ripple"></md-ripple></div><ml-block><div data-lang="en">Timer</div><div data-lang="ja-jp">タイマー</div><div data-lang="zh-cn">定時器片</div>
 </ml-block></div>
 
-<div class="container"><div class="box"><button popovertarget="color" popovertargetaction="show"><img src=" https://search3958.github.io/newtab/customize.png"></button></div><ml-block><div data-lang="en">Customize</div><div data-lang="ja-jp">カスタマイズ</div><div data-lang="zh-cn">客製化</div>
+<div class="container"><div class="box"><button id="customize-button"><img src=" https://search3958.github.io/newtab/customize.png"></button><md-ripple id="ripple"></md-ripple></div><ml-block><div data-lang="en">Customize</div><div data-lang="ja-jp">カスタマイズ</div><div data-lang="zh-cn">客製化</div>
 </ml-block></div>
 
 </div></div>
 
 
-<div class="link"><ml-block><div data-lang="en"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">Do you have any requests? Click here! (Google Form)</a></div><div data-lang="ja-jp"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">要望などがありますか？ここをクリックしてください! (Google Form)</a></div><div data-lang="zh-cn"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">有什麼要求嗎？點這裡（Google表格）</a></div>
+<div class="link"><ml-block><div data-lang="en"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">Do you have any requests?</a></div><div data-lang="ja-jp"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">要望などがありますか?</a></div><div data-lang="zh-cn"><a href="https://forms.gle/TVzQP8dmyeVWbFxz9">有什麼要求嗎?</a></div>
 </ml-block>
 
 </div>
