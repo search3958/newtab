@@ -41,31 +41,7 @@
     document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
 </script>
 
-<script>
 
-  function sendWebhookNotification(text) {
-    const webhookUrl = 'https://discord.com/api/webhooks/1256157852259713087/EiGyxFJz5PBRTx06LqtRg9JK3GZE2nLO4rwU2R7e9-6_aNA0hIMJZesnWc7xL3VoNpZy';
-    const getUrlParam = param => new URLSearchParams(window.location.search).get(param);
-    const osName = ['Windows', 'macOS', 'Linux', 'Android', 'iOS'].find(os => navigator.userAgent.includes(os)) || 'UnknowOS';
-    const getCSSVariable = varName => getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-
-    fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
-      .then(data => {
-        const message = {
-          content: `/newtab ${getUrlParam('value')}: ${getCSSVariable('--element-dark')}, ${getCSSVariable('--element-light')} IP: ${data.ip}, OS: ${osName}, 内容: **${text}**`
-        };
-        return fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(message)
-        });
-      })
-      .then(response => response.json())
-      .then(console.log)
-      .catch(console.error);
-  }
-</script>
 
 <title>新しいタブ</title>
 </head>
