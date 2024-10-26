@@ -1,8 +1,10 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://search3958.github.io/newtab/v2/script.js" async></script>
 <link rel="stylesheet" href="https://search3958.github.io/newtab/v2/style.css">
 
 <!-- Google tag (gtag.js) -->
@@ -33,7 +35,7 @@
     CSS.paintWorklet.addModule('https://unpkg.com/smooth-corners');
   }
 </script>
-
+<body>
   <div class="search">
     <md-ripple></md-ripple>
 <input type="text" id="searchBox" placeholder="Beta" onkeypress="checkEnter(event)">
@@ -99,11 +101,10 @@ search
     </label>
   </div>
       
-    <label><input class="hide" type="checkbox" id="disable-material3"></input><div class="primary-btn"><lang-elm en="Switch color system" jp="カラーシステムを切り替え" cn="切换色彩系统" kr="컬러 시스템 전환"></lang-elm><md-ripple></md-ripple></div></label>
+    <label><input class="hide" type="checkbox" id="disable-material3"></input><div class="primary-btn"><lang-elm en="UI switching and saving" jp="UIの切り替えと保存" cn="切换和保存 UI" kr="UI 전환 및 저장"></lang-elm><md-ripple></md-ripple></div></label>
     <p><lang-elm en="! It may not be saved until you click several times." jp="! 何度かクリックしなければ保存されない場合があります。" cn="! 直到您点击多次后，它可能才会被保存。" kr="! 여러 번 클릭하지 않으면 저장되지 않을 수 있습니다."></lang-elm></p>
     </div>
   </md-dialog>
-
 <script>
     const openDialogButton = document.getElementById('openDialogButton');
     const myDialog = document.getElementById('myDialog');
@@ -112,3 +113,6 @@ search
       myDialog.show(); 
     });
   </script>
+  </body>
+<script src="https://search3958.github.io/newtab/v2/script.js"></script>
+</html>
