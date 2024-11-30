@@ -76,9 +76,21 @@
     const openDialogButton = document.getElementById('openDialogButton');
     const myDialog = document.getElementById('myDialog');
 
-    openDialogButton.addEventListener('click', () => {
-      myDialog.show(); 
+   // すべての<a>タグにtarget="_blank"を追加
+function openLinksInNewTab() {
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+        link.setAttribute('target', '_blank');
     });
+}
+
+// ページ読み込み時に既存の<a>タグを処理
+openLinksInNewTab();
+
+// MutationObserverを使用して動的に追加された<a>タグにも対応
+const observer = new MutationObserver(openLinksInNewTab);
+observer.observe(document.body, { childList: true, subtree: true });
+
   </script>
   </body>
 <script async src="https://search3958.github.io/newtab/v2/script.js"></script>
@@ -98,4 +110,5 @@ img{
 }
     </style>
 </html>
+
 
