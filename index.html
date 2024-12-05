@@ -65,7 +65,7 @@ delete_history
 <link-box href="docs.google.com/presentation/" img="slide.webp">Slide</link-box>
 <link-box href="docs.google.com/spreadsheet/" img="spreadsheet.webp">Spreadsheet</link-box>
 <link-box href="translate.google.com" img="translate.webp">Translate</link-box>
-<link-box href="gemini.google.com" img="gemini.webp">Gemini</link-box>
+      <div class="container"> <div class="box"><a id="open-modal4"><img src="https://search3958.github.io/newtab/img/gemini.webp" alt="Gemini"><md-ripple></md-ripple></a></div> <div>Gemini</div> </div>
 <link-box href="notebooklm.google.com/" img="notebooklm.webp">Notebook LM</link-box>
 <link-box href="about.google/products" img="product.webp">Product</link-box></div>
 <p class="sc"><lang-elm en="Learning and productivity" jp="学習と作業効率化" cn="学习和工作效率" kr="학습 및 작업 효율화"></lang-elm></p><div class="links">
@@ -160,6 +160,7 @@ delete_history
   <md-dialog id="myDialog">
     <div slot="headline"><lang-elm en="customize" jp="カスタマイズ" cn="定制" kr="맞춤형"></lang-elm></div>
     <div slot="content" class="content"> 
+      
       <p><lang-elm en="Choose your color:" jp="色を選択:" cn="选择色彩:" kr="색상 선택:"></lang-elm></p>
       <input type="color" id="base-color" value="#185af2">
 <div style="display: flex;">
@@ -195,6 +196,12 @@ delete_history
         <a href="javascript:void(0)" class="close-btn" id="close-modal3"></a>
     </div>
 </div>
+<div id="modal4" class="modal">
+    <div class="modal-content">
+      <p>Gemini</p><a href="#" style="margin-top:-16px">新しいタブで開く</a>
+      <iframe src="https://search3958.github.io/gemini.html" width="290" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal4"></a>
+    </div>
 <script>
     const openDialogButton = document.getElementById('openDialogButton');
     const myDialog = document.getElementById('myDialog');
