@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<title>Newtab 3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://search3958.github.io/newtab/v2.1/style.css">
+<link rel="icon" href="https://search3958.github.io/favicon-newtab.svg">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7N56NHPY3C');
+</script>
+<script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '@material/web/all.js';
+    import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+<script>
+  if (CSS && 'paintWorklet' in CSS) {
+    CSS.paintWorklet.addModule('https://unpkg.com/smooth-corners');
+  }
+</script>
+    <body>
+      <div class="help">
+      <p class="helptxt"> 
+        <svg viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><style>@keyframes slide-20{to{transform:translateY(-8px)}}</style><path class="svganimation" d="M18.215 13.484a.857.857 0 11-1.098 1.317l-4.594-3.828L7.93 14.8a.857.857 0 11-1.097-1.317l5.131-4.276a.854.854 0 011.12 0l5.132 4.276z" style="animation:slide-20 1s infinite alternate both cubic-bezier(1,-.01,0,.98)"/></svg><br>
+        スクロールしてショートカットを表示</p></div>
+      <div class="bg-out">
+<div class="bg">
+  <div class="search-buttons">
+        <button class="enginebtn" onclick="setSearchEngine('google')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/google.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('bing')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/bing.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('yahoo')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/yahoo.svg"></button>
+    <span class="material-symbols-outlined">
+more_vert
+</span>
+        <button class="enginebtn" onclick="setSearchEngine('duckduckgo')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/duckduckgo.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('nenara')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/naenara.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('neighb')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/naver.svg"></button>
+    </div>
+<div class="search">
+  <md-ripple></md-ripple>
+  <input type="text" id="searchBox" placeholder="" onkeypress="checkEnter(event)" autofocus />
+  <button id="searchButton" class="searchbtn">
+    <span class="material-symbols-outlined">search</span>
+  </button>
+</div></div></div><div class="bg-u"><div class="links">
+    <div class="history 1"></div>
+    <div class="history 2"></div>
+    <div class="history 3"></div>
+    <div class="history 4"></div>
+    <div class="history 5"></div>
+    <button id="clearHistory" class="hibtn" style="border:none"><span class="material-symbols-outlined">
+delete_history
+</span></button>
+  </div></div>
+  </div>
+<div class="shortcut">
+  <p class="sc">Google</p><div class="links">
+<link-box href="mail.google.com" img="gmail.webp">Gmail</link-box>
+<link-box href="classroom.google.com" img="classroom.webp">Classroom</link-box>
+<link-box href="youtube.com" img="youtube.webp">Youtube</link-box>
+<link-box href="docs.google.com" img="document.webp">Document</link-box>
+<link-box href="docs.google.com/presentation/" img="slide.webp">Slide</link-box>
+<link-box href="docs.google.com/spreadsheet/" img="spreadsheet.webp">Spreadsheet</link-box>
+<link-box href="translate.google.com" img="translate.webp">Translate</link-box>
+      <div class="container"> <div class="box"><a id="open-modal4"><img src="https://search3958.github.io/newtab/img/gemini.webp" alt="Gemini"><md-ripple></md-ripple></a></div> <div>Gemini</div> </div>
+<link-box href="drive.google.com/" img="drive.webp">ドライブ</link-box>
+<link-box href="about.google/products" img="product.webp">Product</link-box></div>
+<p class="sc">学習と作業効率化</p><div class="links">
+<link-box href="app.monoxer.com" img="monoxer.webp">Monoxer</link-box>
+<link-box href="chatgpt.com" img="chatgpt.webp">Chat GPT</link-box>
+<link-box href="copilot.microsoft.com" img="copilot.webp">Copilot</link-box>
+<link-box href="codepen.io" img="codepen.webp">Codepen</link-box>
+<link-box href="https://claude.ai/new" img="claude.webp">Claude</link-box>
+<link-box href="canva.com" img="canva.webp">Canva</link-box>
+<link-box href="www.office.com/?auth=1" img="microsoft365.webp">Microsoft 365</link-box>
+<link-box href="turbowarp.org" img="turbowarp.webp">TurboWarp</link-box>
+<link-box href="kahoot.it" img="kahoot.webp">Kahoot</link-box>
+  </div>
+    <p class="sc">ツール</p><div class="links">
+  <div class="container"> <div class="box"><a id="open-modal1"><img src="https://search3958.github.io/newtab/img/in-calc.webp" alt="計算機"><md-ripple></md-ripple></a></div> <div>计算器</div> </div>
+    <div class="container"> <div class="box"><a id="open-modal2"><img src="https://search3958.github.io/newtab/img/timer.webp" alt="タイマー"><md-ripple></md-ripple></a></div> <div>タイマー</div> </div>
+    <div class="container"> <div class="box"><a id="open-modal3"><img src="https://search3958.github.io/newtab/img/stopwatch.webp" alt="ストップウォッチ"><md-ripple></md-ripple></a></div> <div>タイマー</div> </div>
+    <div class="container"> <div class="box"><a id="openDialogButton"><img src="https://search3958.github.io/newtab/img/customize.webp" alt="カスタマイズ"><md-ripple></md-ripple></a></div><div>カスタマイズ</div></div>
+  </div>
+<p class="sc">ショッピング</p><div class="links">
+<link-box href="www.amazon.co.jp/" img="amazon.webp">Amazon</link-box>
+<link-box href="ja.aliexpress.com/" img="aliexpress.webp">AliExpress</link-box>
+<link-box href="www.wish.com/ja" img="wish.webp">Wish</link-box>
+<link-box href="jp.mercari.com/" img="mercari.webp">Mercali</link-box>
+<link-box href="www.taobao.com/" img="taobao.webp">淘宝</link-box>
+  </div>
+  <p class="sc"><lang-elm en="Entertainment" jp="娯楽" cn="娱乐" kr="오락"></lang-elm></p><div class="links">
+  <link-box href="scratch.mit.edu" img="scratch.webp">Scratch</link-box>
+<link-box href="poki.com" img="poki.webp">poki</link-box>
+<link-box href="snake.io" img="snakeio.webp">Snake.io</link-box>
+<link-box href="www.google.com/logos/2010/pacman10-i.html" img="pacman.webp">PACMAN</link-box>
+<link-box href="www.instagram.com/" img="instagram.webp">Instagram</link-box>
+<link-box href="www.netflix.com/jp/" img="netflix.webp">Netflix</link-box>
+<link-box href="weverse.io/?hl=ja" img="weverse.webp">Weverse</link-box>
+<link-box href="www.primevideo.com/ref=atv_nb_lcl_ja_JP" img="primevideo.webp">Prime Video</link-box>
+<link-box href="open.spotify.com/intl-ja" img="spotify.webp">Spotify</link-box>
+    </div>
+  <div class="links">
+  <a href="https://forms.gle/TVzQP8dmyeVWbFxz9">要望などがありますか?</a>
+    </div>
+    <div class="links">
+  <a href="https://search3958.github.io/">Search 3958</a>
+    </div>
+</div>
+      <md-dialog id="errorDialog">
+  <div slot="headline">検閲</div>
+  <div slot="content" id="errorMessage"></div> 
+  </md-dialog>
+  <md-dialog id="myDialog">
+    <div slot="headline">カスタマイズ</div>
+    <div slot="content" class="content"> 
+      <p>色を選択:</p>
+      <input type="color" id="base-color" value="#185af2">
+<div style="display: flex;">
+      <label id="label-off">
+        <input class="hide" type="radio" name="icon-toggle" id="switch-off" value="off" checked> <div class="svgrd"><md-ripple></md-ripple><div class="prev1">Newtab3</div>PNG</div>
+    </label>
+<label id="label-on">
+        <input class="hide" type="radio" name="icon-toggle" id="switch-on" value="on"> <div class="svgrd"><md-ripple></md-ripple><div class="prev2">Newtab3</div>SVG</div>
+    </label>
+  </div>  
+    <label><input class="hide" type="checkbox" id="disable-material3"></input><div class="primary-btn">UIを切り替え<md-ripple></md-ripple></div></label>
+    <input type="text" id="urlInput" placeholder="背景画像のURLを入力">
+    <button id="setBackgroundButton" class="primary-btn"><md-ripple></md-ripple>背景を設定</button>
+      <button id="resetBackgroundButton" class="primary-btn"><md-ripple></md-ripple>リセット</button>
+    <p>変更は自動的に保存されます。</p>
+    </div>
+  </md-dialog>
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <p>計算機</p>
+        <iframe src="https://search3958.github.io/newtab/calc.html" width="290" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal1"></a>
+    </div>
+</div>
+<div id="modal2" class="modal">
+    <div class="modal-content">
+        <p>タイマー</p>
+      <iframe src="https://search3958.github.io/newtab/timer.html" width="320" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal2"></a>
+    </div>
+</div>
+<div id="modal3" class="modal">
+    <div class="modal-content">
+        <p>ストップウォッチ</p>
+      <iframe src="https://search3958.github.io/newtab/stopwatch.html" width="290" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal3"></a>
+    </div>
+</div>
+<md-dialog id="errorDialog">
+  <div slot="headline">検閲</div>
+  <div slot="content" id="errorMessage"></div> 
+  </md-dialog>
+  <md-dialog id="myDialog">
+    <div slot="headline">カスタマイズ</div>
+    <div slot="content" class="content"> 
+      <p>色を選択:</p>
+      <input type="color" id="base-color" value="#185af2">
+<div style="display: flex;">
+      <label id="label-off">
+        <input class="hide" type="radio" name="icon-toggle" id="switch-off" value="off" checked> <div class="svgrd"><md-ripple></md-ripple><div class="prev1">Newtab3</div>PNG</div>
+    </label>
+<label id="label-on">
+        <input class="hide" type="radio" name="icon-toggle" id="switch-on" value="on"> <div class="svgrd"><md-ripple></md-ripple><div class="prev2">Newtab3</div>SVG</div>
+    </label>
+  </div>  
+    <label><input class="hide" type="checkbox" id="disable-material3"></input><div class="primary-btn">UIを切り替え<md-ripple></md-ripple></div></label>
+    <p>変更は自動的に保存されます。</p>
+    </div>
+  </md-dialog>
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <p><lang-elm en="Calculator" jp="計算機" cn="计算器" kr="계산기"></lang-elm></p>
+        <iframe src="https://search3958.github.io/newtab/calc.html" width="290" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal1"></a>
+    </div>
+</div>
+<div id="modal2" class="modal">
+    <div class="modal-content">
+        <p><lang-elm en="Timer" jp="タイマー" cn="定时器" kr="타이머"></lang-elm></p>
+      <iframe src="https://search3958.github.io/newtab/timer.html" width="320" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal2"></a>
+    </div>
+</div>
+<div id="modal3" class="modal">
+    <div class="modal-content">
+        <p><lang-elm en="Stopwatch" jp="ストップウォッチ" cn="跑表" kr="스톱워치"></lang-elm></p>
+      <iframe src="https://search3958.github.io/newtab/stopwatch.html" width="290" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal3"></a>
+    </div>
+</div>
+<div id="modal4" class="modal">
+    <div class="modal-content" style="width:700px;">
+      <p>Gemini</p><a href="https://gemini.google.com/app?hl=ja" style="margin-top:-16px">新しいタブで開く</a>
+      <iframe src="https://search3958.github.io/gemini.html" width="700" height="458.19" loading="lazy"></iframe>
+        <a href="javascript:void(0)" class="close-btn" id="close-modal4"></a>
+    </div>
+<script>
+    const openDialogButton = document.getElementById('openDialogButton');
+    const myDialog = document.getElementById('myDialog');
+
+    openDialogButton.addEventListener('click', () => {
+      myDialog.show(); 
+    });
+  </script>
+  </body>
+<script async src="https://search3958.github.io/newtab/v2.1/script.js"></script>
+</html>
