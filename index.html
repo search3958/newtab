@@ -107,7 +107,7 @@ check
       <div class="flexcard">
       <div onclick="changeText1()" style="background-image:url('https://search3958.github.io/newtab/bgimg/pre-1.webp')" class="imgbtn"></div>
     <div onclick="changeText2()" style="background-image:url('https://search3958.github.io/newtab/bgimg/pre-2.webp')" class="imgbtn"></div>
-      <a class="imgbtn" href="https://search3958.github.io/project/images/">もっと表示</a>
+      <a class="imgbtn" href="https://search3958.github.io/project/images/" target="_blank">もっと表示</a>
       </div>
       <input type="text" id="imageUrl" placeholder="画像URLを入力" />
       <div class="flexcard" style="gap:8px">
@@ -120,20 +120,31 @@ check
         <div class="item">
     <div class="settingcard" style="padding-left:16px;">
       <a class="block" href="https://search3958.github.io">Search 3958</a>
-    <a class="block" href="https://search3958.github.io/i/newtab/?section=content1-1.html">Newtab 3の詳細</a><div class="line"></div><p>HTMLバージョン:4-OneUI</p><p class="css-ver">CSSバージョン:</p><p id="js-ver">JavaScriptが作動していません</p>
+      <a class="block" href="https://search3958.github.io/newtab/newtab-simple.html">Newtab简易版</a>
+    <a class="block" href="https://search3958.github.io/i/newtab/?section=content1-1.html">Newtab 3の詳細</a><div class="line"></div><p>HTMLバージョン:5-Link</p><p class="css-ver">CSSバージョン:</p><p id="js-ver">JavaScriptが作動していません</p>
   </div>
     </div>
           </div>
     
   <div id="batteryStatus"></div>
 <div class="engine">
-  <input id="google" class="enginebtn" type="radio" name="engine" value="https://www.google.com/search" checked> <label for="google" class="enginelbl">Google</label>
-  <input id="bing" class="enginebtn" type="radio" name="engine" value="https://www.bing.com/search"> <label for="bing" class="enginelbl">Bing</label>
-  <input id="yahoo" class="enginebtn" type="radio" name="engine" value="https://search.yahoo.com/search"> <label for="yahoo" class="enginelbl">Yahoo</label>
-  <input id="naver" class="enginebtn" type="radio" name="engine" value="https://search.naver.com/search.naver"> <label for="naver" class="enginelbl">Naver</label>
+  <input id="google" class="enginebtn" type="radio" name="engine" value="https://www.google.com/search" checked> 
+  <label for="google" class="enginelbl">Google</label>
+  <input id="bing" class="enginebtn" type="radio" name="engine" value="https://www.bing.com/search"> 
+  <label for="bing" class="enginelbl">Bing</label>
+  <input id="yahoo" class="enginebtn" type="radio" name="engine" value="https://search.yahoo.com/search"> 
+  <label for="yahoo" class="enginelbl">Yahoo</label>
+  <input id="naver" class="enginebtn" type="radio" name="engine" value="https://search.naver.com/search.naver"> 
+  <label for="naver" class="enginelbl">Naver</label>
 </div>
-  <form class="search" id="searchForm" method="get"><input class="searchtext" type="text" id="searchInput" name="q" placeholder="Search" required><button class="searchbtn" type="submit"><span class="material-symbols-rounded searchicon">search</span></button></form>
-    <div class="history" id="history"></div>
+
+<form class="search" id="searchForm" method="get">
+  <input class="searchtext" type="text" id="searchInput" name="q" placeholder="Search" required>
+  <button class="searchbtn" type="button"><span class="material-symbols-rounded searchicon">search</span></button>
+</form>
+
+<div class="history" id="history"></div>
+
 
   <div id="bg">
     <div id="shortcuts">
@@ -164,6 +175,8 @@ check
     <link-box href="https://www.microsoft.com/microsoft-365" bg-color="var(--white)" img="microsoft365">Microsoft 365</link-box>
     <link-box href="https://turbowarp.org/" bg-color="var(--white)" img="turbowarp">TurboWarp</link-box>
     <link-box href="https://kahoot.com/" bg-color="#401A89" img="kahoot">Kahoot</link-box>
+    <link-box href="https://www.figma.com/files/" bg-color="var(--white)" img="figma">Figma</link-box>
+    <link-box href="https://discord.com/channels/@me" bg-color="linear-gradient(0deg, rgba(54, 67, 203, 1), rgba(88, 101, 242, 1))" img="discord">Discord</link-box>
   </div>
   <div class="linktext">ショッピング</div>
   <div class="links">
@@ -180,6 +193,7 @@ check
     <link-box href="https://snake.io/" bg-color="var(--white)" img="snakeio">Snake.io</link-box>
     <link-box href="https://www.pacman.com/" bg-color="black" img="pacman">PACMAN</link-box>
     <link-box href="https://www.instagram.com/" bg-color="linear-gradient(135deg, #427eff 0%, #f13f79 70%) no-repeat" img="instagram">Instagram</link-box>
+    <link-box href="https://thinking-grp.github.io/sns/" bg-color="var(--white)" img="thinking">thinking SNS</link-box>
     <link-box href="https://www.netflix.com/" bg-color="black" img="netflix">Netflix</link-box>
     <link-box href="https://www.weverse.io/" bg-color="#6AE2C2" img="weverse">Weverse</link-box>
     <link-box href="https://www.primevideo.com/" bg-color="#3171F6" img="primevideo">Prime Video</link-box>
