@@ -107,7 +107,7 @@ check
       <div class="flexcard">
       <div onclick="changeText1()" style="background-image:url('https://search3958.github.io/newtab/bgimg/pre-1.webp')" class="imgbtn"></div>
     <div onclick="changeText2()" style="background-image:url('https://search3958.github.io/newtab/bgimg/pre-2.webp')" class="imgbtn"></div>
-      <a class="imgbtn" href="https://search3958.github.io/project/images/" target="_blank">もっと表示</a>
+      <a class="imgbtn" href="https://search3958.github.io/project/images/">もっと表示</a>
       </div>
       <input type="text" id="imageUrl" placeholder="画像URLを入力" />
       <div class="flexcard" style="gap:8px">
@@ -116,7 +116,7 @@ check
     </div>
       </div>
     </div>
-    <div class="item">背景画像</div>
+    <div class="item">情報</div>
         <div class="item">
     <div class="settingcard" style="padding-left:16px;">
       <a class="block" href="https://search3958.github.io">Search 3958</a>
@@ -139,12 +139,58 @@ check
 </div>
 
 <form class="search" id="searchForm" method="get">
-  <input class="searchtext" type="text" id="searchInput" name="q" placeholder="Search" required>
+  <input class="searchtext" autocomplete="off" type="text" id="searchInput" name="q" placeholder="Search" required>
   <button class="searchbtn" type="button"><span class="material-symbols-rounded searchicon">search</span></button>
 </form>
 
 <div class="history" id="history"></div>
 
+  <div class="widget">
+   <div class="battery-container">
+        <div id="battery-fill" class="battery-fill"></div>
+        <div id="battery-text" class="battery-text">100%</div>
+    </div>
+    
+    <div class="clock-watch">
+    <div class="analog-clock-container">
+    <!-- 左側：個性的なアナログ時計 -->
+    <div class="clock-face" id="clock-face">
+      <div class="clock-hand clock-hour-hand" id="hour-hand"></div>
+      <div class="clock-hand clock-minute-hand" id="minute-hand"></div>
+      <div class="clock-hand clock-second-hand" id="second-hand"></div>
+    </div>
+    <!-- 右側：日付表示 -->
+    <div class="date-display" id="date-display">
+      <span id="day-of-week"></span>
+      <span id="month-day"></span>
+    </div>
+  </div>
+      
+      <div class="stopwatch-wrapper">
+    <!-- 左側ボタン -->
+    <div class="stopwatch-buttons">
+      <!-- 再生/一時停止ボタン -->
+      <button id="playPauseBtn" class="stopwatch-button">
+        <span class="material-symbols-rounded stopwatchicon">play_arrow</span>
+      </button>
+      <!-- リセットボタン -->
+      <button id="resetBtn" class="stopwatch-button">
+        <span class="material-symbols-rounded stopwatchicon">refresh</span>
+      </button>
+    </div>
+    <!-- 右側の時間表示 -->
+    <div class="time-display" id="timeDisplay">00:00</div>
+  </div>
+    </div>
+    
+<div id="weatherBox">
+    <p class="temperature">--°C</p>
+    <p class="weather">--</p>
+    <p class="location">取得中</p>
+  </div>
+
+    
+    </div>
 
   <div id="bg">
     <div id="shortcuts">
