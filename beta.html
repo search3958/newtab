@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <script src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1"></script>
+  <script src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js" async></script>
   <!--google tags-->
   <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
@@ -17,9 +17,28 @@
   <link rel="stylesheet" href="https://search3958.github.io/newtab/v3.6/style.css">
 <link rel="icon" href="https://search3958.github.io/favicon/newtab.svg">
 <script type="text/javascript" src="//typesquare.com/3/tsst/script/ja/typesquare.js?67afe5719990420aa8d92d04ac1e02e5" charset="utf-8" async></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <script>
+  window.addEventListener('load', function () {
+    // 'preconnect' リソースを遅延で読み込む
+    var preconnect1 = document.createElement('link');
+    preconnect1.rel = 'preconnect';
+    preconnect1.href = 'https://fonts.googleapis.com';
+    document.head.appendChild(preconnect1);
+
+    var preconnect2 = document.createElement('link');
+    preconnect2.rel = 'preconnect';
+    preconnect2.href = 'https://fonts.gstatic.com';
+    preconnect2.crossOrigin = 'anonymous';
+    document.head.appendChild(preconnect2);
+
+    // フォントの読み込みを遅延
+    var link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  });
+</script>
+
     <meta charset="UTF-8">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,200" />
   <meta charset="UTF-8">
@@ -28,7 +47,8 @@
 </head>
 <body>
   <div class="aibg"></div>
-  
+
+
   <div class="bar shadow"><div id="clock">9:41 AM</div>
     <button class="btn" id="showBtn"><span class="material-symbols-rounded">
 page_info
@@ -37,9 +57,9 @@ page_info
     <button class="aibtn"><span class="material-symbols-rounded">
 frame_inspect
 </span></button></div>
-  
+
   <div class="settingcontainer">
-    
+
         <div class="item noclick">アイコン</div>
         <div class="item">
           <div class="settingcard flexcard shadow">
@@ -48,7 +68,7 @@ frame_inspect
   <span class="material-symbols-rounded">
 check
 </span>
-  
+
 </label>
              <input type="range" id="hueRotation" min="0" max="360" value="0">
              </div>
@@ -77,19 +97,19 @@ check
   </div>
     </div>
           </div>
-    
+
   <div id="batteryStatus" class="shadow"></div>
-  
+
 <div class="engine shadow">
   <input id="google" class="enginebtn" type="radio" name="engine" value="https://www.google.com/search" checked> 
   <label for="google" class="enginelbl">Google</label>
   <input id="bing" class="enginebtn" type="radio" name="engine" value="https://www.bing.com/search"> 
   <label for="bing" class="enginelbl">Bing</label>
-  
+
   <span class="material-symbols-rounded engineicon">
 stat_1
 </span>
-  
+
   <input id="yahoo" class="enginebtn" type="radio" name="engine" value="https://search.yahoo.com/search"> 
   <label for="yahoo" class="enginelbl">Yahoo</label>
   <input id="naver" class="enginebtn" type="radio" name="engine" value="https://search.naver.com/search.naver"> 
@@ -104,8 +124,8 @@ stat_1
 <div class="history" id="history"></div>
 
   <div class="widget">
-    
-    
+
+
 <div id="weatherBox" class="widgetctn shadow">
     <div>
     <p class="weather">--</p>
@@ -113,15 +133,15 @@ stat_1
       </div>
   <p class="temperature">--°C</p>
   </div>
-    
-    
+
+
     <div class="analog-clock-container widgetctn shadow">
     <div class="date-display" id="date-display">
       <span id="month-day" style="font-size: 1.3em!important;"></span>
       <span id="day-of-week"></span>
     </div>
   </div>
-      
+
       <div class="stopwatch-wrapper widgetctn shadow">
     <!-- 左側ボタン -->
     <div class="stopwatch-buttons">
@@ -137,11 +157,11 @@ stat_1
     <!-- 右側の時間表示 -->
     <div class="time-display" id="timeDisplay">00:00</div>
   </div>
-    
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
      crossorigin="anonymous"></script>
 <ins class="adsbygoogle"
-     style="display:inline-block;width:130px;height:61px"
+     style="display:inline-block;width:130px;height:62px"
      data-ad-client="ca-pub-6151036058675874"
      data-ad-slot="2601158311"></ins>
 <script>
@@ -153,7 +173,7 @@ stat_1
         <div id="battery-text" class="battery-text">100%</div>
     </div>
   </div>
-    
+
   <div id="bg">
     <div id="shortcuts">
   <div class="linktext">Google</div>
@@ -183,7 +203,7 @@ stat_1
     <link-box href="https://kahoot.com/" bg-color="#401A89" img="kahoot">Kahoot</link-box>
     <link-box href="https://discord.com/channels/@me" bg-color="linear-gradient(0deg, rgba(54, 67, 203, 1), rgba(88, 101, 242, 1))" img="discord">Discord</link-box>
   </div>
-      
+
   <div class="linktext">開発</div>
   <div class="links">
     <link-box href="https://console.firebase.google.com/" bg-color="var(--white)" img="firebase">Firebase</link-box>
@@ -217,7 +237,7 @@ stat_1
   <div class="linktext">広告</div>
       <div class="ad">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-  crossorigin="anonymous"></script>
+  crossorigin="anonymous"  async></script>
   <ins class="adsbygoogle"
     style="display:block"
     data-ad-format="autorelaxed"
