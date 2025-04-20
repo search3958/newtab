@@ -4,51 +4,51 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             title: '<ml-block><div data-lang="en">Google</div><div data-lang="ja-jp">Google</div><div data-lang="zh-cn">Google</div></ml-block>',
             links: [
-{ href: "https://mail.google.com", src: "https://search3958.github.io/newtab/gmail.png", content: "Gmail" },
-{ href: "https://classroom.google.com", src: "https://search3958.github.io/newtab/classroom.png", content: "Classroom" },
-{ href: "https://youtube.com", src: "https://search3958.github.io/newtab/youtube.png", content: "Youtube" },
-{ href: "https://docs.google.com", src: "https://search3958.github.io/newtab/document.png", content: "Document" },
-{ href: "https://docs.google.com/presentation/", src: "https://search3958.github.io/newtab/slide.png", content: "Slide" },
-{ href: "https://docs.google.com/spreadsheet/", src: "https://search3958.github.io/newtab/spreadsheet.png", content: "Spreadsheet" },
-{ href: "https://translate.google.com", src: "https://search3958.github.io/newtab/translate.png", content: "Translate" },
-{ href: "https://gemini.google.com", src: "https://search3958.github.io/newtab/gemini.png", content: "Gemini" },
-{ href: "https://about.google/products", src: "https://search3958.github.io/newtab/product.png", content: "Product" }
+{ href: "https://mail.google.com", src: "https://search3958.github.io/newtab/gmail.webp", content: "Gmail" },
+{ href: "https://classroom.google.com", src: "https://search3958.github.io/newtab/classroom.webp", content: "Classroom" },
+{ href: "https://youtube.com", src: "https://search3958.github.io/newtab/youtube.webp", content: "Youtube" },
+{ href: "https://docs.google.com", src: "https://search3958.github.io/newtab/document.webp", content: "Document" },
+{ href: "https://docs.google.com/presentation/", src: "https://search3958.github.io/newtab/slide.webp", content: "Slide" },
+{ href: "https://docs.google.com/spreadsheet/", src: "https://search3958.github.io/newtab/spreadsheet.webp", content: "Spreadsheet" },
+{ href: "https://translate.google.com", src: "https://search3958.github.io/newtab/translate.webp", content: "Translate" },
+{ href: "https://gemini.google.com", src: "https://search3958.github.io/newtab/gemini.webp", content: "Gemini" },
+{ href: "https://about.google/products", src: "https://search3958.github.io/newtab/product.webp", content: "Product" }
             ]
         },
         {
             title: '<ml-block><div data-lang="en">Learning and productivity</div><div data-lang="ja-jp">学習と作業効率化</div><div data-lang="zh-cn">學習和工作效率</div></ml-block>',
             links: [
-{ href: "https://app.monoxer.com", src: "https://search3958.github.io/newtab/monoxer.png", content: "Monoxer" },
-{ href: "https://chatgpt.com", src: "https://search3958.github.io/newtab/chatgpt.png", content: "Chat GPT" },
-{ href: "https://copilot.microsoft.com", src: "https://search3958.github.io/newtab/copilot.png", content: "Copilot" },
-{ href: "https://codepen.io", src: "https://search3958.github.io/newtab/codepen.png", content: "Codepen" },
-{ href: "https://wikipedia.org", src: "https://search3958.github.io/newtab/wikipedia.png", content: "Wikipedia" },
-{ href: "https://canva.com", src: "https://search3958.github.io/newtab/canva.png", content: "Canva" },
-{ href: "https://www.office.com/?auth=1", src: "https://search3958.github.io/newtab/microsoft365.png", content: "Microsoft 365" },
-{ href: "https://turbowarp.ore", src: "https://search3958.github.io/newtab/turbowarp.png", content: "TurboWarp" }
+{ href: "https://app.monoxer.com", src: "https://search3958.github.io/newtab/monoxer.webp", content: "Monoxer" },
+{ href: "https://chatgpt.com", src: "https://search3958.github.io/newtab/chatgpt.webp", content: "Chat GPT" },
+{ href: "https://copilot.microsoft.com", src: "https://search3958.github.io/newtab/copilot.webp", content: "Copilot" },
+{ href: "https://codepen.io", src: "https://search3958.github.io/newtab/codepen.webp", content: "Codepen" },
+{ href: "https://wikipedia.org", src: "https://search3958.github.io/newtab/wikipedia.webp", content: "Wikipedia" },
+{ href: "https://canva.com", src: "https://search3958.github.io/newtab/canva.webp", content: "Canva" },
+{ href: "https://www.office.com/?auth=1", src: "https://search3958.github.io/newtab/microsoft365.webp", content: "Microsoft 365" },
+{ href: "https://turbowarp.ore", src: "https://search3958.github.io/newtab/turbowarp.webp", content: "TurboWarp" }
         },
       
               {
             title: '<ml-block><div data-lang="en">Shipping</div><div data-lang="ja-jp">ショッピング</div><div data-lang="zh-cn">购物</div></ml-block>',
             links: [
-{ href: "https://www.amazon.co.jp/", src: "https://search3958.github.io/newtab/amazon.png", content: "Amazon" },
-{ href: "https://ja.aliexpress.com/", src: "https://search3958.github.io/newtab/aliexpress.png", content: "AliExpress" },
-{ href: "https://www.wish.com/ja", src: "https://search3958.github.io/newtab/wish.png", content: "Wish" },
-{ href: "https://jp.mercari.com/", src: "https://search3958.github.io/newtab/mercali.png", content: "Mercali" },
-{ href: "https://www.taobao.com/", src: "https://search3958.github.io/newtab/taobao.png", content: "淘宝" }
+{ href: "https://www.amazon.co.jp/", src: "https://search3958.github.io/newtab/amazon.webp", content: "Amazon" },
+{ href: "https://ja.aliexpress.com/", src: "https://search3958.github.io/newtab/aliexpress.webp", content: "AliExpress" },
+{ href: "https://www.wish.com/ja", src: "https://search3958.github.io/newtab/wish.webp", content: "Wish" },
+{ href: "https://jp.mercari.com/", src: "https://search3958.github.io/newtab/mercali.webp", content: "Mercali" },
+{ href: "https://www.taobao.com/", src: "https://search3958.github.io/newtab/taobao.webp", content: "淘宝" }
             ]
         },
       
               {
             title: '<ml-block><div data-lang="en">Entertainment</div><div data-lang="ja-jp">娯楽</div><div data-lang="zh-cn">娛樂</div></ml-block>',
             links: [
-{ href: "https://scratch.mit.edu", src: "https://search3958.github.io/newtab/scratch.png", content: "Scratch" },
-{ href: "https://poki.com", src: "https://search3958.github.io/newtab/poki.png", content: "poki" },
-{ href: "https://snake.io", src: "https://search3958.github.io/newtab/snakeio.png", content: "Snake.io" },
-{ href: "https://www.google.com/logos/2010/pacman10-i.html", src: "https://search3958.github.io/newtab/pacman.png", content: "PACMAN" },
-{ href: "https://www.instagram.com/", src: "https://search3958.github.io/newtab/instagram.png", content: "Instagram" },
-{ href: "https://www.netflix.com/jp/", src: "https://search3958.github.io/newtab/netflix.png", content: "Netflix" },
-{ href: "https://weverse.io/?hl=ja", src: "https://search3958.github.io/newtab/weverse.png", content: "Weverse" }
+{ href: "https://scratch.mit.edu", src: "https://search3958.github.io/newtab/scratch.webp", content: "Scratch" },
+{ href: "https://poki.com", src: "https://search3958.github.io/newtab/poki.webp", content: "poki" },
+{ href: "https://snake.io", src: "https://search3958.github.io/newtab/snakeio.webp", content: "Snake.io" },
+{ href: "https://www.google.com/logos/2010/pacman10-i.html", src: "https://search3958.github.io/newtab/pacman.webp", content: "PACMAN" },
+{ href: "https://www.instagram.com/", src: "https://search3958.github.io/newtab/instagram.webp", content: "Instagram" },
+{ href: "https://www.netflix.com/jp/", src: "https://search3958.github.io/newtab/netflix.webp", content: "Netflix" },
+{ href: "https://weverse.io/?hl=ja", src: "https://search3958.github.io/newtab/weverse.webp", content: "Weverse" }
             ]
         },
     ];

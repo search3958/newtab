@@ -148,10 +148,10 @@ function updateClock() {
             images.forEach(img => {
                 const src = img.src;
                 if (switchControl.checked) {
-                    img.src = src.replace('.png', '.svg'); // pngからsvgに切り替え
+                    img.src = src.replace('.webp', '.svg'); // pngからsvgに切り替え
                     img.classList.add('background-on'); // 背景色を変更
                 } else {
-                    img.src = src.replace('.svg', '.png'); // svgからpngに戻す
+                    img.src = src.replace('.svg', '.webp'); // svgからpngに戻す
                     img.classList.remove('background-on'); // 背景色を元に戻す
                 }
             });
