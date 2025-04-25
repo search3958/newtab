@@ -60,10 +60,14 @@ window.addEventListener("DOMContentLoaded", () => {
   // 実際のバッテリー取得 (対応しているブラウザ限定)
   if (navigator.getBattery) {
     navigator.getBattery().then(function(battery) {
-      document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}%`;
+      const level = Math.round(battery.level * 100);
+      const batteryText = document.getElementById("battery");
+      const batteryContainer = document.getElementById("battery-container");
+
+      batteryText.textContent = `${level}%`;
+      batteryContainer.style.background = `linear-gradient(to right, rgba(120,160,255,0.4) ${level}%, rgba(255,255,255,0.4) ${level}%)`;
     });
   }
-
   // 履歴の表示
   function renderHistory() {
     const history = JSON.parse(localStorage.getItem('searchHistory')) || [];

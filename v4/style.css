@@ -18,7 +18,7 @@
 
 body {
 	margin: 0;
-	height: calc(100vh + 1px);
+	height: calc(100vh + 2px);
 	background-image: url('https://search3958.github.io/newtab/bgimg/reflect5.webp');
 	background-size: cover;
 	background-position: center;
@@ -149,6 +149,15 @@ svg {
 	filter:blur(8px);
 	opacity:0;
 }
+
+#clearButton{
+	filter:blur(0px);
+	opacity:0;
+}
+.history:hover > #clearButton{
+	filter:blur(0px);
+	opacity:1;
+}
 #historyList{
 	display:flex;
 	gap:16px;
@@ -260,10 +269,11 @@ img:hover{
     margin: 16px 0px;
 }
 .settingcard {
-    width: fit-content;
-	display:flex;
-	padding:8px;
-	gap:8px;
+    width: 460px;
+    display: flex;
+    padding: 8px;
+    gap: 8px;
+    justify-content: flex-end;
 }
 input#bgUrlInput {
     font-size: 24px;
@@ -302,8 +312,7 @@ input#bgUrlInput {
   }
 
   .pill.battery {
-	background: linear-gradient(to right, rgba(120,160,255,0.4) 70%, rgba(255,255,255,0.4) 70%);
-	width: 50px;
+		width: 50px;
   }
   .pill.tool {
 	display: flex;
@@ -365,6 +374,7 @@ input#bgUrlInput {
 	scale:0;
 	filter:blur(60px);
 	backdrop-filter: blur(8px);
+	overflow: hidden;
   }
   
   .settings.active {
