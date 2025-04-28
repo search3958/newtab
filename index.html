@@ -1,238 +1,159 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <script async src="https://fundingchoicesmessages.google.com/i/pub-6151036058675874?ers=1"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js" async></script>
-  <!--google tags-->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-     crossorigin="anonymous" async></script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C" async></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-7N56NHPY3C');
-</script>
-  <link rel="stylesheet" href="https://search3958.github.io/newtab/v3.6/style.css">
-<link rel="icon" href="https://search3958.github.io/favicon/newtab.svg">
-<script type="text/javascript" src="//typesquare.com/3/tsst/script/ja/typesquare.js?67afe5719990420aa8d92d04ac1e02e5" charset="utf-8" async></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://search3958.github.io/newtab/v4/style.css">
+  <link rel="icon" href="https://search3958.github.io/favicon/newtab.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,200" />
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans&family=Zen+Kaku+Gothic+Antique&display=swap" rel="stylesheet">
+  <script>
+  if (CSS && 'paintWorklet' in CSS) CSS.paintWorklet.addModule('https://unpkg.com/smooth-corners')
+</script>
   <meta charset="UTF-8">
-  <title>Newtab3</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Newtab-beta</title>
 </head>
 <body>
-  <div class="aibg"></div>
-  
-  <p class="help">スクロールしてショートカットを表示します</p>
-  <div class="bar shadow"><div id="clock">9:41 AM</div>
-    <button class="btn" id="showBtn"><span class="material-symbols-rounded">
-page_info
-</span></button></div>
-  <div class="aibar shadow">
-    <button class="aibtn"><span class="material-symbols-rounded">
-frame_inspect
-</span></button></div>
-  
-  <div class="settingcontainer">
-    
-        <div class="item noclick">アイコン</div>
-        <div class="item">
-          <div class="settingcard flexcard shadow">
-            <input type="checkbox" id="colorMode">
-<label for="colorMode" class="switch">
-  <span class="material-symbols-rounded">
-check
-</span>
-  
-</label>
-             <input type="range" id="hueRotation" min="0" max="360" value="0">
-             </div>
-          </div>
-        <div class="item">背景画像</div>
-        <div class="item">
-    <div class="settingcard shadow">
-      <div class="flexcard">
-      <div onclick="changeText1()" style="background-image:url('https://search3958.github.io/newtab/bgimg/pre-1.webp')" class="imgbtn"></div>
-    <div onclick="changeText2()" style="background-image:url('https://search3958.github.io/newtab/bgimg/pre-2.webp')" class="imgbtn"></div>
-      <a class="imgbtn" href="https://search3958.github.io/project/images/">もっと表示</a>
-      </div>
-      <input type="text" id="imageUrl" placeholder="画像URLを入力" />
-      <div class="flexcard" style="gap:8px">
-    <button class="pbutton shadow" onclick="updateBackground()">適用</button>
-    <button class="sbutton shadow" onclick="resetBackground()">リセット</button>
-    </div>
-      </div>
-    </div>
-    <div class="item">情報</div>
-        <div class="item">
-    <div class="settingcard shadow" style="padding-left:16px;">
-      <a class="block" href="https://search3958.github.io">Search 3958</a>
-      <a class="block" href="https://search3958.github.io/newtab/newtab-simple.html">Newtab簡易版</a>
-    <a class="block" href="https://search3958.github.io/i/newtab/?section=content1-1.html">Newtab 3の詳細</a><div class="line"></div><p>HTMLバージョン:8.1-Ad</p><p class="css-ver">CSSバージョン:</p><p id="js-ver">JavaScriptが作動していません</p>
-  </div>
-    </div>
-          </div>
-    
-  <div id="batteryStatus" class="shadow"></div>
-  
-<div class="engine shadow">
-  <input id="google" class="enginebtn" type="radio" name="engine" value="https://www.google.com/search" checked> 
-  <label for="google" class="enginelbl">Google</label>
-  <input id="bing" class="enginebtn" type="radio" name="engine" value="https://www.bing.com/search"> 
-  <label for="bing" class="enginelbl">Bing</label>
-  
-  <span class="material-symbols-rounded engineicon">
-stat_1
-</span>
-  
-  <input id="yahoo" class="enginebtn" type="radio" name="engine" value="https://search.yahoo.com/search"> 
-  <label for="yahoo" class="enginelbl">Yahoo</label>
-  <input id="naver" class="enginebtn" type="radio" name="engine" value="https://search.naver.com/search.naver"> 
-  <label for="naver" class="enginelbl">Naver</label>
+  <form class="search-container smooth" id="searchForm">
+    <input type="text" name="q" id="searchInput" placeholder="検索" autocomplete="off" autofocus>
+  </form>
+  <button type="button" id="searchButton"  class="smooth">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="24" height="24">
+      <path d="M647-440H200q-17 0-28.5-11.5T160-480q0-17 11.5-28.5T200-520h447L451-716q-12-12-11.5-28t12.5-28q12-11 28-11.5t28 11.5l264 264q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L508-188q-11 11-27.5 11T452-188q-12-12-12-28.5t12-28.5l195-195Z"/>
+    </svg>
+  </button>
+  <div class="history">
+    <div class="historytext">履歴</div>
+    <div id="historyList" ></div>
+    <button id="clearButton">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" class="deleteicon"><path d="m656-120-56-56 84-84-84-84 56-56 84 84 84-84 56 56-83 84 83 84-56 56-84-83-84 83Zm-176 0q-138 0-240.5-91.5T122-440h82q14 104 92.5 172T480-200q11 0 20.5-.5T520-203v81q-10 1-19.5 1.5t-20.5.5ZM120-560v-240h80v94q51-64 124.5-99T480-840q150 0 255 105t105 255h-80q0-117-81.5-198.5T480-760q-69 0-129 32t-101 88h110v80H120Zm414 190-94-94v-216h80v184l56 56-42 70Z"/></svg>
+</button>
 </div>
 
-<form class="search shadow" id="searchForm" method="get">
-  <input class="searchtext" autocomplete="off" type="text" id="searchInput" name="q" placeholder="検索" required>
-  <button class="searchbtn" type="button"><span class="material-symbols-rounded searchicon">search</span></button>
-</form>
+<div class="widgetcontainer">
+  <div class="pill">
+    <div class="date" id="date"></div>
+    <div class="weekday" id="weekday"></div>
+  </div>
+  <div class="pill battery" id="battery-container">
+    <div class="percentage" id="battery">--%</div>
+  </div>
 
-<div class="history" id="history"></div>
 
-  <div class="widget">
-    
-    
-<div id="weatherBox" class="widgetctn shadow">
-    <div>
-    <p class="weather">--</p>
-    <p class="location">取得中</p>
+  <div class="pill tool">
+      <div class="pillicon hoverscale" id="calc">
+       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" class="plgl"><path d="M320-320v50q0 13 8.5 21.5T350-240q13 0 21.5-8.5T380-270v-50h50q13 0 21.5-8.5T460-350q0-13-8.5-21.5T430-380h-50v-50q0-13-8.5-21.5T350-460q-13 0-21.5 8.5T320-430v50h-50q-13 0-21.5 8.5T240-350q0 13 8.5 21.5T270-320h50Zm230 50h140q13 0 21.5-8.5T720-300q0-13-8.5-21.5T690-330H550q-13 0-21.5 8.5T520-300q0 13 8.5 21.5T550-270Zm0-100h140q13 0 21.5-8.5T720-400q0-13-8.5-21.5T690-430H550q-13 0-21.5 8.5T520-400q0 13 8.5 21.5T550-370ZM280-592h140q13 0 21.5-8.5T450-622q0-13-8.5-21.5T420-652H280q-13 0-21.5 8.5T250-622q0 13 8.5 21.5T280-592Zm-80 472q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm420-458 35 35q9 9 21 9t21-9q8-8 8.5-20.5T698-585l-36-37 35-35q9-9 9-21t-9-21q-9-9-21-9t-21 9l-35 35-35-35q-9-9-21-9t-21 9q-9 9-9 21t9 21l35 35-36 37q-8 9-8 21t9 21q9 9 21 9t21-9l35-35Z"/></svg>
       </div>
-  <p class="temperature">--°C</p>
+      <div class="pillicon hoverscale" id="clock">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" class="plgl"><path d="M400-840q-17 0-28.5-11.5T360-880q0-17 11.5-28.5T400-920h160q17 0 28.5 11.5T600-880q0 17-11.5 28.5T560-840H400Zm80 440q17 0 28.5-11.5T520-440v-160q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600v160q0 17 11.5 28.5T480-400Zm0 320q-74 0-139.5-28.5T226-186q-49-49-77.5-114.5T120-440q0-74 28.5-139.5T226-694q49-49 114.5-77.5T480-800q62 0 119 20t107 58l28-28q11-11 28-11t28 11q11 11 11 28t-11 28l-28 28q38 50 58 107t20 119q0 74-28.5 139.5T734-186q-49 49-114.5 77.5T480-80Z"/></svg>
+       </div>
   </div>
-    
-    
-    <div class="analog-clock-container widgetctn shadow">
-    <div class="date-display" id="date-display">
-      <span id="month-day" style="font-size: 1.3em!important;"></span>
-      <span id="day-of-week"></span>
+</div>
+<div id="toolframe">
+  <button class="closetool">完了</button>
+  <br>
+  <iframe id="tool"></iframe>
+</div>
+<div class="bar">
+  <div id="time">9:41 AN</div>
+</div>
+<button id="aisearch" class="hoverscale"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q127 0 226.5 70T851-629q7 17 .5 34T828-572q-16 5-30.5-3T777-599q-24-60-69-106t-108-71v16q0 33-23.5 56.5T520-680h-80v80q0 17-11.5 28.5T400-560h-80v80h40q17 0 28.5 11.5T400-440v80h-40L168-552q-3 18-5.5 36t-2.5 36q0 122 80.5 213T443-162q16 2 26.5 13.5T480-120q0 17-11.5 28.5T441-82Q288-97 184-210T80-480Zm736 352L716-228q-21 12-45 20t-51 8q-75 0-127.5-52.5T440-380q0-75 52.5-127.5T620-560q75 0 127.5 52.5T800-380q0 27-8 51t-20 45l100 100q11 11 11 28t-11 28q-11 11-28 11t-28-11ZM620-280q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg></button>
+
+<button id="setting" class="hoverscale">
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff"><path d="M710-150q-63 0-106.5-43.5T560-300q0-63 43.5-106.5T710-450q63 0 106.5 43.5T860-300q0 63-43.5 106.5T710-150Zm0-80q29 0 49.5-20.5T780-300q0-29-20.5-49.5T710-370q-29 0-49.5 20.5T640-300q0 29 20.5 49.5T710-230Zm-270-30H200q-17 0-28.5-11.5T160-300q0-17 11.5-28.5T200-340h240q17 0 28.5 11.5T480-300q0 17-11.5 28.5T440-260ZM250-510q-63 0-106.5-43.5T100-660q0-63 43.5-106.5T250-810q63 0 106.5 43.5T400-660q0 63-43.5 106.5T250-510Zm0-80q29 0 49.5-20.5T320-660q0-29-20.5-49.5T250-730q-29 0-49.5 20.5T180-660q0 29 20.5 49.5T250-590Zm510-30H520q-17 0-28.5-11.5T480-660q0-17 11.5-28.5T520-700h240q17 0 28.5 11.5T800-660q0 17-11.5 28.5T760-620Zm-50 320ZM250-660Z"/></svg>
+</button>
+<div class="settings">
+    <div class="settingcard">
+      <input type="text" id="bgUrlInput" placeholder="背景画像のURL">
+      <button onclick="window.location.href='https://search3958.github.io/project/images/'" class="settingbtn">もっと見る</button>
+      <button id="setButton" class="settingbtn">設定</button>
     </div>
-  </div>
-      
-      <div class="stopwatch-wrapper widgetctn shadow">
-    <!-- 左側ボタン -->
-    <div class="stopwatch-buttons">
-      <!-- 再生/一時停止ボタン -->
-      <button id="playPauseBtn" class="stopwatch-button">
-        <span class="material-symbols-rounded stopwatchicon">play_arrow</span>
-      </button>
-      <!-- リセットボタン -->
-      <button id="resetBtn" class="stopwatch-button">
-        <span class="material-symbols-rounded stopwatchicon">refresh</span>
-      </button>
+    <div class="settingcard">
+      <div class="settingtext">Newtab-v4</div>
+      <button onclick="window.location.href='https://search3958.github.io/'" class="settingbtn">私について</button>
     </div>
-    <!-- 右側の時間表示 -->
-    <div class="time-display" id="timeDisplay">00:00</div>
-  </div>
-    
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+</div>
+<div class="aibg" id="aiBg"></div>
+<div class="bg"></div>
+<div class="shortcut">
+<div class="linktext">Google</div>
+  <div class="links">
+<link-box name="Gmail" bg="var(--iconbg)" url="https://mail.google.com/" icon="gmail.webp"></link-box>
+<link-box name="Keep" bg="var(--iconbg)" url="https://keep.google.com/" icon="keep.webp"></link-box>
+<link-box name="Classroom" bg="var(--iconbg)" url="https://classroom.google.com/" icon="classroom.webp"></link-box>
+<link-box name="Youtube" bg="var(--iconbg)" url="https://www.youtube.com/" icon="youtube.webp"></link-box>
+<link-box name="Document" bg="var(--iconbg)" url="https://docs.google.com/document/" icon="document.webp"></link-box>
+<link-box name="Slide" bg="var(--iconbg)" url="https://docs.google.com/presentation/" icon="slide.webp"></link-box>
+<link-box name="Spreadsheet" bg="var(--iconbg)" url="https://docs.google.com/spreadsheets/" icon="spreadsheet.webp"></link-box>
+<link-box name="Translate" bg="var(--iconbg)" url="https://translate.google.com/" icon="translate.webp"></link-box>
+<link-box name="Gemini" bg="var(--iconbg)" url="https://gemini.google.com/" icon="gemini.webp"></link-box>
+<link-box name="リモート" bg="var(--iconbg)" url="https://remotedesktop.google.com/" icon="remotedesktop.webp"></link-box>
+<link-box name="ドライブ" bg="var(--iconbg)" url="https://drive.google.com/" icon="drive.webp"></link-box>
+<link-box name="Product" bg="var(--iconbg)" url="https://about.google/products/" icon="products.webp"></link-box>
+</div>
+
+<div class="linktext">学習と作業効率化</div>
+  <div class="links">
+    <link-box name="Monoxer" bg="#0073ffc9" url="https://app.monoxer.com/" icon="monoxer.webp"></link-box>
+<link-box name="Chat GPT" bg="#000000c9" url="https://chat.openai.com/" icon="chatgpt.webp"></link-box>
+<link-box name="Copilot" bg="var(--iconbg)" url="https://copilot.microsoft.com/" icon="copilot.webp"></link-box>
+<link-box name="Claude" bg="var(--iconbg)" url="https://claude.ai/" icon="claude.webp"></link-box>
+<link-box name="Canva" bg="var(--iconbg)" url="https://www.canva.com/" icon="canva.webp"></link-box>
+<link-box name="Microsoft 365" bg="var(--iconbg)" url="https://www.microsoft.com/microsoft-365" icon="microsodt.webp"></link-box>
+<link-box name="TurboWarp" bg="var(--iconbg)" url="https://turbowarp.org/" icon="turbowarp.webp"></link-box>
+<link-box name="Kahoot" bg="#1b00a8c9" url="https://kahoot.it/" icon="kahoot.webp"></link-box>
+<link-box name="Discord" bg="#5618ffc9" url="https://discord.com/app" icon="discord.webp"></link-box>
+</div>
+
+<div class="linktext">開発</div>
+  <div class="links">
+    <link-box name="Firebase" bg="var(--iconbg)" url="https://firebase.google.com/" icon="firebase.webp"></link-box>
+<link-box name="Codepen" bg="#000000c9" url="https://codepen.io/" icon="codepen.webp"></link-box>
+<link-box name="Figma" bg="var(--iconbg)" url="https://www.figma.com/" icon="figma.webp"></link-box>
+<link-box name="GitHub" bg="var(--iconbg)" url="https://github.com/" icon="github.webp"></link-box>
+<link-box name="AdSense" bg="var(--iconbg)" url="https://www.google.com/adsense/" icon="adsense.webp"></link-box>
+<link-box name="Tools" bg="var(--iconbg)" url="https://search3958.github.io/tools" icon="tools.webp"></link-box>
+</div>
+
+<div class="linktext">ショッピング</div>
+  <div class="links">
+    <link-box name="Amazon" bg="var(--iconbg)" url="https://www.amazon.co.jp/" icon="amazon.webp"></link-box>
+<link-box name="AliExpress" bg="var(--iconbg)" url="https://www.aliexpress.com/" icon="aliexpress.webp"></link-box>
+<link-box name="Wish" bg="var(--iconbg)" url="https://www.wish.com/" icon="wish.webp"></link-box>
+<link-box name="Mercari" bg="var(--iconbg)" url="https://www.mercari.com/jp/" icon="mercari.webp"></link-box>
+<link-box name="淘宝" bg="var(--iconbg)" url="https://www.taobao.com/" icon="taobao.webp"></link-box>
+</div>
+
+<div class="linktext">エンターテイメント</div>
+  <div class="links">
+    <link-box name="Scratch" bg="var(--iconbg)" url="https://scratch.mit.edu/" icon="scratch.webp"></link-box>
+<link-box name="poki" bg="var(--iconbg)" url="https://poki.com/" icon="poki.webp"></link-box>
+<link-box name="Snake.io" bg="var(--iconbg)" url="https://snake.io/" icon="snake.webp"></link-box>
+<link-box name="PACMAN" bg="#000000c9" url="https://www.google.com/search?q=play+pacman" icon="pacman.webp"></link-box>
+<link-box name="Instagram" bg="#b600ffc9" url="https://www.instagram.com/" icon="instagram.webp"></link-box>
+<link-box name="thinking SNS" bg="var(--iconbg)" url="https://thinking-grp.github.io/sns/" icon="thinking.webp"></link-box>
+<link-box name="Netflix" bg="var(--iconbg)" url="https://www.netflix.com/" icon="netflix.webp"></link-box>
+<link-box name="Weverse" bg="#27ffbfc9" url="https://weverse.io/" icon="weverse.webp"></link-box>
+<link-box name="Prime Video" bg="#0398ffc9" url="https://www.amazon.co.jp/Prime-Video/" icon="primevideo.webp"></link-box>
+<link-box name="Spotify" bg="var(--iconbg)" url="https://www.spotify.com/" icon="spotify.webp"></link-box>
+</div>
+
+<div class="linktext">おすすめ情報</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
      crossorigin="anonymous"></script>
 <ins class="adsbygoogle"
-     style="display:inline-block;width:130px;height:62px"
+     style="display:block"
+     data-ad-format="autorelaxed"
      data-ad-client="ca-pub-6151036058675874"
-     data-ad-slot="2601158311"></ins>
+     data-ad-slot="9559715307"></ins>
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-
-   <div class="battery-container widgetctn shadow">
-        <div id="battery-fill" class="battery-fill"></div>
-        <div id="battery-text" class="battery-text">100%</div>
-    </div>
-  </div>
-    
-  <div id="bg">
-    <div id="shortcuts">
-  <div class="linktext">Google</div>
-  <div class="links">
-    <link-box href="https://mail.google.com/" bg-color="var(--white)" img="gmail">Gmail</link-box>
-    <link-box href="https://keep.google.com/" bg-color="var(--white)" img="keep">Keep</link-box>
-    <link-box href="https://classroom.google.com/" bg-color="var(--white)" img="classroom">Classroom</link-box>
-    <link-box href="https://www.youtube.com/" bg-color="var(--white)" img="youtube">Youtube</link-box>
-    <link-box href="https://docs.google.com/document/" bg-color="var(--white)" img="document">Document</link-box>
-    <link-box href="https://docs.google.com/presentation/" bg-color="var(--white)" img="slide">Slide</link-box>
-    <link-box href="https://docs.google.com/spreadsheets/" bg-color="var(--white)" img="spreadsheet">Spreadsheet</link-box>
-    <link-box href="https://translate.google.com/" bg-color="var(--white)" img="translate">Translate</link-box>
-    <link-box href="https://gemini.google.com/app" bg-color="var(--white)" img="gemini">Gemini</link-box>
-    <link-box href="https://remotedesktop.google.com/" bg-color="var(--white)" img="remotedesktop">リモートデスクトップ</link-box>
-    <link-box href="https://drive.google.com/" bg-color="var(--white)" img="drive">ドライブ</link-box>
-    <link-box href="https://about.google/products/" bg-color="var(--white)" img="products">Product</link-box>
-  </div>
-  <div class="linktext">学習と作業効率化</div>
-  <div class="links">
-    <link-box href="https://app.monoxer.com/" bg-color="#459CF8" img="monoxer">Monoxer</link-box>
-    <link-box href="https://chat.openai.com/" bg-color="black" img="chatgpt">Chat GPT</link-box>
-    <link-box href="https://copilot.github.com/" bg-color="var(--white)" img="copilot">Copilot</link-box>
-    <link-box href="https://claude.ai/" bg-color="var(--white)" img="claude">Claude</link-box>
-    <link-box href="https://www.canva.com/" bg-color="var(--white)" img="canva">Canva</link-box>
-    <link-box href="https://www.microsoft.com/microsoft-365" bg-color="var(--white)" img="microsoft365">Microsoft 365</link-box>
-    <link-box href="https://turbowarp.org/" bg-color="var(--white)" img="turbowarp">TurboWarp</link-box>
-    <link-box href="https://kahoot.com/" bg-color="#401A89" img="kahoot">Kahoot</link-box>
-    <link-box href="https://discord.com/channels/@me" bg-color="linear-gradient(0deg, rgba(54, 67, 203, 1), rgba(88, 101, 242, 1))" img="discord">Discord</link-box>
-  </div>
-      
-  <div class="linktext">開発</div>
-  <div class="links">
-    <link-box href="https://console.firebase.google.com/" bg-color="var(--white)" img="firebase">Firebase</link-box>
-    <link-box href="https://codepen.io/" bg-color="black" img="codepen">Codepen</link-box>
-    <link-box href="https://www.figma.com/files/" bg-color="var(--white)" img="figma">Figma</link-box>
-    <link-box href="https://github.com/" bg-color="var(--white)" img="github">GitHub</link-box>
-    <link-box href="https://www.google.com/adsense/" bg-color="var(--white)" img="adsense">AdSense</link-box>
-    <link-box href="https://search3958.github.io/tools" bg-color="var(--white)" img="tools">Tools</link-box>
-  </div>
-  <div class="linktext">ショッピング</div>
-  <div class="links">
-    <link-box href="https://www.amazon.com/" bg-color="var(--white)" img="amazon">Amazon</link-box>
-    <link-box href="https://www.aliexpress.com/" bg-color="var(--white)" img="aliexpress">AliExpress</link-box>
-    <link-box href="https://www.wish.com/" bg-color="#70DF80" img="wish">Wish</link-box>
-    <link-box href="https://jp.mercari.com/" bg-color="var(--white)" img="mercari">Mercari</link-box>
-    <link-box href="https://www.taobao.com/" bg-color="var(--white)" img="taobao">淘宝</link-box>
-  </div>
-  <div class="linktext">エンターテイメント</div>
-  <div class="links">
-    <link-box href="https://scratch.mit.edu/" bg-color="#55ACEE" img="scratch">Scratch</link-box>
-    <link-box href="https://poki.com/" bg-color="#A2FCE7" img="poki">poki</link-box>
-    <link-box href="https://snake.io/" bg-color="var(--white)" img="snakeio">Snake.io</link-box>
-    <link-box href="https://www.pacman.com/" bg-color="black" img="pacman">PACMAN</link-box>
-    <link-box href="https://www.instagram.com/" bg-color="linear-gradient(135deg, #427eff 0%, #f13f79 70%) no-repeat" img="instagram">Instagram</link-box>
-    <link-box href="https://thinking-grp.github.io/sns/" bg-color="var(--white)" img="thinking">thinking SNS</link-box>
-    <link-box href="https://www.netflix.com/" bg-color="black" img="netflix">Netflix</link-box>
-    <link-box href="https://www.weverse.io/" bg-color="#6AE2C2" img="weverse">Weverse</link-box>
-    <link-box href="https://www.primevideo.com/" bg-color="#3171F6" img="primevideo">Prime Video</link-box>
-    <link-box href="https://www.spotify.com/" bg-color="var(--white)" img="spotify">Spotify</link-box>
-  </div>
-  <div class="linktext">広告</div>
-      <div class="ad">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-  crossorigin="anonymous"></script>
-  <ins class="adsbygoogle"
-    style="display:block"
-    data-ad-format="autorelaxed"
-       data-full-width-responsive="false"
-    data-ad-client="ca-pub-6151036058675874"
-    data-ad-slot="9559715307"></ins>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-        </div>
 </div>
-
-</div>
-  </div>
-<script src="https://search3958.github.io/newtab/v3.6/script.js"></script>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
+
+<script src="https://search3958.github.io/newtab/v4/script.js" type="module" ></script>
+<script src="https://search3958.github.io/newtab/v4/miniapps.js" defer></script>
+
 </html>
