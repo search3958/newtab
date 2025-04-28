@@ -9,8 +9,8 @@
 	--textboxbg: #fff6;
 	--textcolor: #000;
 	--textcolor-o: #0007;
-	--searchbtn: #7f7f7f;
-	--searchbtncolor: #fff;
+	--searchbtn: #000000;
+	--searchbtncolor: #b3b3b3;
 	--anm: 0.2s ease;
 	--iconbg: #fff9;
 	interpolate-size: allow-keywords;
@@ -53,7 +53,7 @@ body {
 	position: fixed;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, -50px);
 	--smooth-corners: 35, 7;
 }
 
@@ -78,7 +78,7 @@ input::-webkit-input-placeholder {
 
 #searchButton {
 	background: var(--searchbtn);
-	mix-blend-mode: color-burn;
+	mix-blend-mode: overlay;
 	border: none;
 	padding: 12px 24px;
 	border-radius: 100px;
@@ -90,7 +90,7 @@ input::-webkit-input-placeholder {
 	position: fixed;
 	top: 50%;
 	left: calc(50% + 127px);
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, -35.5px);
 	--smooth-corners: 7, 4;
 	color: var(--searchbtncolor);
 	transition: all var(--anm),left 0.4s cubic-bezier(.56,0,0,1);
@@ -100,7 +100,7 @@ input::-webkit-input-placeholder {
 }
 
 #searchButton:hover {
-	background: #777;
+	background: #222;
 }
 
 svg {
@@ -387,8 +387,8 @@ input#bgUrlInput {
 	border-radius: 37px;
 }
 #setting{
-	mix-blend-mode: color-burn;
-	background:#5c5c5c;
+	background: var(--searchbtn);
+    mix-blend-mode: overlay;
 	color:#fff;
 	position:fixed;
     top: 11px;
@@ -482,4 +482,61 @@ iframe#tool {
 
 iframe{
 	background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root{
+		--iconbg:#0009;
+		--textboxbg:#0006;
+		--searchbtn: #ddd;
+	--searchbtncolor: #555;
+	--textcolor:#fff;
+	--textcolor-o: #fff7;
+	}
+	.bg.active{
+		background:#0005;
+	}
+	.linkbox-label,.linktext,.pill{
+		color:#fff;
+	}
+	#searchButton:hover {
+		background: #c7c7c7;
+	}
+	svg {
+		width: 24px;
+		height: 24px;
+		fill: rgba(0, 0, 0, 0.8);
+	}
+	#aisearch {
+		mix-blend-mode: overlay;
+		background: linear-gradient(140deg, rgb(156 200 255 / 80%) 0%, rgb(236 182 255 / 80%) 100%);
+	}
+	.history{
+		color:#fff;
+	}
+	a{
+		color:#fff;
+	}
+	.deleteicon {
+		fill: #ffffff !important;
+	}
+	#time{
+		color:#fff;
+	}
+	.pillicon{
+		background:#0003;
+	}
+	.plgl{
+		fill: #fff !important;;
+	}
+	.weekday{
+		color:#bbb;
+	}
+	.settingcard{
+		color:#fff;
+	}
+	.settingbtn{
+		background:#0009;
+		color:#fff;
+	}
 }

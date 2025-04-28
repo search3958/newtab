@@ -65,7 +65,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const batteryContainer = document.getElementById("battery-container");
 
       batteryText.textContent = `${level}%`;
-      batteryContainer.style.background = `linear-gradient(to right, rgba(120,160,255,0.4) ${level}%, rgba(255,255,255,0.4) ${level}%)`;
+      batteryContainer.style.background = `linear-gradient(to right, rgba(120,160,255,0.4) ${level}%, var(--textboxbg) ${level}%)`;
     });
   }
   // 履歴の表示
