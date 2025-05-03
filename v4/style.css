@@ -3,6 +3,7 @@
 	font-weight: 400;
   font-style: normal;
   line-height: 1.5;
+  text-wrap-mode: nowrap;
 }
 
 :root {
@@ -56,7 +57,11 @@ body {
 	transform: translate(-50%, -50px);
 	--smooth-corners: 35, 7;
 }
-
+#searchInput{
+	margin:0px;
+	width:220px;
+	margin-right: 80px;
+}
 input {
 	background: transparent;
 	border: none;
@@ -68,8 +73,8 @@ input {
 	transition:width 0.4s cubic-bezier(.56,0,0,1);
 }
 
-input.active{
-	width: 500px;
+#searchInput.active{
+	width: 440px;
 }
 
 input::-webkit-input-placeholder {
@@ -96,7 +101,7 @@ input::-webkit-input-placeholder {
 	transition: all var(--anm),left 0.4s cubic-bezier(.56,0,0,1);
 }
 #searchButton.active {
-	left: calc(50% + 227px);
+	left: calc(50% + 237px);
 }
 
 #searchButton:hover {
@@ -256,6 +261,7 @@ img:hover{
     align-items: center;
     display: flex;
     flex-wrap: wrap;
+	gap: 8px;
 }
 .linkbox-anchor{
 	width: 110px;
@@ -269,21 +275,24 @@ img:hover{
     margin: 16px 0px;
 }
 .settingcard {
-    width: 460px;
     display: flex;
-    padding: 8px;
     gap: 8px;
-    justify-content: flex-end;
+	margin: 8px 0px;
 }
 input#bgUrlInput {
     font-size: 24px;
-	width:200px;
+    width: 362px;
+    background: var(--textboxbg);
+    border-radius: 100px;
 }
+
 .settingbtn {
     padding: 0px 24px;
     border-radius: 100px;
     border: none;
+    width: 100%;
     background: #fff9;
+    height: 48px;
 }
 .settingtext{
 	padding: 12px 20px;
@@ -297,6 +306,11 @@ input#bgUrlInput {
     transform: translateX(-50%);
     left: 50vw;
 }
+h3 {
+    margin: 0px;
+    margin-bottom: 8px;
+}
+
 .pill {
 	border-radius: 100px;
 	padding: 0px 30px;
@@ -363,10 +377,11 @@ input#bgUrlInput {
 
   .settings {
 	opacity: 0;
-	display: flex;
+	display: block;
     flex-wrap: wrap;
 	justify-content: flex-end;
-	width:470px;
+	width:400px;
+	padding:16px;
 	position:fixed;
 	top:-80px;
 	right:-200px;
@@ -443,7 +458,6 @@ input#bgUrlInput {
 }
 iframe#tool {
     height: 477px;
-    border-radius: 39px;
     border: none;
 }
 #toolframe {
@@ -481,7 +495,8 @@ iframe#tool {
 }
 
 iframe{
-	background: transparent;
+	background: #fff3;
+	border-radius: 39px;
 }
 
 @media (prefers-color-scheme: dark) {
