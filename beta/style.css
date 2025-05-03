@@ -57,7 +57,11 @@ body {
 	transform: translate(-50%, -50px);
 	--smooth-corners: 35, 7;
 }
-
+#searchInput{
+	margin:0px;
+	width:220px;
+	margin-right: 80px;
+}
 input {
 	background: transparent;
 	border: none;
@@ -69,8 +73,8 @@ input {
 	transition:width 0.4s cubic-bezier(.56,0,0,1);
 }
 
-input.active{
-	width: 500px;
+#searchInput.active{
+	width: 440px;
 }
 
 input::-webkit-input-placeholder {
@@ -97,7 +101,7 @@ input::-webkit-input-placeholder {
 	transition: all var(--anm),left 0.4s cubic-bezier(.56,0,0,1);
 }
 #searchButton.active {
-	left: calc(50% + 227px);
+	left: calc(50% + 237px);
 }
 
 #searchButton:hover {
@@ -257,6 +261,7 @@ img:hover{
     align-items: center;
     display: flex;
     flex-wrap: wrap;
+	gap: 8px;
 }
 .linkbox-anchor{
 	width: 110px;
