@@ -390,6 +390,7 @@ h3 {
 	filter:blur(60px);
 	backdrop-filter: blur(8px);
 	overflow: hidden;
+	padding-bottom: 8px;
   }
   
   .settings.active {
