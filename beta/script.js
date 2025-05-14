@@ -210,9 +210,14 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!historyContainer) return;
 
     const history = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
-    historyContainer.innerHTML = history.map(item => 
-      `<link-box name="${item.name}" bg="${item.bg}" url="${item.url}" icon="${item.icon}"></link-box>`
-    ).join('');
+    
+    if (history.length === 0) {
+      historyContainer.innerHTML = '<div class="empty-history">ここに履歴が表示されます</div>';
+    } else {
+      historyContainer.innerHTML = history.map(item => 
+        `<link-box name="${item.name}" bg="${item.bg}" url="${item.url}" icon="${item.icon}"></link-box>`
+      ).join('');
+    }
   }
 
   // link-boxのクリックイベントを監視

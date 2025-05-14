@@ -168,6 +168,7 @@ svg {
 	filter:blur(0px);
 	opacity:1;
 }
+
 #historyList{
 	display:flex;
 	gap:16px;
@@ -179,6 +180,24 @@ svg {
 .history:hover > #historyList{
 	filter:blur(0px);
 	opacity:1;
+}
+.linkhistory {
+    background: #fff3;
+    width: fit-content;
+    padding: 27px 24px;
+    padding-bottom: 0px;
+    border-radius: 79px;
+    margin: 0 auto;
+    margin-top: 24px;
+}
+.empty-history {
+  color: var(--textcolor-o);
+  font-size: 14px;
+  white-space: nowrap;
+  padding: 40px;
+}
+.history:hover .empty-history {
+  display: none;
 }
 a{
 	color: #000;
@@ -244,8 +263,8 @@ img:hover{
 	padding:0px;
 	width:fit-content;
 	border-radius:30px;
-	-webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M80 0C104.796 0 114.653 0 124.705 4.24431C139.225 9.3822 150.618 20.9982 155.979 35.5183C160 45.3473 160 55.4276 160 80C160 99.2391 160 114.653 155.979 124.482C150.618 139.002 139.225 150.618 124.705 155.756C114.653 160 104.796 160 80 160C55.4275 160 45.3473 160 35.5183 155.756C20.9983 150.618 9.60556 139.002 4.24431 124.482C0.223361 114.653 0 99.2391 0 80C0 55.4276 0.223382 45.3473 4.24431 35.5183C9.60556 20.9983 20.9982 9.3822 35.5183 4.24431C45.3473 0 55.4275 0 80 0Z" fill="white"/></svg>');
-	mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M80 0C104.796 0 114.653 0 124.705 4.24431C139.225 9.3822 150.618 20.9982 155.979 35.5183C160 45.3473 160 55.4276 160 80C160 99.2391 160 114.653 155.979 124.482C150.618 139.002 139.225 150.618 124.705 155.756C114.653 160 104.796 160 80 160C55.4275 160 45.3473 160 35.5183 155.756C20.9983 150.618 9.60556 139.002 4.24431 124.482C0.223361 114.653 0 99.2391 0 80C0 55.4276 0.223382 45.3473 4.24431 35.5183C9.60556 20.9983 20.9982 9.3822 35.5183 4.24431C45.3473 0 55.4275 0 80 0Z" fill="white"/></svg>');
+	-webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M 0 80 C 0 28, 28 0, 80 0 S 160 28, 160 80, 132 160 80 160, 0 132, 0 80" fill="white"/></svg>');
+	mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M 0 80 C 0 28, 28 0, 80 0 S 160 28, 160 80, 132 160 80 160, 0 132, 0 80" fill="white"/></svg>');
 	transition: all 0.4s cubic-bezier(0,0,0,1);
 	scale:1;
 	mask-repeat: no-repeat;
@@ -409,7 +428,7 @@ h3 {
 	transition: all 0.5s cubic-bezier(.4,0,0,1);
 	scale:0;
 	filter:blur(60px);
-	backdrop-filter: blur(8px);
+	backdrop-filter: blur(24px);
 	overflow: hidden;
 	padding-bottom: 8px;
   }
@@ -538,6 +557,9 @@ iframe{
 	}
 	#searchButton:hover {
 		background: #c7c7c7;
+	}
+	.linkhistory {
+		background: rgba(0, 0, 0, 0.2);
 	}
 	svg {
 		width: 24px;

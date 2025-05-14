@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GoogleログインとGmail未読表示</title>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <h1>Googleログインと未読メール表示</h1>
+
+  <button id="loginButton">Googleでログイン</button>
+  <div id="emailList">ログインしてください。</div>
+
+  <script>
+    // Firebase 設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYSzOAmqY_IJCEUNb-cJNQfp4AKt93a_A",
+      authDomain: "couud-dashboard.firebaseapp.com",
+      databaseURL: "https://couud-dashboard-default-rtdb.firebaseio.com",
+      projectId: "couud-dashboard",
+      storageBucket: "couud-dashboard.appspot.com",
+      messagingSenderId: "163996109972",
+      appId: "1:163996109972:web:e806be3a622a4da2a33881",
+      measurementId: "G-XCX2C68FM6"
+    };
+
+    // 初期化
+    firebase.initializeApp(firebaseConfig);
+
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+
+    document.getElementById('loginButton').addEventListener('click', () => {
+      firebase.auth().signInWithPopup(provider)
+        .then(result => {
+          const token = result.credential.accessToken;
+          loadGmailApi(token);
+        })
+        .catch(error => {
+          console.error('ログイン失敗', error);
+        });
+    });
+
+    function loadGmailApi(accessToken) {
+      gapi.load('client', () => {
+        gapi.client.init({
+          apiKey: firebaseConfig.apiKey,
+          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"],
+        }).then(() => {
+          gapi.client.setToken({ access_token: accessToken });
+          listUnreadEmails();
+        });
+      });
+    }
+
+    function listUnreadEmails() {
+      gapi.client.gmail.users.messages.list({
+        userId: 'me',
+        labelIds: ['INBOX', 'UNREAD'],
+        maxResults: 5
+      }).then(response => {
+        const messages = response.result.messages;
+        const emailList = document.getElementById('emailList');
+        emailList.innerHTML = '';
+
+        if (!messages || messages.length === 0) {
+          emailList.innerHTML = '<p>未読メールはありません。</p>';
+          return;
+        }
+
+        messages.forEach(message => {
+          gapi.client.gmail.users.messages.get({
+            userId: 'me',
+            id: message.id,
+            format: 'metadata',
+            metadataHeaders: ['Subject', 'From']
+          }).then(msg => {
+            const headers = msg.result.payload.headers;
+            const from = headers.find(h => h.name === 'From')?.value || '送信者不明';
+            const subject = headers.find(h => h.name === 'Subject')?.value || '(件名なし)';
+
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>From:</strong> ${from}<br><strong>Subject:</strong> ${subject}<hr>`;
+            emailList.appendChild(div);
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>
