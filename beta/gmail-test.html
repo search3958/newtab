@@ -2,14 +2,13 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GoogleログインとGmail未読表示</title>
+  <title>未読メール一覧</title>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-  <h1>Googleログインと未読メール表示</h1>
-
+  <h1>未読メール（最新5件）</h1>
   <button id="loginButton">Googleでログイン</button>
   <div id="emailList">ログインしてください。</div>
 
@@ -18,7 +17,6 @@
     const firebaseConfig = {
       apiKey: "AIzaSyAYSzOAmqY_IJCEUNb-cJNQfp4AKt93a_A",
       authDomain: "couud-dashboard.firebaseapp.com",
-      databaseURL: "https://couud-dashboard-default-rtdb.firebaseio.com",
       projectId: "couud-dashboard",
       storageBucket: "couud-dashboard.appspot.com",
       messagingSenderId: "163996109972",
@@ -26,20 +24,27 @@
       measurementId: "G-XCX2C68FM6"
     };
 
-    // 初期化
     firebase.initializeApp(firebaseConfig);
 
+    // Googleログインの設定
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
 
+    // ログインボタンクリック時
     document.getElementById('loginButton').addEventListener('click', () => {
       firebase.auth().signInWithPopup(provider)
         .then(result => {
-          const token = result.credential.accessToken;
-          loadGmailApi(token);
+          const accessToken = result.credential.accessToken;
+          if (!accessToken) {
+            document.getElementById('emailList').innerText = 'アクセストークン取得失敗';
+            return;
+          }
+          // Gmail API 初期化
+          loadGmailApi(accessToken);
         })
         .catch(error => {
-          console.error('ログイン失敗', error);
+          console.error('ログイン失敗:', error);
+          document.getElementById('emailList').innerText = 'ログイン失敗: ' + error.message;
         });
     });
 
@@ -47,10 +52,13 @@
       gapi.load('client', () => {
         gapi.client.init({
           apiKey: firebaseConfig.apiKey,
-          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"],
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'],
         }).then(() => {
           gapi.client.setToken({ access_token: accessToken });
           listUnreadEmails();
+        }).catch(error => {
+          console.error('Gmail API初期化エラー:', error);
+          document.getElementById('emailList').innerText = 'Gmail API初期化エラー';
         });
       });
     }
@@ -86,6 +94,9 @@
             emailList.appendChild(div);
           });
         });
+      }).catch(error => {
+        console.error('未読メール取得失敗:', error);
+        document.getElementById('emailList').innerText = '未読メール取得に失敗しました。';
       });
     }
   </script>
