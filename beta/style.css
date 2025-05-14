@@ -20,7 +20,7 @@
 body {
 	margin: 0;
 	height: calc(100vh + 2px);
-	background-image: url('https://search3958.github.io/newtab/bgimg/reflect5.webp');
+	background-image: url('https://search3958.github.io/newtab/bgimg/3958bg2.webp');
 	background-size: cover;
 	background-position: center;
 }
@@ -34,8 +34,13 @@ body {
 	mask-size: cover;
 }
 
+ins.adsbygoogle {
+    display: flex !important;
+    justify-content: center;
+}
+
 .hoverscale{
-	transition: all 0.2s ease;
+	transition: all 0.2s cubic-bezier(0,0,0,1);
 	scale:1;
 }
 .hoverscale:hover{
@@ -129,7 +134,7 @@ svg {
 	padding:16px 24px;
 	padding-bottom:14px;
 	padding-right: 14px;
-	transition: all 0.8s cubic-bezier(.18,1.57,.25,1);
+	transition: all 0.4s cubic-bezier(0.25, 0.09, 0, 1);
 	justify-content: center; /* 横方向の中央 */
   align-items: center;     /* 縦方向の中央 */
   overflow:hidden;
@@ -226,49 +231,65 @@ img{
 	width:110px;
 	padding:0px;
 	margin:0px;
-	transition: all 0.4s cubic-bezier(.34,0,.03,1.01);
+	transition: all 0.4s cubic-bezier(0,0,0,1);
 	scale:1;
+	transform: translate3d(0, 0, 40px);
 }
 img:hover{
-	scale:1.2;
+	scale:1.1;
+	transform: translate3d(var(--moveX), var(--moveY), 60px);
 }
 .icon-wrapper{
 	height:110px;
 	padding:0px;
 	width:fit-content;
 	border-radius:30px;
-	-webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M 0 80 C 0 28, 28 0, 80 0 S 160 28, 160 80, 132 160 80 160, 0 132, 0 80" fill="white"/></svg>');
-	mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M 0 80 C 0 28, 28 0, 80 0 S 160 28, 160 80, 132 160 80 160, 0 132, 0 80" fill="white"/></svg>');
-	transition: all 0.4s cubic-bezier(.34,0,.03,1.01);
+	-webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M80 0C104.796 0 114.653 0 124.705 4.24431C139.225 9.3822 150.618 20.9982 155.979 35.5183C160 45.3473 160 55.4276 160 80C160 99.2391 160 114.653 155.979 124.482C150.618 139.002 139.225 150.618 124.705 155.756C114.653 160 104.796 160 80 160C55.4275 160 45.3473 160 35.5183 155.756C20.9983 150.618 9.60556 139.002 4.24431 124.482C0.223361 114.653 0 99.2391 0 80C0 55.4276 0.223382 45.3473 4.24431 35.5183C9.60556 20.9983 20.9982 9.3822 35.5183 4.24431C45.3473 0 55.4275 0 80 0Z" fill="white"/></svg>');
+	mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg"><path d="M80 0C104.796 0 114.653 0 124.705 4.24431C139.225 9.3822 150.618 20.9982 155.979 35.5183C160 45.3473 160 55.4276 160 80C160 99.2391 160 114.653 155.979 124.482C150.618 139.002 139.225 150.618 124.705 155.756C114.653 160 104.796 160 80 160C55.4275 160 45.3473 160 35.5183 155.756C20.9983 150.618 9.60556 139.002 4.24431 124.482C0.223361 114.653 0 99.2391 0 80C0 55.4276 0.223382 45.3473 4.24431 35.5183C9.60556 20.9983 20.9982 9.3822 35.5183 4.24431C45.3473 0 55.4275 0 80 0Z" fill="white"/></svg>');
+	transition: all 0.4s cubic-bezier(0,0,0,1);
 	scale:1;
 	mask-repeat: no-repeat;
 	mask-size: cover;
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-size: cover;
+	transform-style: preserve-3d;
+	transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
 }
 .icon-wrapper:hover {
+	transform: translate3d(var(--moveX), var(--moveY), 20px) rotateX(var(--rotateX)) rotateY(var(--rotateY));
 	scale:1.08;
 }
 .linkbox-label{
     width: 110px;
     text-align: center;
+	margin-top:8px;
 }
 .linkbox{
 	width:110px;
+	transform-style: preserve-3d;
+	perspective: 800px;
+	transform: translate3d(0, 0, 0);
 }
-.links{
-    justify-content: center;
-    align-items: center;
-    display: flex;
+link-box {
+    width: fit-content;
+    display: block;
+}
+.links {
+    display: flex
+;
     flex-wrap: wrap;
-	gap: 8px;
+    justify-content: center;
 }
 .linkbox-anchor{
 	width: 110px;
     display: block;
-	margin:8px;
+	margin: 8px 12px;
+	transition: transform 0.2s ease;
+	transform-style: preserve-3d;
 }
-
+.linkbox-anchor:hover {
+	transform: rotateX(var(--rotateX)) rotateY(var(--rotateY));
+}
 .linktext {
     text-align: center;
     font-size: 24px;
