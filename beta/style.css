@@ -10,7 +10,7 @@
 	--textboxbg: #fff6;
 	--textcolor: #000;
 	--textcolor-o: #0007;
-	--searchbtn: #000000;
+	--searchbtn: #0f0f0f;
 	--searchbtncolor: #b3b3b3;
 	--anm: 0.2s ease;
 	--iconbg: #fff9;
@@ -61,7 +61,9 @@ ins.adsbygoogle {
 	left: 50%;
 	transform: translate(-50%, -50px);
 	--smooth-corners: 35, 7;
+	box-shadow: inset 0px -5px 6px 0px #0001, inset 0px 5px 6px 0px #fff2;
 }
+
 #searchInput{
 	margin:0px;
 	width:220px;
@@ -104,6 +106,7 @@ input::-webkit-input-placeholder {
 	--smooth-corners: 7, 4;
 	color: var(--searchbtncolor);
 	transition: all var(--anm),left 0.4s cubic-bezier(.56,0,0,1);
+	box-shadow: inset 0px -5px 6px 0px #fff2, inset 0px 5px 6px 0px #000;
 }
 #searchButton.active {
 	left: calc(50% + 237px);
@@ -139,6 +142,7 @@ svg {
   align-items: center;     /* 縦方向の中央 */
   overflow:hidden;
   white-space:nowrap;
+  box-shadow: inset 0px -5px 6px 0px #0001, inset 0px 5px 6px 0px #fff2;
 }
 .history:hover{
 	top: calc(50% + 75px);
@@ -253,10 +257,12 @@ img{
 	transition: all 0.4s cubic-bezier(0,0,0,1);
 	scale:1;
 	transform: translate3d(0, 0, 40px);
+	filter: drop-shadow(0px 0px 0px #0000);
 }
 img:hover{
 	scale:1.1;
 	transform: translate3d(var(--moveX), var(--moveY), 60px);
+	filter: drop-shadow(0px 5px 10px #0003);
 }
 .icon-wrapper{
 	height:110px;
@@ -273,6 +279,33 @@ img:hover{
 	-webkit-mask-size: cover;
 	transform-style: preserve-3d;
 	transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+}
+.searchai-btn {
+    background: var(--textboxbg);
+    color: var(--textcolor);
+    width: fit-content;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -240px);
+    padding: 14px;
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0px -5px 6px 0px #0001, inset 0px 5px 6px 0px #fff2, -5px -5px 40px 5px rgba(0, 133, 255, 0.4), 30px 0px 40px 0px rgba(255, 224, 0, 0.4), -2px 5px 40px 2px rgba(255, 0, 169, 0.4);
+    text-align: center;
+	filter:blur(30px);
+	opacity: 0;
+	transition: all 0.4s cubic-bezier(0,0,0,1);
+	pointer-events: none;
+}
+.searchai-btn.active {
+    transform: translate(-50%, -170px);
+	filter:blur(0px);
+	opacity: 1;
+	pointer-events: all;
+}
+small{
+	color:var(--textcolor-o);
 }
 .icon-wrapper:hover {
 	transform: translate3d(var(--moveX), var(--moveY), 20px) rotateX(var(--rotateX)) rotateY(var(--rotateY));

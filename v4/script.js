@@ -55,7 +55,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
   const weekdays = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
   document.getElementById("date").textContent = `${now.getMonth() + 1}月${now.getDate()}日`;
-  document.getElementById("weekday").textContent = weekdays[now.getDay()];
+  
+  // 7月20日から30日の期間チェック
+  if (now.getMonth() === 6 && now.getDate() >= 17 && now.getDate() <= 30) {
+    document.getElementById("weekday").textContent = "7.27 祖国解放戦争勝利記念日";
+  } else {
+    document.getElementById("weekday").textContent = weekdays[now.getDay()];
+  }
 
   // 実際のバッテリー取得 (対応しているブラウザ限定)
   if (navigator.getBattery) {
@@ -143,6 +149,126 @@ window.addEventListener("DOMContentLoaded", () => {
       document.querySelector('.shortcut')?.classList.remove('active');
       document.querySelector('.bg')?.classList.remove('active');
     }
+  });
+
+  // 3D回転エフェクトの追加
+  document.querySelectorAll('.icon-wrapper').forEach(wrapper => {
+    const img = wrapper.querySelector('img');
+    
+    wrapper.addEventListener('mousemove', e => {
+      const box = wrapper.getBoundingClientRect();
+      const mouseX = e.clientX - box.left;
+      const mouseY = e.clientY - box.top;
+      
+      const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 15;
+      const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -15;
+      
+      const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 10;
+      const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 10;
+      
+      wrapper.style.setProperty('--rotateX', `${rotateX}deg`);
+      wrapper.style.setProperty('--rotateY', `${rotateY}deg`);
+      wrapper.style.setProperty('--moveX', `${moveX}px`);
+      wrapper.style.setProperty('--moveY', `${moveY}px`);
+      
+      // 画像にも同じ移動効果を適用
+      img.style.setProperty('--moveX', `${moveX * 1.2}px`);
+      img.style.setProperty('--moveY', `${moveY * 1.2}px`);
+    });
+    
+    wrapper.addEventListener('mouseleave', () => {
+      wrapper.style.setProperty('--rotateX', '0deg');
+      wrapper.style.setProperty('--rotateY', '0deg');
+      wrapper.style.setProperty('--moveX', '0px');
+      wrapper.style.setProperty('--moveY', '0px');
+      
+      // 画像の移動もリセット
+      img.style.setProperty('--moveX', '0px');
+      img.style.setProperty('--moveY', '0px');
+    });
+  });
+
+  // ショートカット履歴の管理
+  function addToShortcutHistory(name, url, icon, bg) {
+    let history = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
+    
+    // 同じURLがある場合は削除
+    history = history.filter(item => item.url !== url);
+    
+    // 新しい項目を追加
+    history.unshift({ name, url, icon, bg });
+    
+    // 最大5件に制限
+    history = history.slice(0, 5);
+    
+    localStorage.setItem('shortcutHistory', JSON.stringify(history));
+    displayShortcutHistory();
+  }
+
+  function displayShortcutHistory() {
+    const historyContainer = document.querySelector('.shortcut .links');
+    if (!historyContainer) return;
+
+    const history = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
+    
+    if (history.length === 0) {
+      historyContainer.innerHTML = '<div class="empty-history">ここに履歴が表示されます</div>';
+    } else {
+      historyContainer.innerHTML = history.map(item => 
+        `<link-box name="${item.name}" bg="${item.bg}" url="${item.url}" icon="${item.icon}"></link-box>`
+      ).join('');
+    }
+  }
+
+  // link-boxのクリックイベントを監視
+  document.addEventListener('click', (e) => {
+    const linkBox = e.target.closest('link-box');
+    if (linkBox) {
+      const name = linkBox.getAttribute('name');
+      const url = linkBox.getAttribute('url');
+      const icon = linkBox.getAttribute('icon');
+      const bg = linkBox.getAttribute('bg');
+      addToShortcutHistory(name, url, icon, bg);
+    }
+  });
+
+  // 初期表示
+  displayShortcutHistory();
+
+   const searchInput = document.getElementById('searchInput');
+    const searchaiBtn = document.querySelector('.searchai-btn');
+    const aiSearch = document.getElementById('aisearch');
+
+    // AI検索の状態を監視するMutationObserverを作成
+    const observer = new MutationObserver(() => {
+      if (aiSearch.classList.contains('active')) {
+        searchaiBtn.classList.remove('active');
+      } else if (searchInput.value.length >= 17) {
+        searchaiBtn.classList.add('active');
+      }
+    });
+
+    // AI検索ボタンのclass変更を監視
+    observer.observe(aiSearch, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // 入力時の処理
+    searchInput.addEventListener('input', () => {
+      if (!aiSearch.classList.contains('active')) {
+        if (searchInput.value.length >= 17) {
+          searchaiBtn.classList.add('active');
+        } else {
+          searchaiBtn.classList.remove('active');
+        }
+      } else {
+        searchaiBtn.classList.remove('active');
+      }
+    });
+  // searchai-btnのクリックイベントを追加
+  document.querySelector('.searchai-btn').addEventListener('click', () => {
+    document.querySelector('#aisearch').click();
   });
 });
 

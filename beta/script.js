@@ -234,6 +234,42 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // 初期表示
   displayShortcutHistory();
+
+   const searchInput = document.getElementById('searchInput');
+    const searchaiBtn = document.querySelector('.searchai-btn');
+    const aiSearch = document.getElementById('aisearch');
+
+    // AI検索の状態を監視するMutationObserverを作成
+    const observer = new MutationObserver(() => {
+      if (aiSearch.classList.contains('active')) {
+        searchaiBtn.classList.remove('active');
+      } else if (searchInput.value.length >= 17) {
+        searchaiBtn.classList.add('active');
+      }
+    });
+
+    // AI検索ボタンのclass変更を監視
+    observer.observe(aiSearch, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // 入力時の処理
+    searchInput.addEventListener('input', () => {
+      if (!aiSearch.classList.contains('active')) {
+        if (searchInput.value.length >= 17) {
+          searchaiBtn.classList.add('active');
+        } else {
+          searchaiBtn.classList.remove('active');
+        }
+      } else {
+        searchaiBtn.classList.remove('active');
+      }
+    });
+  // searchai-btnのクリックイベントを追加
+  document.querySelector('.searchai-btn').addEventListener('click', () => {
+    document.querySelector('#aisearch').click();
+  });
 });
 
 // link-box.js（モジュールではなく通常のスクリプトとして統合）
