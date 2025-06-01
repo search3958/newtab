@@ -588,6 +588,9 @@ iframe{
 	.linkbox-label,.linktext,.pill{
 		color:#fff;
 	}
+	#searchButton{
+		box-shadow: inset 0px -5px 6px 0px #fff2, inset 0px 5px 6px 0px #0000002b;
+	}
 	#searchButton:hover {
 		background: #c7c7c7;
 	}
