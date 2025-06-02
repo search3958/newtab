@@ -1,5 +1,5 @@
 *{
-	font-family: "Work Sans", "Zen Kaku Gothic Antique", sans-serif;
+	font-family: "Work Sans", "Zen Kaku Gothic Antique", "Inter", sans-serif;
 	font-weight: 400;
   font-style: normal;
   line-height: 1.5;
@@ -61,7 +61,7 @@ ins.adsbygoogle {
 	left: 50%;
 	transform: translate(-50%, -50px);
 	--smooth-corners: 35, 7;
-	box-shadow: inset 0px -5px 6px 0px #0001, inset 0px 5px 6px 0px #fff2;
+	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88;
 }
 
 #searchInput{
@@ -77,7 +77,7 @@ input {
 	padding: 12px 20px;
 	width: 300px;
 	outline: none;
-	transition:width 0.4s cubic-bezier(.56,0,0,1);
+	transition:width 0.4s cubic-bezier(0.33, 0.14, 0, 1);
 }
 
 #searchInput.active{
@@ -105,8 +105,8 @@ input::-webkit-input-placeholder {
 	transform: translate(-50%, -35.5px);
 	--smooth-corners: 7, 4;
 	color: var(--searchbtncolor);
-	transition: all var(--anm),left 0.4s cubic-bezier(.56,0,0,1);
-	box-shadow: inset 0px -5px 6px 0px #fff2, inset 0px 5px 6px 0px #000;
+	transition: all var(--anm),left 0.4s cubic-bezier(0.33, 0.14, 0, 1);
+	box-shadow: inset 0px -5px 2px -2px #000000, inset 0px 5px 2px -3px #ffffff3d;
 }
 #searchButton.active {
 	left: calc(50% + 237px);
@@ -133,7 +133,7 @@ svg {
 	backdrop-filter: blur(10px);
 	background: var(--textboxbg);
 	border-radius: 100px;
-	gap:16px;
+	gap:0px;
 	padding:16px 24px;
 	padding-bottom:14px;
 	padding-right: 14px;
@@ -142,10 +142,9 @@ svg {
   align-items: center;     /* 縦方向の中央 */
   overflow:hidden;
   white-space:nowrap;
-  box-shadow: inset 0px -5px 6px 0px #0001, inset 0px 5px 6px 0px #fff2;
 }
 .history:hover{
-	top: calc(50% + 75px);
+	top: calc(50% + 66px);
 	width:fit-content;
 	height:fit-content;
 }
@@ -228,7 +227,7 @@ a{
 }
 .bg.active{
 	pointer-events: auto;
-	background:rgba(255, 255, 255, 0.307);
+	background:#fff3;
 	backdrop-filter: blur(32px);
 }
 .shortcut{
@@ -295,7 +294,7 @@ img:hover{
     text-align: center;
 	filter:blur(30px);
 	opacity: 0;
-	transition: all 0.4s cubic-bezier(0,0,0,1);
+	transition: all 0.6s cubic-bezier(0.41, 0, 0, 1);
 	pointer-events: none;
 }
 .searchai-btn.active {
@@ -435,19 +434,17 @@ h3 {
 	width:fit-content;
 	font-size:20px;
   }
-  .bar{
-	background: var(--textboxbg);
-	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-	padding:10px 16px;
-	width:fit-content;
-	border-radius:100px;
-	position:fixed;
-	top:8px;
-	right:8px;
-	backdrop-filter: blur(8px);
-	padding-right: 100px;
-  }
-
+  .bar {
+    background: var(--textboxbg);
+    padding: 13px 18px;
+    width: fit-content;
+    border-radius: 100px;
+    position: fixed;
+    top: 4px;
+    right: 6px;
+    backdrop-filter: blur(8px);
+    padding-right: 108px;
+}
   .settings {
 	opacity: 0;
 	display: block;
@@ -464,8 +461,11 @@ h3 {
 	backdrop-filter: blur(24px);
 	overflow: hidden;
 	padding-bottom: 8px;
+	
   }
-  
+  .settings ,.settingbtn,.linkhistory,.history{
+	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88;
+  }
   .settings.active {
     opacity: 1;
 	scale: 1;
@@ -511,24 +511,22 @@ h3 {
     right: 50vw;
     width: 0vw;
     height: 0vh;
-    background-color: rgba(188, 212, 225, 0.8);
-    background-image: radial-gradient(at 0% 100%, rgba(255, 0, 64, 0.7) 0px, transparent 30%), radial-gradient(at 84% 74%, rgba(0, 140, 255, 0.7) 0px, transparent 30%), radial-gradient(at 0% 0%, rgba(255, 162, 0, 0.7) 0px, transparent 30%);
+    background-color: rgba(188, 212, 225);
+    background-image: radial-gradient(at 0% 100%, rgba(255, 0, 64, 0.9) 0px, transparent 30%), radial-gradient(at 84% 74%, rgba(0, 166, 255, 0.9) 0px, transparent 30%), radial-gradient(at 0% 0%, rgba(255, 197, 4, 0.9) 0px, transparent 30%);
     filter: blur(150px);
     opacity: 0;
-    border-radius: calc(40vh + 40vw);
+    border-radius: 1000px;
     transition: 0.5s cubic-bezier(0.34, 0, 0, 1);
 	pointer-events: none;
 	z-index:-10;
 }
 
 .aibg.active {
-    filter: blur(100px);
-    height: calc(100vh - 200px);
-    width: calc(100vw - 200px);
+    height: calc(100vh - 280px);
+    width: calc(100vw - 280px);
     opacity: 1;
-    top: 100px;
-    right: 100px;
-    border-radius: 0vh;
+    top: 140px;
+    right: 140px;
 }
 iframe#tool {
     height: 477px;
@@ -582,14 +580,17 @@ iframe{
 	--textcolor:#fff;
 	--textcolor-o: #fff7;
 	}
+	h3{
+		color:#fff;
+	}
 	.bg.active{
-		background:#0005;
+		background:#0003;
 	}
 	.linkbox-label,.linktext,.pill{
 		color:#fff;
 	}
 	#searchButton{
-		box-shadow: inset 0px -5px 6px 0px #fff2, inset 0px 5px 6px 0px #0000002b;
+		box-shadow: inset 0px -5px 2px -3px #00000029, inset 0px 5px 2px -3px #ffffff;
 	}
 	#searchButton:hover {
 		background: #c7c7c7;
@@ -633,5 +634,11 @@ iframe{
 	.settingbtn{
 		background:#0009;
 		color:#fff;
+	}
+	.search-container,.settings,.settingbtn ,.linkhistory,.history{
+		box-shadow: inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
+	}
+	.bar {
+		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1), inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
 	}
 }
