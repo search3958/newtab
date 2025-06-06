@@ -15,6 +15,47 @@ function setBackground() {
 // AISearch モードの状態を管理するための変数
 let isAISearchMode = false;
 
+// AIエンジンURLリスト
+const aiEngines = {
+  aisearch: 'https://search3958.github.io/aisearch/?q=',
+  aishortcut: 'https://search3958.github.io/aishortcut/?q=',
+  chatgpt: 'https://chatgpt.com/?q=auto'
+};
+function getCurrentAiEngine() {
+  // localStorage未設定時はaisearchをセットして返す
+  let engine = localStorage.getItem('aiEngine');
+  if (!engine) {
+    engine = 'aisearch';
+    localStorage.setItem('aiEngine', engine);
+  }
+  return engine;
+}
+function setCurrentAiEngine(engine) {
+  localStorage.setItem('aiEngine', engine);
+  updateAiEngineButtons();
+}
+function updateAiEngineButtons() {
+  const current = getCurrentAiEngine();
+  document.querySelectorAll('.ai-engine-btn').forEach(btn => {
+    if (btn.dataset.engine === current) {
+      btn.style.background = '#fffa';
+      btn.style.color = '#000';
+    } else {
+      btn.style.background = '';
+      btn.style.color = '';
+    }
+  });
+}
+function updateAiEngineSelectVisibility() {
+  const aiEngineSelect = document.getElementById('ai-engine-select');
+  if (!aiEngineSelect) return;
+  if (isAISearchMode) {
+    aiEngineSelect.classList.add('active');
+  } else {
+    aiEngineSelect.classList.remove('active');
+  }
+}
+
 // AISearch モード切り替え関数
 function toggleAISearch() {
   const searchInput = document.getElementById('searchInput');
@@ -22,7 +63,9 @@ function toggleAISearch() {
   const aiSearch = document.getElementById('aisearch');
   const aiBg = document.getElementById('aiBg');
   isAISearchMode = !isAISearchMode;
-  
+
+  updateAiEngineSelectVisibility();
+
   if (isAISearchMode) {
     // AI検索モードに切り替え
     searchInput.classList.add('active');
@@ -74,6 +117,13 @@ window.addEventListener("DOMContentLoaded", () => {
       batteryContainer.style.background = `linear-gradient(to right, rgba(120,160,255,0.4) ${level}%, var(--textboxbg) ${level}%)`;
     });
   }
+  // AIエンジン選択ボタンのイベント
+  document.querySelectorAll('.ai-engine-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setCurrentAiEngine(btn.dataset.engine);
+    });
+  });
+
   // 履歴の表示
   function renderHistory() {
     const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
@@ -86,10 +136,13 @@ window.addEventListener("DOMContentLoaded", () => {
         div.className = 'history-item';
 
         const a = document.createElement('a');
-        // 検索履歴アイテムのリンク先も、現在のモードに応じて変更
-        const baseUrl = isAISearchMode 
-          ? "https://search3958.github.io/aisearch/?q=" 
-          : "https://www.google.com/search?q=";
+        // 検索履歴アイテムのリンク先も、現在のモード・AIエンジンに応じて変更
+        let baseUrl;
+        if (isAISearchMode) {
+          baseUrl = aiEngines[getCurrentAiEngine()] || aiEngines.aisearch;
+        } else {
+          baseUrl = "https://www.google.com/search?q=";
+        }
         a.href = `${baseUrl}${encodeURIComponent(item)}`;
         a.textContent = item;
 
@@ -103,13 +156,14 @@ window.addEventListener("DOMContentLoaded", () => {
   function performSearch() {
     const query = document.getElementById('searchInput').value.trim();
     if (query) {
-      // 検索エンジンのURLを状態に応じて変更
-      const baseUrl = isAISearchMode 
-        ? "https://search3958.github.io/aisearch/?q=" 
-        : "https://www.google.com/search?q=";
-      
+      let baseUrl;
+      if (isAISearchMode) {
+        baseUrl = aiEngines[getCurrentAiEngine()] || aiEngines.aisearch;
+      } else {
+        baseUrl = "https://www.google.com/search?q=";
+      }
       const url = `${baseUrl}${encodeURIComponent(query)}`;
-      
+
       let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
       history = history.filter(item => typeof item === 'string');
       history = history.filter(item => item !== query);
@@ -118,7 +172,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
       localStorage.setItem('searchHistory', JSON.stringify(history));
       renderHistory();
-      
+
       // 検索を実行
       window.location.href = url;
     }
@@ -134,6 +188,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // 初期表示
   renderHistory();
+
+  // AIエンジン選択ボタンの初期化
+  setCurrentAiEngine(getCurrentAiEngine());
 
   // フォーム送信時（Enter押下）のイベント
   document.getElementById('searchForm').addEventListener('submit', function (e) {
