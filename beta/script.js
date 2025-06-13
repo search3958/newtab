@@ -62,6 +62,8 @@ function toggleAISearch() {
   const searchButton = document.getElementById('searchButton');
   const aiSearch = document.getElementById('aisearch');
   const aiBg = document.getElementById('aiBg');
+  const searchLens = document.querySelector('.searchLens');
+
   isAISearchMode = !isAISearchMode;
 
   updateAiEngineSelectVisibility();
@@ -72,6 +74,7 @@ function toggleAISearch() {
     searchButton.classList.add('active');
     aiBg.classList.add('active');
     aiSearch.classList.add('active');
+    searchLens.classList.add('active');
     searchInput.placeholder = "AIは不正確な情報を示すことがあります";
   } else {
     // 通常の検索モードに戻す
@@ -79,6 +82,7 @@ function toggleAISearch() {
     searchButton.classList.remove('active');
     aiBg.classList.remove('active');
     aiSearch.classList.remove('active');
+    searchLens.classList.remove('active');
     searchInput.placeholder = "検索"; // 元のプレースホルダーに戻す
   }
 }

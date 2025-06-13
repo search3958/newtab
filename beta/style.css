@@ -7,7 +7,7 @@
 }
 
 :root {
-	--textboxbg: #fff6;
+	--textboxbg: #fff5;
 	--textcolor: #000;
 	--textcolor-o: #0007;
 	--searchbtn: #0f0f0f;
@@ -49,10 +49,28 @@ ins.adsbygoogle {
 .hoverscale:active{
 	scale:0.8;
 }
+
+    #lensFx_canvas {
+      position: fixed;
+      left: 50%;
+      top: calc(50% - 12px);
+      transform: translate(-50%, -50%);
+      width: 356px;
+      height: 76px;
+      border-radius: 38px;
+      pointer-events: none;
+		transition:width 0.6s cubic-bezier(0.33, 0.14, 0, 1);
+
+	z-index:-2;
+	}
+	
+	#lensFx_canvas.active{
+		width:576px;
+	}
 .search-container {
 	display: flex;
 	align-items: center;
-	backdrop-filter: blur(10px);
+	backdrop-filter: blur(2px);
 	background: var(--textboxbg);
 	border-radius: 100px;
 	padding: 8px;
@@ -60,8 +78,7 @@ ins.adsbygoogle {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50px);
-	--smooth-corners: 35, 7;
-	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88;
+	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88, inset 0px 0px 14px 9px #ffffff33;
 }
 
 #searchInput{
@@ -77,7 +94,7 @@ input {
 	padding: 12px 20px;
 	width: 300px;
 	outline: none;
-	transition:width 0.4s cubic-bezier(0.33, 0.14, 0, 1);
+	transition:width 0.6s cubic-bezier(0.33, 0.14, 0, 1);
 }
 
 #searchInput.active{
@@ -105,7 +122,7 @@ input::-webkit-input-placeholder {
 	transform: translate(-50%, -35.5px);
 	--smooth-corners: 7, 4;
 	color: var(--searchbtncolor);
-	transition: all var(--anm),left 0.4s cubic-bezier(0.33, 0.14, 0, 1);
+	transition: all var(--anm),left 0.6s cubic-bezier(0.33, 0.14, 0, 1);
 	box-shadow: inset 0px -5px 2px -2px #000000, inset 0px 5px 2px -3px #ffffff3d;
 }
 #searchButton.active {
@@ -191,7 +208,9 @@ svg {
     padding-bottom: 0px;
     border-radius: 79px;
     margin: 0 auto;
-    margin-top: 24px;
+    margin-top: -9px;
+    scale: 0.7;
+    margin-bottom: -31px;
 }
 .empty-history {
   color: var(--textcolor-o);
@@ -308,7 +327,10 @@ small{
 }
 .icon-wrapper:hover {
 	transform: translate3d(var(--moveX), var(--moveY), 20px) rotateX(var(--rotateX)) rotateY(var(--rotateY));
-	scale:1.08;
+	scale:1.1;
+}
+.icon-wrapper:active {
+	scale:0.95;
 }
 .linkbox-label{
     width: 110px;
@@ -391,7 +413,7 @@ h3 {
 	justify-content: center;
 	align-items: center;
 	background: var(--textboxbg);
-	backdrop-filter: blur(8px);
+	backdrop-filter: blur(4px);
 	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 	width: fit-content;
 	height: 60px;
@@ -435,15 +457,18 @@ h3 {
 	font-size:20px;
   }
   .bar {
-    background: var(--textboxbg);
+	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88, inset 0px 0px 14px 9px #ffffff33;
     padding: 13px 18px;
-    width: fit-content;
-    border-radius: 100px;
+    width:90px;
+    border-radius: 27.4px;
     position: fixed;
     top: 4px;
     right: 6px;
-    backdrop-filter: blur(8px);
     padding-right: 108px;
+    overflow: hidden;
+
+	backdrop-filter: blur(2px);
+	background: var(--textboxbg);
 }
   .settings {
 	opacity: 0;
@@ -463,7 +488,7 @@ h3 {
 	padding-bottom: 8px;
 	
   }
-  .settings ,.settingbtn,.linkhistory,.history,.ai-engine-btn{
+  .settings ,.settingbtn,.linkhistory,.history,.ai-engine-btn,.pill{
 	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88;
   }
   .settings.active {
@@ -476,7 +501,7 @@ h3 {
 	border-radius: 37px;
 }
 #setting{
-	background: var(--searchbtn);
+	background: #0f0f0f;
     mix-blend-mode: overlay;
 	color:#fff;
 	position:fixed;
@@ -518,7 +543,8 @@ h3 {
     border-radius: 1000px;
     transition: 0.5s cubic-bezier(0.34, 0, 0, 1);
 	pointer-events: none;
-	z-index:-10;
+
+	z-index:-1;
 }
 
 .aibg.active {
@@ -601,10 +627,21 @@ button.ai-engine-btn {
 	transition:background 0.2s ease,color 0.2s ease;
 }
 
+#topRightCanvas {
+  position: fixed;
+  right: 6px;
+  top: 4px;
+  width: 216px;
+  height: 56px;
+  border-radius: 100px;
+  pointer-events: none;
+  transition: width 0.6s cubic-bezier(0.33, 0.14, 0, 1);
+}
+
 @media (prefers-color-scheme: dark) {
 	:root{
 		--iconbg:#0009;
-		--textboxbg:#0006;
+		--textboxbg:#0005;
 		--searchbtn: #ddd;
 	--searchbtncolor: #555;
 	--textcolor:#fff;
@@ -632,10 +669,6 @@ button.ai-engine-btn {
 		width: 24px;
 		height: 24px;
 		fill: rgba(0, 0, 0, 0.8);
-	}
-	#aisearch {
-		mix-blend-mode: overlay;
-		background: linear-gradient(140deg, rgb(156 200 255 / 80%) 0%, rgb(236 182 255 / 80%) 100%);
 	}
 	.history{
 		color:#fff;
@@ -665,13 +698,16 @@ button.ai-engine-btn {
 		background:#0009;
 		color:#fff;
 	}
-	.search-container,.settings,.settingbtn ,.linkhistory,.history,.ai-engine-btn{
+	.search-container,.settings,.settingbtn ,.linkhistory,.history,.ai-engine-btn,.pill{
 		box-shadow: inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
 	}
 	.bar {
 		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1), inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
 	}
-	button.ai-engine-btn {
-		color:#fff;
+	#aisearch {
+		mix-blend-mode:overlay;
+	}
+	#setting{
+	background: #444;
 	}
 }
