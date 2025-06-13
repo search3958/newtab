@@ -455,20 +455,34 @@ h3 {
   #time{
 	width:fit-content;
 	font-size:20px;
+	opacity: 1;
+	filter:blur(0px);
+	scale:1;
+	transition:all 0.3s ease;
+  }
+  #time.show{
+
+	opacity: 0;
+	filter:blur(10px);
+	scale:0.4;
   }
   .bar {
 	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88, inset 0px 0px 14px 9px #ffffff33;
     padding: 13px 18px;
     width:90px;
-    border-radius: 27.4px;
+    border-radius: 40px;
     position: fixed;
     top: 4px;
     right: 6px;
     padding-right: 108px;
     overflow: hidden;
-
+    transition: all 0.6s cubic-bezier(.4,0,0,1);
 	backdrop-filter: blur(2px);
 	background: var(--textboxbg);
+}
+.bar.show {
+    width: 307px;
+    padding-bottom: 283px;
 }
   .settings {
 	opacity: 0;
@@ -480,24 +494,22 @@ h3 {
 	position:fixed;
 	top:-80px;
 	right:-200px;
-	transition: all 0.5s cubic-bezier(.4,0,0,1);
+	transition: all 0.6s cubic-bezier(.4,0,0,1);
 	scale:0;
 	filter:blur(60px);
-	backdrop-filter: blur(24px);
 	overflow: hidden;
 	padding-bottom: 8px;
 	
   }
-  .settings ,.settingbtn,.linkhistory,.history,.ai-engine-btn,.pill{
+  .settingbtn,.linkhistory,.history,.ai-engine-btn,.pill{
 	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88;
   }
-  .settings.active {
+  .settings.show {
     opacity: 1;
 	scale: 1;
-	top:65px;
+	top:55px;
 	right:8px;
 	filter:blur(0px);
-    background: var(--textboxbg);
 	border-radius: 37px;
 }
 #setting{
@@ -509,8 +521,22 @@ h3 {
     right: 59px;
 	border:none;
 	border-radius:100px;
+	width:45px;
 	padding: 10px 10.5px;
 	padding-bottom: 4px;
+}
+
+#setting.show{
+    top: 19px;
+    right: 19px;
+	width:100px;
+}
+#setting.show:after{
+    content: "閉じる";
+	padding:4px;
+	font-size:16px;
+	position: relative;
+    bottom: 6px;
 }
 
 #aisearch{
@@ -524,7 +550,20 @@ h3 {
 	border-radius:100px;
 	padding: 10px 10.5px;
 	padding-bottom: 4px;
+	opacity: 1;
+	filter:blur(0px);
+	scale:1;
 }
+#aisearch.show{
+transition:all 0.3s ease;
+	opacity: 0;
+	filter:blur(10px);
+	scale:0.8;
+
+    top: 19px;
+    right: 19px;
+}
+
 #aisearch.active{
 	background: linear-gradient(140deg, rgba(20, 106, 255, 0.8) 0%, rgba(108, 0, 240, 0.8) 100%);
 }
@@ -633,9 +672,14 @@ button.ai-engine-btn {
   top: 4px;
   width: 216px;
   height: 56px;
-  border-radius: 100px;
+  border-radius: 40px;
   pointer-events: none;
-  transition: width 0.6s cubic-bezier(0.33, 0.14, 0, 1);
+  
+	transition: all 0.6s cubic-bezier(.4,0,0,1);
+}
+#topRightCanvas.show {
+width: 432px;
+    height: 326px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -698,7 +742,7 @@ button.ai-engine-btn {
 		background:#0009;
 		color:#fff;
 	}
-	.search-container,.settings,.settingbtn ,.linkhistory,.history,.ai-engine-btn,.pill{
+	.search-container,.settingbtn ,.linkhistory,.history,.ai-engine-btn,.pill{
 		box-shadow: inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
 	}
 	.bar {

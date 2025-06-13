@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://search3958.github.io/newtab/v4/style.css">
+  <link rel="stylesheet" href="v4/style.css">
   <link rel="icon" href="https://search3958.github.io/favicon/newtab.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans&family=Zen+Kaku+Gothic+Antique&display=swap" rel="stylesheet">
-  <script>
-  if (CSS && 'paintWorklet' in CSS) CSS.paintWorklet.addModule('https://unpkg.com/smooth-corners')
-</script>
-  <meta charset="UTF-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <title>Newtab</title>
   <meta name="description" content="ショートカットや便利ツールを集約したカスタマイズ可能な新しいタブページ。日常の作業効率を向上させます。">
 <meta property="og:title" content="NewTab3 - カスタマイズ可能な新しいタブページ">
@@ -19,9 +17,9 @@
 <meta property="og:type" content="website">
 </head>
 <body>
-  
-
-  <form class="search-container smooth" id="searchForm">
+<canvas id="topRightCanvas"></canvas>
+<canvas class="searchLens" id="lensFx_canvas"></canvas>
+  <form class="search-container" id="searchForm">
     <input type="text" name="q" id="searchInput" placeholder="検索" autocomplete="off" autofocus>
   </form>
   <button type="button" id="searchButton">
@@ -48,23 +46,16 @@
     <div class="percentage" id="battery">--%</div>
   </div>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-  crossorigin="anonymous"></script>
-<!-- NewtabAd-2 -->
-<ins class="adsbygoogle"
-  style="display:inline-block;width:130px;height:61px"
-  data-ad-client="ca-pub-6151036058675874"
-  data-ad-slot="6928920130"></ins>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-
   <div class="pill tool">
       <div class="pillicon hoverscale" id="calc">
-       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="http://www.w3.org/2000/svg" width="24px" class="plgl"><path d="M320-320v50q0 13 8.5 21.5T350-240q13 0 21.5-8.5T380-270v-50h50q13 0 21.5-8.5T460-350q0-13-8.5-21.5T430-380h-50v-50q0-13-8.5-21.5T350-460q-13 0-21.5 8.5T320-430v50h-50q-13 0-21.5 8.5T240-350q0 13 8.5 21.5T270-320h50Zm230 50h140q13 0 21.5-8.5T720-300q0-13-8.5-21.5T690-330H550q-13 0-21.5 8.5T520-300q0 13 8.5 21.5T550-270Zm0-100h140q13 0 21.5-8.5T720-400q0-13-8.5-21.5T690-430H550q-13 0-21.5 8.5T520-400q0 13 8.5 21.5T550-370ZM280-592h140q13 0 21.5-8.5T450-622q0-13-8.5-21.5T420-652H280q-13 0-21.5 8.5T250-622q0 13 8.5 21.5T280-592Zm-80 472q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm420-458 35 35q9 9 21 9t21-9q8-8 8.5-20.5T698-585l-36-37 35-35q9-9 9-21t-9-21q-9-9-21-9t-21 9l-35 35-35-35q-9-9-21-9t-21 9q-9 9-9 21t9 21l35 35-36 37q-8 9-8 21t9 21q9 9 21 9t21-9l35-35Z"/></svg>
+       <span class="material-symbols-outlined">
+calculate
+</span>
       </div>
       <div class="pillicon hoverscale" id="clock">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="http://www.w3.org/2000/svg" width="24px" class="plgl"><path d="M400-840q-17 0-28.5-11.5T360-880q0-17 11.5-28.5T400-920h160q17 0 28.5 11.5T600-880q0 17-11.5 28.5T560-840H400Zm80 440q17 0 28.5-11.5T520-440v-160q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600v160q0 17 11.5 28.5T480-400Zm0 320q-74 0-139.5-28.5T226-186q-49-49-77.5-114.5T120-440q0-74 28.5-139.5T226-694q49-49 114.5-77.5T480-800q62 0 119 20t107 58l28-28q11-11 28-11t28 11q11 11 11 28t-11 28l-28 28q38 50 58 107t20 119q0 74-28.5 139.5T734-186q-49 49-114.5 77.5T480-80Z"/></svg>
+        <span class="material-symbols-outlined">
+timer
+</span>
        </div>
   </div>
 </div>
@@ -76,14 +67,18 @@
 <div class="bar">
   <div id="time">9:41 AN</div>
 </div>
-<button id="aisearch" class="hoverscale"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q127 0 226.5 70T851-629q7 17 .5 34T828-572q-16 5-30.5-3T777-599q-24-60-69-106t-108-71v16q0 33-23.5 56.5T520-680h-80v80q0 17-11.5 28.5T400-560h-80v80h40q17 0 28.5 11.5T400-440v80h-40L168-552q-3 18-5.5 36t-2.5 36q0 122 80.5 213T443-162q16 2 26.5 13.5T480-120q0 17-11.5 28.5T441-82Q288-97 184-210T80-480Zm736 352L716-228q-21 12-45 20t-51 8q-75 0-127.5-52.5T440-380q0-75 52.5-127.5T620-560q75 0 127.5 52.5T800-380q0 27-8 51t-20 45l100 100q11 11 11 28t-11 28q-11 11-28 11t-28-11ZM620-280q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg></button>
+<button id="aisearch" class="hoverscale"><span class="material-symbols-outlined">
+explore
+</span></button>
 <div id="ai-engine-select">
   <button class="ai-engine-btn" data-engine="aisearch" style="margin-right:4px;">より正確な検索</button>
   <button class="ai-engine-btn" data-engine="aishortcut" style="margin-right:4px;">複数のタブを開く</button>
   <button class="ai-engine-btn" data-engine="chatgpt">ChatGPTに質問する</button>
 </div>
 <button id="setting" class="hoverscale">
-  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="http://www.w3.org/2000/svg" width="24px" fill="#fff"><path d="M710-150q-63 0-106.5-43.5T560-300q0-63 43.5-106.5T710-450q63 0 106.5 43.5T860-300q0 63-43.5 106.5T710-150Zm0-80q29 0 49.5-20.5T780-300q0-29-20.5-49.5T710-370q-29 0-49.5 20.5T640-300q0 29 20.5 49.5T710-230Zm-270-30H200q-17 0-28.5-11.5T160-300q0-17 11.5-28.5T200-340h240q17 0 28.5 11.5T480-300q0 17-11.5 28.5T440-260ZM250-510q-63 0-106.5-43.5T100-660q0-63 43.5-106.5T250-810q63 0 106.5 43.5T400-660q0 63-43.5 106.5T250-510Zm0-80q29 0 49.5-20.5T320-660q0-29-20.5-49.5T250-730q-29 0-49.5 20.5T180-660q0 29 20.5 49.5T250-590Zm510-30H520q-17 0-28.5-11.5T480-660q0-17 11.5-28.5T520-700h240q17 0 28.5 11.5T800-660q0 17-11.5 28.5T760-620Zm-50 320ZM250-660Z"/></svg>
+  <span class="material-symbols-outlined">
+palette
+</span>
 </button>
 <div class="settings">
   <h3>背景画像</h3>
@@ -121,7 +116,7 @@
 <link-box name="Gemini" bg="var(--iconbg)" url="https://gemini.google.com/" icon="gemini.webp"></link-box>
 <link-box name="リモート" bg="var(--iconbg)" url="https://remotedesktop.google.com/" icon="remotedesktop.webp"></link-box>
 <link-box name="ドライブ" bg="var(--iconbg)" url="https://drive.google.com/" icon="drive.webp"></link-box>
-<link-box name="Product" bg="var(--iconbg)" url="https://about.google/products/" icon="products.webp"></link-box>
+<link-box name="Product" bg="#fff9" url="https://about.google/products/" icon="products.webp"></link-box>
 </div>
 
 <div class="linktext">学習と作業効率化</div>
@@ -145,24 +140,24 @@
 <link-box name="GitHub" bg="var(--iconbg)" url="https://github.com/" icon="github.webp"></link-box>
 <link-box name="AdSense" bg="var(--iconbg)" url="https://www.google.com/adsense/" icon="adsense.webp"></link-box>
 <link-box name="Tools" bg="var(--iconbg)" url="https://search3958.github.io/tools" icon="tools.webp"></link-box>
+<link-box name="Fonts" bg="var(--iconbg)" url="https://fonts.google.com/" icon="fonts.webp"></link-box>
 </div>
 
 <div class="linktext">ショッピング</div>
   <div class="links">
-    <link-box name="Amazon" bg="var(--iconbg)" url="https://www.amazon.co.jp/" icon="amazon.webp"></link-box>
+    <link-box name="Amazon" bg="#fff9" url="https://www.amazon.co.jp/" icon="amazon.webp"></link-box>
 <link-box name="AliExpress" bg="var(--iconbg)" url="https://www.aliexpress.com/" icon="aliexpress.webp"></link-box>
-<link-box name="Wish" bg="var(--iconbg)" url="https://www.wish.com/" icon="wish.webp"></link-box>
+<link-box name="Wish" bg="#30dd73c9" url="https://www.wish.com/" icon="wish.webp"></link-box>
 <link-box name="Mercari" bg="var(--iconbg)" url="https://www.mercari.com/jp/" icon="mercari.webp"></link-box>
-<link-box name="淘宝" bg="var(--iconbg)" url="https://www.taobao.com/" icon="taobao.webp"></link-box>
+<link-box name="Yahoo!フリマ" bg="var(--iconbg)" url="https://paypayfleamarket.yahoo.co.jp/" icon="pfm.webp"></link-box>
 </div>
 
 <div class="linktext">エンターテイメント</div>
   <div class="links">
     <link-box name="Scratch" bg="var(--iconbg)" url="https://scratch.mit.edu/" icon="scratch.webp"></link-box>
-<link-box name="poki" bg="var(--iconbg)" url="https://poki.com/" icon="poki.webp"></link-box>
-<link-box name="Snake.io" bg="var(--iconbg)" url="https://snake.io/" icon="snake.webp"></link-box>
-<link-box name="PACMAN" bg="#000000c9" url="https://www.google.com/search?q=play+pacman" icon="pacman.webp"></link-box>
-<link-box name="Instagram" bg="#b600ffc9" url="https://www.instagram.com/" icon="instagram.webp"></link-box>
+<link-box name="poki" bg="#fff9" url="https://poki.com/" icon="poki.webp"></link-box>
+<link-box name="小红书" bg="var(--iconbg)" url="https://www.xiaohongshu.com/explore" icon="xiaohongshu.webp"></link-box>
+<link-box name="Instagram" bg="var(--iconbg)" url="https://www.instagram.com/" icon="instagram.webp"></link-box>
 <link-box name="thinkSocial" bg="var(--iconbg)" url="https://sns.thinking-grp.org/" icon="thinking.webp"></link-box>
 <link-box name="Netflix" bg="var(--iconbg)" url="https://www.netflix.com/" icon="netflix.webp"></link-box>
 <link-box name="Weverse" bg="#27ffbfc9" url="https://weverse.io/" icon="weverse.webp"></link-box>
@@ -184,7 +179,7 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
 
-<script src="https://search3958.github.io/newtab/v4/script.js" type="module" ></script>
-<script src="https://search3958.github.io/newtab/v4/miniapps.js" defer></script>
+<script src="v4/script.js" type="module" ></script>
+<script src="v4/miniapps.js" defer></script>
 
 </html>

@@ -140,33 +140,32 @@ function drawLensFxOnTopRightCanvas(img) {
 
   updateTopRightCanvasSize();
   const rect = topRightCanvas.getBoundingClientRect();
+  const canvasW = rect.width;
+  const canvasH = rect.height;
+  const dpr = window.devicePixelRatio || 1;
+
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const { drawW, drawH, offX, offY } = lensFx_getCoverParams(img.width, img.height, vw, vh);
 
-  const wLens = 216; // 固定サイズ
-  const hLens = 56;  // 固定サイズ
-  const radius = 28;  // 固定の角丸半径
-  
-  // 画像の右上部分を表示するための座標計算
   const scaleX = img.width / drawW;
   const scaleY = img.height / drawH;
-  
-  // ズームの中心を右上に設定
-  const zoomCenterX = vw - wLens/2; // 右端からwLens/2の位置
-  const zoomCenterY = hLens/2;      // 上端からhLens/2の位置
+
+  const zoomCenterX = vw - canvasW / 2;
+  const zoomCenterY = canvasH / 2;
 
   topRightCtx.clearRect(0, 0, topRightCanvas.width, topRightCanvas.height);
+
+  const radius = 40; // 可変な角丸
 
   for (let i = 0; i < lensFx_layerCount; i++) {
     const t = i / (lensFx_layerCount - 1);
     const zoom = lensFx_minZoom + lensFx_safeInverseEasing(t) * (lensFx_maxZoom - lensFx_minZoom);
-    const w = wLens - i * lensFx_shrinkStep;
-    const h = hLens - i * lensFx_shrinkStep;
-    const dx = (wLens - w) / 2;
-    const dy = (hLens - h) / 2;
-    
-    // 右上を中心としたソース座標の計算
+    const w = canvasW - i * lensFx_shrinkStep;
+    const h = canvasH - i * lensFx_shrinkStep;
+    const dx = (canvasW - w) / 2;
+    const dy = (canvasH - h) / 2;
+
     const imgCenterX = (zoomCenterX + offX) * scaleX;
     const imgCenterY = (zoomCenterY + offY) * scaleY;
     const sw = (w / zoom) * scaleX;
@@ -246,6 +245,7 @@ const canvasResizeObserver = new ResizeObserver(() => {
   }
 });
 canvasResizeObserver.observe(lensFx_canvas);
+canvasResizeObserver.observe(topRightCanvas);
 observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
 
 
@@ -283,4 +283,3 @@ const calcBtn = document.getElementById('calc');
     }
   `;
   iframeDoc.head.appendChild(style);
-  

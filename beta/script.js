@@ -471,6 +471,18 @@ updateTime(); // 初期表示
 setInterval(updateTime, 1000); // 毎秒更新
 
 document.getElementById('setting').addEventListener('click', function() {
-  const card = document.querySelector('.settings');
-  card.classList.toggle('active');
+  const targets = [
+    document.getElementById('aisearch'),
+    document.getElementById('setting'),
+    document.getElementById('time'),
+    document.querySelector('.bar'),
+    document.getElementById('topRightCanvas'),
+    document.querySelector('.settings')
+  ];
+
+  targets.forEach(el => {
+    if (el) {
+      el.classList.toggle('show');
+    }
+  });
 });
