@@ -1,7 +1,22 @@
-<title>新しいタブ</title>
-<link rel="icon" href="https://search3958.github.io/favicon-newtab.svg">
-
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<title>Newtab 3</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+<!link rel="stylesheet" href="https://search3958.github.io/newtab/v2.1/style.css">
+<link rel="icon" href="https://search3958.github.io/favicon-newtab.svg">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7N56NHPY3C');
+</script>
 <script type="importmap">
     {
       "imports": {
@@ -9,35 +24,584 @@
       }
     }
   </script>
-<script type="module">
+  <script type="module">
     import '@material/web/all.js';
     import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
 
     document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
   </script>
-<body>
-  <div class="links">
-  <a href="https://mail.google.com/mail/?tab=rm&amp;ogbl">Gmail</a>
-  <a href="https://www.google.com/imghp?hl=ja&amp;tab=ri&amp;ogbl">画像</a>
-    <a href="https://labs.google.com/search?source=ntp"> 
-      <svg class="gb_D" focusable="false" height="24px" viewBox="0 -960 960 960" width="24px">
-      <path d="M209-120q-42 0-70.5-28.5T110-217q0-14 3-25.5t9-21.5l228-341q10-14 15-31t5-34v-110h-20q-13 0-21.5-8.5T320-810q0-13 8.5-21.5T350-840h260q13 0 21.5 8.5T640-810q0 13-8.5 21.5T610-780h-20v110q0 17 5 34t15 31l227 341q6 9 9.5 20.5T850-217q0 41-28 69t-69 28H209Zm221-660v110q0 26-7.5 50.5T401-573L276-385q-6 8-8.5 16t-2.5 16q0 23 17 39.5t42 16.5q28 0 56-12t80-47q69-45 103.5-62.5T633-443q4-1 5.5-4.5t-.5-7.5l-78-117q-15-21-22.5-46t-7.5-52v-110H430Z"></path>
-      </svg>
-    </a>
+<script>
+  if (CSS && 'paintWorklet' in CSS) {
+    CSS.paintWorklet.addModule('https://unpkg.com/smooth-corners');
+  }
+</script>
+  <style>
+  :root {
+  --background-light: #f0f0f0;
+  --background-dark: #000;
+  --element-light: #185af2;
+  --element-dark: #185af2;
+  --link-light: #fff;
+  --link-dark: #111;
+  --search-light: #ffffffa0;
+  --search-dark: #1c1c1ca0;
+  --md-ripple-hover-color: #00000030;
+  --md-ripple-pressed-color: #000;
+  --md-dialog-container-color: #fff;
+  --md-dialog-headline-color: #000;
+  --md-dialog-supporting-text-color: #000
+}
+
+* {
+  font-family: "IBM Plex Sans JP", sans-serif
+}
+
+.svganimation {
+  fill: #777c;
+  margin: 0 auto
+}
+
+.material-symbols-outlined {
+  font-size: 24px;
+  font-variation-settings: 'FILL'0, 'wght'400, 'GRAD'0, 'opsz'40
+}
+
+body {
+  background-color: var(--background-light);
+  padding: 0;
+  margin: 0;
+  transition: background-image 0.3s ease;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  scrollbar-width: 0;
+  overflow-x: hidden
+}
+
+.helptxt {
+  text-align: center
+}
+
+.help {
+  position: fixed;
+  color: #777c;
+  left: 0;
+  top: calc(100vh - 80px);
+  margin: 0 auto;
+  width: 100vw
+}
+
+.container {
+  perspective: 800px;
+  width: 192px;
+  height: 117px;
+  position: relative;
+  margin: 14px 10px;
+  text-align: center;
+  border-radius: 40px
+}
+
+.links {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap
+}
+
+.box {
+  width: 192px;
+  height: 117px;
+  border-radius: 40px;
+  background-color: var(--link-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease-out;
+  --smooth-corners: 6.4, 3.6;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners);
+  transform: rotateX(0deg) rotateY(0deg)
+}
+
+img {
+  width: 192px;
+  height: 117px;
+    position: relative;
+    top: 3px;
+}
+
+.history,
+.hibtn {
+  position: relative;
+  margin: 4px;
+  padding: 8px 16px;
+  background-color: var(--search-light);
+  color: #000;
+  border-radius: 16px;
+  backdrop-filter: blur(16px)
+}
+
+.search {
+  margin: 16px auto;
+  width: 413px;
+  background: var(--search-light);
+  border-radius: 27px;
+  --smooth-corners: 20.9495, 2.8445;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners);
+  position: relative;
+  padding: 3px;
+  backdrop-filter: blur(24px)
+}
+
+#searchBox {
+  margin: 0;
+  width: 344px;
+  height: 48px;
+  font-size: 32px;
+  padding-left: 16px;
+  border: none;
+  background: none;
+  outline: none !important;
+  border-radius: 100px
+}
+
+.searchbtn {
+  margin: 0;
+  width: 39px;
+  height: 50px;
+  border: none;
+  background: none;
+  text-align: right;
+  transform: scale(1.2);
+  color: var(--element-light);
+  border-radius: 100px
+}
+
+.hide {
+  display: none
+}
+.engineicon{
+  height:45px;
+  width:45px;
+}
+
+#label-off,
+#label-on {
+  border-radius: 30px;
+  text-align: center;
+  background: var(--background-light);
+  padding: 0;
+  --smooth-corners: 6.0495, 4.9105;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners)
+}
+
+.svgrd {
+  padding: 7px;
+  transition: all 0.2s ease-out;
+  border-radius: 30px;
+  width: 107px;
+  position: relative;
+  box-shadow: inset 0 0 0 0 rgba(0, 0, 0, .3);
+  --smooth-corners: 6.0495, 4.9105;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners)
+}
+
+.prev1 {
+  width: 100px;
+  height: 39.25px;
+  margin: 4px;
+  border-radius: 20px;
+  background: linear-gradient(to bottom right, blue, pink);
+  color: #fff;
+  text-align: center;
+  padding-top: 17px;
+  --smooth-corners: 10, 5.623;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners)
+}
+
+.prev2 {
+  width: 100px;
+  height: 39.25px;
+  margin: 4px;
+  border-radius: 20px;
+  background: var(--link-light);
+  color: #000;
+  text-align: center;
+  padding-top: 17px;
+  --smooth-corners: 10, 5.623;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners)
+}
+
+.primary-btn {
+  text-align: center;
+  border-radius: 18px;
+  padding: 8px;
+  margin-top: 4px;
+  color: #fff;
+  background: var(--element-light);
+  --smooth-corners: 24.102, 3.599 !important;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners);
+  position: relative;
+  border: none
+}
+
+#base-color {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%
+}
+
+.highlight>.svgrd {
+  box-shadow: inset 0 0 0 4px var(--element-light)
+}
+
+#clock {
+  position: fixed;
+  top: 35px;
+  right: 40px;
+  color: #0008;
+  z-index: 100
+}
+
+#myDialog {
+  width: 289.01px
+}
+
+.content {
+  display: none
+}
+
+.sc {
+  text-align: center;
+  width: 100%;
+  margin-top: 24px;
+  font-size: 24px;
+  margin-bottom: 0
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, .3);
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease
+}
+
+.modal.active {
+  display: flex;
+  opacity: 1
+}
+
+iframe {
+  border: none
+}
+
+.modal-content {
+  background: #ffffff90;
+  width: 290px;
+  height: 516px;
+  border-radius: 28px;
+  text-align: center;
+  animation: slideIn 0.5s cubic-bezier(.43, 0, 0, 1);
+  overflow: hidden;
+  backdrop-filter: blur(24px)
+}
+
+a {
+  text-decoration: none;
+  color: #00000080;
+  text-align: center
+}
+
+.close-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 15px;
+  background: #333;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none
+}
+
+.history {
+  height: 24px
+}
+
+.hibtn {
+  height: 40px
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-350px);
+    height: 0;
+    backdrop-filter: blur(16px)
+  }
+
+  to {
+    transform: translateY(0);
+    height: 516px;
+    backdrop-filter: blur(16px)
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    height: 516px
+  }
+
+  to {
+    transform: translateY(-300px);
+    height: 0
+  }
+}
+
+.content::-webkit-scrollbar {
+  display: none
+}
+
+.bg-out{
+  position: fixed;
+  top: calc(50vh - 100px);
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+.bg {
+  display:flex;
+  justify-content: center;
+  gap: 8px;
+  margin:0 auto;
+  width: fit-content;
+}
+.bg-u {
+  position: fixed;
+  top: calc(50vh - 20px);
+  width: 100vw;
+}
+
+.shortcut {
+  position: relative;
+  top: 100vh;
+  background: #ffffff80;
+  padding-top: 8px;
+  backdrop-filter: blur(32px)
+}
+
+input#urlInput {
+  margin-top: 8px;
+  width: 233px;
+  padding: 4px;
+  border-radius: 20px;
+  border: none;
+  background: #f0f0f0;
+  margin-bottom: 8px;
+  --smooth-corners: 24.102, 3.599 !important;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners);
+  position: relative
+}
+
+.search-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0px;
+  background: var(--search-light);
+  height:57px;
+  width:57px;
+  overflow: hidden;
+  transition:all 0.5s cubic-bezier(0.88, 0, 0, 1);
+  margin-top:15px;
+  border-radius: 30px;
+        }
+.search-buttons > .material-symbols-outlined {
+  transition:all 0.5s cubic-bezier(0.88, 0, 0, 1);
+  width:45px;
+  scale:1;
+  position: relative;
+  top:16px;
+}
+.search-buttons > .enginebtn {
+  transition:all 0.5s cubic-bezier(0.88, 0, 0, 1);
+  scale:0;
+}
+.search-buttons:hover > .enginebtn {
+  scale:1;
+}
+.search-buttons:hover {
+  width:320px;
+}
+.search-buttons:hover > .material-symbols-outlined {
+  width:0px;
+  scale:0;
+  top:0px;
+}
+        .search-buttons button {
+            padding: 0px;
+            cursor: pointer;
+          height:45px;
+          border:none;
+            background:none;
+        }
+.enginebtn{
+  position: relative;
+    padding:12px;
+  border-radius:30px;
+  margin:0px 4px;
+  margin-top: 6px;
+}
+.topglelinks{
+  position:fixed;
+  right:8px;
+  top:8px;
+}
+#toggleButton{
+  position:relative;
+  top:5px;
+}
+iframe {
+   transition: all 0.5s cubic-bezier(.27,0,0,1);
+  border-radius: 48px;
+  border:none;
+  height: 0px;
+  width: 430px;
+  position:fixed;
+  right:16px;
+  top:48px;
+  background:#f0f0f088;
+  box-shadow: 0px 10px 24px -6px rgba(0, 0, 0, 0.2);
+  z-index:3;
+      backdrop-filter: blur(8px);
+}
+@media (prefers-color-scheme:dark) {
+  :root {
+    --md-ripple-pressed-color: #fff;
+    --md-dialog-container-color: #000;
+    --md-dialog-headline-color: #fff;
+    --md-dialog-supporting-text-color: #fff;
+    --md-ripple-hover-color: #ffffff30
+  }
+
+  body {
+    background-color: var(--background-dark);
+    color: #fff
+  }
+
+  .box {
+    background-color: var(--link-dark)
+  }
+
+  .search {
+    background-color: var(--search-dark)
+  }
+
+  #searchBox {
+    color: #fff
+  }
+
+  .primary-btn {
+    background: var(--element-dark)
+  }
+
+  label {
+    background: var(--background-dark)
+  }
+
+  .modal-content {
+    background: #00000090 !important;
+    color: #fff
+  }
+
+  .history {
+    background: var(--search-dark);
+    color: #fff
+  }
+
+  a {
+    color: #ffffff80
+  }
+
+  #clock {
+    color: #fff8
+  }
+
+  #label-off,
+  #label-on {
+    background: var(--background-dark);
+    color: fff
+  }
+
+  .highlight>.svgrd {
+    box-shadow: inset 0 0 0 4px var(--element-dark)
+  }
+
+  .prev2 {
+    background: var(--link-dark);
+    color: #fff
+  }
+
+  .hibtn {
+    background-color: var(--search-dark);
+    color: #fff
+  }
+
+  .searchbtn {
+    color: var(--element-dark)
+  }
+
+  .shortcut {
+    background: #000000a0
+  }
+  .engineicon{
+  filter: invert(1);
+}
+  .search-buttons {
+    background: var(--search-dark);
+  }
+}
+
+@media (max-width:650px) {
+  #clock {
+    display: none
+  }
+
+  img,
+  .box {
+    width: 96px;
+    height: 58.5px
+  }
+
+  .container {
+    width: 96px;
+    height: 70px
+  }
+}
+  </style>
+    <body>
+      
+  <div class="topglelinks">
+  <a class="toplink" href="https://mail.google.com/mail/?tab=rm&amp;ogbl">Gmail</a>
+  <a class="toplink"  href="https://www.google.com/imghp?hl=ja&amp;tab=ri&amp;ogbl">画像</a>
     <a id="toggleButton"><span class="material-symbols-outlined">
 apps
 </span></a>
-    
-  </div>
-  <div class="box">
-<img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" height="92" width="272">
-  </div>
-<form class="search" id="searchForm" method="get">
-  <input class="searchtext" type="text" id="searchInput" name="q" placeholder="Search" required>
-  <button class="searchbtn" type="button"><span class="material-symbols-outlined searchicon">search</span></button>
-</form>
-<div class="history" id="history"></div>
   
+</div>
+    
   <iframe id="apps" src="https://search3958.github.io/newtab/newtab-mini.html" loading="lazy"></iframe>
   <script>// First Script: Iframe Toggle Functionality
 const button = document.getElementById('toggleButton');
@@ -57,208 +621,161 @@ if (button && iframe) {
     });
 }
     </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('searchForm');
-  const searchInput = document.getElementById('searchInput');
-  const historyDiv = document.getElementById('history');
-  const searchButton = document.querySelector('.searchbtn');
+      <div class="bg-out">
+<div class="bg">
+  <div class="search-buttons">
+        <button class="enginebtn" onclick="setSearchEngine('google')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/google.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('bing')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/bing.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('yahoo')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/yahoo.svg"></button>
+    <span class="material-symbols-outlined">
+more_vert
+</span>
+        <button class="enginebtn" onclick="setSearchEngine('duckduckgo')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/duckduckgo.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('nenara')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/naenara.svg"></button>
+        <button class="enginebtn" onclick="setSearchEngine('neighb')"><md-ripple></md-ripple><img class="engineicon" src="https://search3958.github.io/newtab/img/naver.svg"></button>
+    </div>
+<div class="search">
+  <md-ripple></md-ripple>
+  <input type="text" id="searchBox" placeholder="" onkeypress="checkEnter(event)" autofocus />
+  <button id="searchButton" class="searchbtn">
+    <span class="material-symbols-outlined">search</span>
+  </button>
+</div></div></div><div class="bg-u"><div class="links">
+    <div class="history 1"></div>
+    <div class="history 2"></div>
+    <div class="history 3"></div>
+    <div class="history 4"></div>
+    <div class="history 5"></div>
+    <button id="clearHistory" class="hibtn" style="border:none"><span class="material-symbols-outlined">
+delete_history
+</span></button>
+  </div></div>
+  </div>
+  
+      <md-dialog id="errorDialog">
+  <div slot="headline">検閲</div>
+  <div slot="content" id="errorMessage"></div> 
+  </md-dialog>
+<md-dialog id="errorDialog">
+  <div slot="headline">検閲</div>
+  <div slot="content" id="errorMessage"></div> 
+  </md-dialog>
 
-  form.addEventListener('submit', handleSearch);
-  searchButton.addEventListener('click', handleSearch);
+<script>
+    const openDialogButton = document.getElementById('openDialogButton');
+    const myDialog = document.getElementById('myDialog');
 
-  function handleSearch(event) {
-    event.preventDefault();
-    const query = searchInput.value.trim();
-    if (!query) return;
-
-    // Google検索のURLに固定
-    const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-
-    saveSearchHistory(query, url, () => {
-      window.location.href = url;
+    openDialogButton.addEventListener('click', () => {
+      myDialog.show(); 
     });
-  }
+  </script>
+  </body>
+<script>
+let searchEngine = 'google';
 
-  function saveSearchHistory(query, url, callback) {
-    let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    history.unshift({ query, url });
-    if (history.length > 5) history = history.slice(0, 5);
+function setSearchEngine(engine) {
+    searchEngine = engine;
+}
 
-    localStorage.setItem('searchHistory', JSON.stringify(history));
-    displayHistory();
-    callback(); // 保存後にコールバックでページ遷移
-  }
+const specialWords = [
+    "天安門事件", "六四", "熊婦産", "8964", "豚恩", "南北統一",
+    "남북 통일", "남북통일", "検閲", "プー", "ぷー", "小熊", "维尼"
+];
 
-  function displayHistory() {
+const historyContainer = document.querySelectorAll('.history');
+
+document.addEventListener("DOMContentLoaded", function() {
+    renderHistory();
+    document.getElementById("clearHistory").addEventListener("click", function() {
+        localStorage.removeItem('searchHistory');
+        renderHistory();
+    });
+
+    document.getElementById("setSearchButton").addEventListener("click", searchGoogle);
+    document.getElementById("searchBox").addEventListener("keypress", function(e) {
+        if (e.key === 'Enter') searchGoogle();
+    });
+});
+
+const updateHistory = (query) => {
     const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-    historyDiv.innerHTML = '';
+    history.unshift(query);
+    if (history.length > 5) history.pop();
+    localStorage.setItem('searchHistory', JSON.stringify(history));
+    renderHistory();
+};
 
-    if (history.length === 0) {
-      historyDiv.style.display = 'none';
-      return;
+const renderHistory = () => {
+    const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    historyContainer.forEach((container, index) => {
+        container.innerHTML = history[index] ? `${history[index]}<md-ripple></md-ripple>` : '';
+        container.onclick = () => {
+            const clickedQuery = history[index];
+            if (clickedQuery) {
+                if (clickedQuery.startsWith('http://') || clickedQuery.startsWith('https://')) {
+                    window.location.href = clickedQuery;
+                } else {
+                    searchWithQuery(clickedQuery);
+                }
+            }
+        };
+    });
+};
+
+const searchWithQuery = (query) => {
+    if (specialWords.some(word => query.includes(word))) {
+        const errorDialog = document.getElementById('errorDialog');
+        document.getElementById('errorMessage').innerText =
+            'その検索内容には機密性の高い情報が含まれている可能性があります。';
+        errorDialog?.show?.(); // エラーダイアログが存在すれば表示
+        return;
     }
 
-    historyDiv.style.display = 'block';
-    const clearButton = document.createElement('button');
-    clearButton.classList.add('clear-button');
-    clearButton.id = 'clearHistory';
-    clearButton.innerHTML = '<span class="material-symbols-outlined deletehistory">delete_history</span>';
-    historyDiv.appendChild(clearButton);
+    updateHistory(query);
 
-    history.forEach(item => {
-      const link = document.createElement('a');
-      link.href = item.url;
-      link.textContent = item.query;
-      link.target = '_blank';
-      historyDiv.appendChild(link);
-    });
+    let url = '';
+    switch (searchEngine) {
+        case 'google':
+            url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            break;
+        case 'bing':
+            url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+            break;
+        case 'yahoo':
+            url = `https://search.yahoo.co.jp/search?p=${encodeURIComponent(query)}`;
+            break;
+        case 'duckduckgo':
+            url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            break;
+        case 'nenara':
+            url = `https://www.naenara.com.kp/main/search_first?sVal=${encodeURIComponent(query)}`;
+            break;
+        case 'neighb':
+            url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`;
+            break;
+        default:
+            url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            break;
+    }
 
-    clearButton.addEventListener('click', function () {
-      localStorage.removeItem('searchHistory');
-      displayHistory();
-    });
-  }
-displayHistory();
-});
+    window.location.href = url;
+};
+
+const searchGoogle = () => {
+    const query = document.getElementById("searchBox").value.trim();
+    if (!query) {
+        alert("検索ワードを入力してください");
+        return;
+    }
+
+    if (query.startsWith('http://') || query.startsWith('https://')) {
+        window.location.href = query;
+    } else {
+        searchWithQuery(query);
+    }
+};
+
 
 
 </script>
-  
-  <style>
-:root{
-  --md-ripple-hover-color:#00000000;
-}
-*{
-  
-  line-height: 1.5;
-}
-body{
-  height:100vh;
-  width:100vw;
-    font-family: system-ui, Hiragino Kaku Gothic ProN, sans-serif;
-}
-
-img{
-  margin-top:120px;
-}
-.box{
-  display: flex;
-  justify-content: center;
-  margin-top:8px;
-}
-.search{
-background:#fff;
-  box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.2);
-  border-radius:100px;
-  padding:8px;
-  position: relative;
-  width:fit-content;
-  margin:0 auto;
-  margin-top:32px;
-}
-.searchtext{
-  width:40vw;
-  padding:8px;
-  font-size:16px;
-  border-radius:100px 32px 32px 100px;
-  border:none;
-  padding-left:10px;
-  outline:none;
-  background:none;
-  
-}
-.searchbtn{
-  height:38px;
-  margin-top:-8px;
-  position: relative;
-  top:5px;
-  border-radius:32px 100px 100px 32px;
-  background:none;
-  border:none;
-  color:#444;
-  width:fit-content;
-}
-a {
-    color: rgba(0, 0, 0, .87);
-    text-decoration: none;
-  padding:10px;
-}
-.links{
-position: absolute;
- right: 0;
-}
-svg{
-  position:relative;
-  top:5px;
-}
-iframe {
-   transition: all 0.5s cubic-bezier(.27,0,0,1);
-  border-radius: 48px;
-  border:none;
-  height: 0px;
-  width: 400px;
-  position:fixed;
-  right:16px;
-  top:48px;
-  background:#f0f0f0;
-  box-shadow: 0px 10px 24px -6px rgba(0, 0, 0, 0.3);
-}
-#toggleButton{
- position:relative;
-  top:6px;right:6px; 
-}
-.hslk {
-    justify-content: center;
-    align-items: center;
-    display: flex
-;
-    flex-wrap: wrap;
-}
-
-
-.history {
-  width:fit-content;
-  margin:0 auto;
-  margin-top:8px;
-}
-
-.deletehistory {
-  font-size: 20px !important;
-  margin: 0;
-  margin-bottom: -5px;
-  position:relative;
-  top:2px;
-}
-
-a {
-  color: #000;
-  text-decoration: none !important
-}
-
-.history a,.clear-button {
-  backdrop-filter: blur(10px);
-  font-size: 16px;
-  border: none;
-  margin: 4px;
-  background:#f4f4f4;
-  padding: 4px 10px;
-  border-radius: 100px;
-  color: #000;
-  text-decoration: none !important;
-  z-index: 1;
-  display: inline-block;
-  min-width:12px;
-  max-width: 5.5vw;
-  text-align:center;
-  overflow: scroll;
-  white-space: nowrap
-}
-
-.clear-button {
-  position: relative;
-  bottom: 12.5px;
-  padding-bottom: 0px;
-  padding:3.5px 7px;
-}
-    </style>
+</html>
