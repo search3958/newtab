@@ -482,7 +482,7 @@ h3 {
 
     _render() {
       this.innerHTML = `
-        <a class="linkbox-anchor" href="#">
+        <a class="linkbox-anchor" href="#" target="_blank">
           <div class="linkbox">
             <div class="icon-wrapper">
               <img class="linkbox-img" />
@@ -496,7 +496,7 @@ h3 {
       this.$img = this.querySelector('.linkbox-img');
       this.$label = this.querySelector('.linkbox-label');
     }
-
+    
     _updateAll() {
       ['url', 'bg', 'img', 'name', 'icon'].forEach(attr => {
         const val = this.getAttribute(attr);
