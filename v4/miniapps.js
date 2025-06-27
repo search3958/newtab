@@ -5,9 +5,9 @@ const topRightCanvas = document.getElementById("topRightCanvas");
 const topRightCtx = topRightCanvas.getContext("2d");
 
 const lensFx_layerCount = 15;
-const lensFx_minZoom = 0.1;
+const lensFx_minZoom = 3;
 const lensFx_maxZoom = 1.1;
-const lensFx_shrinkStep = 4;
+const lensFx_shrinkStep = 3;
 
 function lensFx_safeInverseEasing(t) {
   const ε = 0.05;

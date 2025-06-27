@@ -20,7 +20,7 @@
 body {
 	margin: 0;
 	height: calc(100vh + 2px);
-	background-image: url('https://search3958.github.io/newtab/bgimg/3958bg2.webp');
+	background-image: url('https://search3958.github.io/newtab/bgimg/reflect6.webp');
 	background-size: cover;
 	background-position: center;
 }
@@ -470,7 +470,7 @@ h3 {
 	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88, inset 0px 0px 14px 9px #ffffff33;
     padding: 13px 18px;
     width:90px;
-    border-radius: 40px;
+    border-radius: 28px;
     position: fixed;
     top: 4px;
     right: 6px;
@@ -483,6 +483,7 @@ h3 {
 .bar.show {
     width: 307px;
     padding-bottom: 283px;
+	border-radius: 40px;
 }
   .settings {
 	opacity: 0;
