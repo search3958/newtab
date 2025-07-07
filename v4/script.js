@@ -104,7 +104,7 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("date").textContent = `${now.getMonth() + 1}月${now.getDate()}日`;
   
   // 7月20日から30日の期間チェック
-  if (now.getMonth() === 6 && now.getDate() >= 17 && now.getDate() <= 30) {
+  if (now.getMonth() === 6 && now.getDate() >= 10 && now.getDate() <= 30) {
     document.getElementById("weekday").textContent = "7.27 祖国解放戦争勝利記念日";
   } else {
     document.getElementById("weekday").textContent = weekdays[now.getDay()];
