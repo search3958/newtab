@@ -59,7 +59,7 @@ ins.adsbygoogle {
       height: 76px;
       border-radius: 38px;
       pointer-events: none;
-		transition:width 0.6s cubic-bezier(0.33, 0.14, 0, 1);
+		transition:width 0.6s cubic-bezier(.06,.57,0,1);
 
 	z-index:-2;
 	}
@@ -94,7 +94,7 @@ input {
 	padding: 12px 20px;
 	width: 300px;
 	outline: none;
-	transition:width 0.6s cubic-bezier(0.33, 0.14, 0, 1);
+	transition:width 0.6s cubic-bezier(.06,.57,0,1);
 }
 
 #searchInput.active{
@@ -122,7 +122,7 @@ input::-webkit-input-placeholder {
 	transform: translate(-50%, -35.5px);
 	--smooth-corners: 7, 4;
 	color: var(--searchbtncolor);
-	transition: all var(--anm),left 0.6s cubic-bezier(0.33, 0.14, 0, 1);
+	transition: all var(--anm),left 0.6s cubic-bezier(.06,.57,0,1);
 	box-shadow: inset 0px -5px 2px -2px #000000, inset 0px 5px 2px -3px #ffffff3d;
 }
 #searchButton.active {
@@ -154,7 +154,7 @@ svg {
 	padding:16px 24px;
 	padding-bottom:14px;
 	padding-right: 14px;
-	transition: all 0.4s cubic-bezier(0.25, 0.09, 0, 1);
+	transition: all 0.4s cubic-bezier(.06,.57,0,1);
 	justify-content: center; /* 横方向の中央 */
   align-items: center;     /* 縦方向の中央 */
   overflow:hidden;
@@ -476,7 +476,7 @@ h3 {
     right: 6px;
     padding-right: 108px;
     overflow: hidden;
-    transition: all 0.6s cubic-bezier(.4,0,0,1);
+    transition: all 0.6s cubic-bezier(.12,.93,0,1);
 	backdrop-filter: blur(2px);
 	background: var(--textboxbg);
 }
@@ -495,7 +495,7 @@ h3 {
 	position:fixed;
 	top:-80px;
 	right:-200px;
-	transition: all 0.6s cubic-bezier(.4,0,0,1);
+	transition: all 0.6s cubic-bezier(.12,.93,0,1);
 	scale:0;
 	filter:blur(60px);
 	overflow: hidden;
@@ -553,7 +553,6 @@ h3 {
 	padding-bottom: 4px;
 	opacity: 1;
 	filter:blur(0px);
-	scale:1;
 }
 #aisearch.show{
 transition:all 0.3s ease;
@@ -646,7 +645,7 @@ div#ai-engine-select {
     opacity: 0;
     filter: blur(30px);
     pointer-events: none;
-    transition: all 0.6s cubic-bezier(0.41, 0, 0, 1);
+    transition: all 0.6s cubic-bezier(.06,.57,0,1);
 }
 div#ai-engine-select.active {
     transform: translate(-50%, -50%);
@@ -676,7 +675,7 @@ button.ai-engine-btn {
   border-radius: 40px;
   pointer-events: none;
   
-	transition: all 0.6s cubic-bezier(.4,0,0,1);
+	transition: all 0.6s cubic-bezier(.12,.93,0,1);
 }
 #topRightCanvas.show {
 width: 432px;
