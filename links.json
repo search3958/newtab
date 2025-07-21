@@ -1,0 +1,281 @@
+{
+  "categories": [
+    {
+      "title": "Google",
+      "links": [
+        {
+          "name": "Gmail",
+          "bg": "var(--iconbg)",
+          "url": "https://mail.google.com/",
+          "icon": "gmail.webp"
+        },
+        {
+          "name": "Keep",
+          "bg": "var(--iconbg)",
+          "url": "https://keep.google.com/",
+          "icon": "keep.webp"
+        },
+        {
+          "name": "Classroom",
+          "bg": "var(--iconbg)",
+          "url": "https://classroom.google.com/",
+          "icon": "classroom.webp"
+        },
+        {
+          "name": "Youtube",
+          "bg": "var(--iconbg)",
+          "url": "https://www.youtube.com/",
+          "icon": "youtube.webp"
+        },
+        {
+          "name": "Document",
+          "bg": "var(--iconbg)",
+          "url": "https://docs.google.com/document/",
+          "icon": "document.webp"
+        },
+        {
+          "name": "Slide",
+          "bg": "var(--iconbg)",
+          "url": "https://docs.google.com/presentation/",
+          "icon": "slide.webp"
+        },
+        {
+          "name": "Spreadsheet",
+          "bg": "var(--iconbg)",
+          "url": "https://docs.google.com/spreadsheets/",
+          "icon": "spreadsheet.webp"
+        },
+        {
+          "name": "Translate",
+          "bg": "var(--iconbg)",
+          "url": "https://translate.google.com/",
+          "icon": "translate.webp"
+        },
+        {
+          "name": "Gemini",
+          "bg": "var(--iconbg)",
+          "url": "https://gemini.google.com/",
+          "icon": "gemini.webp"
+        },
+        {
+          "name": "リモート",
+          "bg": "var(--iconbg)",
+          "url": "https://remotedesktop.google.com/",
+          "icon": "remotedesktop.webp"
+        },
+        {
+          "name": "ドライブ",
+          "bg": "var(--iconbg)",
+          "url": "https://drive.google.com/",
+          "icon": "drive.webp"
+        },
+        {
+          "name": "Product",
+          "bg": "#fff9",
+          "url": "https://about.google/products/",
+          "icon": "products.webp"
+        }
+      ]
+    },
+    {
+      "title": "学習と作業効率化",
+      "links": [
+        {
+          "name": "Monoxer",
+          "bg": "#0073ffc9",
+          "url": "https://app.monoxer.com/",
+          "icon": "monoxer.webp"
+        },
+        {
+          "name": "ChatGPT",
+          "bg": "#000000c9",
+          "url": "https://chat.openai.com/",
+          "icon": "chatgpt.webp"
+        },
+        {
+          "name": "Copilot",
+          "bg": "var(--iconbg)",
+          "url": "https://copilot.microsoft.com/",
+          "icon": "copilot.webp"
+        },
+        {
+          "name": "Claude",
+          "bg": "var(--iconbg)",
+          "url": "https://claude.ai/",
+          "icon": "claude.webp"
+        },
+        {
+          "name": "Canva",
+          "bg": "var(--iconbg)",
+          "url": "https://www.canva.com/",
+          "icon": "canva.webp"
+        },
+        {
+          "name": "Microsoft 365",
+          "bg": "var(--iconbg)",
+          "url": "https://www.microsoft.com/microsoft-365",
+          "icon": "microsodt.webp"
+        },
+        {
+          "name": "TurboWarp",
+          "bg": "var(--iconbg)",
+          "url": "https://turbowarp.org/",
+          "icon": "turbowarp.webp"
+        },
+        {
+          "name": "Kahoot",
+          "bg": "#1b00a8c9",
+          "url": "https://kahoot.it/",
+          "icon": "kahoot.webp"
+        },
+        {
+          "name": "Discord",
+          "bg": "#5618ffc9",
+          "url": "https://discord.com/app",
+          "icon": "discord.webp"
+        }
+      ]
+    },
+    {
+      "title": "開発",
+      "links": [
+        {
+          "name": "Firebase",
+          "bg": "var(--iconbg)",
+          "url": "https://firebase.google.com/",
+          "icon": "firebase.webp"
+        },
+        {
+          "name": "Codepen",
+          "bg": "#000000c9",
+          "url": "https://codepen.io/",
+          "icon": "codepen.webp"
+        },
+        {
+          "name": "Figma",
+          "bg": "var(--iconbg)",
+          "url": "https://www.figma.com/",
+          "icon": "figma.webp"
+        },
+        {
+          "name": "GitHub",
+          "bg": "var(--iconbg)",
+          "url": "https://github.com/",
+          "icon": "github.webp"
+        },
+        {
+          "name": "AdSense",
+          "bg": "var(--iconbg)",
+          "url": "https://www.google.com/adsense/",
+          "icon": "adsense.webp"
+        },
+        {
+          "name": "Tools",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/tools",
+          "icon": "tools.webp"
+        },
+        {
+          "name": "Fonts",
+          "bg": "var(--iconbg)",
+          "url": "https://fonts.google.com/",
+          "icon": "fonts.webp"
+        }
+      ]
+    },
+    {
+      "title": "ショッピング",
+      "links": [
+        {
+          "name": "Amazon",
+          "bg": "#fff9",
+          "url": "https://www.amazon.co.jp/",
+          "icon": "amazon.webp"
+        },
+        {
+          "name": "AliExpress",
+          "bg": "var(--iconbg)",
+          "url": "https://www.aliexpress.com/",
+          "icon": "aliexpress.webp"
+        },
+        {
+          "name": "Wish",
+          "bg": "#30dd73c9",
+          "url": "https://www.wish.com/",
+          "icon": "wish.webp"
+        },
+        {
+          "name": "Mercari",
+          "bg": "var(--iconbg)",
+          "url": "https://www.mercari.com/jp/",
+          "icon": "mercari.webp"
+        },
+        {
+          "name": "Yahoo!フリマ",
+          "bg": "var(--iconbg)",
+          "url": "https://paypayfleamarket.yahoo.co.jp/",
+          "icon": "pfm.webp"
+        }
+      ]
+    },
+    {
+      "title": "エンターテイメント",
+      "links": [
+        {
+          "name": "Scratch",
+          "bg": "var(--iconbg)",
+          "url": "https://scratch.mit.edu/",
+          "icon": "scratch.webp"
+        },
+        {
+          "name": "poki",
+          "bg": "#fff9",
+          "url": "https://poki.com/",
+          "icon": "poki.webp"
+        },
+        {
+          "name": "小红书",
+          "bg": "var(--iconbg)",
+          "url": "https://www.xiaohongshu.com/explore",
+          "icon": "xiaohongshu.webp"
+        },
+        {
+          "name": "Instagram",
+          "bg": "var(--iconbg)",
+          "url": "https://www.instagram.com/",
+          "icon": "instagram.webp"
+        },
+        {
+          "name": "thinkSocial",
+          "bg": "var(--iconbg)",
+          "url": "https://sns.thinking-grp.org/",
+          "icon": "thinking.webp"
+        },
+        {
+          "name": "Netflix",
+          "bg": "var(--iconbg)",
+          "url": "https://www.netflix.com/",
+          "icon": "netflix.webp"
+        },
+        {
+          "name": "Weverse",
+          "bg": "#27ffbfc9",
+          "url": "https://weverse.io/",
+          "icon": "weverse.webp"
+        },
+        {
+          "name": "Prime Video",
+          "bg": "#0398ffc9",
+          "url": "https://www.amazon.co.jp/Prime-Video/",
+          "icon": "primevideo.webp"
+        },
+        {
+          "name": "Spotify",
+          "bg": "var(--iconbg)",
+          "url": "https://www.spotify.com/",
+          "icon": "spotify.webp"
+        }
+      ]
+    }
+  ]
+} 

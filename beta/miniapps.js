@@ -276,10 +276,16 @@ const calcBtn = document.getElementById('calc');
     toolIframe.src = ''; // 不要なら削除してもOK
   });
 
-  const style = iframeDoc.createElement('style');
-  style.textContent = `
-    body {
-      background: transparent !important;
+  // iframeDocが存在する場合のみスタイルを適用
+  toolIframe.addEventListener('load', () => {
+    if (toolIframe.contentDocument) {
+      const iframeDoc = toolIframe.contentDocument;
+      const style = iframeDoc.createElement('style');
+      style.textContent = `
+        body {
+          background: transparent !important;
+        }
+      `;
+      iframeDoc.head.appendChild(style);
     }
-  `;
-  iframeDoc.head.appendChild(style);
+  });
