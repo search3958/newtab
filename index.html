@@ -276,5 +276,14 @@ document.getElementById('searchForm').addEventListener('submit', (e) => {
   // ...既存の検索処理...
 });
 </script>
+<script>
+// Google FontsをDOMContentLoaded後に遅延読み込み
+  document.addEventListener('DOMContentLoaded', function() {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Work+Sans&family=Zen+Kaku+Gothic+Antique&display=swap';
+    document.head.appendChild(link);
+  });
+</script>
 
 </html>

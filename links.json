@@ -1,5 +1,48 @@
 {
   "categories": [
+
+    {
+      "title": "Search3958",
+      "links": [
+        
+        {
+          "name": "Tools",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/tools",
+          "icon": "tools.webp"
+        },
+        {
+          "name": "ツールボード",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/toolboard",
+          "icon": "toolboard.webp"
+        },
+        {
+          "name": "火源台txt",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/firebasetext",
+          "icon": "firebasetxt.webp"
+        },
+        {
+          "name": "thinkSocial",
+          "bg": "var(--iconbg)",
+          "url": "https://sns.thinking-grp.org/",
+          "icon": "thinking.webp"
+        },
+        {
+          "name": "クソゲー広場",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/games/",
+          "icon": "games.webp"
+        },
+        {
+          "name": "3D Space",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/3dspace/",
+          "icon": "3dspace.webp"
+        }
+      ]
+    },
     {
       "title": "Google",
       "links": [
@@ -170,12 +213,6 @@
           "icon": "adsense.webp"
         },
         {
-          "name": "Tools",
-          "bg": "var(--iconbg)",
-          "url": "https://search3958.github.io/tools",
-          "icon": "tools.webp"
-        },
-        {
           "name": "Fonts",
           "bg": "var(--iconbg)",
           "url": "https://fonts.google.com/",
@@ -244,12 +281,6 @@
           "bg": "var(--iconbg)",
           "url": "https://www.instagram.com/",
           "icon": "instagram.webp"
-        },
-        {
-          "name": "thinkSocial",
-          "bg": "var(--iconbg)",
-          "url": "https://sns.thinking-grp.org/",
-          "icon": "thinking.webp"
         },
         {
           "name": "Netflix",

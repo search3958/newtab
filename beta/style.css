@@ -20,7 +20,7 @@
 body {
 	margin: 0;
 	height: calc(100vh + 2px);
-	background-image: url('https://search3958.github.io/newtab/bgimg/reflect6.webp');
+	background-image: url('https://search3958.github.io/newtab/bgimg/glass1.webp');
 	background-size: cover;
 	background-position: center;
 }
@@ -680,6 +680,15 @@ button.ai-engine-btn {
 #topRightCanvas.show {
 width: 432px;
     height: 326px;
+}
+
+#shortcut-match-box{
+	border-radius:16px!important;
+	position: fixed;
+	top: 50%;
+	left:calc(50% + 116.5px);
+	transform: translate(-50%, -65px);
+	scale:0.6;
 }
 
 @media (prefers-color-scheme: dark) {

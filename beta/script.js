@@ -182,7 +182,25 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  document.getElementById('searchButton').addEventListener('click', performSearch);
+  // 検索ボタンのクリック時にも@ショートカット対応
+  const searchButton = document.getElementById('searchButton');
+  if (searchButton) {
+    searchButton.addEventListener('click', function (e) {
+      const searchInput = document.getElementById('searchInput');
+      const val = searchInput.value.trim();
+      if (val.startsWith('@')) {
+        const name = val.slice(1).toLowerCase();
+        const found = allAppLinks.find(s => s.name.toLowerCase() === name);
+        if (found) {
+          window.location.href = found.url;
+          e.preventDefault();
+          return false;
+        }
+      }
+      // 通常の検索処理
+      performSearch();
+    });
+  }
 
   // クリアボタン処理
   document.getElementById('clearButton').addEventListener('click', function () {
@@ -197,10 +215,26 @@ window.addEventListener("DOMContentLoaded", () => {
   setCurrentAiEngine(getCurrentAiEngine());
 
   // フォーム送信時（Enter押下）のイベント
-  document.getElementById('searchForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // デフォルトのフォーム送信を防止
-    performSearch();
-  });
+  // 既存のdocument.getElementById('searchForm')を'ZsearchForm'に修正する場合は適宜変更
+  const searchForm = document.getElementById('searchForm') || document.getElementById('ZsearchForm');
+  if (searchForm) {
+    searchForm.addEventListener('submit', function (e) {
+      const searchInput = document.getElementById('searchInput');
+      const val = searchInput.value.trim();
+      if (val.startsWith('@')) {
+        const name = val.slice(1).toLowerCase();
+        const found = allAppLinks.find(s => s.name.toLowerCase() === name);
+        if (found) {
+          window.location.href = found.url;
+          e.preventDefault();
+          return false;
+        }
+      }
+      // 通常の検索処理
+      e.preventDefault();
+      performSearch();
+    });
+  }
 
   window.addEventListener('scroll', function() {
     if (window.scrollY >= 1) {
@@ -263,22 +297,6 @@ window.addEventListener("DOMContentLoaded", () => {
     history = history.slice(0, 5);
     
     localStorage.setItem('shortcutHistory', JSON.stringify(history));
-    displayShortcutHistory();
-  }
-
-  function displayShortcutHistory() {
-    const historyContainer = document.querySelector('.shortcut .links');
-    if (!historyContainer) return;
-
-    const history = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
-    
-    if (history.length === 0) {
-      historyContainer.innerHTML = '<div class="empty-history">ここに履歴が表示されます</div>';
-    } else {
-      historyContainer.innerHTML = history.map(item => 
-        `<link-box name="${item.name}" bg="${item.bg}" url="${item.url}" icon="${item.icon}"></link-box>`
-      ).join('');
-    }
   }
 
   // link-boxのクリックイベントを監視
@@ -294,7 +312,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   // 初期表示
-  displayShortcutHistory();
+  // displayShortcutHistory(); // これを削除
 
    const searchInput = document.getElementById('searchInput');
     const searchaiBtn = document.querySelector('.searchai-btn');
@@ -485,4 +503,288 @@ document.getElementById('setting').addEventListener('click', function() {
       el.classList.toggle('show');
     }
   });
+});
+
+// --- ショートカット一致時のアイコン表示 ---
+// 検索ボタンの直後にアイコン表示用の要素を作成
+let shortcutMatchBox = document.getElementById('shortcut-match-box');
+const searchButton = document.getElementById('searchButton');
+if (!shortcutMatchBox) {
+  shortcutMatchBox = document.createElement('div');
+  shortcutMatchBox.id = 'shortcut-match-box';
+  shortcutMatchBox.style.display = 'none';
+  shortcutMatchBox.style.position = 'fixed';
+  // 位置指定はCSSで行うため、ここでは設定しない
+  shortcutMatchBox.style.zIndex = '1000';
+  shortcutMatchBox.style.background = 'var(--textboxbg, #fff9)';
+  shortcutMatchBox.style.borderRadius = '32px';
+  shortcutMatchBox.style.boxShadow = '0 2px 8px #0002';
+  shortcutMatchBox.style.padding = '12px 24px 12px 16px';
+  shortcutMatchBox.style.display = 'none';
+  shortcutMatchBox.style.alignItems = 'center';
+  shortcutMatchBox.style.gap = '12px';
+  shortcutMatchBox.style.fontSize = '20px';
+  shortcutMatchBox.style.pointerEvents = 'none';
+  searchButton.parentNode.insertBefore(shortcutMatchBox, searchButton.nextSibling);
+}
+
+// --- links.jsonの全リンクをグローバルで保持 ---
+let allAppLinks = [];
+
+async function loadAllAppLinks() {
+  const res = await fetch('links.json');
+  const data = await res.json();
+  allAppLinks = data.categories.flatMap(cat => cat.links);
+}
+
+// --- 初期化 ---
+window.addEventListener('DOMContentLoaded', () => {
+  loadIconsZip().then(generateAppLinks);
+  loadAllAppLinks();
+});
+
+// @検索の参照先をallAppLinksに変更
+searchInput.addEventListener('input', function(e) {
+  const val = searchInput.value.trim();
+  if (val.startsWith('@') && val.length > 1) {
+    const name = val.slice(1).toLowerCase();
+    const found = allAppLinks.find(s => s.name.toLowerCase() === name);
+    if (found) {
+      shortcutMatchBox.innerHTML = '';
+      let iconUrl = '';
+      if (typeof found.icon === 'string' && found.icon.endsWith('.webp')) {
+        iconUrl = iconsMap[found.icon] || '';
+      }
+      if (!iconUrl) {
+        iconUrl = 'https://search3958.github.io/favicon/newtab.svg';
+      }
+      const img = document.createElement('img');
+      img.src = iconUrl;
+      img.alt = found.name;
+      img.style.width = '48px';
+      img.style.height = '48px';
+      img.style.borderRadius = '16px';
+      img.style.objectFit = 'contain';
+      img.style.display = 'block';
+      // アイコン背景色
+      const iconBg = found.bg || '#fff';
+      const iconWrapper = document.createElement('div');
+      iconWrapper.style.background = iconBg;
+      iconWrapper.style.borderRadius = '16px';
+      iconWrapper.style.display = 'flex';
+      iconWrapper.style.alignItems = 'center';
+      iconWrapper.style.justifyContent = 'center';
+      iconWrapper.style.width = '56px';
+      iconWrapper.style.height = '56px';
+      iconWrapper.appendChild(img);
+      shortcutMatchBox.appendChild(iconWrapper);
+      shortcutMatchBox.style.display = 'flex';
+      shortcutMatchBox.style.background = '#fff';
+      shortcutMatchBox.style.boxShadow = '0 2px 8px #0002';
+      shortcutMatchBox.style.padding = '0';
+      shortcutMatchBox.style.borderRadius = '0';
+      return;
+    }
+  }
+  shortcutMatchBox.style.display = 'none';
+  shortcutMatchBox.innerHTML = '';
+  shortcutMatchBox.style.background = 'var(--textboxbg, #fff9)';
+});
+
+// --- アイコンzip展開・iconsMap生成 ---
+const iconsMap = {};
+let iconsReady = false;
+const iconWaiters = [];
+
+async function loadIconsZip() {
+  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons.zip';
+  const res = await fetch(zipUrl);
+  if (!res.ok) throw new Error(`Failed to fetch icons.zip: ${res.status}`);
+  const blob = await res.blob();
+  const zip = await JSZip.loadAsync(blob);
+  const tasks = [];
+  zip.forEach((relativePath, file) => {
+    if (file.name.endsWith('.webp')) {
+      const task = file.async('blob').then(blobData => {
+        const objectURL = URL.createObjectURL(blobData);
+        const fileName = file.name.split('/').pop();
+        iconsMap[fileName] = objectURL;
+      });
+      tasks.push(task);
+    }
+  });
+  await Promise.all(tasks);
+  iconsReady = true;
+  iconWaiters.forEach(fn => fn());
+}
+
+// --- アプリリスト動的生成 ---
+async function generateAppLinks() {
+  // アイコンzipが未ロードなら待つ
+  if (!iconsReady) {
+    await new Promise(resolve => iconWaiters.push(resolve));
+  }
+  try {
+    const res = await fetch('links.json');
+    const data = await res.json();
+    const container = document.getElementById('dynamic-links');
+    if (!container) return;
+    container.innerHTML = '';
+
+    // --- 最近の使用セクションをGoogleカテゴリの前に挿入 ---
+    // 履歴取得
+    const shortcutHistory = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
+    if (shortcutHistory.length > 0) {
+      // セクションタイトル
+      const recentTitleDiv = document.createElement('div');
+      recentTitleDiv.className = 'linktext';
+      recentTitleDiv.textContent = '最近の使用';
+      container.appendChild(recentTitleDiv);
+      // 履歴リンク群
+      const recentLinksDiv = document.createElement('div');
+      recentLinksDiv.className = 'links';
+      shortcutHistory.forEach(item => {
+        const a = document.createElement('a');
+        a.className = 'linkbox-anchor';
+        a.href = item.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        // box
+        const box = document.createElement('div');
+        box.className = 'linkbox';
+        // アイコン
+        const iconWrapper = document.createElement('div');
+        iconWrapper.className = 'icon-wrapper';
+        iconWrapper.style.backgroundColor = item.bg;
+        const img = document.createElement('img');
+        img.className = 'linkbox-img';
+        if (iconsMap[item.icon]) {
+          img.src = iconsMap[item.icon];
+        } else {
+          img.src = 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
+        }
+        img.alt = item.name;
+        iconWrapper.appendChild(img);
+        // 3D効果イベント
+        iconWrapper.addEventListener('mousemove', e => {
+          const box = iconWrapper.getBoundingClientRect();
+          const mouseX = e.clientX - box.left;
+          const mouseY = e.clientY - box.top;
+          const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 15;
+          const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -15;
+          const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 10;
+          const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 10;
+          iconWrapper.style.setProperty('--rotateX', `${rotateX}deg`);
+          iconWrapper.style.setProperty('--rotateY', `${rotateY}deg`);
+          iconWrapper.style.setProperty('--moveX', `${moveX}px`);
+          iconWrapper.style.setProperty('--moveY', `${moveY}px`);
+          img.style.setProperty('--moveX', `${moveX * 1.2}px`);
+          img.style.setProperty('--moveY', `${moveY * 1.2}px`);
+        });
+        iconWrapper.addEventListener('mouseleave', () => {
+          iconWrapper.style.setProperty('--rotateX', '0deg');
+          iconWrapper.style.setProperty('--rotateY', '0deg');
+          iconWrapper.style.setProperty('--moveX', '0px');
+          iconWrapper.style.setProperty('--moveY', '0px');
+          img.style.setProperty('--moveX', '0px');
+          img.style.setProperty('--moveY', '0px');
+        });
+        // ラベル
+        const label = document.createElement('div');
+        label.className = 'linkbox-label';
+        label.textContent = item.name;
+        // 組み立て
+        box.appendChild(iconWrapper);
+        box.appendChild(label);
+        a.appendChild(box);
+        // --- 履歴クリック時にも履歴を最新化 ---
+        a.addEventListener('click', () => {
+          addToShortcutHistory(item.name, item.url, item.icon, item.bg);
+        });
+        recentLinksDiv.appendChild(a);
+      });
+      container.appendChild(recentLinksDiv);
+    }
+    // --- ここまで ---
+
+    // 各カテゴリ描画
+    data.categories.forEach(category => {
+      // カテゴリタイトル
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'linktext';
+      titleDiv.textContent = category.title;
+      container.appendChild(titleDiv);
+      // リンク群
+      const linksDiv = document.createElement('div');
+      linksDiv.className = 'links';
+      category.links.forEach(link => {
+        const a = document.createElement('a');
+        a.className = 'linkbox-anchor';
+        a.href = link.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        // box
+        const box = document.createElement('div');
+        box.className = 'linkbox';
+        // アイコン
+        const iconWrapper = document.createElement('div');
+        iconWrapper.className = 'icon-wrapper';
+        iconWrapper.style.backgroundColor = link.bg;
+        const img = document.createElement('img');
+        img.className = 'linkbox-img';
+        if (iconsMap[link.icon]) {
+          img.src = iconsMap[link.icon];
+        } else {
+          img.src = 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
+        }
+        img.alt = link.name;
+        iconWrapper.appendChild(img);
+        // 3D効果イベント
+        iconWrapper.addEventListener('mousemove', e => {
+          const box = iconWrapper.getBoundingClientRect();
+          const mouseX = e.clientX - box.left;
+          const mouseY = e.clientY - box.top;
+          const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 15;
+          const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -15;
+          const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 10;
+          const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 10;
+          iconWrapper.style.setProperty('--rotateX', `${rotateX}deg`);
+          iconWrapper.style.setProperty('--rotateY', `${rotateY}deg`);
+          iconWrapper.style.setProperty('--moveX', `${moveX}px`);
+          iconWrapper.style.setProperty('--moveY', `${moveY}px`);
+          img.style.setProperty('--moveX', `${moveX * 1.2}px`);
+          img.style.setProperty('--moveY', `${moveY * 1.2}px`);
+        });
+        iconWrapper.addEventListener('mouseleave', () => {
+          iconWrapper.style.setProperty('--rotateX', '0deg');
+          iconWrapper.style.setProperty('--rotateY', '0deg');
+          iconWrapper.style.setProperty('--moveX', '0px');
+          iconWrapper.style.setProperty('--moveY', '0px');
+          img.style.setProperty('--moveX', '0px');
+          img.style.setProperty('--moveY', '0px');
+        });
+        // ラベル
+        const label = document.createElement('div');
+        label.className = 'linkbox-label';
+        label.textContent = link.name;
+        // 組み立て
+        box.appendChild(iconWrapper);
+        box.appendChild(label);
+        a.appendChild(box);
+        // --- クリック時に履歴追加 ---
+        a.addEventListener('click', () => {
+          addToShortcutHistory(link.name, link.url, link.icon, link.bg);
+        });
+        linksDiv.appendChild(a);
+      });
+      container.appendChild(linksDiv);
+    });
+  } catch (e) {
+    console.error('アプリリストの取得に失敗:', e);
+  }
+}
+
+// --- 初期化 ---
+window.addEventListener('DOMContentLoaded', () => {
+  loadIconsZip().then(generateAppLinks);
 });
