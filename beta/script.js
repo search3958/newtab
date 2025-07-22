@@ -359,11 +359,11 @@ window.addEventListener("DOMContentLoaded", () => {
   let iconsReady = false;
   const iconWaiters = [];
 
-  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons.zip';
+  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
 
   async function loadIcons() {
     const res = await fetch(zipUrl);
-    if (!res.ok) throw new Error(`Failed to fetch icons.zip: ${res.status}`);
+    if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
     const blob = await res.blob();
     const zip = await JSZip.loadAsync(blob);
     const tasks = [];
@@ -597,9 +597,9 @@ let iconsReady = false;
 const iconWaiters = [];
 
 async function loadIconsZip() {
-  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons.zip';
+  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
   const res = await fetch(zipUrl);
-  if (!res.ok) throw new Error(`Failed to fetch icons.zip: ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
   const blob = await res.blob();
   const zip = await JSZip.loadAsync(blob);
   const tasks = [];
