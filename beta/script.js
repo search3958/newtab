@@ -188,7 +188,8 @@ window.addEventListener("DOMContentLoaded", () => {
     searchButton.addEventListener('click', function (e) {
       const searchInput = document.getElementById('searchInput');
       const val = searchInput.value.trim();
-      if (val.startsWith('@')) {
+      // AIモード時は@ショートカット無効
+      if (!isAISearchMode && val.startsWith('@')) {
         const name = val.slice(1).toLowerCase();
         const found = allAppLinks.find(s => s.name.toLowerCase() === name);
         if (found) {
@@ -221,7 +222,8 @@ window.addEventListener("DOMContentLoaded", () => {
     searchForm.addEventListener('submit', function (e) {
       const searchInput = document.getElementById('searchInput');
       const val = searchInput.value.trim();
-      if (val.startsWith('@')) {
+      // AIモード時は@ショートカット無効
+      if (!isAISearchMode && val.startsWith('@')) {
         const name = val.slice(1).toLowerCase();
         const found = allAppLinks.find(s => s.name.toLowerCase() === name);
         if (found) {
@@ -351,123 +353,6 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// link-box.js（モジュールではなく通常のスクリプトとして統合）
-// JSZip は事前に <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script> で読み込まれている前提
-
-(function () {
-  const iconsMap = {};
-  let iconsReady = false;
-  const iconWaiters = [];
-
-  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
-
-  async function loadIcons() {
-    const res = await fetch(zipUrl);
-    if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
-    const blob = await res.blob();
-    const zip = await JSZip.loadAsync(blob);
-    const tasks = [];
-    zip.forEach((relativePath, file) => {
-      if (file.name.endsWith('.webp')) {
-        const task = file.async('blob').then(blobData => {
-          const objectURL = URL.createObjectURL(blobData);
-          const fileName = file.name.split('/').pop();
-          iconsMap[fileName] = objectURL; // ← ZIP内のファイル名だけをキーに
-        });
-        tasks.push(task);
-      }
-    });
-    await Promise.all(tasks);
-    iconsReady = true;
-    iconWaiters.forEach(fn => fn());
-    console.log('Icons loaded:', Object.keys(iconsMap));
-  }
-
-  class LinkBox extends HTMLElement {
-    static get observedAttributes() {
-      return ['name', 'img', 'bg', 'url', 'icon'];
-    }
-
-    constructor() {
-      super();
-      this._render();
-    }
-
-    connectedCallback() {
-      if (!LinkBox.iconsLoaded) {
-        LinkBox.iconsLoaded = true;
-        loadIcons().catch(err => console.error(err));
-      }
-      this._updateAll();
-    }
-
-    attributeChangedCallback(name, oldVal, newVal) {
-      if (oldVal !== newVal) this._update(name, newVal);
-    }
-
-    _render() {
-      this.innerHTML = `
-        <a class="linkbox-anchor" href="#">
-          <div class="linkbox">
-            <div class="icon-wrapper">
-              <img class="linkbox-img" />
-            </div>
-            <div class="linkbox-label"></div>
-          </div>
-        </a>
-      `;
-      this.$anchor = this.querySelector('.linkbox-anchor');
-      this.$iconWrapper = this.querySelector('.icon-wrapper');
-      this.$img = this.querySelector('.linkbox-img');
-      this.$label = this.querySelector('.linkbox-label');
-    }
-
-    _updateAll() {
-      ['url', 'bg', 'img', 'name', 'icon'].forEach(attr => {
-        const val = this.getAttribute(attr);
-        if (val !== null) this._update(attr, val);
-      });
-    }
-
-    _update(attr, value) {
-      switch (attr) {
-        case 'url':
-          this.$anchor.href = value;
-          break;
-        case 'bg':
-          this.$iconWrapper.style.backgroundColor = value;
-          break;
-        case 'img':
-          this.$img.src = value;
-          break;
-        case 'name':
-          this.$label.textContent = value;
-          break;
-        case 'icon': {
-          const applyIcon = () => {
-            const iconUrl = iconsMap[value];
-            if (iconUrl) {
-              this.$img.src = iconUrl;
-            } else {
-              console.warn(`Icon not found: ${value}`);
-            }
-          };
-          if (iconsReady) {
-            applyIcon();
-          } else {
-            iconWaiters.push(applyIcon);
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    customElements.define('link-box', LinkBox);
-  });
-})();
-
 function formatAMPM(date) {
   let hours = date.getHours();
   let minutes = date.getMinutes();
@@ -513,9 +398,6 @@ if (!shortcutMatchBox) {
   shortcutMatchBox = document.createElement('div');
   shortcutMatchBox.id = 'shortcut-match-box';
   shortcutMatchBox.style.display = 'none';
-  shortcutMatchBox.style.position = 'fixed';
-  // 位置指定はCSSで行うため、ここでは設定しない
-  shortcutMatchBox.style.zIndex = '1000';
   shortcutMatchBox.style.background = 'var(--textboxbg, #fff9)';
   shortcutMatchBox.style.borderRadius = '32px';
   shortcutMatchBox.style.boxShadow = '0 2px 8px #0002';
@@ -538,13 +420,25 @@ async function loadAllAppLinks() {
 }
 
 // --- 初期化 ---
-window.addEventListener('DOMContentLoaded', () => {
+// window.addEventListener('DOMContentLoaded', () => {
+//   loadAllAppLinks();
+// });
+
+window.onload = function() {
+  // 他の初期処理がここで完了した後にzip解凍＆リンク生成
   loadIconsZip().then(generateAppLinks);
   loadAllAppLinks();
-});
+};
 
 // @検索の参照先をallAppLinksに変更
 searchInput.addEventListener('input', function(e) {
+  // AIモード時はショートカットマッチボックスを常に非表示＆return
+  if (isAISearchMode) {
+    shortcutMatchBox.style.display = 'none';
+    shortcutMatchBox.innerHTML = '';
+    shortcutMatchBox.style.background = 'var(--textboxbg, #fff9)';
+    return;
+  }
   const val = searchInput.value.trim();
   if (val.startsWith('@') && val.length > 1) {
     const name = val.slice(1).toLowerCase();
@@ -785,6 +679,6 @@ async function generateAppLinks() {
 }
 
 // --- 初期化 ---
-window.addEventListener('DOMContentLoaded', () => {
-  loadIconsZip().then(generateAppLinks);
-});
+// window.addEventListener('DOMContentLoaded', () => {
+//   loadIconsZip().then(generateAppLinks);
+// });

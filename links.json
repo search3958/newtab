@@ -24,6 +24,12 @@
           "icon": "firebasetxt.webp"
         },
         {
+          "name": "TechPick 10",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/techpick10/",
+          "icon": "techpick10.webp"
+        },
+        {
           "name": "thinkSocial",
           "bg": "var(--iconbg)",
           "url": "https://sns.thinking-grp.org/",
@@ -114,7 +120,7 @@
         },
         {
           "name": "Product",
-          "bg": "#fff9",
+          "bg": "var(--iconbg)",
           "url": "https://about.google/products/",
           "icon": "products.webp"
         }
