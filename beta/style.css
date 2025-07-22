@@ -70,7 +70,7 @@ ins.adsbygoogle {
 .search-container {
 	display: flex;
 	align-items: center;
-	backdrop-filter: blur(2px);
+	backdrop-filter: blur(5px);
 	background: var(--textboxbg);
 	border-radius: 100px;
 	padding: 8px;
@@ -466,12 +466,12 @@ h3 {
     padding-right: 108px;
     overflow: hidden;
     transition: all 0.6s cubic-bezier(.12,.93,0,1);
-	backdrop-filter: blur(2px);
+	backdrop-filter: blur(5px);
 	background: var(--textboxbg);
 }
 .bar.show {
     width: 307px;
-    padding-bottom: 283px;
+    padding-bottom: 380px;
 	border-radius: 40px;
 }
   .settings {
@@ -668,7 +668,7 @@ button.ai-engine-btn {
 }
 #topRightCanvas.show {
 width: 432px;
-    height: 326px;
+    height: 423px;
 }
 
 #shortcut-match-box{

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拡張機能管理</title>
+  <style>
+    body { font-family: 'Zen Kaku Gothic Antique', sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+    h1 { font-size: 1.5em; margin-bottom: 1em; }
+    textarea { width: 100%; min-height: 80px; margin-bottom: 1em; font-family: monospace; font-size: 1em; border-radius: 6px; border: 1px solid #ccc; padding: 8px; }
+    button { padding: 8px 20px; border: none; border-radius: 6px; background: #1976d2; color: #fff; font-size: 1em; cursor: pointer; margin-right: 8px; }
+    button.delete { background: #e53935; }
+    .ext-list { margin-top: 2em; }
+    .ext-item { background: #f0f0f0; border-radius: 6px; padding: 12px; margin-bottom: 10px; position: relative; }
+    .ext-item pre { background: #e0e0e0; padding: 6px; border-radius: 4px; overflow-x: auto; }
+    .ext-item .delete { position: absolute; top: 12px; right: 12px; }
+    .all-delete { background: #e53935; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>拡張機能を追加</h1>
+    <label>CSS:</label>
+    <textarea id="cssBox" placeholder="ここにCSSを入力"></textarea>
+    <label>JavaScript:</label>
+    <textarea id="jsBox" placeholder="ここにJavaScriptを入力"></textarea>
+    <button id="addExt">読み込む</button>
+    <button id="allDelete" class="all-delete">全て削除</button>
+    <div class="ext-list" id="extList"></div>
+  </div>
+  <script>
+    // 拡張機能データの取得
+    function getExtensions() {
+      return JSON.parse(localStorage.getItem('extensions') || '[]');
+    }
+    // 拡張機能データの保存
+    function saveExtensions(exts) {
+      localStorage.setItem('extensions', JSON.stringify(exts));
+    }
+    // 拡張機能のリスト表示
+    function renderList() {
+      const list = document.getElementById('extList');
+      list.innerHTML = '';
+      const exts = getExtensions();
+      exts.forEach((ext, i) => {
+        const div = document.createElement('div');
+        div.className = 'ext-item';
+        div.innerHTML =
+          '<b>拡張機能 ' + (i+1) + '</b>' +
+          '<pre>CSS:\n' + (ext.css ? ext.css : '(なし)') + '</pre>' +
+          '<pre>JS:\n' + (ext.js ? ext.js : '(なし)') + '</pre>' +
+          '<button class="delete" data-id="' + ext.id + '">削除</button>';
+        list.appendChild(div);
+      });
+      // 削除ボタンイベント
+      document.querySelectorAll('.delete').forEach(btn => {
+        btn.onclick = function() {
+          const id = this.dataset.id;
+          const newExts = getExtensions().filter(ext => ext.id !== id);
+          saveExtensions(newExts);
+          renderList();
+        };
+      });
+    }
+    // 拡張機能の全削除
+    document.getElementById('allDelete').onclick = function() {
+      saveExtensions([]);
+      renderList();
+    };
+    // 拡張機能の追加
+    document.getElementById('addExt').onclick = function() {
+      const css = document.getElementById('cssBox').value;
+      const js = document.getElementById('jsBox').value;
+      if (!css && !js) return alert('CSSまたはJavaScriptを入力してください');
+      const id = 'ext_' + Date.now();
+      const exts = getExtensions();
+      exts.push({ id, css, js });
+      saveExtensions(exts);
+      renderList();
+      document.getElementById('cssBox').value = '';
+      document.getElementById('jsBox').value = '';
+    };
+    // ページ読み込み時、リストのみ表示
+    window.onload = function() {
+      renderList();
+    };
+  </script>
+</body>
+</html>

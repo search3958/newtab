@@ -541,7 +541,6 @@ async function generateAppLinks() {
         const a = document.createElement('a');
         a.className = 'linkbox-anchor';
         a.href = item.url;
-        a.target = '_blank';
         a.rel = 'noopener noreferrer';
         // box
         const box = document.createElement('div');
@@ -592,8 +591,14 @@ async function generateAppLinks() {
         box.appendChild(label);
         a.appendChild(box);
         // --- 履歴クリック時にも履歴を最新化 ---
-        a.addEventListener('click', () => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
           addToShortcutHistory(item.name, item.url, item.icon, item.bg);
+          generateAppLinks();
+          const url = a.href;
+          setTimeout(() => {
+            window.location.href = url;
+          }, 50);
         });
         recentLinksDiv.appendChild(a);
       });
@@ -615,7 +620,6 @@ async function generateAppLinks() {
         const a = document.createElement('a');
         a.className = 'linkbox-anchor';
         a.href = link.url;
-        a.target = '_blank';
         a.rel = 'noopener noreferrer';
         // box
         const box = document.createElement('div');
@@ -666,8 +670,14 @@ async function generateAppLinks() {
         box.appendChild(label);
         a.appendChild(box);
         // --- クリック時に履歴追加 ---
-        a.addEventListener('click', () => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
           addToShortcutHistory(link.name, link.url, link.icon, link.bg);
+          generateAppLinks();
+          const url = a.href;
+          setTimeout(() => {
+            window.location.href = url;
+          }, 50);
         });
         linksDiv.appendChild(a);
       });
@@ -682,3 +692,33 @@ async function generateAppLinks() {
 // window.addEventListener('DOMContentLoaded', () => {
 //   loadIconsZip().then(generateAppLinks);
 // });
+function addToShortcutHistory(name, url, icon, bg) {
+  let history = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
+  history = history.filter(item => item.url !== url);
+  history.unshift({ name, url, icon, bg });
+  history = history.slice(0, 5);
+  localStorage.setItem('shortcutHistory', JSON.stringify(history));
+}
+
+// --- 拡張機能（extensions）自動適用 ---
+(function(){
+  // extensions/index.html では適用しない
+  if (location.pathname.endsWith('/extensions/index.html')) return;
+  try {
+    const exts = JSON.parse(localStorage.getItem('extensions') || '[]');
+    exts.forEach(ext => {
+      if (ext.css) {
+        const style = document.createElement('style');
+        style.textContent = ext.css;
+        style.dataset.extid = ext.id;
+        document.head.appendChild(style);
+      }
+      if (ext.js) {
+        const script = document.createElement('script');
+        script.textContent = ext.js;
+        script.dataset.extid = ext.id;
+        document.body.appendChild(script);
+      }
+    });
+  } catch(e) { /* 何もしない */ }
+})();
