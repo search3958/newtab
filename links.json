@@ -131,13 +131,13 @@
       "links": [
         {
           "name": "Monoxer",
-          "bg": "#0073ffc9",
+          "bg": "#0073ffbb",
           "url": "https://app.monoxer.com/",
           "icon": "monoxer.webp"
         },
         {
           "name": "ChatGPT",
-          "bg": "#000000c9",
+          "bg": "#000000bb",
           "url": "https://chat.openai.com/",
           "icon": "chatgpt.webp"
         },
@@ -173,13 +173,13 @@
         },
         {
           "name": "Kahoot",
-          "bg": "#1b00a8c9",
+          "bg": "#1b00a8bb",
           "url": "https://kahoot.it/",
           "icon": "kahoot.webp"
         },
         {
           "name": "Discord",
-          "bg": "#5618ffc9",
+          "bg": "#5618ffbb",
           "url": "https://discord.com/app",
           "icon": "discord.webp"
         }
@@ -196,7 +196,7 @@
         },
         {
           "name": "Codepen",
-          "bg": "#000000c9",
+          "bg": "#000000bb",
           "url": "https://codepen.io/",
           "icon": "codepen.webp"
         },
@@ -243,7 +243,7 @@
         },
         {
           "name": "Wish",
-          "bg": "#30dd73c9",
+          "bg": "#30dd73bb",
           "url": "https://www.wish.com/",
           "icon": "wish.webp"
         },
@@ -296,13 +296,13 @@
         },
         {
           "name": "Weverse",
-          "bg": "#27ffbfc9",
+          "bg": "#27ffbfbb",
           "url": "https://weverse.io/",
           "icon": "weverse.webp"
         },
         {
           "name": "Prime Video",
-          "bg": "#0398ffc9",
+          "bg": "#0398ffbb",
           "url": "https://www.amazon.co.jp/Prime-Video/",
           "icon": "primevideo.webp"
         },

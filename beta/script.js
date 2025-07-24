@@ -470,6 +470,9 @@ searchInput.addEventListener('input', function(e) {
       iconWrapper.style.justifyContent = 'center';
       iconWrapper.style.width = '56px';
       iconWrapper.style.height = '56px';
+      // md-ripple追加
+      const ripple = document.createElement('md-ripple');
+      iconWrapper.appendChild(ripple);
       iconWrapper.appendChild(img);
       shortcutMatchBox.appendChild(iconWrapper);
       shortcutMatchBox.style.display = 'flex';
@@ -549,6 +552,9 @@ async function generateAppLinks() {
         const iconWrapper = document.createElement('div');
         iconWrapper.className = 'icon-wrapper';
         iconWrapper.style.backgroundColor = item.bg;
+        // md-ripple追加
+        const ripple = document.createElement('md-ripple');
+        iconWrapper.appendChild(ripple);
         const img = document.createElement('img');
         img.className = 'linkbox-img';
         if (iconsMap[item.icon]) {
@@ -628,6 +634,9 @@ async function generateAppLinks() {
         const iconWrapper = document.createElement('div');
         iconWrapper.className = 'icon-wrapper';
         iconWrapper.style.backgroundColor = link.bg;
+        // md-ripple追加
+        const ripple = document.createElement('md-ripple');
+        iconWrapper.appendChild(ripple);
         const img = document.createElement('img');
         img.className = 'linkbox-img';
         if (iconsMap[link.icon]) {

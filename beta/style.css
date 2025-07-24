@@ -7,14 +7,16 @@
 }
 
 :root {
-	--textboxbg: #fff5;
+	--textboxbg: #fff2;
 	--textcolor: #000;
 	--textcolor-o: #0007;
 	--searchbtn: #0f0f0f;
 	--searchbtncolor: #b3b3b3;
 	--anm: 0.2s ease;
-	--iconbg: #fff9;
+	--iconbg: rgba(253, 253, 253, 0.6);
 	interpolate-size: allow-keywords;
+	--md-ripple-hover-color:#fff0;
+	--md-ripple-pressed-color:#fff;
 }
 
 body {
@@ -25,6 +27,10 @@ body {
 	background-position: center;
 }
 
+
+canvas{
+	filter:brightness(1.4) saturate(0.7);
+}
 ::-webkit-scrollbar {
 	display: none
   }
@@ -49,7 +55,6 @@ ins.adsbygoogle {
 .hoverscale:active{
 	scale:0.8;
 }
-
     #lensFx_canvas {
       position: fixed;
       left: 50%;
@@ -235,8 +240,8 @@ a{
 }
 .bg.active{
 	pointer-events: auto;
-	background:#fff3;
-	backdrop-filter: blur(32px);
+	background:#fff4;
+	backdrop-filter: blur(16px);
 }
 .shortcut{
 	overflow: scroll;
@@ -261,7 +266,8 @@ img{
 	width:110px;
 	padding:0px;
 	margin:0px;
-	transition: all 0.4s cubic-bezier(0,0,0,1);
+	
+transition: all 0.8s cubic-bezier(.38,2.04,.39,1);
 	scale:1;
 	transform: translate3d(0, 0, 40px);
 	filter: drop-shadow(0px 0px 0px #0000);
@@ -270,6 +276,7 @@ img:hover{
 	scale:1.1;
 	transform: translate3d(var(--moveX), var(--moveY), 60px);
 	filter: drop-shadow(0px 5px 10px #0003);
+	transition: all 0.6s cubic-bezier(0,1,.63,1);
 }
 .icon-wrapper{
 	height:110px;
@@ -278,7 +285,7 @@ img:hover{
 	border-radius:30px;
 	-webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="620 200 680 680" xmlns="http://www.w3.org/2000/svg"><path d="M 960,878.6445 c 58.703,0 136.419,-3.5417 167.845,-18.0215 35.502,-12.9215 67.235,-33.3652 93.324,-59.4539 26.089,-26.0887 46.532,-57.8223 59.454,-93.3238 14.48,-31.4267 18.022,-109.1418 18.022,-167.8453 0,-58.7035 -3.542,-136.4186 -18.022,-167.8453 -12.922,-35.5015 -33.365,-67.2351 -59.454,-93.3238 -26.089,-26.0887 -57.822,-46.5324 -93.324,-59.4539 -31.426,-14.4798 -109.142,-18.0215 -167.845,-18.0215 -58.7035,0 -136.4186,3.5417 -167.8453,18.0215 -35.5015,12.9215 -67.2351,33.3652 -93.3238,59.4539 -26.0887,26.0887 -46.5324,57.8223 -59.4539,93.3238 -14.4798,31.4267 -18.0215,109.1418 -18.0215,167.8453 0,58.7035 3.5417,136.4186 18.0215,167.8453 12.9215,35.5015 33.3652,67.2351 59.4539,93.3238 26.0887,26.0887 57.8223,46.5324 93.3238,59.4539 31.4267,14.4798 109.1418,18.0215 167.8453,18.0215 z" fill="white"/></svg>');
 mask-image: url('data:image/svg+xml;utf8,<svg viewBox="620 200 680 680" xmlns="http://www.w3.org/2000/svg"><path d="M 960,878.6445 c 58.703,0 136.419,-3.5417 167.845,-18.0215 35.502,-12.9215 67.235,-33.3652 93.324,-59.4539 26.089,-26.0887 46.532,-57.8223 59.454,-93.3238 14.48,-31.4267 18.022,-109.1418 18.022,-167.8453 0,-58.7035 -3.542,-136.4186 -18.022,-167.8453 -12.922,-35.5015 -33.365,-67.2351 -59.454,-93.3238 -26.089,-26.0887 -57.822,-46.5324 -93.324,-59.4539 -31.426,-14.4798 -109.142,-18.0215 -167.845,-18.0215 -58.7035,0 -136.4186,3.5417 -167.8453,18.0215 -35.5015,12.9215 -67.2351,33.3652 -93.3238,59.4539 -26.0887,26.0887 -46.5324,57.8223 -59.4539,93.3238 -14.4798,31.4267 -18.0215,109.1418 -18.0215,167.8453 0,58.7035 3.5417,136.4186 18.0215,167.8453 12.9215,35.5015 33.3652,67.2351 59.4539,93.3238 26.0887,26.0887 57.8223,46.5324 93.3238,59.4539 31.4267,14.4798 109.1418,18.0215 167.8453,18.0215 z" fill="white"/></svg>');
-	transition: all 0.4s cubic-bezier(0,0,0,1);
+transition: all 0.8s cubic-bezier(.38,2.04,.39,1), filter 0.5s cubic-bezier(.25,0,0,1);
 	scale:1;
 	mask-repeat: no-repeat;
 	mask-size: cover;
@@ -286,6 +293,11 @@ mask-image: url('data:image/svg+xml;utf8,<svg viewBox="620 200 680 680" xmlns="h
 	-webkit-mask-size: cover;
 	transform-style: preserve-3d;
 	transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+	filter:brightness(1);
+}
+.icon-wrapper:hover{
+	transition: all 0.6s cubic-bezier(0,1,.63,1);
+	filter:brightness(1.2);
 }
 .searchai-btn {
     background: var(--textboxbg);
@@ -465,7 +477,7 @@ h3 {
     right: 6px;
     padding-right: 108px;
     overflow: hidden;
-    transition: all 0.6s cubic-bezier(.12,.93,0,1);
+    transition: all  1.2s cubic-bezier(.16,1.24,.1,1);
 	backdrop-filter: blur(5px);
 	background: var(--textboxbg);
 }
@@ -484,7 +496,7 @@ h3 {
 	position:fixed;
 	top:-80px;
 	right:-200px;
-	transition: all 0.6s cubic-bezier(.12,.93,0,1);
+	transition: all  1.2s cubic-bezier(.16,1.24,.1,1);
 	scale:0;
 	filter:blur(60px);
 	overflow: hidden;
@@ -492,7 +504,7 @@ h3 {
 	
   }
   .settingbtn,.linkhistory,.history,.ai-engine-btn,.pill{
-	box-shadow: inset 0px -5px 2px -3px #00000020, inset 0px 5px 2px -3px #ffffff88;
+	box-shadow: inset 0px -5px 2px -3px #00000008, inset 0px 5px 2px -3px #ffffff0d, inset 0px -5px 7px -3px #00000030, inset 0px 5px 7px -3px #ffffff36
   }
   .settings.show {
     opacity: 1;
@@ -663,8 +675,7 @@ button.ai-engine-btn {
   height: 56px;
   border-radius: 40px;
   pointer-events: none;
-  
-	transition: all 0.6s cubic-bezier(.12,.93,0,1);
+	transition: all  1.2s cubic-bezier(.16,1.24,.1,1);
 }
 #topRightCanvas.show {
 width: 432px;
@@ -684,11 +695,14 @@ width: 432px;
 @media (prefers-color-scheme: dark) {
 	:root{
 		--iconbg:#0009;
-		--textboxbg:#0005;
+		--textboxbg:#0002;
 		--searchbtn: #ddd;
 	--searchbtncolor: #555;
 	--textcolor:#fff;
 	--textcolor-o: #fff7;
+	}
+	canvas{
+		filter:brightness(0.6) saturate(1.4);
 	}
 	h3{
 		color:#fff;
@@ -741,9 +755,7 @@ width: 432px;
 		background:#0009;
 		color:#fff;
 	}
-	.search-container,.settingbtn ,.linkhistory,.history,.ai-engine-btn,.pill{
-		box-shadow: inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
-	}
+	
 	.bar {
 		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1), inset 0px -5px 2px -3px #00000078, inset 0px 5px 2px -3px #ffffff5e;
 	}

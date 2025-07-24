@@ -15,6 +15,19 @@
 <meta property="og:description" content="ショートカットや便利ツールを集約したカスタマイズ可能な新しいタブページ。日常の作業効率を向上させます。">
 <meta property="og:url" content="https://search3958.github.io/newtab">
 <meta property="og:type" content="website">
+<script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+</script>
+<script type="module">
+  import '@material/web/all.js';
+  import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+  document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+</script>
 </head>
 <body>
 <canvas id="topRightCanvas"></canvas>
@@ -71,8 +84,8 @@ timer
 explore
 </span></button>
 <div id="ai-engine-select">
-  <button class="ai-engine-btn" data-engine="aisearch" style="margin-right:4px;">より正確な検索</button>
-  <button class="ai-engine-btn" data-engine="aishortcut" style="margin-right:4px;">複数のタブを開く</button>
+  <button class="ai-engine-btn" data-engine="aisearch" style="margin-right:4px;">正確な情報を簡単に得る</button>
+  <button class="ai-engine-btn" data-engine="aishortcut" style="margin-right:4px;">関連する複数のタブを開く</button>
   <button class="ai-engine-btn" data-engine="chatgpt">ChatGPTに質問する</button>
 </div>
 <button id="setting" class="hoverscale">

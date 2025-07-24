@@ -109,8 +109,8 @@ function lensFx_draw(img) {
     lensFx_ctx.drawImage(img, sx, sy, sw, sh, dx, dy, w, h);
     lensFx_ctx.restore();
 
-    lensFx_ctx.lineWidth = 1;
-    lensFx_ctx.strokeStyle = `rgba(255,255,255,${0.005 + 0.02 * t})`;
+    lensFx_ctx.lineWidth = 0;
+    lensFx_ctx.strokeStyle = `#0000`;
     lensFx_ctx.beginPath();
     lensFx_ctx.moveTo(dx + easedRadius, dy);
     lensFx_ctx.lineTo(dx + w - easedRadius, dy);
