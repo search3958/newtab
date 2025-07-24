@@ -41,11 +41,24 @@
        <div class="h3">デザイン拡張</div>
        <div class="container smooth">
         <div class="card">
-          <img class="card-img" src="./img/design/superglass.png">
+          <img class="card-img" src="./img/design/liquidglass.png">
           <div class="card-title">Ultra Glass</div>
           <div class="card-text">もっと透明感のあるLiquid Glass</div>
           <button id="setNewtab" onclick="
+            document.getElementById('extName').value = 'Ultra Glass';
             document.getElementById('cssBox').value = ':root { --textboxbg: #fff0; } .search-container,.bar{backdrop-filter: blur(0px);}canvas{filter:brightness(1)!important;}';
+            document.getElementById('jsBox').value = '';
+            document.getElementById('addExt').click();
+          ">拡張機能を追加<md-ripple></md-ripple></button>
+        </div>
+
+        <div class="card">
+          <img class="card-img" src="./img/design/win10.png">
+          <div class="card-title">Windowa10</div>
+          <div class="card-text">いい感じにWindows10感。ほんまに試してみて！！</div>
+          <button id="setNewtab" onclick="
+            document.getElementById('extName').value = 'Windowa10';
+            document.getElementById('cssBox').value = ':root{--textboxbg:#fffa!important}canvas{display:none}.search-container{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#fff3!important;mix-blend-mode:unset!important;padding:18px 19px!important;border-radius:0px!important;box-shadow:0 2px 4px 0 #0001!important;transform:translate(calc(-50% + 11px),-46px)!important}svg{fill:#000!important}.bar{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}#aisearch,#setting{border-radius:0px!important}.pill{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:0px!important;background:#f9f9f9!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:0px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:0px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}#aisearch{mix-blend-mode:unset!important;top:4px!important;right:5.5px!important;padding:16px 16px!important;padding-bottom:11px!important}#setting{background:#fff8!important;mix-blend-mode:unset!important;color:#000000!important;top:4px!important;right:61px!important;padding:16px 16px!important;padding-bottom:11px!important;width:fit-content!important}#setting.show{right:5.5px!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#0008!important}#searchButton{background:#4cc1fe!important}.settingbtn{background:#111!important}.bg.active{background:#00000057!important}}';
             document.getElementById('jsBox').value = '';
             document.getElementById('addExt').click();
           ">拡張機能を追加<md-ripple></md-ripple></button>
@@ -56,6 +69,7 @@
           <div class="card-title">Windows11</div>
           <div class="card-text">v3.6が拡張機能として生き返ったのかもしれない。</div>
           <button id="setNewtab" onclick="
+            document.getElementById('extName').value = 'Windows11';
             document.getElementById('cssBox').value = ':root{--textboxbg:#fff8!important}canvas{display:none}.search-container{border-radius:12px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#0166c0!important;mix-blend-mode:unset!important;padding:7px 19px!important;border-radius:5px!important;box-shadow:0 2px 4px 0 #0001!important}.bar{border-radius:12px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}#aisearch,#setting{border-radius:5px!important}.pill{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:6px!important;background:#f9f9f9!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:6px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:5px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#0008!important}#searchButton{background:#4cc1fe!important}.settingbtn{background:#111!important}.bg.active{background:#00000057!important}}';
             document.getElementById('jsBox').value = '';
             document.getElementById('addExt').click();
@@ -63,11 +77,25 @@
         </div>
 
         <div class="card">
-          <img class="card-img" src="./img/design/win10.png">
-          <div class="card-title">Windowa10</div>
-          <div class="card-text">いい感じにWindows10感出てる。ほんまに</div>
+          <img class="card-img" src="./img/design/material3.png">
+          <div class="card-title">Material3</div>
+          <div class="card-text">いい感じにMaterial Youって感じ。</div>
           <button id="setNewtab" onclick="
-            document.getElementById('cssBox').value = ':root{--textboxbg:#fffa!important}canvas{display:none}.search-container{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#fff3!important;mix-blend-mode:unset!important;padding:18px 19px!important;border-radius:0px!important;box-shadow:0 2px 4px 0 #0001!important;transform:translate(calc(-50% + 11px),-46px)!important}svg{fill:#000!important}.bar{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}#aisearch,#setting{border-radius:0px!important}.pill{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:0px!important;background:#f9f9f9!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:0px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:0px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}#aisearch{mix-blend-mode:unset!important;top:4px!important;right:5.5px!important;padding:16px 16px!important;padding-bottom:11px!important}#setting{background:#fff8!important;mix-blend-mode:unset!important;color:#000000!important;top:4px!important;right:61px!important;padding:16px 16px!important;padding-bottom:11px!important;width:fit-content!important}#setting.show{right:5.5px!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#0008!important}#searchButton{background:#4cc1fe!important}.settingbtn{background:#111!important}.bg.active{background:#00000057!important}}';
+            document.getElementById('extName').value = 'Material3';
+            document.getElementById('cssBox').value = ':root{--textboxbg:#f3f3faaa!important;--searchbtn:#415f91!important}*{box-shadow:none!important}canvas{filter:brightness(1)!important}#searchButton{mix-blend-mode:unset!important}#setting{background:#d6e3ff!important;mix-blend-mode:unset!important;color:#284777!important}#aisearch{background:#573e5c!important;mix-blend-mode:unset!important;color:#fad8fd!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#191c20aa!important;--searchbtn:#aac7ff!important}#setting{background:#284777!important;color:#d6e3ff!important}#aisearch{background:#ddbce0!important;color:#3f2844!important}}';
+            document.getElementById('jsBox').value = '';
+            document.getElementById('addExt').click();
+          ">拡張機能を追加<md-ripple></md-ripple></button>
+        </div>
+
+
+        <div class="card">
+          <img class="card-img" src="./img/design/material2.png">
+          <div class="card-title">Material2</div>
+          <div class="card-text">やっぱM2はGoogle感あるなー。</div>
+          <button id="setNewtab" onclick="
+            document.getElementById('extName').value = 'Material2';
+            document.getElementById('cssBox').value = ':root{--textboxbg:#fffb!important}canvas{display:none}.search-container{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#3f51b5!important;mix-blend-mode:unset!important;padding:7px 19px!important;border-radius:3px!important;box-shadow:0 2px 4px 0 #0001!important}#aisearch{mix-blend-mode:unset!important;background:#f50057!important}#setting{mix-blend-mode:unset!important;background:#3f51b5!important}.bar{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}.pill{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:6px!important;background:#1565c0!important;color:#fff!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:6px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:5px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#000b!important}svg{fill:#fff!important}.bg.active{background:#00000057!important}}';
             document.getElementById('jsBox').value = '';
             document.getElementById('addExt').click();
           ">拡張機能を追加<md-ripple></md-ripple></button>
@@ -76,13 +104,17 @@
        </div>
 
 
+    <label>名前:</label>
+    <input id="extName" type="text" placeholder="拡張機能名を入力">
     <label>CSS:</label>
     <textarea id="cssBox" placeholder="ここにCSSを入力"></textarea>
     <label>JavaScript:</label>
     <textarea id="jsBox" placeholder="ここにJavaScriptを入力"></textarea>
     <button id="addExt">読み込む</button>
     <button id="allDelete" class="all-delete">全て削除</button>
-    <div class="ext-list" id="extList"></div>
+
+    <div class="h3">使用中の拡張機能</div>
+    <div class="ext-list container smooth" id="extList"></div>
   <script>
     // 拡張機能データの取得
     function getExtensions() {
@@ -99,12 +131,10 @@
       const exts = getExtensions();
       exts.forEach((ext, i) => {
         const div = document.createElement('div');
-        div.className = 'ext-item';
+        div.className = 'card-c';
         div.innerHTML =
-          '<b>拡張機能 ' + (i+1) + '</b>' +
-          '<pre>CSS:\n' + (ext.css ? ext.css : '(なし)') + '</pre>' +
-          '<pre>JS:\n' + (ext.js ? ext.js : '(なし)') + '</pre>' +
-          '<button class="delete" data-id="' + ext.id + '">削除</button>';
+          '<div class="card-title">' + (ext.name ? ext.name : '拡張機能 ' + (i+1)) + '<div>' +
+          '<button class="delete setNewtab" data-id="' + ext.id + '">削除</button>';
         list.appendChild(div);
       });
       // 削除ボタンイベント
@@ -124,14 +154,17 @@
     };
     // 拡張機能の追加
     document.getElementById('addExt').onclick = function() {
+      const name = document.getElementById('extName').value;
       const css = document.getElementById('cssBox').value;
       const js = document.getElementById('jsBox').value;
+      if (!name) return alert('名前を入力してください');
       if (!css && !js) return alert('CSSまたはJavaScriptを入力してください');
       const id = 'ext_' + Date.now();
       const exts = getExtensions();
-      exts.push({ id, css, js });
+      exts.push({ id, name, css, js });
       saveExtensions(exts);
       renderList();
+      document.getElementById('extName').value = '';
       document.getElementById('cssBox').value = '';
       document.getElementById('jsBox').value = '';
     };

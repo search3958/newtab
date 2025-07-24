@@ -53,13 +53,25 @@
 ;
   flex-direction: column;
 }
+
+.card-c {
+  height: 108px;
+  width: 200px;
+  background: #F1F5F8;
+  --smooth-corners: 8, 4;
+  mask-image: paint(smooth-corners);
+  -webkit-mask-image: paint(smooth-corners);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
   .btns{
     width:255px;
     display:flex;
     gap:8px;
     height:48px;
   }
-  #copy,#download,#setNewtab{
+  #copy,#download,#setNewtab,.setNewtab{
     width:50%;
     border-radius:24px;
     padding:8px 0px;
@@ -72,7 +84,7 @@
     -webkit-mask-image: paint(smooth-corners);
   }
   
-  #setNewtab {
+  #setNewtab,.setNewtab {
     width: 100%;
     background: #CAEEE0;
     color: #013c28;

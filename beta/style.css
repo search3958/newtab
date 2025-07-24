@@ -29,7 +29,7 @@ body {
 
 
 canvas{
-	filter:brightness(1.4) saturate(0.7);
+	filter:brightness(1.2) saturate(0.8);
 }
 ::-webkit-scrollbar {
 	display: none
