@@ -15,6 +15,16 @@
           }
   
   
+.debug{
+	width:6px;
+	height:2px;
+  overflow: hidden;
+  background:#0002;
+}
+.debug:hover{
+	height:100px;
+	width:100vw;
+}
   body{
     opacity: 0;
     background: var(--bg-color);

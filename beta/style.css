@@ -1,5 +1,5 @@
 *{
-	font-family: "Work Sans", "Zen Kaku Gothic Antique", "Inter", sans-serif;
+	font-family: "Albert Sans", "Noto Sans JP", sans-serif;
 	font-weight: 400;
   font-style: normal;
   line-height: 1.5;
@@ -7,7 +7,7 @@
 }
 
 :root {
-	--textboxbg: #fff2;
+	--textboxbg: #fff4;
 	--textcolor: #000;
 	--textcolor-o: #0007;
 	--searchbtn: #0f0f0f;
@@ -19,6 +19,75 @@
 	--md-ripple-pressed-color:#fff;
 }
 
+  .switch {
+    position: relative;
+	left:calc(50vw - 80px);
+    display: inline-block;
+    width: 160px; /* 横幅を拡大 */
+    height: 44px;
+    font-family: sans-serif;
+	margin-top:10px;
+	border-radius:100px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ffffff6d;
+    border-radius: 22px;
+    display: flex;
+    justify-content: space-around; /* ラベルの間隔を開ける */
+    align-items: center;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.54);
+    transition: 0.4s;
+    padding: 0 10px;
+  }
+
+  .slider span {
+    width: 50%;
+    text-align: center;
+    z-index: 2;
+    transition: color 0.4s;
+  }
+
+  .slider::before {
+    content: "";
+    position: absolute;
+    height: 36px;
+    width: 76px; /* 横に広く */
+    left: 4px;
+    top: 4px;
+    background-color: white;
+    border-radius: 20px;
+    transition: 0.4s cubic-bezier(.28, .21, 0, 1);
+    z-index: 1;
+	box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.1);
+  }
+
+  /* チェック状態でスライド */
+  #grid-switch:checked + .slider::before {
+    transform: translateX(76px); /* 横幅に合わせた移動量 */
+  }
+
+  /* 選択中の文字を黒に */
+  #grid-switch:not(:checked) + .slider .left-label {
+    color: black;
+  }
+
+  #grid-switch:checked + .slider .right-label {
+    color: black;
+  }
 body {
 	margin: 0;
 	height: calc(100vh + 2px);
@@ -242,6 +311,26 @@ a{
 	pointer-events: auto;
 	background:#fff4;
 	backdrop-filter: blur(16px);
+}
+#dynamic-links.grid{
+	display:flex;
+	flex-wrap: wrap;
+    justify-content: center;
+}
+.linktext.grid{
+	display:none;
+}
+.links.grid {
+    display: flex;
+    width: 402px;
+    height: 287px;
+    background: rgba(255, 255, 255, 0.162);
+    overflow: scroll;
+    margin: -20px -32px;
+    padding: 15px;
+    border-radius: 66px;
+    align-content: flex-start;
+    scale: 0.8;
 }
 .shortcut{
 	overflow: scroll;
@@ -503,7 +592,7 @@ h3 {
 	padding-bottom: 8px;
 	
   }
-  .settingbtn,.linkhistory,.history,.ai-engine-btn,.pill{
+  .settingbtn,.linkhistory,.history,.ai-engine-btn,.pill,.links.grid{
 	box-shadow: inset 0px -5px 2px -3px #00000008, inset 0px 5px 2px -3px #ffffff0d, inset 0px -5px 7px -3px #00000030, inset 0px 5px 7px -3px #ffffff36
   }
   .settings.show {

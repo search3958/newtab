@@ -157,31 +157,53 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // 検索処理
-  function performSearch() {
-    const query = document.getElementById('searchInput').value.trim();
-    if (query) {
-      let baseUrl;
-      if (isAISearchMode) {
-        baseUrl = aiEngines[getCurrentAiEngine()] || aiEngines.aisearch;
-      } else {
-        baseUrl = "https://www.google.com/search?q=";
-      }
-      const url = `${baseUrl}${encodeURIComponent(query)}`;
-
-      let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-      history = history.filter(item => typeof item === 'string');
-      history = history.filter(item => item !== query);
-      history.unshift(query);
-      if (history.length > 5) history.pop();
-
-      localStorage.setItem('searchHistory', JSON.stringify(history));
-      renderHistory();
-
-      // 検索を実行
-      window.location.href = url;
-    }
+// 検索処理
+function performSearch() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (!query) {
+    return; // 入力が空なら何もしない
   }
 
+  // 入力文字列がURL形式か簡易的に判定
+  // 条件: ドット(.)を含み、かつスペースを含まない
+  const isUrl = query.includes('.') && !query.includes(' ');
+
+  if (isUrl) {
+    // URLの場合、直接そのアドレスに移動する
+    let urlToGo = query;
+    
+    // 'http://' や 'https://' が先頭になければ補う
+    if (!/^https?:\/\//i.test(urlToGo)) {
+      urlToGo = 'https://' + urlToGo;
+    }
+    
+    window.location.href = urlToGo;
+
+  } else {
+    // URLでない場合、通常の検索処理を実行
+    let baseUrl;
+    if (isAISearchMode) {
+      baseUrl = aiEngines[getCurrentAiEngine()] || aiEngines.aisearch;
+    } else {
+      baseUrl = "https://www.google.com/search?q=";
+    }
+    const url = `${baseUrl}${encodeURIComponent(query)}`;
+
+    // 検索履歴を保存
+    let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    history = history.filter(item => typeof item === 'string');
+    history = history.filter(item => item !== query);
+    history.unshift(query);
+    if (history.length > 5) history.pop();
+    localStorage.setItem('searchHistory', JSON.stringify(history));
+    
+    // 履歴を再描画
+    renderHistory();
+
+    // 検索を実行
+    window.location.href = url;
+  }
+}
   // 検索ボタンのクリック時にも@ショートカット対応
   const searchButton = document.getElementById('searchButton');
   if (searchButton) {
@@ -216,7 +238,6 @@ window.addEventListener("DOMContentLoaded", () => {
   setCurrentAiEngine(getCurrentAiEngine());
 
   // フォーム送信時（Enter押下）のイベント
-  // 既存のdocument.getElementById('searchForm')を'ZsearchForm'に修正する場合は適宜変更
   const searchForm = document.getElementById('searchForm') || document.getElementById('ZsearchForm');
   if (searchForm) {
     searchForm.addEventListener('submit', function (e) {
@@ -313,9 +334,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 初期表示
-  // displayShortcutHistory(); // これを削除
-
    const searchInput = document.getElementById('searchInput');
     const searchaiBtn = document.querySelector('.searchai-btn');
     const aiSearch = document.getElementById('aisearch');
@@ -352,6 +370,26 @@ window.addEventListener("DOMContentLoaded", () => {
     document.querySelector('#aisearch').click();
   });
 });
+
+// グリッドモード切替関数
+function updateGridMode(checked) {
+  // checked: true ならグリッド解除、false ならグリッドON
+  const targets = [
+    document.getElementById('dynamic-links'),
+    ...document.querySelectorAll('.linktext'),
+    ...document.querySelectorAll('.links')
+  ];
+  targets.forEach(el => {
+    if (!el) return;
+    // checked = true (スイッチON) でグリッド解除 (gridクラスを削除)
+    // checked = false (スイッチOFF) でグリッドON (gridクラスを追加)
+    if (checked) {
+      el.classList.remove('grid');
+    } else {
+      el.classList.add('grid');
+    }
+  });
+}
 
 function formatAMPM(date) {
   let hours = date.getHours();
@@ -391,7 +429,6 @@ document.getElementById('setting').addEventListener('click', function() {
 });
 
 // --- ショートカット一致時のアイコン表示 ---
-// 検索ボタンの直後にアイコン表示用の要素を作成
 let shortcutMatchBox = document.getElementById('shortcut-match-box');
 const searchButton = document.getElementById('searchButton');
 if (!shortcutMatchBox) {
@@ -414,25 +451,52 @@ if (!shortcutMatchBox) {
 let allAppLinks = [];
 
 async function loadAllAppLinks() {
-  const res = await fetch('links.json');
-  const data = await res.json();
-  allAppLinks = data.categories.flatMap(cat => cat.links);
+  try {
+    const res = await fetch('links.json');
+    const data = await res.json();
+    allAppLinks = data.categories.flatMap(cat => cat.links);
+  } catch (error) {
+    console.error("links.json の読み込みに失敗しました:", error);
+  }
 }
 
-// --- 初期化 ---
-// window.addEventListener('DOMContentLoaded', () => {
-//   loadAllAppLinks();
-// });
+// ★★★ ページのすべてのリソースが読み込まれた後に実行する処理 ★★★
+window.onload = async function() {
+  try {
+    // 1. 必要なデータを非同期で読み込む (awaitで完了を待つ)
+    await loadAllAppLinks();
+    await loadIconsZip();
 
-window.onload = function() {
-  // 他の初期処理がここで完了した後にzip解凍＆リンク生成
-  loadIconsZip().then(generateAppLinks);
-  loadAllAppLinks();
+    // 2. リンク要素を動的に生成する (awaitで完了を待つ)
+    await generateAppLinks();
+
+    // 3. すべての要素が生成された後で、グリッドモードの初期化を行う
+    const gridSwitch = document.getElementById('grid-switch');
+    if (gridSwitch) {
+      // localStorageから前回の状態を復元
+      const savedGridMode = localStorage.getItem('gridMode');
+      // スイッチのチェック状態を設定 ('on'ならチェック、それ以外はチェックしない)
+      // このスイッチはONの時にグリッドが「解除」される仕様
+      gridSwitch.checked = (savedGridMode === 'on');
+
+      // 初期状態をページに適用
+      updateGridMode(gridSwitch.checked);
+
+      // スイッチが操作された時のイベントリスナーを設定
+      gridSwitch.addEventListener('change', function() {
+        // 現在の状態をlocalStorageに保存
+        localStorage.setItem('gridMode', this.checked ? 'on' : 'off');
+        // 現在の状態をページに適用
+        updateGridMode(this.checked);
+      });
+    }
+  } catch (error) {
+    console.error("ページの初期化処理中にエラーが発生しました:", error);
+  }
 };
 
-// @検索の参照先をallAppLinksに変更
+
 searchInput.addEventListener('input', function(e) {
-  // AIモード時はショートカットマッチボックスを常に非表示＆return
   if (isAISearchMode) {
     shortcutMatchBox.style.display = 'none';
     shortcutMatchBox.innerHTML = '';
@@ -460,7 +524,6 @@ searchInput.addEventListener('input', function(e) {
       img.style.borderRadius = '16px';
       img.style.objectFit = 'contain';
       img.style.display = 'block';
-      // アイコン背景色
       const iconBg = found.bg || '#fff';
       const iconWrapper = document.createElement('div');
       iconWrapper.style.background = iconBg;
@@ -470,7 +533,6 @@ searchInput.addEventListener('input', function(e) {
       iconWrapper.style.justifyContent = 'center';
       iconWrapper.style.width = '56px';
       iconWrapper.style.height = '56px';
-      // md-ripple追加
       const ripple = document.createElement('md-ripple');
       iconWrapper.appendChild(ripple);
       iconWrapper.appendChild(img);
@@ -494,30 +556,33 @@ let iconsReady = false;
 const iconWaiters = [];
 
 async function loadIconsZip() {
-  const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
-  const res = await fetch(zipUrl);
-  if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
-  const blob = await res.blob();
-  const zip = await JSZip.loadAsync(blob);
-  const tasks = [];
-  zip.forEach((relativePath, file) => {
-    if (file.name.endsWith('.webp')) {
-      const task = file.async('blob').then(blobData => {
-        const objectURL = URL.createObjectURL(blobData);
-        const fileName = file.name.split('/').pop();
-        iconsMap[fileName] = objectURL;
-      });
-      tasks.push(task);
-    }
-  });
-  await Promise.all(tasks);
-  iconsReady = true;
-  iconWaiters.forEach(fn => fn());
+  try {
+    const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
+    const res = await fetch(zipUrl);
+    if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
+    const blob = await res.blob();
+    const zip = await JSZip.loadAsync(blob);
+    const tasks = [];
+    zip.forEach((relativePath, file) => {
+      if (file.name.endsWith('.webp')) {
+        const task = file.async('blob').then(blobData => {
+          const objectURL = URL.createObjectURL(blobData);
+          const fileName = file.name.split('/').pop();
+          iconsMap[fileName] = objectURL;
+        });
+        tasks.push(task);
+      }
+    });
+    await Promise.all(tasks);
+    iconsReady = true;
+    iconWaiters.forEach(fn => fn());
+  } catch (error) {
+    console.error("アイコンzipの読み込みに失敗しました:", error);
+  }
 }
 
 // --- アプリリスト動的生成 ---
 async function generateAppLinks() {
-  // アイコンzipが未ロードなら待つ
   if (!iconsReady) {
     await new Promise(resolve => iconWaiters.push(resolve));
   }
@@ -528,16 +593,12 @@ async function generateAppLinks() {
     if (!container) return;
     container.innerHTML = '';
 
-    // --- 最近の使用セクションをGoogleカテゴリの前に挿入 ---
-    // 履歴取得
     const shortcutHistory = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
     if (shortcutHistory.length > 0) {
-      // セクションタイトル
       const recentTitleDiv = document.createElement('div');
       recentTitleDiv.className = 'linktext';
       recentTitleDiv.textContent = '最近の使用';
       container.appendChild(recentTitleDiv);
-      // 履歴リンク群
       const recentLinksDiv = document.createElement('div');
       recentLinksDiv.className = 'links';
       shortcutHistory.forEach(item => {
@@ -545,26 +606,18 @@ async function generateAppLinks() {
         a.className = 'linkbox-anchor';
         a.href = item.url;
         a.rel = 'noopener noreferrer';
-        // box
         const box = document.createElement('div');
         box.className = 'linkbox';
-        // アイコン
         const iconWrapper = document.createElement('div');
         iconWrapper.className = 'icon-wrapper';
         iconWrapper.style.backgroundColor = item.bg;
-        // md-ripple追加
         const ripple = document.createElement('md-ripple');
         iconWrapper.appendChild(ripple);
         const img = document.createElement('img');
         img.className = 'linkbox-img';
-        if (iconsMap[item.icon]) {
-          img.src = iconsMap[item.icon];
-        } else {
-          img.src = 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
-        }
+        img.src = iconsMap[item.icon] || 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
         img.alt = item.name;
         iconWrapper.appendChild(img);
-        // 3D効果イベント
         iconWrapper.addEventListener('mousemove', e => {
           const box = iconWrapper.getBoundingClientRect();
           const mouseX = e.clientX - box.left;
@@ -588,15 +641,12 @@ async function generateAppLinks() {
           img.style.setProperty('--moveX', '0px');
           img.style.setProperty('--moveY', '0px');
         });
-        // ラベル
         const label = document.createElement('div');
         label.className = 'linkbox-label';
         label.textContent = item.name;
-        // 組み立て
         box.appendChild(iconWrapper);
         box.appendChild(label);
         a.appendChild(box);
-        // --- 履歴クリック時にも履歴を最新化 ---
         a.addEventListener('click', (e) => {
           e.preventDefault();
           addToShortcutHistory(item.name, item.url, item.icon, item.bg);
@@ -610,16 +660,12 @@ async function generateAppLinks() {
       });
       container.appendChild(recentLinksDiv);
     }
-    // --- ここまで ---
 
-    // 各カテゴリ描画
     data.categories.forEach(category => {
-      // カテゴリタイトル
       const titleDiv = document.createElement('div');
       titleDiv.className = 'linktext';
       titleDiv.textContent = category.title;
       container.appendChild(titleDiv);
-      // リンク群
       const linksDiv = document.createElement('div');
       linksDiv.className = 'links';
       category.links.forEach(link => {
@@ -627,26 +673,18 @@ async function generateAppLinks() {
         a.className = 'linkbox-anchor';
         a.href = link.url;
         a.rel = 'noopener noreferrer';
-        // box
         const box = document.createElement('div');
         box.className = 'linkbox';
-        // アイコン
         const iconWrapper = document.createElement('div');
         iconWrapper.className = 'icon-wrapper';
         iconWrapper.style.backgroundColor = link.bg;
-        // md-ripple追加
         const ripple = document.createElement('md-ripple');
         iconWrapper.appendChild(ripple);
         const img = document.createElement('img');
         img.className = 'linkbox-img';
-        if (iconsMap[link.icon]) {
-          img.src = iconsMap[link.icon];
-        } else {
-          img.src = 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
-        }
+        img.src = iconsMap[link.icon] || 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
         img.alt = link.name;
         iconWrapper.appendChild(img);
-        // 3D効果イベント
         iconWrapper.addEventListener('mousemove', e => {
           const box = iconWrapper.getBoundingClientRect();
           const mouseX = e.clientX - box.left;
@@ -670,15 +708,12 @@ async function generateAppLinks() {
           img.style.setProperty('--moveX', '0px');
           img.style.setProperty('--moveY', '0px');
         });
-        // ラベル
         const label = document.createElement('div');
         label.className = 'linkbox-label';
         label.textContent = link.name;
-        // 組み立て
         box.appendChild(iconWrapper);
         box.appendChild(label);
         a.appendChild(box);
-        // --- クリック時に履歴追加 ---
         a.addEventListener('click', (e) => {
           e.preventDefault();
           addToShortcutHistory(link.name, link.url, link.icon, link.bg);
@@ -692,15 +727,12 @@ async function generateAppLinks() {
       });
       container.appendChild(linksDiv);
     });
+
   } catch (e) {
     console.error('アプリリストの取得に失敗:', e);
   }
 }
 
-// --- 初期化 ---
-// window.addEventListener('DOMContentLoaded', () => {
-//   loadIconsZip().then(generateAppLinks);
-// });
 function addToShortcutHistory(name, url, icon, bg) {
   let history = JSON.parse(localStorage.getItem('shortcutHistory') || '[]');
   history = history.filter(item => item.url !== url);
@@ -711,7 +743,6 @@ function addToShortcutHistory(name, url, icon, bg) {
 
 // --- 拡張機能（extensions）自動適用 ---
 (function(){
-  // extensions/index.html では適用しない
   if (location.pathname.endsWith('/extensions/index.html')) return;
   try {
     const exts = JSON.parse(localStorage.getItem('extensions') || '[]');

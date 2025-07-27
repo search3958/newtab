@@ -35,7 +35,7 @@
      <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#000000"><path d="M647.44-93.85 261.28-480l386.16-386.15 49.33 50L360.61-480l336.16 336.15-49.33 50Z"/></svg>
        
      </a>
-     <div class="h2">Extensions</div>
+     <div class="h2">Extensions(Beta)</div>
        </div>
 
        <div class="h3">デザイン拡張</div>
@@ -103,18 +103,19 @@
 
        </div>
 
-
-    <label>名前:</label>
-    <input id="extName" type="text" placeholder="拡張機能名を入力">
-    <label>CSS:</label>
-    <textarea id="cssBox" placeholder="ここにCSSを入力"></textarea>
-    <label>JavaScript:</label>
-    <textarea id="jsBox" placeholder="ここにJavaScriptを入力"></textarea>
-    <button id="addExt">読み込む</button>
-    <button id="allDelete" class="all-delete">全て削除</button>
-
     <div class="h3">使用中の拡張機能</div>
     <div class="ext-list container smooth" id="extList"></div>
+
+<div class="debug">
+  <label>名前:</label>
+  <input id="extName" type="text" placeholder="拡張機能名を入力">
+  <label>CSS:</label>
+  <textarea id="cssBox" placeholder="ここにCSSを入力"></textarea>
+  <label>JavaScript:</label>
+  <textarea id="jsBox" placeholder="ここにJavaScriptを入力"></textarea>
+  <button id="addExt">読み込む</button>
+  <button id="allDelete" class="all-delete">全て削除</button>
+</div>
   <script>
     // 拡張機能データの取得
     function getExtensions() {

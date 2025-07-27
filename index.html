@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="v4/style.css">
-  <link rel="icon" href="https://search3958.github.io/favicon/newtab.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="v4.1/style.css">
+  <link rel="icon" href="https://search3958.github.io/icons/newtab.svg"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans&family=Zen+Kaku+Gothic+Antique&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <title>Newtab</title>
   <meta name="description" content="ショートカットや便利ツールを集約したカスタマイズ可能な新しいタブページ。日常の作業効率を向上させます。">
@@ -15,13 +14,25 @@
 <meta property="og:description" content="ショートカットや便利ツールを集約したカスタマイズ可能な新しいタブページ。日常の作業効率を向上させます。">
 <meta property="og:url" content="https://search3958.github.io/newtab">
 <meta property="og:type" content="website">
+<script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+</script>
+<script type="module">
+  import '@material/web/all.js';
+  import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+  document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+</script>
 </head>
 <body>
 <canvas id="topRightCanvas"></canvas>
 <canvas class="searchLens" id="lensFx_canvas"></canvas>
-  <form class="search-container" id="searchForm">
+  <form class="search-container" id="ZsearchForm">
     <input type="text" name="q" id="searchInput" placeholder="検索" autocomplete="off" autofocus>
-    <div id="shortcut-suggestions" style="display:none;position:absolute;z-index:10;background:#fff;border-radius:8px;box-shadow:0 2px 8px #0002;max-width:320px;width:100%;"></div>
   </form>
   <button type="button" id="searchButton">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="24" height="24">
@@ -72,8 +83,8 @@ timer
 explore
 </span></button>
 <div id="ai-engine-select">
-  <button class="ai-engine-btn" data-engine="aisearch" style="margin-right:4px;">より正確な検索</button>
-  <button class="ai-engine-btn" data-engine="aishortcut" style="margin-right:4px;">複数のタブを開く</button>
+  <button class="ai-engine-btn" data-engine="aisearch" style="margin-right:4px;">正確な情報を簡単に得る</button>
+  <button class="ai-engine-btn" data-engine="aishortcut" style="margin-right:4px;">関連する複数のタブを開く</button>
   <button class="ai-engine-btn" data-engine="chatgpt">ChatGPTに質問する</button>
 </div>
 <button id="setting" class="hoverscale">
@@ -84,13 +95,20 @@ palette
 <div class="settings">
   <h3>背景画像</h3>
     
-      
       <input type="text" id="bgUrlInput" placeholder="背景画像のURL">
     <div class="settingcard">
       <button onclick="window.location.href='https://search3958.github.io/project/images/'" class="settingbtn">もっと見る</button>
       <button id="setButton" class="settingbtn">設定</button>
     </div>
-    <h3>Newtab v4</h3>
+
+    <h3>拡張機能</h3>
+    <div class="settingcard">
+      <button onclick="window.location.href='./extensions/'" class="settingbtn">拡張機能を追加</button>
+      <button class="settingbtn">全て削除</button>
+    </div>
+
+
+    <h3>Newtab v4.1</h3>
     <div class="settingcard">
       <button onclick="window.location.href='https://search3958.github.io/'" class="settingbtn">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'" class="settingbtn">設定方法</button>
@@ -101,181 +119,35 @@ palette
 <div class="aibg" id="aiBg"></div>
 <div class="bg"></div>
 <div class="shortcut">
-  <div class="links linkhistory">
-</div>
 
-<div class="linktext">Google</div>
-  <div class="links">
-<link-box name="Gmail" bg="var(--iconbg)" url="https://mail.google.com/" icon="gmail.webp"></link-box>
-<link-box name="Keep" bg="var(--iconbg)" url="https://keep.google.com/" icon="keep.webp"></link-box>
-<link-box name="Classroom" bg="var(--iconbg)" url="https://classroom.google.com/" icon="classroom.webp"></link-box>
-<link-box name="Youtube" bg="var(--iconbg)" url="https://www.youtube.com/" icon="youtube.webp"></link-box>
-<link-box name="Document" bg="var(--iconbg)" url="https://docs.google.com/document/" icon="document.webp"></link-box>
-<link-box name="Slide" bg="var(--iconbg)" url="https://docs.google.com/presentation/" icon="slide.webp"></link-box>
-<link-box name="Spreadsheet" bg="var(--iconbg)" url="https://docs.google.com/spreadsheets/" icon="spreadsheet.webp"></link-box>
-<link-box name="Translate" bg="var(--iconbg)" url="https://translate.google.com/" icon="translate.webp"></link-box>
-<link-box name="Gemini" bg="var(--iconbg)" url="https://gemini.google.com/" icon="gemini.webp"></link-box>
-<link-box name="リモート" bg="var(--iconbg)" url="https://remotedesktop.google.com/" icon="remotedesktop.webp"></link-box>
-<link-box name="ドライブ" bg="var(--iconbg)" url="https://drive.google.com/" icon="drive.webp"></link-box>
-<link-box name="Product" bg="#fff9" url="https://about.google/products/" icon="products.webp"></link-box>
-</div>
+<label class="switch">
+  <input type="checkbox" id="grid-switch">
+  <span class="slider">
+    <span class="left-label">グリッド</span>
+    <span class="right-label">リスト</span>
+  </span>
+</label>
 
-<div class="linktext">学習と作業効率化</div>
-  <div class="links">
-    <link-box name="Monoxer" bg="#0073ffc9" url="https://app.monoxer.com/" icon="monoxer.webp"></link-box>
-<link-box name="ChatGPT" bg="#000000c9" url="https://chat.openai.com/" icon="chatgpt.webp"></link-box>
-<link-box name="Copilot" bg="var(--iconbg)" url="https://copilot.microsoft.com/" icon="copilot.webp"></link-box>
-<link-box name="Claude" bg="var(--iconbg)" url="https://claude.ai/" icon="claude.webp"></link-box>
-<link-box name="Canva" bg="var(--iconbg)" url="https://www.canva.com/" icon="canva.webp"></link-box>
-<link-box name="Microsoft 365" bg="var(--iconbg)" url="https://www.microsoft.com/microsoft-365" icon="microsodt.webp"></link-box>
-<link-box name="TurboWarp" bg="var(--iconbg)" url="https://turbowarp.org/" icon="turbowarp.webp"></link-box>
-<link-box name="Kahoot" bg="#1b00a8c9" url="https://kahoot.it/" icon="kahoot.webp"></link-box>
-<link-box name="Discord" bg="#5618ffc9" url="https://discord.com/app" icon="discord.webp"></link-box>
-</div>
-
-<div class="linktext">開発</div>
-  <div class="links">
-    <link-box name="Firebase" bg="var(--iconbg)" url="https://firebase.google.com/" icon="firebase.webp"></link-box>
-<link-box name="Codepen" bg="#000000c9" url="https://codepen.io/" icon="codepen.webp"></link-box>
-<link-box name="Figma" bg="var(--iconbg)" url="https://www.figma.com/" icon="figma.webp"></link-box>
-<link-box name="GitHub" bg="var(--iconbg)" url="https://github.com/" icon="github.webp"></link-box>
-<link-box name="AdSense" bg="var(--iconbg)" url="https://www.google.com/adsense/" icon="adsense.webp"></link-box>
-<link-box name="Tools" bg="var(--iconbg)" url="https://search3958.github.io/tools" icon="tools.webp"></link-box>
-<link-box name="Fonts" bg="var(--iconbg)" url="https://fonts.google.com/" icon="fonts.webp"></link-box>
-</div>
-
-<div class="linktext">ショッピング</div>
-  <div class="links">
-    <link-box name="Amazon" bg="#fff9" url="https://www.amazon.co.jp/" icon="amazon.webp"></link-box>
-<link-box name="AliExpress" bg="var(--iconbg)" url="https://www.aliexpress.com/" icon="aliexpress.webp"></link-box>
-<link-box name="Wish" bg="#30dd73c9" url="https://www.wish.com/" icon="wish.webp"></link-box>
-<link-box name="Mercari" bg="var(--iconbg)" url="https://www.mercari.com/jp/" icon="mercari.webp"></link-box>
-<link-box name="Yahoo!フリマ" bg="var(--iconbg)" url="https://paypayfleamarket.yahoo.co.jp/" icon="pfm.webp"></link-box>
-</div>
-
-<div class="linktext">エンターテイメント</div>
-  <div class="links">
-    <link-box name="Scratch" bg="var(--iconbg)" url="https://scratch.mit.edu/" icon="scratch.webp"></link-box>
-<link-box name="poki" bg="#fff9" url="https://poki.com/" icon="poki.webp"></link-box>
-<link-box name="小红书" bg="var(--iconbg)" url="https://www.xiaohongshu.com/explore" icon="xiaohongshu.webp"></link-box>
-<link-box name="Instagram" bg="var(--iconbg)" url="https://www.instagram.com/" icon="instagram.webp"></link-box>
-<link-box name="thinkSocial" bg="var(--iconbg)" url="https://sns.thinking-grp.org/" icon="thinking.webp"></link-box>
-<link-box name="Netflix" bg="var(--iconbg)" url="https://www.netflix.com/" icon="netflix.webp"></link-box>
-<link-box name="Weverse" bg="#27ffbfc9" url="https://weverse.io/" icon="weverse.webp"></link-box>
-<link-box name="Prime Video" bg="#0398ffc9" url="https://www.amazon.co.jp/Prime-Video/" icon="primevideo.webp"></link-box>
-<link-box name="Spotify" bg="var(--iconbg)" url="https://www.spotify.com/" icon="spotify.webp"></link-box>
-</div>
+  <div id="dynamic-links"></div>
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-     crossorigin="anonymous"></script>
+crossorigin="anonymous"></script>
 <ins class="adsbygoogle"
-     style="display:block"
-     data-ad-format="autorelaxed"
-     data-ad-client="ca-pub-6151036058675874"
-     data-ad-slot="9559715307"></ins>
+style="display:block"
+data-ad-format="autorelaxed"
+data-ad-client="ca-pub-6151036058675874"
+data-ad-slot="9559715307"></ins>
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+(adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
 
-<script src="v4/script.js" type="module" ></script>
-<script src="v4/miniapps.js" defer></script>
-<script type="module">
-/* --- ショートカットアクセス機能 --- */
-const shortcuts = [
-  { name: "Gmail", url: "https://mail.google.com/" },
-  { name: "Keep", url: "https://keep.google.com/" },
-  { name: "Classroom", url: "https://classroom.google.com/" },
-  { name: "Youtube", url: "https://www.youtube.com/" },
-  { name: "Document", url: "https://docs.google.com/document/" },
-  { name: "Slide", url: "https://docs.google.com/presentation/" },
-  { name: "Spreadsheet", url: "https://docs.google.com/spreadsheets/" },
-  { name: "Translate", url: "https://translate.google.com/" },
-  { name: "Gemini", url: "https://gemini.google.com/" },
-  { name: "Remote", url: "https://remotedesktop.google.com/" },
-  { name: "Drive", url: "https://drive.google.com/" },
-  { name: "Product", url: "https://about.google/products/" },
-  { name: "Monoxer", url: "https://app.monoxer.com/" },
-  { name: "ChatGPT", url: "https://chat.openai.com/" },
-  { name: "Copilot", url: "https://copilot.microsoft.com/" },
-  { name: "Claude", url: "https://claude.ai/" },
-  { name: "Canva", url: "https://www.canva.com/" },
-  { name: "Microsoft 365", url: "https://www.microsoft.com/microsoft-365" },
-  { name: "TurboWarp", url: "https://turbowarp.org/" },
-  { name: "Kahoot", url: "https://kahoot.it/" },
-  { name: "Discord", url: "https://discord.com/app" },
-  { name: "Firebase", url: "https://firebase.google.com/" },
-  { name: "Codepen", url: "https://codepen.io/" },
-  { name: "Figma", url: "https://www.figma.com/" },
-  { name: "GitHub", url: "https://github.com/" },
-  { name: "AdSense", url: "https://www.google.com/adsense/" },
-  { name: "Tools", url: "https://search3958.github.io/tools" },
-  { name: "Fonts", url: "https://fonts.google.com/" },
-  { name: "Amazon", url: "https://www.amazon.co.jp/" },
-  { name: "AliExpress", url: "https://www.aliexpress.com/" },
-  { name: "Wish", url: "https://www.wish.com/" },
-  { name: "Mercari", url: "https://www.mercari.com/jp/" },
-  { name: "Yahoo", url: "https://paypayfleamarket.yahoo.co.jp/" },
-  { name: "Scratch", url: "https://scratch.mit.edu/" },
-  { name: "poki", url: "https://poki.com/" },
-  { name: "Xiaohongshu", url: "https://www.xiaohongshu.com/explore" },
-  { name: "Instagram", url: "https://www.instagram.com/" },
-  { name: "thinkSocial", url: "https://sns.thinking-grp.org/" },
-  { name: "Netflix", url: "https://www.netflix.com/" },
-  { name: "Weverse", url: "https://weverse.io/" },
-  { name: "Prime Video", url: "https://www.amazon.co.jp/Prime-Video/" },
-  { name: "Spotify", url: "https://www.spotify.com/" }
-];
+</div>
 
-const searchInput = document.getElementById('searchInput');
-const shortcutBox = document.getElementById('shortcut-suggestions');
-let shortcutActive = false;
-
-searchInput.addEventListener('input', (e) => {
-  const val = e.target.value;
-  const atIdx = val.indexOf('@');
-  if (atIdx === 0 && val.length > 1) {
-    const keyword = val.slice(1).toLowerCase();
-    const filtered = shortcuts.filter(s => s.name.toLowerCase().startsWith(keyword));
-    if (filtered.length > 0 && keyword.length > 0) {
-      shortcutBox.innerHTML = filtered.map(s => `<div style="padding:8px;cursor:pointer;" data-name="${s.name}">@${s.name}</div>`).join('');
-      shortcutBox.style.display = 'block';
-      shortcutActive = true;
-    } else {
-      shortcutBox.style.display = 'none';
-      shortcutActive = false;
-    }
-  } else {
-    shortcutBox.style.display = 'none';
-    shortcutActive = false;
-  }
-});
-
-shortcutBox.addEventListener('mousedown', (e) => {
-  if (e.target.dataset.name) {
-    searchInput.value = '@' + e.target.dataset.name;
-    shortcutBox.style.display = 'none';
-    shortcutActive = false;
-    searchInput.focus();
-  }
-});
-
-document.getElementById('searchForm').addEventListener('submit', (e) => {
-  const val = searchInput.value.trim();
-  if (val.startsWith('@')) {
-    const name = val.slice(1).toLowerCase();
-    const found = shortcuts.find(s => s.name.toLowerCase() === name);
-    if (found) {
-      window.location.href = found.url;
-      e.preventDefault();
-      return false;
-    }
-  }
-  // ...既存の検索処理...
-});
-</script>
+<script src="v4.1/script.js"></script>
+<script src="v4.1/miniapps.js" defer></script>
 <script>
 // Google FontsをDOMContentLoaded後に遅延読み込み
   document.addEventListener('DOMContentLoaded', function() {
