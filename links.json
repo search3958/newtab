@@ -18,14 +18,8 @@
           "icon": "toolboard.webp"
         },
         {
-          "name": "火源台txt",
-          "bg": "var(--iconbg)",
-          "url": "https://search3958.github.io/firebasetext",
-          "icon": "firebasetxt.webp"
-        },
-        {
           "name": "TechPick 10",
-          "bg": "#fff7",
+          "bg": "rgba(255, 255, 255, 0.759)",
           "url": "https://search3958.github.io/techpick10/",
           "icon": "techpick10.webp"
         },
@@ -185,6 +179,66 @@
         }
       ]
     },
+
+    {
+      "title": "エンターテイメント",
+      "links": [
+        {
+          "name": "Scratch",
+          "bg": "var(--iconbg)",
+          "url": "https://scratch.mit.edu/",
+          "icon": "scratch.webp"
+        },
+        {
+          "name": "poki",
+          "bg": "rgba(255, 255, 255, 0.759)",
+          "url": "https://poki.com/",
+          "icon": "poki.webp"
+        },
+        {
+          "name": "小红书",
+          "bg": "var(--iconbg)",
+          "url": "https://www.xiaohongshu.com/explore",
+          "icon": "xiaohongshu.webp"
+        },
+        {
+          "name": "Instagram",
+          "bg": "var(--iconbg)",
+          "url": "https://www.instagram.com/",
+          "icon": "instagram.webp"
+        },
+        {
+          "name": "火源台txt",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/firebasetext",
+          "icon": "firebasetxt.webp"
+        },
+        {
+          "name": "Netflix",
+          "bg": "var(--iconbg)",
+          "url": "https://www.netflix.com/",
+          "icon": "netflix.webp"
+        },
+        {
+          "name": "Weverse",
+          "bg": "#27ffbfbb",
+          "url": "https://weverse.io/",
+          "icon": "weverse.webp"
+        },
+        {
+          "name": "Prime Video",
+          "bg": "#0398ffbb",
+          "url": "https://www.amazon.co.jp/Prime-Video/",
+          "icon": "primevideo.webp"
+        },
+        {
+          "name": "Spotify",
+          "bg": "var(--iconbg)",
+          "url": "https://www.spotify.com/",
+          "icon": "spotify.webp"
+        }
+      ]
+    },
     {
       "title": "開発",
       "links": [
@@ -231,7 +285,7 @@
       "links": [
         {
           "name": "Amazon",
-          "bg": "#fff9",
+          "bg": "rgba(255, 255, 255, 0.759)",
           "url": "https://www.amazon.co.jp/",
           "icon": "amazon.webp"
         },
@@ -258,59 +312,6 @@
           "bg": "var(--iconbg)",
           "url": "https://paypayfleamarket.yahoo.co.jp/",
           "icon": "pfm.webp"
-        }
-      ]
-    },
-    {
-      "title": "エンターテイメント",
-      "links": [
-        {
-          "name": "Scratch",
-          "bg": "var(--iconbg)",
-          "url": "https://scratch.mit.edu/",
-          "icon": "scratch.webp"
-        },
-        {
-          "name": "poki",
-          "bg": "#fff9",
-          "url": "https://poki.com/",
-          "icon": "poki.webp"
-        },
-        {
-          "name": "小红书",
-          "bg": "var(--iconbg)",
-          "url": "https://www.xiaohongshu.com/explore",
-          "icon": "xiaohongshu.webp"
-        },
-        {
-          "name": "Instagram",
-          "bg": "var(--iconbg)",
-          "url": "https://www.instagram.com/",
-          "icon": "instagram.webp"
-        },
-        {
-          "name": "Netflix",
-          "bg": "var(--iconbg)",
-          "url": "https://www.netflix.com/",
-          "icon": "netflix.webp"
-        },
-        {
-          "name": "Weverse",
-          "bg": "#27ffbfbb",
-          "url": "https://weverse.io/",
-          "icon": "weverse.webp"
-        },
-        {
-          "name": "Prime Video",
-          "bg": "#0398ffbb",
-          "url": "https://www.amazon.co.jp/Prime-Video/",
-          "icon": "primevideo.webp"
-        },
-        {
-          "name": "Spotify",
-          "bg": "var(--iconbg)",
-          "url": "https://www.spotify.com/",
-          "icon": "spotify.webp"
         }
       ]
     }
