@@ -60,7 +60,7 @@ function updateHistoryDisplay() {
     // クリックイベントを追加
     historyItem.addEventListener('click', () => {
       saveToHistory(item);
-      window.open(item.url, '_blank');
+      window.location.href = item.url;
     });
     
     historyContainer.appendChild(historyItem);
@@ -72,16 +72,19 @@ function updateHistoryDisplay() {
       var form = document.getElementById('search-form');
       var container = document.getElementById('search-container');
       var searchInput = document.querySelector('.searchinput');
+      var aiBg = document.querySelector('.aibg');
 
       if (this.checked) {
         // チェックON → AI検索用URLに切り替え、.ai を付与
         form.action = 'https://search3958.github.io/aisearch/';
         container.classList.add('ai');
+        aiBg.classList.add('show');
         searchInput.placeholder = 'AIは稀に不正確な情報を示すことがあります';
       } else {
         // チェックOFF → 通常の Google 検索に戻す、.ai を外す
         form.action = 'https://www.google.com/search';
         container.classList.remove('ai');
+        aiBg.classList.remove('show');
         searchInput.placeholder = 'ここに入力して検索';
       }
     });
@@ -264,7 +267,7 @@ async function loadIconsAndGenerateLinks() {
         a.addEventListener('click', (e) => {
           e.preventDefault();
           saveToHistory(link);
-          window.open(link.url, '_blank');
+          window.location.href = link.url;
         });
         
         const box = document.createElement('div');
