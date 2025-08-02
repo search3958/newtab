@@ -296,12 +296,6 @@
           "icon": "aliexpress.webp"
         },
         {
-          "name": "Wish",
-          "bg": "#30dd73bb",
-          "url": "https://www.wish.com/",
-          "icon": "wish.webp"
-        },
-        {
           "name": "Mercari",
           "bg": "var(--iconbg)",
           "url": "https://www.mercari.com/jp/",

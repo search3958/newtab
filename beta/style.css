@@ -307,7 +307,7 @@ opacity: 0;
 .links {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
   mask-image: paint(squircle);
   background: var(--bgcolor);
   --squircle-radius: 33px;
@@ -316,12 +316,13 @@ opacity: 0;
   padding: 22px 12px;
   width: 402px;
   padding-bottom: 0px;
+  gap: 4px 24px;
 }
 
 .linkbox-anchor {
   width: 110px;
   display: block;
-  margin: 2px 12px;
+  margin: 0px;
   transition: transform 0.2s ease;
   transform-style: preserve-3d;
   text-decoration: none;
@@ -469,4 +470,3 @@ ins.adsbygoogle {
     bottom:140px;
   }
 }
-

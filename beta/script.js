@@ -228,7 +228,6 @@ async function loadIconsZip() {
   }
 }
 
-// アイコンとリンクを読み込んで生成
 async function loadIconsAndGenerateLinks() {
   if (!iconsReady) {
     await new Promise(resolve => iconWaiters.push(resolve));
@@ -243,9 +242,9 @@ async function loadIconsAndGenerateLinks() {
     
     container.innerHTML = '';
     
-    // 各カテゴリのリンクを生成
+    // 각カテゴリの링크を생성
     data.categories.forEach(category => {
-      // linkbgでラップするdivを作成
+      // linkbgでラップするdivを작성
       const groupDiv = document.createElement('div');
       groupDiv.className = 'linkbg';
 
@@ -263,7 +262,7 @@ async function loadIconsAndGenerateLinks() {
         a.href = link.url;
         a.rel = 'noopener noreferrer';
         
-        // クリックイベントを追加して履歴に保存
+        // 클릭이벤트を추가해서히스토리에저장
         a.addEventListener('click', (e) => {
           e.preventDefault();
           saveToHistory(link);
@@ -286,7 +285,7 @@ async function loadIconsAndGenerateLinks() {
         img.alt = link.name;
         iconWrapper.appendChild(img);
         
-        // マウスホバー効果
+        // マウスホバー효과
         iconWrapper.addEventListener('mousemove', e => {
           const box = iconWrapper.getBoundingClientRect();
           const mouseX = e.clientX - box.left;
@@ -322,11 +321,27 @@ async function loadIconsAndGenerateLinks() {
         a.appendChild(box);
         linksDiv.appendChild(a);
       });
+
+      // 쇼핑핑일때광고스크립트추가
+      if (category.title === 'ショッピング') {
+        linksDiv.insertAdjacentHTML('beforeend', `
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874" crossorigin="anonymous"></script>
+<!-- ShortCut -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:244px;height:110px"
+     data-ad-client="ca-pub-6151036058675874"
+     data-ad-slot="2788469305"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        `);
+      }
+
       groupDiv.appendChild(linksDiv);
       container.appendChild(groupDiv);
     });
 
-    // すべての画像の読み込み完了を待つ
+    // 모든이미지독입완료를대기
     const allImages = container.querySelectorAll('img');
     const imageLoadPromises = Array.from(allImages).map(img => {
       return new Promise((resolve) => {
@@ -334,16 +349,16 @@ async function loadIconsAndGenerateLinks() {
           resolve();
         } else {
           img.addEventListener('load', resolve);
-          img.addEventListener('error', resolve); // エラーでも続行
+          img.addEventListener('error', resolve);
         }
       });
     });
 
-    // すべての画像の読み込み完了を待ってから0.5秒遅延
+    // 모든이미지독입완료후0.5초지연
     await Promise.all(imageLoadPromises);
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 完全な読み込み完了後に.bottombarに.showクラスを追加
+    // 완전독입완료후에.bottombar에.show클래스추가
     const bottomBar = document.querySelector('.bottombar');
     if (bottomBar) {
       bottomBar.classList.add('show');
@@ -353,5 +368,6 @@ async function loadIconsAndGenerateLinks() {
     console.error('アプリアイコンリストの取得に失敗:', e);
   }
 }
+
 // アイコンzipファイルの読み込みを開始
 loadIconsZip();
