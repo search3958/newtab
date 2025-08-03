@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7N56NHPY3C');
+</script>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="https://search3958.github.io/icons/newtab.svg"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <title>Newtab</title>
+  <meta name="description" content="ショートカットや便利ツールを集約したカスタマイズ可能な新しいタブページ。日常の作業効率を向上させます。">
+<meta property="og:title" content="NewTab3 - カスタマイズ可能な新しいタブページ">
+<meta property="og:description" content="ショートカットや便利ツールを集約したカスタマイズ可能な新しいタブページ。日常の作業効率を向上させます。">
+<meta property="og:url" content="https://search3958.github.io/newtab">
+<meta property="og:type" content="website">
+<script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+</script>
+<script type="module">
+  import '@material/web/all.js';
+  import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+  document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+</script>
+</head>
+<body>
+<canvas id="topRightCanvas"></canvas>
+<canvas class="searchLens" id="lensFx_canvas"></canvas>
+  <form class="search-container" id="ZsearchForm">
+    <input type="text" name="q" id="searchInput" placeholder="検索" autocomplete="off" autofocus>
+  </form>
+  <button type="button" id="searchButton">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="24" height="24">
+      <path d="M647-440H200q-17 0-28.5-11.5T160-480q0-17 11.5-28.5T200-520h447L451-716q-12-12-11.5-28t12.5-28q12-11 28-11.5t28 11.5l264 264q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L508-188q-11 11-27.5 11T452-188q-12-12-12-28.5t12-28.5l195-195Z"/>
+    </svg>
+  </button>
+  <div class="history">
+    <div class="historytext">履歴</div>
+    <div id="historyList" ></div>
+    <button id="clearButton">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" class="deleteicon"><path d="m656-120-56-56 84-84-84-84 56-56 84 84 84-84 56 56-83 84 83 84-56 56-84-83-84 83Zm-176 0q-138 0-240.5-91.5T122-440h82q14 104 92.5 172T480-200q11 0 20.5-.5T520-203v81q-10 1-19.5 1.5t-20.5.5ZM120-560v-240h80v94q51-64 124.5-99T480-840q150 0 255 105t105 255h-80q0-117-81.5-198.5T480-760q-69 0-129 32t-101 88h110v80H120Zm414 190-94-94v-216h80v184l56 56-42 70Z"/></svg>
+</button>
+</div>
+
+<div class="searchai-btn">AI検索を利用しませんか？<br><small>検索精度が上がる可能性があります！<br>ここをクリックして有効化します</small></div>
+
+<div class="widgetcontainer">
+  <div class="pill">
+    <div class="date" id="date"></div>
+    <div class="weekday" id="weekday"></div>
+  </div>
+  <div class="pill battery" id="battery-container">
+    <div class="percentage" id="battery">--%</div>
+  </div>
+
+  <div class="pill tool">
+      <div class="pillicon hoverscale" id="calc">
+       <span class="material-symbols-outlined">
+calculate
+</span>
+      </div>
+      <div class="pillicon hoverscale" id="clock">
+        <span class="material-symbols-outlined">
+timer
+</span>
+       </div>
+  </div>
+</div>
+<div id="toolframe">
+  <button class="closetool">完了</button>
+  <br>
+  <iframe id="tool"></iframe>
+</div>
+<div class="bar">
+  <div id="time">9:41 AN</div>
+</div>
+<button id="aisearch" class="hoverscale"><span class="material-symbols-outlined">
+explore
+</span></button>
+<div id="ai-engine-select">
+  <button class="ai-engine-btn" data-engine="aisearch" style="margin-right:4px;">正確な情報を簡単に得る</button>
+  <button class="ai-engine-btn" data-engine="aishortcut" style="margin-right:4px;">関連する複数のタブを開く</button>
+  <button class="ai-engine-btn" data-engine="chatgpt">ChatGPTに質問する</button>
+</div>
+<button id="setting" class="hoverscale">
+  <span class="material-symbols-outlined">
+palette
+</span>
+</button>
+<div class="settings">
+  <h3>背景画像</h3>
+    
+      <input type="text" id="bgUrlInput" placeholder="背景画像のURL">
+    <div class="settingcard">
+      <button onclick="window.location.href='https://search3958.github.io/project/images/'" class="settingbtn">もっと見る</button>
+      <button id="setButton" class="settingbtn">設定</button>
+    </div>
+
+    <h3>拡張機能</h3>
+    <div class="settingcard">
+      <button onclick="window.location.href='./extensions/'" class="settingbtn">拡張機能を追加</button>
+      <button class="settingbtn">全て削除</button>
+    </div>
+
+
+    <h3>Newtab v4.1</h3>
+    <div class="settingcard">
+      <button onclick="window.location.href='https://search3958.github.io/'" class="settingbtn">私について</button>
+      <button onclick="window.location.href='https://search3958.github.io/i/newtab/'" class="settingbtn">設定方法</button>
+      <button onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'" class="settingbtn">簡易版</button>
+    </div>
+
+</div>
+<div class="aibg" id="aiBg"></div>
+<div class="bg"></div>
+<div class="shortcut">
+
+<label class="switch">
+  <input type="checkbox" id="grid-switch">
+  <span class="slider">
+    <span class="left-label">グリッド</span>
+    <span class="right-label">リスト</span>
+  </span>
+</label>
+
+  <div id="dynamic-links"></div>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-format="autorelaxed"
+data-ad-client="ca-pub-6151036058675874"
+data-ad-slot="9559715307"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
+
+</div>
+
+<script src="script.js"></script>
+<script src="miniapps.js" defer></script>
+<script>
+// Google FontsをDOMContentLoaded後に遅延読み込み
+  document.addEventListener('DOMContentLoaded', function() {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Work+Sans&family=Zen+Kaku+Gothic+Antique&display=swap';
+    document.head.appendChild(link);
+  });
+</script>
+
+</html>

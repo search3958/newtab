@@ -4,11 +4,10 @@
     {
       "title": "Search3958",
       "links": [
-        
         {
-          "name": "私について",
+          "name": "Tools",
           "bg": "var(--iconbg)",
-          "url": "https://search3958.github.io/",
+          "url": "https://search3958.github.io/tools",
           "icon": "tools.webp"
         },
         {
