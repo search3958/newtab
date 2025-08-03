@@ -5,6 +5,7 @@
   line-height: 1.5;
   text-wrap-mode: nowrap;
 }
+
 :root{
   --bgcolor:#ffffffab;
   --searchbtnclr:rgba(255, 255, 255, 0.759);
@@ -13,13 +14,48 @@
   --iconbg:rgba(255, 255, 255, 0.759);
   --battery-bg:#1088F255;
   --battery-charging-bg:#00ED4B55;
+  --textcolor:#000;
+  --bg-blur:#fff6;
+  --modal-bg:rgba(255, 255, 255, 0.964);
+  --border-color:rgba(0, 0, 0, 0.1);
+  --icon-wrapper-bg:#fff7;
+  --history-item-bg:rgba(0, 0, 0, 0.05);
+  --delete-btn-bg:#FF3B30;
+  --input-bg:#0001;
+  --close-btn-hover:rgba(0, 0, 0, 0.1);
 }
+
+/* ダークモード用の変数 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bgcolor:rgba(17, 17, 17, 0.67);
+    --searchbtnclr:rgba(0, 0, 0, 0.314);
+    --primary:color(display-p3 0 0.452 1 / 1);
+    --iconbg:rgba(14, 14, 14, 0.435);
+    --battery-bg:#1088F244;
+    --battery-charging-bg:#00ED4B44;
+    --textcolor:#fff;
+    --bg-blur:rgba(4, 4, 4, 0.4);
+    --modal-bg:rgba(40, 40, 40, 0.95);
+    --border-color:rgba(255, 255, 255, 0.15);
+    --icon-wrapper-bg:rgba(60, 60, 60, 0.7);
+    --history-item-bg:rgba(255, 255, 255, 0.1);
+    --delete-btn-bg:#FF453A;
+    --input-bg:rgba(255, 255, 255, 0.1);
+    --close-btn-hover:rgba(255, 255, 255, 0.1);
+  }
+  .searchbutton{
+    color:#fff;
+  }
+}
+
 body {
 	margin: 0;
   width:100vw;
 	height: calc(100vh + 2px);
 	background-size: cover;
 	background-position: center;
+  color: var(--textcolor);
 }
 
 ::-webkit-scrollbar {
@@ -55,8 +91,13 @@ body {
   display:block;
   outline:none;
   font-size:20px;
-
+  color: var(--textcolor);
 }
+
+.searchinput::placeholder {
+  color: rgba(128, 128, 128, 0.7);
+}
+
 .searchbutton{
   width:97px;
   height:78px;
@@ -70,8 +111,8 @@ body {
 
 .bar {
   width: fit-content;
-  mask-image: paint(squircle);
   background:var(--bgcolor);
+  mask-image: paint(squircle);
   --squircle-radius: 24px;
   --squircle-smooth: var(--radius);
   display:flex;
@@ -91,6 +132,7 @@ body {
   border:none;
   filter: drop-shadow(0 4px 6px #0002);
   padding:8px;
+  color: var(--textcolor);
 }
 .history{
   width:50px;
@@ -98,7 +140,7 @@ body {
 }
 .aibtn{
 --squircle-fill: var(--primary);
-color:fff;
+color:#fff;
 }
 
 /* 履歴コンテナのスタイル */
@@ -119,7 +161,7 @@ color:fff;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  color: #333;
+  color: var(--textcolor);
   font-size: 14px;
   line-height: 1.2;
   background:var(--searchbtnclr);
@@ -253,7 +295,7 @@ opacity: 0;
   position: fixed;
   right: 0;
   backdrop-filter: blur(32px);
-  background:#fff6;
+  background:var(--bg-blur);
   transition: all 0.6s cubic-bezier(.59,0,0,1), height 0s ease, width 0s ease;
   height: 100vh;
   width: 100vw;
@@ -300,7 +342,7 @@ opacity: 0;
 .linktext {
   font-size: 27px;
   margin: 10px 0;
-  color: var(--textcolor, #000);
+  color: var(--textcolor);
   margin-top: 16px;
   font-weight: 450;
 }
@@ -346,7 +388,7 @@ opacity: 0;
   height: 110px;
   padding: 0;
   width: 110px;
-  background:#fff7;
+  background:var(--icon-wrapper-bg);
   -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 22C0 11.6291 0 6.44365 3.22183 3.22183C6.44365 0 11.6291 0 22 0H88C98.3709 0 103.556 0 106.778 3.22183C110 6.44365 110 11.6291 110 22V88C110 98.3709 110 103.556 106.778 106.778C103.556 110 98.3709 110 88 110H22C11.6291 110 6.44365 110 3.22183 106.778C0 103.556 0 98.3709 0 88V22Z" fill="black"/></svg>');
   mask-image: url('data:image/svg+xml;utf8,<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 22C0 11.6291 0 6.44365 3.22183 3.22183C6.44365 0 11.6291 0 22 0H88C98.3709 0 103.556 0 106.778 3.22183C110 6.44365 110 11.6291 110 22V88C110 98.3709 110 103.556 106.778 106.778C103.556 110 98.3709 110 88 110H22C11.6291 110 6.44365 110 3.22183 106.778C0 103.556 0 98.3709 0 88V22Z" fill="black"/></svg>');
   transition: all 0.8s cubic-bezier(.38,2.04,.39,1), filter 0.5s cubic-bezier(.25,0,0,1);
@@ -401,7 +443,7 @@ opacity: 0;
   width: 110px;
   text-align: center;
   margin-top: 4px;
-  color: var(--textcolor, #000);
+  color: var(--textcolor);
   font-size: 14px;
   max-width: 100px;
   overflow: hidden;
@@ -468,5 +510,281 @@ ins.adsbygoogle {
 @media (min-width: 2354px) and (max-width: 2819px) {
   .linkbg:nth-child(6) {
     bottom:140px;
+  }
+}
+
+
+
+
+/* 設定モーダルのスタイル */
+.settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s cubic-bezier(.32,0,.03,1), visibility 0.5s cubic-bezier(.32,0,.03,1);
+}
+
+.settings-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-modal-content {
+  
+  --squircle-radius: 24px;
+  --squircle-smooth:  var(--radius);
+  background: paint(squircle);
+  --squircle-fill: var(--modal-bg);
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  filter: drop-shadow(0 20px 40px #0003);
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.5s cubic-bezier(.32,0,.03,1);
+}
+
+.settings-modal.show .settings-modal-content {
+  transform: scale(1) translateY(0);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.settings-header h3 {
+  margin: 0;
+  color: var(--textcolor);
+}
+
+.close-settings {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--textcolor);
+  opacity: 0.7;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-settings:hover {
+  background: var(--close-btn-hover);
+  opacity: 1;
+}
+
+.setting-item {
+  margin-bottom: 20px;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--textcolor);
+  font-weight: 500;
+}
+
+.setting-item input[type="text"] {
+  width: 66%;
+  padding: 10px;
+  border:none;
+  font-size: 14px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  mask-image: paint(squircle);
+  --squircle-radius: 12px;
+  --squircle-smooth: var(--radius);
+  background: var(--input-bg);
+  color: var(--textcolor);
+}
+
+.setting-item input[type="text"]::placeholder {
+  color: rgba(128, 128, 128, 0.7);
+}
+
+.setting-item button {
+  background: var(--primary);
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 10px 20px;
+  mask-image: paint(squircle);
+  --squircle-radius: 12px;
+  --squircle-smooth: var(--radius);
+  cursor: pointer;
+}
+
+.search-history-item {
+  background: var(--history-item-bg);
+  padding: 12px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  
+  mask-image: paint(squircle);
+  --squircle-radius: 24px;
+  --squircle-smooth: var(--radius);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--textcolor);
+}
+
+.delete-search-item {
+  background: var(--delete-btn-bg);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#clear-search-history {
+  background: var(--delete-btn-bg) !important;
+}
+
+/* 検索履歴パネルのスタイル */
+.searchhistory {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s cubic-bezier(.32,0,.03,1), visibility 0.5s cubic-bezier(.32,0,.03,1);
+}
+
+.searchhistory.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.searchhistory-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  max-height: 50vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.5s cubic-bezier(.32,0,.03,1);
+
+  --squircle-radius: 24px;
+  --squircle-smooth:  var(--radius);
+  background: paint(squircle);
+  --squircle-fill: var(--modal-bg);
+}
+
+.searchhistory.show .searchhistory-content {
+  transform: translateY(0);
+}
+
+.searchhistory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.searchhistory-header h3 {
+  margin: 0;
+  color: var(--textcolor);
+}
+
+.close-history {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--textcolor);
+  opacity: 0.7;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-history:hover {
+  background: var(--close-btn-hover);
+  opacity: 1;
+}
+
+.searchhistory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.searchhistory-list a {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--textcolor);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.searchhistory-list a:hover {
+  background: var(--history-item-bg);
+}
+
+.searchhistory-list .empty-message {
+  text-align: center;
+  color: var(--textcolor);
+  opacity: 0.7;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* ダークモード用のスクロールバー */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
   }
 }
