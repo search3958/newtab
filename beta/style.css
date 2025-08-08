@@ -61,13 +61,6 @@ body {
 ::-webkit-scrollbar {
 	display: none
   }
-
-
-ins.adsbygoogle {
-  margin: 0 auto;
-  width: auto;
-}
-
 #search-form{
   width:fit-content;
     position: fixed;
@@ -772,6 +765,12 @@ iframe{
   opacity: 0.7;
   font-style: italic;
   padding: 20px;
+}
+
+.naead{
+  display: flex !important;
+    justify-content: center;
+    margin: 0px;
 }
 
 /* ダークモード用のスクロールバー */
