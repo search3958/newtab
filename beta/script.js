@@ -567,7 +567,7 @@ async function loadIconsAndGenerateLinks() {
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874" crossorigin="anonymous"></script>
 <!-- ShortCut -->
 <ins class="adsbygoogle"
-     style="display:inline-block;width:244px;height:110px"
+     style="display:inline-block;width:244px;height:110px;margin:0px;"
      data-ad-client="ca-pub-6151036058675874"
      data-ad-slot="2788469305"></ins>
 <script>
