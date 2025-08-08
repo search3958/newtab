@@ -133,6 +133,7 @@ body {
   filter: drop-shadow(0 4px 6px #0002);
   padding:8px;
   color: var(--textcolor);
+  padding-bottom: 3px;
 }
 .history{
   width:50px;
