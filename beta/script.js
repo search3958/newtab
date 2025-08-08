@@ -610,3 +610,38 @@ async function loadIconsAndGenerateLinks() {
 
 // アイコンzipファイルの読み込みを開始
 loadIconsZip();
+
+const scaleSlider = document.getElementById('scale-slider');
+  const cornerSlider = document.getElementById('corner-slider');
+  const bottombar = document.querySelector('.bottombar');
+  const root = document.documentElement;
+
+  // --- scaleの読み込みと初期設定 ---
+  const savedScale = localStorage.getItem('bottombar-scale');
+  if (savedScale) {
+    scaleSlider.value = savedScale;
+    bottombar.style.scale = `${savedScale}`;
+  } else {
+    bottombar.style.scale = '1';
+  }
+
+  scaleSlider.addEventListener('input', () => {
+    const scale = scaleSlider.value;
+    bottombar.style.scale = `${scale}`;
+    localStorage.setItem('bottombar-scale', scale);
+  });
+
+  // --- radiusの読み込みと初期設定 ---
+  const savedRadius = localStorage.getItem('bottombar-radius');
+  if (savedRadius) {
+    cornerSlider.value = savedRadius;
+    root.style.setProperty('--radius', `${savedRadius}`);
+  } else {
+    root.style.setProperty('--radius', '1');
+  }
+
+  cornerSlider.addEventListener('input', () => {
+    const radius = cornerSlider.value;
+    root.style.setProperty('--radius', `${radius}`);
+    localStorage.setItem('bottombar-radius', radius);
+  });

@@ -154,6 +154,8 @@ color:#fff;
   --squircle-radius: 23px;
   --squircle-smooth: var(--radius);
   backdrop-filter: blur(16px);
+  height: 100px;
+  overflow:hidden;
 }
 
 .today {
@@ -248,23 +250,26 @@ color:#fff;
 .bottombar {
   position: fixed;
   bottom: 32px; /* 常に一定位置（基準）に固定 */
-  left: 50%;
-  transform: translate(-50%, 180px); /* 初期状態：Y方向に隠す */
+  left: 0;
+  width:100vw;
+  transform: translate(0, 180px); /* 初期状態：Y方向に隠す */
   display: flex;
   align-items: center;
   gap: 16px;
   isolation: isolate;
   will-change: transform; /* ←パフォーマンス最適化 */
-  transition: transform 0.6s cubic-bezier(.37, 0, 0, 1);
+  transition: transform 0.6s cubic-bezier(.37, 0, 0, 1),scale 0.6s cubic-bezier(.37, 0, 0, 1);
   z-index: 2;
+  justify-content: center;
 }
 
 .bottombar.show {
-  transform: translate(-50%, 0); /* 表示状態：通常位置に */
+  transform: translate(0, 0); /* 表示状態：通常位置に */
 }
 
 .bottombar.top {
-  transform: translate(-50%, calc(-100vh + 190px)); /* 必要に応じて */
+  transform: translate(0, calc(-100vh + 190px));
+  scale: 1 !important;
 }
 
 .aibg{
@@ -474,9 +479,9 @@ iframe{
   border-radius:8px!important;
   filter: drop-shadow(0 4px 6px #0002);
 }
-ins.adsbygoogle {
+ins.adsbygoogle {/*
   display: flex !important;
-  justify-content: center;
+  justify-content: center;*/
   margin:0px;
 }
 /* 956px ~ 1421px */
