@@ -479,12 +479,11 @@ iframe{
   border-radius:8px!important;
   filter: drop-shadow(0 4px 6px #0002);
 }
-ins.adsbygoogle {/*
-  display: flex !important;
-  justify-content: center;*/
-  margin:0px;
+ins.adsbygoogle {
+  margin: 0 auto;
+  width: fit-content;
 }
-/* 956px ~ 1421px */
+
 @media (min-width: 956px) and (max-width: 1421px) {
   .linkbg:nth-child(3) {
     bottom:280px;
