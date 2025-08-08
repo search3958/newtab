@@ -65,7 +65,7 @@ body {
 
 ins.adsbygoogle {
   margin: 0 auto;
-  width: fit-content;
+  width: auto;
 }
 
 #search-form{
