@@ -61,6 +61,13 @@ body {
 ::-webkit-scrollbar {
 	display: none
   }
+
+
+ins.adsbygoogle {
+  margin: 0 auto;
+  width: fit-content;
+}
+
 #search-form{
   width:fit-content;
     position: fixed;
@@ -464,7 +471,6 @@ opacity: 0;
   transition:all 0.8s ease;
   position: relative;
 }
-/* md-ripple スタイル */
 md-ripple {
   position: absolute;
   top: 0;
@@ -479,11 +485,6 @@ iframe{
   border-radius:8px!important;
   filter: drop-shadow(0 4px 6px #0002);
 }
-ins.adsbygoogle {
-  margin: 0 auto;
-  width: fit-content;
-}
-
 @media (min-width: 956px) and (max-width: 1421px) {
   .linkbg:nth-child(3) {
     bottom:280px;
