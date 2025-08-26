@@ -196,10 +196,10 @@
           "icon": "poki.webp"
         },
         {
-          "name": "小红书",
-          "bg": "var(--iconbg)",
-          "url": "https://www.xiaohongshu.com/explore",
-          "icon": "xiaohongshu.webp"
+          "name": "TikTkk",
+          "bg": "#000000bb",
+          "url": "https://www.tiktok.com/",
+          "icon": "tiktok.webp"
         },
         {
           "name": "Instagram",
