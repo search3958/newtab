@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Metaball 3D Hover</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      filter: contrast(15) blur(1px);
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      gap: 40px; /* 一定の間隔 */
+    }
+
+    .iconWrapper {
+      --rotateX: 0deg;
+      --rotateY: 0deg;
+      --moveX: 0px;
+      --moveY: 0px;
+      position: relative;
+      width: 220px;
+      height: 220px;
+      transform: rotateX(var(--rotateX)) rotateY(var(--rotateY))
+                 translateX(var(--moveX)) translateY(var(--moveY));
+      transition: transform 0.8s cubic-bezier(0,0,0,1);
+    }
+
+    /* メタボール風の見た目 */
+    .iconWrapper::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 10%;
+      background: rgba(255, 255, 255, 1);
+      filter: blur(30px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="iconWrapper"></div>
+    <div class="iconWrapper"></div>
+    <div class="iconWrapper"></div>
+  </div>
+
+  <script>
+    const wrappers = document.querySelectorAll('.iconWrapper');
+
+    wrappers.forEach(iconWrapper => {
+      iconWrapper.addEventListener('mousemove', e => {
+        const box = iconWrapper.getBoundingClientRect();
+        const mouseX = e.clientX - box.left;
+        const mouseY = e.clientY - box.top;
+
+        // 強めに動かす
+        const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 20;
+        const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -20;
+        const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 40;
+        const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 40;
+
+        iconWrapper.style.setProperty('--rotateX', `${rotateX}deg`);
+        iconWrapper.style.setProperty('--rotateY', `${rotateY}deg`);
+        iconWrapper.style.setProperty('--moveX', `${moveX}px`);
+        iconWrapper.style.setProperty('--moveY', `${moveY}px`);
+      });
+
+      iconWrapper.addEventListener('mouseleave', () => {
+        iconWrapper.style.setProperty('--rotateX', '0deg');
+        iconWrapper.style.setProperty('--rotateY', '0deg');
+        iconWrapper.style.setProperty('--moveX', '0px');
+        iconWrapper.style.setProperty('--moveY', '0px');
+      });
+    });
+  </script>
+</body>
+</html>
