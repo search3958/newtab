@@ -208,10 +208,10 @@
           "icon": "instagram.webp"
         },
         {
-          "name": "火源台txt",
-          "bg": "var(--iconbg)",
-          "url": "https://search3958.github.io/firebasetext",
-          "icon": "firebasetxt.webp"
+          "name": "Apple Music",
+          "bg": "#FB4058bb",
+          "url": "https://music.apple.com/jp/new",
+          "icon": "applemusic.webp"
         },
         {
           "name": "Netflix",
