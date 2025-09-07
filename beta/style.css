@@ -1,3 +1,5 @@
+@import url('/fonts/MPLUS2-Regular.ttf');
+
 *{
   font-family: "M PLUS 2", sans-serif;
 	font-weight: 400;
@@ -205,12 +207,12 @@ color:#fff;
 
 .today .date {
   font-size: 16px;
-  font-weight: 600;
+  font-weight:nomal;
 }
 
 .today .info-details {
   font-size: 12px;
-  font-weight: 400;
+  font-weight: nomal;
   opacity: 0.8;
 }
 
@@ -350,7 +352,7 @@ opacity: 0;
   margin: 10px 0;
   color: var(--textcolor);
   margin-top: 16px;
-  font-weight: 450;
+  font-weight: nomal;
 }
 .links {
   display: flex;
@@ -602,7 +604,7 @@ iframe{
   display: block;
   margin-bottom: 8px;
   color: var(--textcolor);
-  font-weight: 500;
+  font-weight: nomal;
 }
 
 .setting-item input[type="text"] {
