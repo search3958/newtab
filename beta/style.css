@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'MPLUS2';
-  src: url('/fonts/MPLUS2-Regular.ttf') format('woff2'),
+  src: url('fonts/MPLUS2-Regular.ttf') format('ttf'),
 }
 
 *{
