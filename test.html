@@ -10,15 +10,23 @@
       padding: 0;
       overflow: hidden;
       background: black;
-      filter: contrast(15) blur(1px);
+    background-image: url(https://search3958.github.io/newtab/bgimg/joson1.webp);
     }
 
     .container {
+      filter: contrast(10) blur(1px);
+    mix-blend-mode: lighten;
+      background:#000;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100%;
       gap: 30px; /* 一定の間隔 */
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1);
+    }
+
+    .container.hide {
+      gap: 20px;
     }
 
     .metaBall {
@@ -31,11 +39,14 @@
       height: 120px;
       transform: rotateX(var(--rotateX)) rotateY(var(--rotateY))
                  translateX(var(--moveX)) translateY(var(--moveY));
-      transition: transform 0.8s cubic-bezier(0,0,0,1);
+      transition: all 0.6s cubic-bezier(.21,0,.21,1);
+      scale:1;
+      right:0px;
     }
 
     .metaBall.search{
       width: 220px !important;
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
     }
     /* メタボール風の見た目 */
     .metaBall::before {
@@ -45,17 +56,61 @@
       height: 100%;
       border-radius: 100px;
       background: rgba(255, 255, 255, 1);
-      filter: blur(25px);
+      filter: blur(20px);
+    }
+    /* 追加: hideクラスで非表示 */
+    .metaBall.hide {
+      width: 30px;
+      height: 30px;
+      right:100px;
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1);
+      filter: blur(10px);
+    }
+    .metaBall.search.hide {
+      height: 130px;
+      right:-60px;
+      width: 500px !important;
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
+    }
+
+    .linkedBall {
+      position: fixed; /* 修正: fixedでウィンドウ座標に合わせる */
+      pointer-events: none;
+      border: 2px dashed #00f;
+      border-radius: 100px;
+      z-index: 7;
+      box-sizing: border-box;
+      background:rgb(0, 128, 255,0.2);
+      filter: none;
+      color:#000;
+      text-align: center;
+    }
+    /* .hide時も連動 */
+    .linkedBall.hide {
+      opacity: 0.5;
+    }
+
+    .linkedBalls {
+      filter: none;
     }
   </style>
 </head>
 <body>
+  <!-- 追加: チェックボックス -->
+  <label style="position: absolute; top: 20px; left: 20px; color: white; z-index: 10;">
+    <input type="checkbox" id="toggleMetaBall"> メタボールを隠す
+  </label>
   <div class="container">
-    <div class="metaBall search"></div>
-    <div class="metaBall"></div>
-    <div class="metaBall"></div>
-    <div class="metaBall"></div>
+    <div class="metaBall search" id="1"></div>
+    <div class="metaBall" id="2"></div>
+    <div class="metaBall" id="3"></div>
+    <div class="metaBall" id="4"></div>
   </div>
+  <!-- 修正: linkedBallsのidを分かりやすく -->
+  <div class="linkedBalls" id="linkedBalls-1">検索</div>
+  <div class="linkedBalls" id="linkedBalls-2">設定</div>
+  <div class="linkedBalls" id="linkedBalls-3">履歴</div>
+  <div class="linkedBalls" id="linkedBalls-4">AI</div>
 
   <script>
     const wrappers = document.querySelectorAll('.metaBall');
@@ -85,6 +140,58 @@
         metaBall.style.setProperty('--moveY', '0px');
       });
     });
+
+    // 位置・サイズを同期する関数（linkedBall生成部分は削除）
+    function syncLinkedBalls() {
+      wrappers.forEach(metaBall => {
+        const linked = document.getElementById('linkedBalls-' + metaBall.id);
+        const rect = metaBall.getBoundingClientRect();
+        linked.style.width = rect.width + 'px';
+        linked.style.height = rect.height + 'px';
+        linked.style.left = rect.left + 'px';
+        linked.style.top = rect.top + 'px';
+        linked.style.position = 'fixed';
+        linked.style.lineHeight = rect.height + 'px';
+        // hideクラスも連動
+        if (metaBall.classList.contains('hide')) {
+          linked.classList.add('hide');
+        } else {
+          linked.classList.remove('hide');
+        }
+      });
+    }
+    // 初期・イベントごとに同期
+    window.addEventListener('resize', syncLinkedBalls);
+    setInterval(syncLinkedBalls, 30); // アニメーションも追従
+
+    // 追加: チェックボックスによる表示/非表示制御
+    const container = document.querySelector('.container');
+    const checkbox = document.getElementById('toggleMetaBall');
+    checkbox.addEventListener('change', function() {
+      wrappers.forEach(metaBall => {
+        if (checkbox.checked) {
+          metaBall.classList.add('hide');
+        } else {
+          metaBall.classList.remove('hide');
+        }
+      });
+      // containerにもhideを追加/削除
+      if (checkbox.checked) {
+        container.classList.add('hide');
+      } else {
+        container.classList.remove('hide');
+      }
+      syncLinkedBalls();
+    });
+
+    // metaBallのtransform変更時にも追従
+    wrappers.forEach(metaBall => {
+      metaBall.addEventListener('mousemove', syncLinkedBalls);
+      metaBall.addEventListener('mouseleave', syncLinkedBalls);
+    });
+
+    // 初期化
+    syncLinkedBalls();
   </script>
 </body>
 </html>
