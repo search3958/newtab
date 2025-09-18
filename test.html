@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+2:wght@100..900&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <title>Metaball 3D Hover</title>
   <style>
+    *{
+      font-family: "M PLUS 2", sans-serif;
+    }
     html, body {
       height: 100%;
       margin: 0;
@@ -14,7 +21,7 @@
     }
 
     .container {
-      filter: contrast(10) blur(1px);
+      filter: contrast(25) blur(1px);
     mix-blend-mode: lighten;
       background:#000;
       display: flex;
@@ -26,22 +33,17 @@
     }
 
     .container.hide {
-      gap: 20px;
+      gap: 0px;
     }
 
     .metaBall {
-      --rotateX: 0deg;
-      --rotateY: 0deg;
-      --moveX: 0px;
-      --moveY: 0px;
       position: relative;
       width: 120px;
       height: 120px;
-      transform: rotateX(var(--rotateX)) rotateY(var(--rotateY))
-                 translateX(var(--moveX)) translateY(var(--moveY));
       transition: all 0.6s cubic-bezier(.21,0,.21,1);
       scale:1;
       right:0px;
+      z-index: 1;
     }
 
     .metaBall.search{
@@ -60,46 +62,71 @@
     }
     /* 追加: hideクラスで非表示 */
     .metaBall.hide {
-      width: 30px;
-      height: 30px;
+      width: 60px;
+      height: 60px;
       right:100px;
       transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1);
-      filter: blur(10px);
+      filter: blur(5px);
     }
     .metaBall.search.hide {
       height: 130px;
-      right:-60px;
+      right:-90px;
       width: 500px !important;
       transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
     }
 
-    .linkedBall {
-      position: fixed; /* 修正: fixedでウィンドウ座標に合わせる */
-      pointer-events: none;
-      border: 2px dashed #00f;
-      border-radius: 100px;
-      z-index: 7;
-      box-sizing: border-box;
-      background:rgb(0, 128, 255,0.2);
+    .linkedBalls {
       filter: none;
-      color:#000;
+      border-radius: 100px;
+      box-sizing: border-box;
+      color: #000;
       text-align: center;
+      opacity: 1;
+      z-index: 2;
+      transition: opacity 0.2s ease,filter 0.2s ease;
+      filter:blur(0px);
+      /* 位置・サイズ・レイアウト系はJSで制御 */
+    }
+    /* .hide時も連動 */
+    .linkedBalls.hide {
+      opacity: 0;
+      filter:blur(8px);
+    }
+    /* .hide時も連動 */
+    #linkedBalls-1 {
+      opacity: 1!important;
+      filter: blur(0px) !important;;
+
+      z-index: 3;
+    }
+    #linkedBalls-4{
+      background:color(display-p3 0.948 0.777 0 / 1);
     }
     /* .hide時も連動 */
     .linkedBall.hide {
-      opacity: 0.5;
+      opacity: 0!important;
     }
+    .iconbig {
+    font-size: 50px;
+    position: relative;
+    top: 16%;
+  }
+  input.searchinput {
+    height: 100%;
+    width: 100%;
+    border: none;
+    border-radius: 100px;
+    background: #0000;
+    text-align: center;
+    font-size: 39px;
+    font-weight: 300;
+    outline:none;
+  }
 
-    .linkedBalls {
-      filter: none;
-    }
-  </style>
+</style>
 </head>
 <body>
-  <!-- 追加: チェックボックス -->
-  <label style="position: absolute; top: 20px; left: 20px; color: white; z-index: 10;">
-    <input type="checkbox" id="toggleMetaBall"> メタボールを隠す
-  </label>
+  <!-- チェックボックス削除、テキストボックスのみ残す -->
   <div class="container">
     <div class="metaBall search" id="1"></div>
     <div class="metaBall" id="2"></div>
@@ -107,51 +134,35 @@
     <div class="metaBall" id="4"></div>
   </div>
   <!-- 修正: linkedBallsのidを分かりやすく -->
-  <div class="linkedBalls" id="linkedBalls-1">検索</div>
-  <div class="linkedBalls" id="linkedBalls-2">設定</div>
-  <div class="linkedBalls" id="linkedBalls-3">履歴</div>
-  <div class="linkedBalls" id="linkedBalls-4">AI</div>
+  <div class="linkedBalls" id="linkedBalls-1">
+    <input class="searchinput" type="text" name="q" placeholder="検索" id="mainSearchInput">
+  </div>
+  <div class="linkedBalls" id="linkedBalls-2">
+    <span class="material-symbols-outlined iconbig">settings</span>
+  </div>
+  <div class="linkedBalls" id="linkedBalls-3">
+    <span class="material-symbols-outlined iconbig">history</span>
+  </div>
+  <div class="linkedBalls" id="linkedBalls-4">
+    <span class="material-symbols-outlined iconbig">explore</span>
+  </div>
 
   <script>
     const wrappers = document.querySelectorAll('.metaBall');
-
-    wrappers.forEach(metaBall => {
-      metaBall.addEventListener('mousemove', e => {
-        const box = metaBall.getBoundingClientRect();
-        const mouseX = e.clientX - box.left;
-        const mouseY = e.clientY - box.top;
-
-        // 強めに動かす
-        const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 20;
-        const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -20;
-        const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 40;
-        const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 40;
-
-        metaBall.style.setProperty('--rotateX', `${rotateX}deg`);
-        metaBall.style.setProperty('--rotateY', `${rotateY}deg`);
-        metaBall.style.setProperty('--moveX', `${moveX}px`);
-        metaBall.style.setProperty('--moveY', `${moveY}px`);
-      });
-
-      metaBall.addEventListener('mouseleave', () => {
-        metaBall.style.setProperty('--rotateX', '0deg');
-        metaBall.style.setProperty('--rotateY', '0deg');
-        metaBall.style.setProperty('--moveX', '0px');
-        metaBall.style.setProperty('--moveY', '0px');
-      });
-    });
 
     // 位置・サイズを同期する関数（linkedBall生成部分は削除）
     function syncLinkedBalls() {
       wrappers.forEach(metaBall => {
         const linked = document.getElementById('linkedBalls-' + metaBall.id);
         const rect = metaBall.getBoundingClientRect();
-        linked.style.width = rect.width + 'px';
-        linked.style.height = rect.height + 'px';
-        linked.style.left = rect.left + 'px';
-        linked.style.top = rect.top + 'px';
+        // サイズを少し小さく補正
+        const offset = 4; // px
+        linked.style.width = (rect.width - offset) + 'px';
+        linked.style.height = (rect.height - offset) + 'px';
+        linked.style.left = (rect.left + offset/2) + 'px';
+        linked.style.top = (rect.top + offset/2) + 'px';
         linked.style.position = 'fixed';
-        linked.style.lineHeight = rect.height + 'px';
+        linked.style.lineHeight = (rect.height - offset) + 'px';
         // hideクラスも連動
         if (metaBall.classList.contains('hide')) {
           linked.classList.add('hide');
@@ -162,24 +173,23 @@
     }
     // 初期・イベントごとに同期
     window.addEventListener('resize', syncLinkedBalls);
-    setInterval(syncLinkedBalls, 30); // アニメーションも追従
 
-    // 追加: チェックボックスによる表示/非表示制御
-    const container = document.querySelector('.container');
-    const checkbox = document.getElementById('toggleMetaBall');
-    checkbox.addEventListener('change', function() {
-      wrappers.forEach(metaBall => {
-        if (checkbox.checked) {
-          metaBall.classList.add('hide');
-        } else {
-          metaBall.classList.remove('hide');
-        }
-      });
-      // containerにもhideを追加/削除
-      if (checkbox.checked) {
-        container.classList.add('hide');
+    // requestAnimationFrameで毎フレーム同期
+    function syncLoop() {
+      syncLinkedBalls();
+      requestAnimationFrame(syncLoop);
+    }
+    syncLoop();
+
+    // テキストボックス入力でhide制御
+    const searchInput = document.getElementById('mainSearchInput');
+    searchInput.addEventListener('input', function() {
+      if (searchInput.value.length > 0) {
+        wrappers.forEach(metaBall => metaBall.classList.add('hide'));
+        document.querySelector('.container').classList.add('hide');
       } else {
-        container.classList.remove('hide');
+        wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
+        document.querySelector('.container').classList.remove('hide');
       }
       syncLinkedBalls();
     });
