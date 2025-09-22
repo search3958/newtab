@@ -20,7 +20,7 @@
     background-image: url(https://search3958.github.io/newtab/bgimg/joson1.webp);
     }
 
-    .container {
+    .metaballcontainer {
       filter: contrast(25) blur(1px);
     mix-blend-mode: lighten;
       background:#000;
@@ -32,7 +32,7 @@
       transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1);
     }
 
-    .container.hide {
+    .metaballcontainer.hide {
       gap: 0px;
     }
 
@@ -94,11 +94,13 @@
     }
     /* .hide時も連動 */
     #linkedBalls-1 {
-      opacity: 1!important;
-      filter: blur(0px) !important;;
-
-      z-index: 3;
-    }
+    opacity: 1 !important;
+    filter: blur(0px) !important;
+    display: flex
+;
+    height: 100%;
+    z-index: 3;
+}
     #linkedBalls-4{
       background:color(display-p3 0.948 0.777 0 / 1);
     }
@@ -111,8 +113,7 @@
     position: relative;
     top: 16%;
   }
-  input.searchinput {
-    height: 100%;
+  .searchinput {
     width: 100%;
     border: none;
     border-radius: 100px;
@@ -121,13 +122,33 @@
     font-size: 39px;
     font-weight: 300;
     outline:none;
+    position:relative;
+    left: 7px;
+    transition:left 0.3s ease;
   }
-
+  .searchbutton{
+  width:0px;
+  display:block;
+  border:none;
+  background:none;
+  scale:0;    
+  position: relative;
+    bottom: 0px;
+    transition:all 0.3s ease;
+}
+  .hide>.searchinput{
+    left: 0px;
+  }
+.hide>.searchbutton{
+    bottom: 18px;
+  scale:1;
+  width:110px;
+}
 </style>
 </head>
 <body>
   <!-- チェックボックス削除、テキストボックスのみ残す -->
-  <div class="container">
+  <div class="metaballcontainer">
     <div class="metaBall search" id="1"></div>
     <div class="metaBall" id="2"></div>
     <div class="metaBall" id="3"></div>
@@ -135,7 +156,11 @@
   </div>
   <!-- 修正: linkedBallsのidを分かりやすく -->
   <div class="linkedBalls" id="linkedBalls-1">
+    
     <input class="searchinput" type="text" name="q" placeholder="検索" id="mainSearchInput">
+    <button class="searchbutton" type="submit">
+    <span class="material-symbols-outlined iconbig">arrow_forward</span>
+  </button>
   </div>
   <div class="linkedBalls" id="linkedBalls-2">
     <span class="material-symbols-outlined iconbig">settings</span>
@@ -148,60 +173,66 @@
   </div>
 
   <script>
-    const wrappers = document.querySelectorAll('.metaBall');
+(function() {
+  const wrappers = document.querySelectorAll('.metaBall');
+  // 位置・サイズを同期する関数（linkedBall生成部分は削除）
+  function syncLinkedBalls() {
+    wrappers.forEach(metaBall => {
+      const linked = document.getElementById('linkedBalls-' + metaBall.id);
+      if (!linked) return;
+      const rect = metaBall.getBoundingClientRect();
+      // サイズを少し小さく補正
+      const offset = 4; // px
+      linked.style.width = (rect.width - offset) + 'px';
+      linked.style.height = (rect.height - offset) + 'px';
+      linked.style.left = (rect.left + offset/2) + 'px';
+      linked.style.top = (rect.top + offset/2) + 'px';
+      linked.style.position = 'fixed';
+      linked.style.lineHeight = (rect.height - offset) + 'px';
+      // hideクラスも連動
+      if (metaBall.classList.contains('hide')) {
+        linked.classList.add('hide');
+      } else {
+        linked.classList.remove('hide');
+      }
+    });
+  }
+  // 初期・イベントごとに同期
+  window.addEventListener('resize', syncLinkedBalls);
 
-    // 位置・サイズを同期する関数（linkedBall生成部分は削除）
-    function syncLinkedBalls() {
-      wrappers.forEach(metaBall => {
-        const linked = document.getElementById('linkedBalls-' + metaBall.id);
-        const rect = metaBall.getBoundingClientRect();
-        // サイズを少し小さく補正
-        const offset = 4; // px
-        linked.style.width = (rect.width - offset) + 'px';
-        linked.style.height = (rect.height - offset) + 'px';
-        linked.style.left = (rect.left + offset/2) + 'px';
-        linked.style.top = (rect.top + offset/2) + 'px';
-        linked.style.position = 'fixed';
-        linked.style.lineHeight = (rect.height - offset) + 'px';
-        // hideクラスも連動
-        if (metaBall.classList.contains('hide')) {
-          linked.classList.add('hide');
-        } else {
-          linked.classList.remove('hide');
-        }
-      });
-    }
-    // 初期・イベントごとに同期
-    window.addEventListener('resize', syncLinkedBalls);
+  // requestAnimationFrameで毎フレーム同期
+  function syncLoop() {
+    syncLinkedBalls();
+    requestAnimationFrame(syncLoop);
+  }
+  syncLoop();
 
-    // requestAnimationFrameで毎フレーム同期
-    function syncLoop() {
-      syncLinkedBalls();
-      requestAnimationFrame(syncLoop);
-    }
-    syncLoop();
-
-    // テキストボックス入力でhide制御
-    const searchInput = document.getElementById('mainSearchInput');
+  // テキストボックス入力でhide制御
+  const searchInput = document.getElementById('mainSearchInput');
+  if (searchInput) {
     searchInput.addEventListener('input', function() {
       if (searchInput.value.length > 0) {
         wrappers.forEach(metaBall => metaBall.classList.add('hide'));
-        document.querySelector('.container').classList.add('hide');
+        const container = document.querySelector('.metaballcontainer');
+        if (container) container.classList.add('hide');
       } else {
         wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
-        document.querySelector('.container').classList.remove('hide');
+        const container = document.querySelector('.metaballcontainer');
+        if (container) container.classList.remove('hide');
       }
       syncLinkedBalls();
     });
+  }
 
-    // metaBallのtransform変更時にも追従
-    wrappers.forEach(metaBall => {
-      metaBall.addEventListener('mousemove', syncLinkedBalls);
-      metaBall.addEventListener('mouseleave', syncLinkedBalls);
-    });
+  // metaBallのtransform変更時にも追従
+  wrappers.forEach(metaBall => {
+    metaBall.addEventListener('mousemove', syncLinkedBalls);
+    metaBall.addEventListener('mouseleave', syncLinkedBalls);
+  });
 
-    // 初期化
-    syncLinkedBalls();
-  </script>
+  // 初期化
+  syncLinkedBalls();
+})();
+</script>
 </body>
 </html>

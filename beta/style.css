@@ -1,10 +1,6 @@
-@font-face {
-  font-family: 'MPLUS2';
-  src: url('https://search3958.github.io/newtab/fonts/MPLUS2-Regular.ttf') format('ttf'),
-}
 
 *{
-  font-family: "MPLUS2", sans-serif;
+  font-family: "M PLUS 2", sans-serif;
 	font-weight: 400;
   font-style: normal;
   line-height: 1.5;
@@ -66,87 +62,155 @@ body {
 ::-webkit-scrollbar {
 	display: none
   }
-#search-form{
-  width:fit-content;
+.appswitchicon {
+    height: 90px;
+    width: 90px;
+    position: absolute;
+    background: #fff;
+    z-index: 1;
+    scale:0;
+    filter:blur(10px);
+    transition:all 0.5s ease;
+}
+
+.appswitchicon.show {
+    scale:1;
+    filter:blur(0px);
+}
+
+    .metaballcontainer {
+    filter: contrast(25) blur(0.3px);
+    mix-blend-mode: lighten;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    transition: all 1.3s 
+cubic-bezier(0.17, 1.35, 0.08, 1);
+    overflow: hidden;
     position: fixed;
-    top: calc(50% - 56px);
-    left: 50%;
-    transform: translate(-50%, -50px);
+    width: 100vw;
+    right: 0;
+    bottom: 32px;
 }
 
-#search-container {
-  width: 400px;
-  mask-image: paint(squircle);
-  background:var(--bgcolor);
-  --squircle-radius: 24px;
-  --squircle-smooth: var(--radius);
-  display:flex;
-  backdrop-filter: blur(16px);
-  transition: width 0.8s cubic-bezier(.15,.96,0,1);
-}
-#search-container.ai {
-  width: 580px;
-}
+    .metaballcontainer.hide {
+      gap: 0px;
+    }
 
-.searchinput{
-  background:#0000;
-  border:none;
-  padding:24px;
-  width:100%;
-  display:block;
-  outline:none;
-  font-size:20px;
-  color: var(--textcolor);
+    .metaBall {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      transition: all 0.6s cubic-bezier(.21,0,.21,1);
+      scale:1;
+      right:0px;
+      z-index: 1;
+    }
+
+    .metaBall.search{
+      width: 220px !important;
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
+    }
+    /* メタボール風の見た目 */
+    .metaBall::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 1);
+      filter: blur(20px);
+    }
+    /* 追加: hideクラスで非表示 */
+    .metaBall.hide {
+      width: 60px;
+      height: 60px;
+      right:100px;
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1);
+      filter: blur(5px);
+    }
+    .metaBall.search.hide {
+      height: 130px;
+      right:-90px;
+      width: 500px !important;
+      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
+    }
+
+    .linkedBalls {
+      filter: none;
+      border-radius: 100px;
+      box-sizing: border-box;
+      color: #000;
+      text-align: center;
+      opacity: 1;
+      z-index: 2;
+      transition: opacity 0.2s ease,filter 0.2s ease;
+      filter:blur(0px);
+      /* 位置・サイズ・レイアウト系はJSで制御 */
+    }
+    /* .hide時も連動 */
+    .linkedBalls.hide {
+      opacity: 0;
+      filter:blur(8px);
+    }
+    /* .hide時も連動 */
+    #linkedBalls-1 {
+    opacity: 1 !important;
+    filter: blur(0px) !important;
+    display: flex;
+    height: 100%;
+    z-index: 3;
+    overflow: hidden;
 }
+    #linkedBalls-4{
+      background:color(display-p3 0.948 0.777 0 / 1);
+    }
+    /* .hide時も連動 */
+    .linkedBall.hide {
+      opacity: 0!important;
+    }
+    .iconbig {
+    font-size: 50px;
+    position: relative;
+    top: 16%;
+  }
+  .searchinput {
+    width: 100%;
+    border: none;
+    border-radius: 100px;
+    background: #0000;
+    text-align: center;
+    font-size: 39px;
+    font-weight: 300;
+    outline:none;
+    position:relative;
+    left: 7px;
+    transition:left 0.3s ease;
+  }
+.hide>.searchbutton {
+    bottom: 16px;
+    scale: 1;
+    width: 110px;
+}
+.searchbutton {
+    width: 0px;
+    display: block;
+    border: none;
+    background: none;
+    scale: 0;
+    position: relative;
+    bottom: 0px;
+    transition: all 0.3s 
+ease;
+}
+  .hide>.searchinput{
+    left: 0px;
+  }
 
 .searchinput::placeholder {
   color: rgba(128, 128, 128, 0.7);
-}
-
-.searchbutton{
-  width:97px;
-  height:78px;
-  display:block;
-  border:none;
-  background:var(--searchbtnclr);
-}
-#ai-toggle{
-  display:none;
-}
-
-.bar {
-  width: fit-content;
-  background:var(--bgcolor);
-  mask-image: paint(squircle);
-  --squircle-radius: 24px;
-  --squircle-smooth: var(--radius);
-  display:flex;
-  backdrop-filter: blur(16px);
-  padding:8px;
-  gap:8px;
-    position: fixed;
-    top: calc(50% + 32px);
-    left: 50%;
-    transform: translate(-50%, -50px);
-}
-.btn{
-  --squircle-radius: 10px;
-  --squircle-smooth:  var(--radius);
-  background: paint(squircle);
-  --squircle-fill: var(--searchbtnclr);
-  border:none;
-  filter: drop-shadow(0 4px 6px #0002);
-  padding:8px;
-  color: var(--textcolor);
-  padding-bottom: 3px;
-}
-.history{
-  width:50px;
-  text-align:center
-}
-.aibtn{
---squircle-fill: var(--primary);
-color:#fff;
 }
 
 /* 履歴コンテナのスタイル */
@@ -272,7 +336,7 @@ color:#fff;
   isolation: isolate;
   will-change: transform; /* ←パフォーマンス最適化 */
   transition: transform 0.6s cubic-bezier(.37, 0, 0, 1),scale 0.6s cubic-bezier(.37, 0, 0, 1);
-  z-index: 2;
+  z-index: 10;
   justify-content: center;
   padding-bottom: 32px;
   padding-top: 32px;
@@ -288,33 +352,11 @@ color:#fff;
   scale: 1 !important;
 }
 
-.aibg{
-  background-color:hsla(0,0%,0%,0);
-background-image:
-radial-gradient(at 34% 66%, hsla(217,100%,50%,1) 0px, transparent 50%),
-radial-gradient(at 61% 38%, hsla(294,100%,50%,1) 0px, transparent 50%),
-radial-gradient(at 61% 62%, hsla(266,100%,50%,1) 0px, transparent 50%),
-radial-gradient(at 35% 37%, hsla(181,100%,50%,1) 0px, transparent 50%);
-z-index:0;
-position:fixed;
-top:0;
-right:0;
-width:100vw;
-height:100vh;
-mix-blend-mode: hard-light;
-scale:0.4;
-filter:blur(60px);
-transition:all 0.8s cubic-bezier(.15,.96,0,1);
-opacity: 0;
-}
-.aibg.show{
-  scale:1;
-  opacity: 1;
-}
 .bg{
   pointer-events: none;
   position: fixed;
   right: 0;
+  top:0;
   backdrop-filter: blur(32px);
   background:var(--bg-blur);
   transition: all 0.6s cubic-bezier(.59,0,0,1), height 0s ease, width 0s ease;
@@ -323,6 +365,7 @@ opacity: 0;
   overflow: scroll;
   opacity: 0;
   padding-bottom:32px;
+  z-index:9;
 }
 
 .bg.show{

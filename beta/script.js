@@ -4,6 +4,10 @@ const SEARCH_HISTORY_KEY = 'search_history';
 const MAX_HISTORY = 4;
 const MAX_SEARCH_HISTORY = 3;
 
+// アプリ検索モードを管理する変数を追加
+let isAppSearchMode = false;
+let linksData = null;
+
 // デフォルトアイテムを定義
 const DEFAULT_ITEMS = [
   { name: "TechPick 10", url: "https://search3958.github.io/techpick10/", icon: "techpick10.webp", bg: "rgba(255, 255, 255, 0.759)" },
@@ -16,7 +20,6 @@ const DEFAULT_ITEMS = [
 function initializeDefaultHistory() {
   let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
   
-  // 履歴が空の場合のみデフォルトアイテムを設定
   if (history.length === 0) {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(DEFAULT_ITEMS));
   }
@@ -28,13 +31,10 @@ function saveSearchHistory(query) {
   
   let searchHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
   
-  // 既存の同じクエリを削除
   searchHistory = searchHistory.filter(item => item !== query.trim());
   
-  // 新しいクエリを先頭に追加
   searchHistory.unshift(query.trim());
   
-  // 最大3件に制限
   if (searchHistory.length > MAX_SEARCH_HISTORY) {
     searchHistory = searchHistory.slice(0, MAX_SEARCH_HISTORY);
   }
@@ -46,13 +46,10 @@ function saveSearchHistory(query) {
 function saveToHistory(linkData) {
   let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
   
-  // 既存の同じURLの履歴を削除
   history = history.filter(item => item.url !== linkData.url);
   
-  // 新しい履歴を先頭に追加
   history.unshift(linkData);
   
-  // 最大4件に制限
   if (history.length > MAX_HISTORY) {
     history = history.slice(0, MAX_HISTORY);
   }
@@ -68,7 +65,6 @@ function updateHistoryDisplay() {
   
   let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
   
-  // 履歴が空の場合はデフォルトアイテムを表示（ただし保存はしない）
   if (history.length === 0) {
     history = DEFAULT_ITEMS;
   }
@@ -91,7 +87,6 @@ function updateHistoryDisplay() {
     iconWrapper.appendChild(img);
     historyItem.appendChild(iconWrapper);
     
-    // クリックイベントを追加
     historyItem.addEventListener('click', () => {
       saveToHistory(item);
       window.location.href = item.url;
@@ -121,7 +116,6 @@ function updateSearchHistoryList() {
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     
-    // クリック時に履歴に追加
     link.addEventListener('click', () => {
       saveSearchHistory(query);
     });
@@ -137,7 +131,6 @@ function showSettingsModal() {
   
   modal.classList.add('show');
   
-  // 現在の壁紙URLを取得して入力欄に設定
   const currentBg = document.body.style.backgroundImage;
   const urlMatch = currentBg.match(/url\(['"]?([^'"]+)['"]?\)/);
   const wallpaperInput = document.getElementById('wallpaper-input');
@@ -145,7 +138,6 @@ function showSettingsModal() {
     wallpaperInput.value = urlMatch[1];
   }
   
-  // 検索履歴を表示
   updateSearchHistoryDisplay();
 }
 
@@ -195,7 +187,6 @@ function updateSearchHistoryDisplay() {
       <button class="delete-search-item" data-index="${index}">削除</button>
     `;
     
-    // 削除ボタンのイベントリスナー
     item.querySelector('.delete-search-item').addEventListener('click', () => {
       const currentHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
       currentHistory.splice(index, 1);
@@ -207,53 +198,120 @@ function updateSearchHistoryDisplay() {
   });
 }
 
-// チェックボックスがトグルされたときに実行
-document.getElementById('ai-toggle').addEventListener('change', function() {
-  var form = document.getElementById('search-form');
-  var container = document.getElementById('search-container');
-  var searchInput = document.querySelector('.searchinput');
-  var aiBg = document.querySelector('.aibg');
+// アプリを検索し、アイコンを表示する関数
 
-  if (this.checked) {
-    // チェックON → AI検索用URLに切り替え、.ai を付与
-    form.action = 'https://search3958.github.io/aisearch/';
-    container.classList.add('ai');
-    aiBg.classList.add('show');
-    searchInput.placeholder = 'AIは稀に不正確な情報を示すことがあります';
-  } else {
-    // チェックOFF → 通常の Google 検索に戻す、.ai を外す
-    form.action = 'https://www.google.com/search';
-    container.classList.remove('ai');
-    aiBg.classList.remove('show');
-    searchInput.placeholder = 'ここに入力して検索';
-  }
-});
 
-// 検索フォームの送信イベント
-document.getElementById('search-form').addEventListener('submit', function(e) {
-  const searchInput = document.querySelector('.searchinput');
-  const query = searchInput.value.trim();
-  const isAiSearch = document.getElementById('ai-toggle').checked;
+function searchAppAndDisplay() {
+  const searchInputBox = document.querySelector('.searchinput') || document.getElementById('mainSearchInput');
+  const appSwitchIcon = document.querySelector('.appswitchicon');
   
-  // AI検索でない場合のみ検索履歴に保存
-  if (!isAiSearch && query) {
-    saveSearchHistory(query);
+  if (!searchInputBox || !appSwitchIcon || !linksData) return;
+  
+  const query = searchInputBox.value.trim().toLowerCase();
+  
+  if (query.length === 0) {
+    appSwitchIcon.style.backgroundImage = 'none';
+    appSwitchIcon.classList.remove('show'); // この行を追加
+    return;
   }
-});
+  
+  let foundApp = null;
+  linksData.categories.forEach(category => {
+    category.links.forEach(link => {
+      if (link.name.toLowerCase().includes(query)) {
+        foundApp = link;
+        return;
+      }
+    });
+    if (foundApp) return;
+  });
 
-// スクロールイベントを検知して.shortcutsに.showクラスを追加
+  if (foundApp) {
+    const iconUrl = iconsMap[foundApp.icon];
+    if (iconUrl) {
+      appSwitchIcon.style.backgroundImage = `url('${iconUrl}')`;
+      appSwitchIcon.style.backgroundSize = 'cover';
+      appSwitchIcon.style.backgroundPosition = 'center';
+      appSwitchIcon.classList.add('show'); // この行を追加
+    }
+  } else {
+    appSwitchIcon.style.backgroundImage = 'none';
+    appSwitchIcon.classList.remove('show'); // この行を追加
+  }
+}
+
+
+
+// 検索を実行する関数
+const searchInputBox = document.querySelector('.searchinput') || document.getElementById('mainSearchInput');
+const searchBtn = document.getElementById('search-btn');
+const searchButton = document.querySelector('.searchbutton');
+
+function performSearch() {
+  if (!searchInputBox) return;
+  const query = searchInputBox.value.trim();
+  if (!query) return;
+
+  if (isAppSearchMode) {
+    let foundApp = null;
+    linksData.categories.forEach(category => {
+      category.links.forEach(link => {
+        if (link.name.toLowerCase().includes(query.toLowerCase())) {
+          foundApp = link;
+          return;
+        }
+      });
+      if (foundApp) return;
+    });
+
+    if (foundApp) {
+      saveToHistory(foundApp);
+      window.location.href = foundApp.url;
+    }
+  } else {
+    const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+    saveSearchHistory(query);
+    window.location.href = url;
+  }
+}
+
+if (searchInputBox) {
+  searchInputBox.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch();
+    }
+  });
+  searchInputBox.addEventListener('input', () => {
+    if (isAppSearchMode) {
+      searchAppAndDisplay();
+    }
+  });
+}
+if (searchBtn) {
+  searchBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    performSearch();
+  });
+}
+if (searchButton) {
+  searchButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    performSearch();
+  });
+}
+
+// スクロールイベント
 window.addEventListener('scroll', function() {
   var shortcuts = document.querySelector('.shortcuts');
   var bg = document.querySelector('.bg');
   var bottombar = document.querySelector('.bottombar');
   if (shortcuts) {
-    // 0.5px以上スクロールされた場合に.showクラスを追加
     if (window.scrollY >= 1) {
       shortcuts.classList.add('show');
       bottombar.classList.add('top');
       bg.classList.add('show');
     } else {
-      // スクロールが0.5px未満の場合は.showクラスを外す
       shortcuts.classList.remove('show');
       bottombar.classList.remove('top');
       bg.classList.remove('show');
@@ -266,34 +324,28 @@ function updateTodayInfo() {
   const todayElement = document.querySelector('.today');
   if (!todayElement) return;
   
-  // 現在の日付を取得
   const now = new Date();
   const month = now.getMonth() + 1;
   const date = now.getDate();
   
-  // 曜日を日本語で取得
   const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
   const weekday = weekdays[now.getDay()];
   
-  // バッテリー残量を取得（対応していない場合は「N/A」を表示）
   let batteryText = 'N/A';
   if ('getBattery' in navigator) {
     navigator.getBattery().then(battery => {
       const batteryLevel = Math.round(battery.level * 100);
       batteryText = `${batteryLevel}%`;
       
-      // 充電状態に応じてクラスを設定
       const isCharging = battery.charging;
       todayElement.className = `today ${isCharging ? 'charging' : ''}`;
       todayElement.style.setProperty('--battery-level', `${batteryLevel}%`);
       
-      // HTMLを更新
       todayElement.innerHTML = `
         <div class="date">${month}月${date}日</div>
         <div class="info-details">${weekday}曜日・${batteryText}</div>
       `;
       
-      // バッテリー状態の変更を監視
       battery.addEventListener('levelchange', () => {
         const newLevel = Math.round(battery.level * 100);
         const newText = `${newLevel}%`;
@@ -310,14 +362,12 @@ function updateTodayInfo() {
       });
       
     }).catch(() => {
-      // バッテリー情報が取得できない場合
       todayElement.innerHTML = `
         <div class="date">${month}月${date}日</div>
         <div class="info-details">${weekday}曜日</div>
       `;
     });
   } else {
-    // getBattery APIが対応していない場合
     todayElement.innerHTML = `
       <div class="date">${month}月${date}日</div>
       <div class="info-details">${weekday}曜日</div>
@@ -327,19 +377,16 @@ function updateTodayInfo() {
 
 // モーダルとパネルのイベントリスナーを設定する関数
 function setupModalEventListeners() {
-  // 設定モーダルの閉じるボタン
   const closeSettingsBtn = document.querySelector('.close-settings');
   if (closeSettingsBtn) {
     closeSettingsBtn.addEventListener('click', hideSettingsModal);
   }
   
-  // 検索履歴パネルの閉じるボタン
   const closeHistoryBtn = document.querySelector('.close-history');
   if (closeHistoryBtn) {
     closeHistoryBtn.addEventListener('click', hideSearchHistory);
   }
   
-  // モーダル背景クリックで閉じる
   const settingsModal = document.getElementById('settings-modal');
   if (settingsModal) {
     settingsModal.addEventListener('click', (e) => {
@@ -349,7 +396,6 @@ function setupModalEventListeners() {
     });
   }
   
-  // パネル背景クリックで閉じる
   const searchHistoryPanel = document.getElementById('search-history-panel');
   if (searchHistoryPanel) {
     searchHistoryPanel.addEventListener('click', (e) => {
@@ -359,7 +405,6 @@ function setupModalEventListeners() {
     });
   }
   
-  // 壁紙適用ボタン
   const applyWallpaperBtn = document.getElementById('apply-wallpaper');
   if (applyWallpaperBtn) {
     applyWallpaperBtn.addEventListener('click', () => {
@@ -374,7 +419,6 @@ function setupModalEventListeners() {
     });
   }
   
-  // 検索履歴クリアボタン
   const clearSearchHistoryBtn = document.getElementById('clear-search-history');
   if (clearSearchHistoryBtn) {
     clearSearchHistoryBtn.addEventListener('click', () => {
@@ -385,56 +429,62 @@ function setupModalEventListeners() {
   }
 }
 
-// ページ読み込み時は.showクラスを外す（スクロールが0の状態）
 document.addEventListener('DOMContentLoaded', function() {
   var shortcuts = document.querySelector('.shortcuts');
   if (shortcuts) {
     shortcuts.classList.remove('show');
   }
   
-  // 初回起動時にデフォルト履歴を設定
   initializeDefaultHistory();
   
-  // 保存された壁紙を適用
   const savedWallpaper = localStorage.getItem('custom_wallpaper');
   if (savedWallpaper) {
     document.body.style.backgroundImage = `url('${savedWallpaper}')`;
   }
   
-  // 設定ボタンのイベントリスナーを追加
   const settingsBtn = document.querySelector('.settings-btn');
   if (settingsBtn) {
     settingsBtn.addEventListener('click', showSettingsModal);
   }
   
-  // 履歴ボタンのイベントリスナーを追加
   const historyBtn = document.querySelector('.history');
   if (historyBtn) {
     historyBtn.addEventListener('click', showSearchHistory);
   }
   
-  // リンクの生成を開始
+  const appSwitchBtn = document.querySelector('.appswitch');
+  const searchInputBox = document.querySelector('.searchinput') || document.getElementById('mainSearchInput');
+  const appSwitchIcon = document.querySelector('.appswitchicon');
+
+  if (appSwitchBtn && searchInputBox) {
+    appSwitchBtn.addEventListener('click', () => {
+      isAppSearchMode = !isAppSearchMode;
+      if (isAppSearchMode) {
+        searchInputBox.placeholder = "アプリ";
+        searchAppAndDisplay();
+      } else {
+        searchInputBox.placeholder = "検索";
+        appSwitchIcon.style.backgroundImage = 'none';
+      }
+      searchInputBox.focus();
+    });
+  }
+
   loadIconsAndGenerateLinks();
   
-  // 履歴表示を初期化
   updateHistoryDisplay();
   
-  // 日付とバッテリー残量を表示
   updateTodayInfo();
   
-  // 検索履歴リストを初期化
   updateSearchHistoryList();
   
-  // モーダルとパネルのイベントリスナーを設定
   setupModalEventListeners();
 });
 
-// アイコンマップとアイコン読み込み状態
 const iconsMap = {};
 let iconsReady = false;
 const iconWaiters = [];
 
-// アイコンzipファイルを読み込む
 async function loadIconsZip() {
   try {
     const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
@@ -460,7 +510,6 @@ async function loadIconsZip() {
     iconsReady = true;
     iconWaiters.forEach(fn => fn());
     
-    // アイコン読み込み完了後に履歴表示を更新
     updateHistoryDisplay();
   } catch (error) {
     console.error("アイコンzipの読み込みに失敗しました:", error);
@@ -474,16 +523,14 @@ async function loadIconsAndGenerateLinks() {
   
   try {
     const res = await fetch('links.json');
-    const data = await res.json();
+    linksData = await res.json();
     const container = document.querySelector('.shortcuts');
     
     if (!container) return;
     
     container.innerHTML = '';
     
-    // 각카테고리의링크를생성
-    data.categories.forEach(category => {
-      // linkbgでラップするdivを작성
+    linksData.categories.forEach(category => {
       const groupDiv = document.createElement('div');
       groupDiv.className = 'linkbg';
 
@@ -501,7 +548,6 @@ async function loadIconsAndGenerateLinks() {
         a.href = link.url;
         a.rel = 'noopener noreferrer';
         
-        // 클릭이벤트를추가해서히스토리에저장
         a.addEventListener('click', (e) => {
           e.preventDefault();
           saveToHistory(link);
@@ -524,7 +570,6 @@ async function loadIconsAndGenerateLinks() {
         img.alt = link.name;
         iconWrapper.appendChild(img);
         
-        // マウスホバー효과
         iconWrapper.addEventListener('mousemove', e => {
           const box = iconWrapper.getBoundingClientRect();
           const mouseX = e.clientX - box.left;
@@ -561,11 +606,9 @@ async function loadIconsAndGenerateLinks() {
         linksDiv.appendChild(a);
       });
 
-      // 쇼핑일때광고스크립트추가
       if (category.title === 'ショッピング') {
         linksDiv.insertAdjacentHTML('beforeend', `
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874" crossorigin="anonymous"></script>
-<!-- ShortCut -->
 <ins class="adsbygoogle"
      style="display:inline-block;width:244px;height:110px;margin:0px;"
      data-ad-client="ca-pub-6151036058675874"
@@ -580,7 +623,6 @@ async function loadIconsAndGenerateLinks() {
       container.appendChild(groupDiv);
     });
 
-    // 모든이미지로딩완료를대기
     const allImages = container.querySelectorAll('img');
     const imageLoadPromises = Array.from(allImages).map(img => {
       return new Promise((resolve) => {
@@ -593,11 +635,9 @@ async function loadIconsAndGenerateLinks() {
       });
     });
 
-    // 모든이미지로딩완료후0.5초지연
     await Promise.all(imageLoadPromises);
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 완전로딩완료후에.bottombar에.show클래스추가
     const bottomBar = document.querySelector('.bottombar');
     if (bottomBar) {
       bottomBar.classList.add('show');
@@ -608,16 +648,15 @@ async function loadIconsAndGenerateLinks() {
   }
 }
 
-// アイコンzipファイルの読み込みを開始
 loadIconsZip();
 
 const scaleSlider = document.getElementById('scale-slider');
-  const cornerSlider = document.getElementById('corner-slider');
-  const bottombar = document.querySelector('.bottombar');
-  const root = document.documentElement;
+const cornerSlider = document.getElementById('corner-slider');
+const bottombar = document.querySelector('.bottombar');
+const root = document.documentElement;
 
-  // --- scaleの読み込みと初期設定 ---
-  const savedScale = localStorage.getItem('bottombar-scale');
+const savedScale = localStorage.getItem('bottombar-scale');
+if (scaleSlider && bottombar) {
   if (savedScale) {
     scaleSlider.value = savedScale;
     bottombar.style.scale = `${savedScale}`;
@@ -630,9 +669,10 @@ const scaleSlider = document.getElementById('scale-slider');
     bottombar.style.scale = `${scale}`;
     localStorage.setItem('bottombar-scale', scale);
   });
+}
 
-  // --- radiusの読み込みと初期設定 ---
-  const savedRadius = localStorage.getItem('bottombar-radius');
+const savedRadius = localStorage.getItem('bottombar-radius');
+if (cornerSlider && root) {
   if (savedRadius) {
     cornerSlider.value = savedRadius;
     root.style.setProperty('--radius', `${savedRadius}`);
@@ -645,3 +685,58 @@ const scaleSlider = document.getElementById('scale-slider');
     root.style.setProperty('--radius', `${radius}`);
     localStorage.setItem('bottombar-radius', radius);
   });
+}
+
+
+(function() {
+  const wrappers = document.querySelectorAll('.metaBall');
+  function syncLinkedBalls() {
+    wrappers.forEach(metaBall => {
+      const linked = document.getElementById('linkedBalls-' + metaBall.id);
+      if (!linked) return;
+      const rect = metaBall.getBoundingClientRect();
+      const offset = 4;
+      linked.style.width = (rect.width - offset) + 'px';
+      linked.style.height = (rect.height - offset) + 'px';
+      linked.style.left = (rect.left + offset/2) + 'px';
+      linked.style.top = (rect.top + offset/2) + 'px';
+      linked.style.position = 'fixed';
+      linked.style.lineHeight = (rect.height - offset) + 'px';
+      if (metaBall.classList.contains('hide')) {
+        linked.classList.add('hide');
+      } else {
+        linked.classList.remove('hide');
+      }
+    });
+  }
+  window.addEventListener('resize', syncLinkedBalls);
+
+  function syncLoop() {
+    syncLinkedBalls();
+    requestAnimationFrame(syncLoop);
+  }
+  syncLoop();
+
+  const searchInput = document.getElementById('mainSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      if (searchInput.value.length > 0) {
+        wrappers.forEach(metaBall => metaBall.classList.add('hide'));
+        const container = document.querySelector('.metaballcontainer');
+        if (container) container.classList.add('hide');
+      } else {
+        wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
+        const container = document.querySelector('.metaballcontainer');
+        if (container) container.classList.remove('hide');
+      }
+      syncLinkedBalls();
+    });
+  }
+
+  wrappers.forEach(metaBall => {
+    metaBall.addEventListener('mousemove', syncLinkedBalls);
+    metaBall.addEventListener('mouseleave', syncLinkedBalls);
+  });
+
+  syncLinkedBalls();
+})();

@@ -71,25 +71,25 @@
           "icon": "youtube.webp"
         },
         {
-          "name": "Document",
+          "name": "ドキュメント",
           "bg": "var(--iconbg)",
           "url": "https://docs.google.com/document/",
           "icon": "document.webp"
         },
         {
-          "name": "Slide",
+          "name": "スライド",
           "bg": "var(--iconbg)",
           "url": "https://docs.google.com/presentation/",
           "icon": "slide.webp"
         },
         {
-          "name": "Spreadsheet",
+          "name": "スプレッドシート",
           "bg": "var(--iconbg)",
           "url": "https://docs.google.com/spreadsheets/",
           "icon": "spreadsheet.webp"
         },
         {
-          "name": "Translate",
+          "name": "翻訳",
           "bg": "var(--iconbg)",
           "url": "https://translate.google.com/",
           "icon": "translate.webp"

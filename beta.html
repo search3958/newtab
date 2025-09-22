@@ -1,7 +1,14 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+2:wght@100..900&display=swap" rel="stylesheet">
+
 <!-- 그글 탁 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
 <script>
@@ -13,8 +20,7 @@
 </script>
 <title>Newtab 5</title>
 <link rel="icon" href="https://search3958.github.io/icons/newtab.svg"><link rel="stylesheet" href="beta/style.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" />
-<style>body{background-image: url('bgimg/liquidglass1.webp');}</style>
+<style>body{background-image: url('bgimg/plate3.webp');}</style>
 <script>
 if ("paintWorklet" in CSS) {
   const workletCode = `
@@ -28,13 +34,32 @@ if ("paintWorklet" in CSS) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
-  <div class="aibg"></div>
-    <form id="search-form" action="https://www.google.com/search" method="get">
-    <div id="search-container">
-      <input class="searchinput" type="text" name="q" placeholder="ここに入力して検索">
-      <button class="searchbutton" type="submit"><span class="material-symbols-rounded">arrow_forward</span></button>
-    </div>
-  </form>
+  <!-- チェックボックス削除、テキストボックスのみ残す -->
+  <div class="metaballcontainer">
+    <div class="metaBall search" id="1"></div>
+    <div class="metaBall" id="2"></div>
+    <div class="metaBall" id="3"></div>
+    <div class="metaBall" id="4"></div>
+  </div>
+  <!-- 修正: linkedBallsのidを分かりやすく -->
+  <div class="linkedBalls" id="linkedBalls-1">
+    
+    <input class="searchinput" type="text" name="q" placeholder="検索" id="mainSearchInput">
+    <button class="searchbutton" type="submit">
+<div class="appswitchicon"></div>
+    <span class="material-symbols-outlined iconbig">arrow_forward</span>
+  </button>
+  </div>
+  <div class="linkedBalls settings-btn" id="linkedBalls-2">
+    <span class="material-symbols-outlined iconbig">settings</span>
+  </div>
+  <div class="linkedBalls history" id="linkedBalls-3">
+    <span class="material-symbols-outlined iconbig">history</span>
+  </div>
+  <div class="linkedBalls appswitch" id="linkedBalls-4">
+    <span class="material-symbols-outlined iconbig">action_key</span>
+  </div>
+
 
   <div class="bottombar">
     <div class="shortcuthistory"></div>
@@ -43,14 +68,7 @@ if ("paintWorklet" in CSS) {
 
     </div>
   </div>
-  <div class="bar">
-        <div class="btn barbtn history">履歴</div>
-        <button class="btn barbtn settings-btn"><span class="material-symbols-rounded">settings</span></button>
-            <label>
-      <input type="checkbox" id="ai-toggle">
-      <div class="btn barbtn aibtn"><span class="material-symbols-rounded">explore</span></div>
-    </label>
-        </div>
+
         <div class="bg">
           <div class="shortcuts">
               </div>
@@ -126,4 +144,11 @@ if ("paintWorklet" in CSS) {
   });
 </script>
 <script src="beta/script.js"></script>
+
+
+  <style>
+
+</style>
+
+
 </html>
