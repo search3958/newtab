@@ -317,6 +317,9 @@ function performSearch() {
     if (foundApp) {
       saveToHistory(foundApp);
       window.location.href = foundApp.url;
+    } else {
+      const chatgptUrl = `https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=${encodeURIComponent(query)}`;
+      window.location.href = chatgptUrl;
     }
   } else {
     const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
@@ -324,6 +327,7 @@ function performSearch() {
     window.location.href = url;
   }
 }
+
 
 // スクロールイベント（最適化版）
 let scrollTimeout;
@@ -675,7 +679,7 @@ if (appSwitchBtn && domCache.searchInputBox) {
     isAppSearchMode = !isAppSearchMode;
 
     if (isAppSearchMode) {
-      domCache.searchInputBox.placeholder = "アプリ";
+      domCache.searchInputBox.placeholder = "アプリ&AI";
 
       // ここでボタンを無理やり押す
       if (pulseBtn) pulseBtn.click();
