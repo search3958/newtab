@@ -297,18 +297,57 @@ ease;
   color: var(--textcolor);
   font-size: 14px;
   line-height: 1.2;
-  background:transparent;
+  background:var(--searchbtnclr);
   height:100px;
-  width:200px;
+  min-width:100px;
   justify-content: center;
   filter: drop-shadow(0 4px 6px #0002);
-mask-image: paint(squircle);
-    --squircle-radius: 44px;
-    --squircle-smooth: 3;
+
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 55C0 29.573 0 16.8595 7.65351 8.76409C8.01325 8.38358 8.38358 8.01325 8.76409 7.65351C16.8595 0 29.573 0 55 0V0C80.427 0 93.1405 0 101.236 7.65351C101.616 8.01325 101.987 8.38358 102.346 8.76409C110 16.8595 110 29.573 110 55V55C110 80.427 110 93.1405 102.346 101.236C101.987 101.616 101.616 101.987 101.236 102.346C93.1405 110 80.427 110 55 110V110C29.573 110 16.8595 110 8.76409 102.346C8.38358 101.987 8.01325 101.616 7.65351 101.236C0 93.1405 0 80.427 0 55V55Z" fill="black"/></svg>');
+  mask-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 55C0 29.573 0 16.8595 7.65351 8.76409C8.01325 8.38358 8.38358 8.01325 8.76409 7.65351C16.8595 0 29.573 0 55 0V0C80.427 0 93.1405 0 101.236 7.65351C101.616 8.01325 101.987 8.38358 102.346 8.76409C110 16.8595 110 29.573 110 55V55C110 80.427 110 93.1405 102.346 101.236C101.987 101.616 101.616 101.987 101.236 102.346C93.1405 110 80.427 110 55 110V110C29.573 110 16.8595 110 8.76409 102.346C8.38358 101.987 8.01325 101.616 7.65351 101.236C0 93.1405 0 80.427 0 55V55Z" fill="black"/></svg>');
+
   position: relative;
   overflow: hidden;
-  border:none;
 }
+
+.today::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--battery-level, 0%);
+  height: 100%;
+  background: var(--battery-bg);
+  transition: width 0.3s ease;
+  z-index: 1;
+}
+
+.today.charging::before {
+  background: var(--battery-charging-bg);
+}
+
+.today .date,
+.today .info-details {
+  position: relative;
+  z-index: 2;
+}
+
+.today.charging .battery-indicator::after {
+  background: var(--battery-charging-bg);
+}
+
+.today .date {
+  font-size: 16px;
+  font-weight:nomal;
+}
+
+.today .info-details {
+  font-size: 12px;
+  font-weight: nomal;
+  opacity: 0.8;
+}
+
+/* 履歴アイテムのスタイル */
 .history-item {
   display: flex;
   align-items: center;
