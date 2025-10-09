@@ -24,10 +24,285 @@ const domCache = {
   shortcuts: null,
   bg: null,
   historyContainer: null,
-  today: null
+  today: null,
+  authStatusDisplay: null // ログイン状態表示用
 };
 
-// DOM要素を初期化時にキャッシュ
+// アイコン管理
+const iconsMap = {};
+let iconsReady = false;
+const iconWaiters = [];
+
+// ====================================================================
+// Firebase と 履歴同期の関連機能
+// ====================================================================
+
+// Firebase 設定
+// ※この設定は公開されていますが、セキュリティのためプロジェクト設定で制限されています。
+const firebaseConfig = {
+  apiKey: "AIzaSyAYSzOAmqY_IJCEUNb-cJNQfp4AKt93a_A",
+  authDomain: "couud-dashboard.firebaseapp.com",
+  databaseURL: "https://couud-dashboard-default-rtdb.firebaseio.com",
+  projectId: "couud-dashboard",
+  storageBucket: "couud-dashboard.appspot.com",
+  messagingSenderId: "163996109972",
+  appId: "1:163996109972:web:e806be3a622a4da2a33881",
+  measurementId: "G-XCX2C68FM6"
+};
+
+let auth;
+let db;
+let currentUser = null; // ログインユーザーオブジェクトを保持
+
+const HISTORY_COLLECTION = 'newtab-history';
+const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed';
+const SEARCH_HISTORY_DOCUMENT_ID = 'search_history_compressed'; 
+
+/**
+ * Brotliでデータを圧縮する
+ * @param {string} data - 圧縮する文字列データ
+ * @returns {Promise<Uint8Array>} 圧縮されたバイトデータ
+ */
+async function compressData(data) {
+  if (!window.CompressionStream) {
+    console.warn('CompressionStream (Brotli) is not supported in this browser.');
+    return new TextEncoder().encode(data); 
+  }
+  const stream = new TextEncoder().encode(data).stream();
+  const compressedStream = stream.pipeThrough(new CompressionStream('brotli-default'));
+  const compressedBlob = await new Response(compressedStream).blob();
+  return new Uint8Array(await compressedBlob.arrayBuffer());
+}
+
+/**
+ * Brotliでデータを解凍する
+ * @param {Uint8Array} compressedData - 解凍するバイトデータ
+ * @returns {Promise<string>} 解凍された文字列データ
+ */
+async function decompressData(compressedData) {
+  if (!window.DecompressionStream) {
+    console.warn('DecompressionStream (Brotli) is not supported in this browser.');
+    return new TextDecoder().decode(compressedData); 
+  }
+  const stream = new Blob([compressedData]).stream();
+  const decompressedStream = stream.pipeThrough(new DecompressionStream('brotli-with-params'));
+  const decompressedBlob = await new Response(decompressedStream).blob();
+  return await decompressedBlob.text();
+}
+
+/**
+ * Firebase関連のスクリプトを動的に読み込む
+ * @returns {Promise<void>}
+ */
+function loadFirebaseScripts() {
+    return new Promise(async (resolve, reject) => {
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+            return resolve(); 
+        }
+
+        const appScript = document.createElement('script');
+        appScript.src = 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js';
+        document.head.appendChild(appScript);
+
+        appScript.onload = () => {
+            const authScript = document.createElement('script');
+            authScript.src = 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js';
+            document.head.appendChild(authScript);
+
+            authScript.onload = () => {
+                const firestoreScript = document.createElement('script');
+                firestoreScript.src = 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js';
+                document.head.appendChild(firestoreScript);
+
+                firestoreScript.onload = () => {
+                    resolve();
+                };
+                firestoreScript.onerror = reject;
+            };
+            authScript.onerror = reject;
+        };
+        appScript.onerror = reject;
+    });
+}
+
+/**
+ * 認証状態表示を更新する関数
+ * @param {firebase.User} user - ログインユーザーオブジェクト
+ */
+function updateAuthStatusDisplay(user) {
+    if (!domCache.authStatusDisplay) return;
+
+    if (user) {
+        domCache.authStatusDisplay.textContent = `✅ Logged in: ${user.uid.substring(0, 8)}...`;
+        domCache.authStatusDisplay.style.backgroundColor = 'rgba(46, 204, 113, 0.9)'; 
+    } else {
+        domCache.authStatusDisplay.textContent = '❌ Logged out (Local mode)';
+        domCache.authStatusDisplay.style.backgroundColor = 'rgba(231, 76, 60, 0.9)'; 
+    }
+}
+
+
+/**
+ * Firebaseを初期化し、認証状態を監視する
+ */
+async function initializeFirebaseAndMonitorAuth() {
+    try {
+        await loadFirebaseScripts();
+        
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        auth = firebase.auth();
+        db = firebase.firestore();
+
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            updateAuthStatusDisplay(user); 
+
+            if (user) {
+                console.log("Firebase: ユーザーログイン済み. UID:", user.uid);
+                // ログイン時、Firestoreから両方の履歴を復元
+                await restoreHistoryFromFirestore();
+                await restoreSearchHistoryFromFirestore(); 
+            } else {
+                console.log("Firebase: ユーザーログアウト済み.");
+            }
+        });
+
+    } catch (error) {
+        console.error("Firebaseの初期化または読み込みに失敗しました:", error);
+        updateAuthStatusDisplay(null); 
+    }
+}
+
+/**
+ * ショートカット履歴をFirestoreに保存する（ログイン時のみ）
+ */
+async function saveHistoryToFirestore() {
+    if (!currentUser || !db) {
+        console.warn("Firestore: ショートカット履歴保存スキップ。");
+        return;
+    }
+
+    try {
+        const historyData = localStorage.getItem(HISTORY_KEY) || '[]';
+        const compressedData = await compressData(historyData);
+        const base64Data = btoa(String.fromCharCode(...compressedData));
+
+        await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
+            [HISTORY_DOCUMENT_ID]: base64Data,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} に圧縮保存しました。`);
+
+    } catch (error) {
+        console.error("Firestoreへのショートカット履歴保存に失敗しました:", error);
+    }
+}
+
+/**
+ * ショートカット履歴をFirestoreから復元する（ログイン時のみ）
+ */
+async function restoreHistoryFromFirestore() {
+    if (!currentUser || !db) return;
+
+    try {
+        const docRef = db.collection(HISTORY_COLLECTION).doc(currentUser.uid);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+            const data = doc.data();
+            const base64Data = data[HISTORY_DOCUMENT_ID];
+
+            if (base64Data) {
+                const binaryString = atob(base64Data);
+                const compressedData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+                const decompressedHistory = await decompressData(compressedData);
+
+                localStorage.setItem(HISTORY_KEY, decompressedHistory);
+                console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} から復元しました。`);
+
+                updateHistoryDisplay();
+            }
+        } else {
+            // ローカルに履歴がある場合はそれを初回同期として保存
+            if(localStorage.getItem(HISTORY_KEY) && JSON.parse(localStorage.getItem(HISTORY_KEY)).length > 0) {
+                console.log("Firestore: ショートカット履歴データが見つかりませんでした。ローカル履歴を初回同期として保存します。");
+                await saveHistoryToFirestore();
+            }
+        }
+    } catch (error) {
+        console.error("Firestoreからのショートカット履歴復元に失敗しました:", error);
+    }
+}
+
+/**
+ * 検索履歴をFirestoreに保存する（ログイン時のみ） 
+ */
+async function saveSearchHistoryToFirestore() {
+    if (!currentUser || !db) return;
+
+    try {
+        const searchHistoryData = localStorage.getItem(SEARCH_HISTORY_KEY) || '[]';
+        const compressedData = await compressData(searchHistoryData);
+        const base64Data = btoa(String.fromCharCode(...compressedData));
+
+        await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
+            [SEARCH_HISTORY_DOCUMENT_ID]: base64Data,
+            searchTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        console.log(`Firestore: 検索履歴をユーザー ${currentUser.uid} に圧縮保存しました。`);
+
+    } catch (error) {
+        console.error("Firestoreへの検索履歴保存に失敗しました:", error);
+    }
+}
+
+/**
+ * 検索履歴をFirestoreから復元する（ログイン時のみ）
+ */
+async function restoreSearchHistoryFromFirestore() {
+    if (!currentUser || !db) return;
+
+    try {
+        const docRef = db.collection(HISTORY_COLLECTION).doc(currentUser.uid);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+            const data = doc.data();
+            const base64Data = data[SEARCH_HISTORY_DOCUMENT_ID];
+
+            if (base64Data) {
+                const binaryString = atob(base64Data);
+                const compressedData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+                const decompressedHistory = await decompressData(compressedData);
+
+                localStorage.setItem(SEARCH_HISTORY_KEY, decompressedHistory);
+                console.log(`Firestore: 検索履歴をユーザー ${currentUser.uid} から復元しました。`);
+
+                updateSearchHistoryList();
+            }
+        } else {
+             // ローカルに履歴がある場合はそれを初回同期として保存
+            if(localStorage.getItem(SEARCH_HISTORY_KEY) && JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)).length > 0) {
+                console.log("Firestore: 検索履歴データが見つかりませんでした。ローカル履歴を初回同期として保存します。");
+                await saveSearchHistoryToFirestore();
+            }
+        }
+    } catch (error) {
+        console.error("Firestoreからの検索履歴復元に失敗しました:", error);
+    }
+}
+
+
+// ====================================================================
+// 既存のDOM操作・履歴管理関数
+// ====================================================================
+
+// DOM要素を初期化時にキャッシュ 
 function cacheDOMElements() {
   domCache.searchInputBox = document.querySelector('.searchinput') || document.getElementById('mainSearchInput');
   domCache.appSwitchIcon = document.querySelector('.appswitchicon');
@@ -35,6 +310,17 @@ function cacheDOMElements() {
   domCache.shortcuts = document.querySelector('.shortcuts');
   domCache.bg = document.querySelector('.bg');
   domCache.historyContainer = document.querySelector('.shortcuthistory');
+
+  // Auth Status Displayの作成
+  domCache.authStatusDisplay = document.getElementById('auth-status-display');
+  if (!domCache.authStatusDisplay && document.body) {
+      const statusDiv = document.createElement('div');
+      statusDiv.id = 'auth-status-display';
+      statusDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; padding: 5px 10px; background: rgba(0,0,0,0.7); color: white; border-radius: 5px; font-size: 12px; z-index: 1000; transition: background-color 0.3s;';
+      document.body.appendChild(statusDiv);
+      domCache.authStatusDisplay = statusDiv;
+      updateAuthStatusDisplay(null); // 初期状態をログアウトに設定
+  }
 }
 
 // 初回起動時にデフォルトアイテムを履歴に設定する関数
@@ -46,7 +332,7 @@ function initializeDefaultHistory() {
   }
 }
 
-// 検索履歴を保存する関数
+// 検索履歴を保存する関数 (Firestore同期を呼び出し)
 function saveSearchHistory(query) {
   if (!query || query.trim() === '') return;
   
@@ -61,9 +347,13 @@ function saveSearchHistory(query) {
   }
   
   localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+
+  if (currentUser) {
+      saveSearchHistoryToFirestore();
+  }
 }
 
-// 履歴を保存する関数
+// 履歴を保存する関数 (ショートカット履歴)
 function saveToHistory(linkData) {
   let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
   
@@ -77,9 +367,13 @@ function saveToHistory(linkData) {
   
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   updateHistoryDisplay();
+  
+  if (currentUser) {
+    saveHistoryToFirestore();
+  }
 }
 
-// 履歴表示を更新する関数（最適化版）
+// 履歴表示を更新する関数
 function updateHistoryDisplay() {
   if (!domCache.historyContainer) return;
   
@@ -89,7 +383,6 @@ function updateHistoryDisplay() {
     history = DEFAULT_ITEMS;
   }
   
-  // DocumentFragmentを使用してDOM操作を最適化
   const fragment = document.createDocumentFragment();
   
   history.forEach(item => {
@@ -104,7 +397,7 @@ function updateHistoryDisplay() {
     img.className = 'history-icon';
     img.src = iconsMap[item.icon] || 'data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" fill="%23ccc"/><text x="50%" y="50%" font-size="12" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
     img.alt = item.name;
-    img.loading = 'lazy'; // 遅延読み込みを追加
+    img.loading = 'lazy'; 
     
     iconWrapper.appendChild(img);
     historyItem.appendChild(iconWrapper);
@@ -195,7 +488,7 @@ function hideSearchHistory() {
   panel.classList.remove('show');
 }
 
-// 検索履歴表示を更新する関数
+// 検索履歴表示を更新する関数 (設定モーダル内)
 function updateSearchHistoryDisplay() {
   const container = document.querySelector('.search-history-list');
   if (!container) return;
@@ -222,7 +515,14 @@ function updateSearchHistoryDisplay() {
       const currentHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
       currentHistory.splice(index, 1);
       localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(currentHistory));
+      
+      // 削除時もFirestoreに同期
+      if (currentUser) {
+          saveSearchHistoryToFirestore();
+      }
+
       updateSearchHistoryDisplay();
+      updateSearchHistoryList();
     });
     
     fragment.appendChild(item);
@@ -231,7 +531,7 @@ function updateSearchHistoryDisplay() {
   container.appendChild(fragment);
 }
 
-// アプリを検索し、アイコンを表示する関数（最適化版）
+// アプリを検索し、アイコンを表示する関数
 let searchCache = new Map();
 
 function searchAppAndDisplay() {
@@ -245,7 +545,6 @@ function searchAppAndDisplay() {
     return;
   }
   
-  // 検索結果をキャッシュ
   if (searchCache.has(query)) {
     const foundApp = searchCache.get(query);
     if (foundApp) {
@@ -258,7 +557,6 @@ function searchAppAndDisplay() {
   
   let foundApp = null;
   
-  // より効率的な検索ループ
   outer: for (const category of linksData.categories) {
     for (const link of category.links) {
       if (link.name.toLowerCase().includes(query)) {
@@ -302,7 +600,6 @@ function performSearch() {
     let foundApp = searchCache.get(query.toLowerCase()) || null;
     
     if (!foundApp) {
-      // キャッシュにない場合のみ再検索
       outer: for (const category of linksData.categories) {
         for (const link of category.links) {
           if (link.name.toLowerCase().includes(query.toLowerCase())) {
@@ -328,7 +625,7 @@ function performSearch() {
 }
 
 
-// スクロールイベント（最適化版）
+// スクロールイベント
 let scrollTimeout;
 function handleScroll() {
   if (scrollTimeout) return;
@@ -398,19 +695,24 @@ function setupModalEventListeners() {
   if (clearSearchHistoryBtn) {
     clearSearchHistoryBtn.addEventListener('click', () => {
       localStorage.removeItem(SEARCH_HISTORY_KEY);
+      if (currentUser) {
+          // Firestoreからも削除（空データで上書き）
+          saveSearchHistoryToFirestore();
+      }
       updateSearchHistoryDisplay();
       updateSearchHistoryList();
     });
   }
 }
 
-// アイコン管理（最適化版）
-const iconsMap = {};
-let iconsReady = false;
-const iconWaiters = [];
-
+// アイコン管理
 async function loadIconsZip() {
   try {
+    if (typeof JSZip === 'undefined') {
+        console.error("JSZipが読み込まれていません。アイコンの読み込みをスキップします。");
+        return;
+    }
+
     const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
     const res = await fetch(zipUrl);
     if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
@@ -452,7 +754,6 @@ async function loadIconsAndGenerateLinks() {
     
     if (!domCache.shortcuts) return;
     
-    // 一度にDOM要素を作成してから追加
     const fragment = document.createDocumentFragment();
     
     linksData.categories.forEach(category => {
@@ -493,10 +794,9 @@ async function loadIconsAndGenerateLinks() {
         img.className = 'linkbox-img';
         img.src = iconsMap[link.icon] || 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><rect width="110" height="110" fill="%23ccc"/><text x="50%" y="50%" font-size="18" text-anchor="middle" fill="%23666" dy=".3em">NoIcon</text></svg>';
         img.alt = link.name;
-        img.loading = 'lazy'; // 遅延読み込みを追加
+        img.loading = 'lazy'; 
         iconWrapper.appendChild(img);
         
-        // マウスイベントを最適化（throttling）
         let mouseTimeout;
         iconWrapper.addEventListener('mousemove', e => {
           if (mouseTimeout) return;
@@ -558,7 +858,6 @@ async function loadIconsAndGenerateLinks() {
     domCache.shortcuts.innerHTML = '';
     domCache.shortcuts.appendChild(fragment);
 
-    // 画像読み込み完了を待つ（最適化版）
     const allImages = domCache.shortcuts.querySelectorAll('img');
     let loadedCount = 0;
     const totalImages = allImages.length;
@@ -597,9 +896,8 @@ async function loadIconsAndGenerateLinks() {
   }
 }
 
-// メイン初期化関数（最適化版）
+// メイン初期化関数
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM要素をキャッシュ
   cacheDOMElements();
   
   if (domCache.shortcuts) {
@@ -613,7 +911,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.style.backgroundImage = `url('${savedWallpaper}')`;
   }
   
-  // イベントリスナーの設定（最適化版）
+  // イベントリスナーの設定
   const settingsBtn = document.querySelector('.settings-btn');
   if (settingsBtn) {
     settingsBtn.addEventListener('click', showSettingsModal);
@@ -625,28 +923,27 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   const appSwitchBtn = document.querySelector('.appswitch');
-const pulseBtn = document.querySelector('#pulse');
+  const pulseBtn = document.querySelector('#pulse');
 
-if (appSwitchBtn && domCache.searchInputBox) {
-  appSwitchBtn.addEventListener('click', () => {
-    isAppSearchMode = !isAppSearchMode;
+  if (appSwitchBtn && domCache.searchInputBox) {
+    appSwitchBtn.addEventListener('click', () => {
+      isAppSearchMode = !isAppSearchMode;
 
-    if (isAppSearchMode) {
-      domCache.searchInputBox.placeholder = "アプリ&AI";
+      if (isAppSearchMode) {
+        domCache.searchInputBox.placeholder = "アプリ&AI";
 
-      // ここでボタンを無理やり押す
-      if (pulseBtn) pulseBtn.click();
+        if (pulseBtn) pulseBtn.click();
 
-      searchAppAndDisplay();
-    } else {
-      domCache.searchInputBox.placeholder = "検索";
-      if (domCache.appSwitchIcon) {
-        domCache.appSwitchIcon.style.backgroundImage = 'none';
+        searchAppAndDisplay();
+      } else {
+        domCache.searchInputBox.placeholder = "検索";
+        if (domCache.appSwitchIcon) {
+          domCache.appSwitchIcon.style.backgroundImage = 'none';
+        }
       }
-    }
-    domCache.searchInputBox.focus();
-  });
-}
+      domCache.searchInputBox.focus();
+    });
+  }
 
 
   // 検索関連のイベントリスナー
@@ -658,7 +955,6 @@ if (appSwitchBtn && domCache.searchInputBox) {
       }
     });
     
-    // インプットイベントのthrottling
     let inputTimeout;
     domCache.searchInputBox.addEventListener('input', () => {
       if (inputTimeout) clearTimeout(inputTimeout);
@@ -697,6 +993,11 @@ if (appSwitchBtn && domCache.searchInputBox) {
     updateHistoryDisplay();
     updateSearchHistoryList();
     setupModalEventListeners();
+
+    // Firebaseの初期化と認証監視を開始
+    setTimeout(() => {
+        initializeFirebaseAndMonitorAuth();
+    }, 1000); 
   });
 });
 
@@ -706,17 +1007,17 @@ const cornerSlider = document.getElementById('corner-slider');
 const root = document.documentElement;
 
 const savedScale = localStorage.getItem('bottombar-scale');
-if (scaleSlider && domCache.bottomBar) {
+if (scaleSlider && document.querySelector('.bottombar')) { 
   if (savedScale) {
     scaleSlider.value = savedScale;
-    domCache.bottomBar.style.scale = `${savedScale}`;
+    document.querySelector('.bottombar').style.scale = `${savedScale}`;
   } else {
-    domCache.bottomBar.style.scale = '1';
+    document.querySelector('.bottombar').style.scale = '1';
   }
 
   scaleSlider.addEventListener('input', () => {
     const scale = scaleSlider.value;
-    domCache.bottomBar.style.scale = `${scale}`;
+    document.querySelector('.bottombar').style.scale = `${scale}`;
     localStorage.setItem('bottombar-scale', scale);
   });
 }
@@ -737,11 +1038,10 @@ if (cornerSlider && root) {
   });
 }
 
-// メタボール処理（最適化版）
+// メタボール処理
 (function() {
   const wrappers = document.querySelectorAll('.metaBall');
   
-  let animationId;
   function syncLinkedBalls() {
     wrappers.forEach(metaBall => {
       const linked = document.getElementById('linkedBalls-' + metaBall.id);
@@ -766,12 +1066,6 @@ if (cornerSlider && root) {
   }
   
   window.addEventListener('resize', syncLinkedBalls);
-
-  function syncLoop() {
-    syncLinkedBalls();
-    animationId = requestAnimationFrame(syncLoop);
-  }
-  syncLoop();
 
   const searchInput = document.getElementById('mainSearchInput');
   if (searchInput) {
@@ -802,21 +1096,21 @@ if (cornerSlider && root) {
 
   syncLinkedBalls();
 })();
+
 function loadLiquidJS() {
-  if (window.liquidLoaded) return; // 二重読み込み防止
+  if (window.liquidLoaded) return; 
   const script = document.createElement('script');
   script.src = 'beta/liquid.js';
   script.onload = () => { window.liquidLoaded = true; };
   document.body.appendChild(script);
 }
+
 async function loadMaterialWeb() {
-    // ripple
     await import('@material/web/ripple/ripple.js');
 
-    // typography
     const { styles: typescaleStyles } =
       await import('@material/web/typography/md-typescale-styles.js');
     document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
 
     console.log("Material Web modules loaded");
-  }
+}
