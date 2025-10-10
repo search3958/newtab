@@ -34,11 +34,10 @@ let iconsReady = false;
 const iconWaiters = [];
 
 // ====================================================================
-// Firebase と 履歴同期の関連機能
+// Firebase と 履歴同期の関連機能 (検索履歴のみ同期)
 // ====================================================================
 
 // Firebase 設定
-// ※この設定は公開されていますが、セキュリティのためプロジェクト設定で制限されています。
 const firebaseConfig = {
   apiKey: "AIzaSyAYSzOAmqY_IJCEUNb-cJNQfp4AKt93a_A",
   authDomain: "couud-dashboard.firebaseapp.com",
@@ -55,7 +54,7 @@ let db;
 let currentUser = null; // ログインユーザーオブジェクトを保持
 
 const HISTORY_COLLECTION = 'newtab-history';
-const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed';
+// const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed'; // <-- ショートカット履歴の定数を削除
 const SEARCH_HISTORY_DOCUMENT_ID = 'search_history_compressed'; 
 
 /**
@@ -162,8 +161,7 @@ async function initializeFirebaseAndMonitorAuth() {
 
             if (user) {
                 console.log("Firebase: ユーザーログイン済み. UID:", user.uid);
-                // ログイン時、Firestoreから両方の履歴を復元
-                await restoreHistoryFromFirestore();
+                // ログイン時、Firestoreから検索履歴のみ復元
                 await restoreSearchHistoryFromFirestore(); 
             } else {
                 console.log("Firebase: ユーザーログアウト済み.");
@@ -176,67 +174,9 @@ async function initializeFirebaseAndMonitorAuth() {
     }
 }
 
-/**
- * ショートカット履歴をFirestoreに保存する（ログイン時のみ）
- */
-async function saveHistoryToFirestore() {
-    if (!currentUser || !db) {
-        console.warn("Firestore: ショートカット履歴保存スキップ。");
-        return;
-    }
+// **--- 削除: saveHistoryToFirestore 関数 ---**
 
-    try {
-        const historyData = localStorage.getItem(HISTORY_KEY) || '[]';
-        const compressedData = await compressData(historyData);
-        const base64Data = btoa(String.fromCharCode(...compressedData));
-
-        await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
-            [HISTORY_DOCUMENT_ID]: base64Data,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-
-        console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} に圧縮保存しました。`);
-
-    } catch (error) {
-        console.error("Firestoreへのショートカット履歴保存に失敗しました:", error);
-    }
-}
-
-/**
- * ショートカット履歴をFirestoreから復元する（ログイン時のみ）
- */
-async function restoreHistoryFromFirestore() {
-    if (!currentUser || !db) return;
-
-    try {
-        const docRef = db.collection(HISTORY_COLLECTION).doc(currentUser.uid);
-        const doc = await docRef.get();
-
-        if (doc.exists) {
-            const data = doc.data();
-            const base64Data = data[HISTORY_DOCUMENT_ID];
-
-            if (base64Data) {
-                const binaryString = atob(base64Data);
-                const compressedData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
-                const decompressedHistory = await decompressData(compressedData);
-
-                localStorage.setItem(HISTORY_KEY, decompressedHistory);
-                console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} から復元しました。`);
-
-                updateHistoryDisplay();
-            }
-        } else {
-            // ローカルに履歴がある場合はそれを初回同期として保存
-            if(localStorage.getItem(HISTORY_KEY) && JSON.parse(localStorage.getItem(HISTORY_KEY)).length > 0) {
-                console.log("Firestore: ショートカット履歴データが見つかりませんでした。ローカル履歴を初回同期として保存します。");
-                await saveHistoryToFirestore();
-            }
-        }
-    } catch (error) {
-        console.error("Firestoreからのショートカット履歴復元に失敗しました:", error);
-    }
-}
+// **--- 削除: restoreHistoryFromFirestore 関数 ---**
 
 /**
  * 検索履歴をFirestoreに保存する（ログイン時のみ） 
@@ -249,6 +189,7 @@ async function saveSearchHistoryToFirestore() {
         const compressedData = await compressData(searchHistoryData);
         const base64Data = btoa(String.fromCharCode(...compressedData));
 
+        // 検索履歴とタイムスタンプのみを保存
         await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
             [SEARCH_HISTORY_DOCUMENT_ID]: base64Data,
             searchTimestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -288,7 +229,7 @@ async function restoreSearchHistoryFromFirestore() {
         } else {
              // ローカルに履歴がある場合はそれを初回同期として保存
             if(localStorage.getItem(SEARCH_HISTORY_KEY) && JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)).length > 0) {
-                console.log("Firestore: 検索履歴データが見つかりませんでした。ローカル履歴を初回同期として保存します。");
+                console.log("Firestore: 検索履歴データが見つかりませんでした。ローカル検索履歴を初回同期として保存します。");
                 await saveSearchHistoryToFirestore();
             }
         }
@@ -349,7 +290,7 @@ function saveSearchHistory(query) {
   localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
 
   if (currentUser) {
-      saveSearchHistoryToFirestore();
+      saveSearchHistoryToFirestore(); // 検索履歴の同期
   }
 }
 
@@ -368,9 +309,10 @@ function saveToHistory(linkData) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   updateHistoryDisplay();
   
-  if (currentUser) {
-    saveHistoryToFirestore();
-  }
+  // ショートカット履歴のFirestoreへの保存は削除
+  // if (currentUser) {
+  //   saveHistoryToFirestore();
+  // }
 }
 
 // 履歴表示を更新する関数
