@@ -15,8 +15,8 @@ let db;
 let currentUser = null;
 const HISTORY_COLLECTION = 'newtab-history';
 const SEARCH_HISTORY_DOCUMENT_ID = 'search_history_compressed';
-const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed'; // ★追加: ショートカット履歴用のFirestoreキー
-const TEST_DOCUMENT_ID = 'test'; // ★追加: テスト保存用のドキュメントID
+const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed';
+const TEST_DOCUMENT_ID = 'test';
 
 async function compressData(data) {
     if (!window.CompressionStream) {
@@ -97,7 +97,7 @@ function updateAuthStatusDisplay(user) {
 
 async function initializeFirebaseAndMonitorAuth() {
     try {
-        await loadFirebaseScripts(); // ★修正: SDKの読み込み完了を待機
+        await loadFirebaseScripts();
 
         if (firebase.apps.length === 0) {
             firebase.initializeApp(firebaseConfig)
@@ -110,9 +110,9 @@ async function initializeFirebaseAndMonitorAuth() {
             updateAuthStatusDisplay(user);
             if (user) {
                 console.log("Firebase: ユーザーログイン済み. UID:", user.uid);
-                // ★追加: ショートカット履歴を復元
-                await restoreHistoryFromFirestore(); 
-                await restoreSearchHistoryFromFirestore();
+                // ★修正: 認証時の履歴自動復元を削除
+                // await restoreHistoryFromFirestore(); 
+                // await restoreSearchHistoryFromFirestore();
             } else {
                 console.log("Firebase: ユーザーログアウト済み.")
             }
@@ -157,15 +157,11 @@ async function restoreSearchHistoryFromFirestore() {
                 localStorage.setItem(SEARCH_HISTORY_KEY, decompressedHistory);
                 console.log(`Firestore: 検索履歴をユーザー ${currentUser.uid} から復元しました。`);
                 updateSearchHistoryList()
-            } else if (localStorage.getItem(SEARCH_HISTORY_KEY) && JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)).length > 0) {
-                 // Firestoreにデータはないがローカルにデータがある場合、初回同期として保存
-                console.log("Firestore: 検索履歴データが見つかりませんでした。ローカル検索履歴を初回同期として保存します。");
-                await saveSearchHistoryToFirestore()
+            } else {
+                console.log("Firestore: 検索履歴のデータフィールドが見つかりませんでした。")
             }
-        } else if (localStorage.getItem(SEARCH_HISTORY_KEY) && JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)).length > 0) {
-             // ドキュメント自体がない場合もローカル履歴を初回同期として保存
-            console.log("Firestore: ユーザーデータドキュメントが見つかりませんでした。ローカル検索履歴を初回同期として保存します。");
-            await saveSearchHistoryToFirestore()
+        } else {
+            console.log("Firestore: ユーザーの検索履歴ドキュメントが見つかりませんでした。")
         }
     } catch (error) {
         console.error("Firestoreからの検索履歴復元に失敗しました:", error)
@@ -182,7 +178,7 @@ async function saveHistoryToFirestore() {
         const compressedData = await compressData(historyData);
         const base64Data = btoa(String.fromCharCode(...compressedData));
         await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
-            [HISTORY_DOCUMENT_ID]: base64Data, // ★追加: 新しいキーを使用
+            [HISTORY_DOCUMENT_ID]: base64Data,
             historyTimestamp: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: !0 });
         console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} に圧縮保存しました。`);
@@ -201,7 +197,7 @@ async function restoreHistoryFromFirestore() {
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
-            const base64Data = data[HISTORY_DOCUMENT_ID]; // ★追加: 新しいキーを使用
+            const base64Data = data[HISTORY_DOCUMENT_ID];
             if (base64Data) {
                 const binaryString = atob(base64Data);
                 const compressedData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
@@ -209,19 +205,43 @@ async function restoreHistoryFromFirestore() {
                 localStorage.setItem(HISTORY_KEY, decompressedHistory);
                 console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} から復元しました。`);
                 updateHistoryDisplay(); // 復元後、表示を更新
-            } else if (localStorage.getItem(HISTORY_KEY) && JSON.parse(localStorage.getItem(HISTORY_KEY)).length > 0) {
-                 // Firestoreにデータはないがローカルにデータがある場合、初回同期として保存
-                console.log("Firestore: ショートカット履歴データが見つかりませんでした。ローカル履歴を初回同期として保存します。");
-                await saveHistoryToFirestore();
+            } else {
+                console.log("Firestore: ショートカット履歴のデータフィールドが見つかりませんでした。");
             }
-        } else if (localStorage.getItem(HISTORY_KEY) && JSON.parse(localStorage.getItem(HISTORY_KEY)).length > 0) {
-             // ドキュメント自体がない場合もローカル履歴を初回同期として保存
-            console.log("Firestore: ユーザーデータドキュメントが見つかりませんでした。ローカル履歴を初回同期として保存します。");
-            await saveHistoryToFirestore();
+        } else {
+            console.log("Firestore: ユーザーのショートカット履歴ドキュメントが見つかりませんでした。");
         }
     } catch (error) {
         console.error("Firestoreからのショートカット履歴復元に失敗しました:", error);
     }
+}
+
+/**
+ * ★追加: ボタンクリックで手動で全履歴をFirestoreに保存する関数
+ */
+function manualBackupHistory() {
+    if (!currentUser) {
+        alert("Firebaseにログインしていません。ログイン後に実行してください。");
+        return;
+    }
+    // 検索履歴とショートカット履歴の両方を保存
+    saveSearchHistoryToFirestore();
+    saveHistoryToFirestore();
+    alert("履歴のバックアップを開始しました。\nコンソールを確認してください。");
+}
+
+/**
+ * ★追加: ボタンクリックで手動で全履歴をFirestoreから復元する関数
+ */
+function manualRestoreHistory() {
+    if (!currentUser) {
+        alert("Firebaseにログインしていません。ログイン後に実行してください。");
+        return;
+    }
+    // 検索履歴とショートカット履歴の両方を復元
+    restoreSearchHistoryFromFirestore();
+    restoreHistoryFromFirestore();
+    alert("履歴の復元を開始しました。\n復元後、ページをリロードするとショートカットが更新されます。");
 }
 
 function cacheDOMElements() {
@@ -256,9 +276,10 @@ function saveSearchHistory(query) {
         searchHistory = searchHistory.slice(0, MAX_SEARCH_HISTORY)
     }
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
-    if (currentUser) {
-        saveSearchHistoryToFirestore()
-    }
+    // ★修正: 自動保存を削除
+    // if (currentUser) {
+    //     saveSearchHistoryToFirestore()
+    // }
 }
 function saveToHistory(linkData) {
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -269,10 +290,10 @@ function saveToHistory(linkData) {
     }
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
     updateHistoryDisplay();
-    // ★修正: ログインユーザーがいればFirestoreにも保存する
-    if (currentUser) { 
-        saveHistoryToFirestore();
-    }
+    // ★修正: 自動保存を削除
+    // if (currentUser) { 
+    //     saveHistoryToFirestore();
+    // }
 }
 function updateHistoryDisplay() {
     if (!domCache.historyContainer) return;
@@ -372,9 +393,10 @@ function updateSearchHistoryDisplay() {
             const currentHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
             currentHistory.splice(index, 1);
             localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(currentHistory));
-            if (currentUser) {
-                saveSearchHistoryToFirestore()
-            }
+            // ★修正: 自動保存を削除
+            // if (currentUser) {
+            //     saveSearchHistoryToFirestore()
+            // }
             updateSearchHistoryDisplay();
             updateSearchHistoryList()
         });
@@ -518,12 +540,23 @@ function setupModalEventListeners() {
     if (clearSearchHistoryBtn) {
         clearSearchHistoryBtn.addEventListener('click', () => {
             localStorage.removeItem(SEARCH_HISTORY_KEY);
-            if (currentUser) {
-                saveSearchHistoryToFirestore()
-            }
+            // ★修正: 自動保存を削除
+            // if (currentUser) {
+            //     saveSearchHistoryToFirestore()
+            // }
             updateSearchHistoryDisplay();
             updateSearchHistoryList()
         })
+    }
+    
+    // ★追加: 手動同期ボタンのイベントリスナー
+    const backupBtn = document.getElementById('historyBackupFS');
+    if (backupBtn) {
+        backupBtn.addEventListener('click', manualBackupHistory);
+    }
+    const restoreBtn = document.getElementById('historyRestoreFS');
+    if (restoreBtn) {
+        restoreBtn.addEventListener('click', manualRestoreHistory);
     }
 }
 async function loadIconsZip() {
@@ -746,8 +779,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateHistoryDisplay();
         updateSearchHistoryList();
         setupModalEventListeners();
-        // ★修正: Firebaseの初期化を遅延なしで実行
-        initializeFirebaseAndMonitorAuth(); 
+        initializeFirebaseAndMonitorAuth();
     })
 });
 const scaleSlider = document.getElementById('scale-slider');
@@ -840,7 +872,6 @@ async function loadMaterialWeb() {
     console.log("Material Web modules loaded")
 }
 
-// 最後に、テスト用の関数も残しておきます
 const TEST_RAW_DATA = 'これはFirestoreの/newtab-history/testに保存されるテストデータです。圧縮されて保存されます。';
 
 /**
