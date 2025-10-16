@@ -194,22 +194,34 @@ async function initializeFirebaseAndMonitorAuth() {
 }
 
 /**
- * ローカルの検索履歴 (SEARCH_HISTORY_KEY) を圧縮し、Firestoreに保存します。
+ * 現在のローカル日時を YYMMDD 形式の6桁文字列で返します (例: 251016)。
+ * @returns {string} 6桁のタイムスタンプ文字列
  */
+function getShortTimestamp() {
+    const now = new Date();
+    // getFullYear()から下2桁を取得 (2025 -> 25)
+    const year = String(now.getFullYear()).slice(-2);
+    // getMonth()は0から始まるため +1 し、padStartで2桁に (10月 -> 10)
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    // getDate()をpadStartで2桁に (16日 -> 16)
+    const day = String(now.getDate()).padStart(2, '0');
+    return year + month + day;
+}
 async function saveSearchHistoryToFirestore() {
     if (!currentUser || !db) return;
     try {
         const searchHistoryData = localStorage.getItem(SEARCH_HISTORY_KEY) || '[]';
-        
-        // ★圧縮処理
         const compressedData = await compressData(searchHistoryData);
         const base64Data = btoa(String.fromCharCode(...compressedData));
         
+        // ★修正ポイント: 短縮タイムスタンプを使用
+        const shortTimestamp = getShortTimestamp(); 
+        
         await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
             [SEARCH_HISTORY_DOCUMENT_ID]: base64Data,
-            searchTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+            searchTimestamp: shortTimestamp // 短縮された値
         }, { merge: !0 });
-        console.log(`Firestore: 検索履歴をユーザー ${currentUser.uid} に圧縮保存しました。`)
+        console.log(`Firestore: 検索履歴をユーザー ${currentUser.uid} に圧縮保存しました (Timestamp: ${shortTimestamp})。`)
     } catch (error) {
         console.error("Firestoreへの検索履歴保存に失敗しました:", error)
     }
@@ -243,24 +255,21 @@ async function restoreSearchHistoryFromFirestore() {
         console.error("Firestoreからの検索履歴復元に失敗しました:", error)
     }
 }
-
-/**
- * ローカルのショートカット履歴 (HISTORY_KEY) を圧縮し、Firestoreに保存します。
- */
 async function saveHistoryToFirestore() {
     if (!currentUser || !db) return;
     try {
         const historyData = localStorage.getItem(HISTORY_KEY) || '[]';
-        
-        // ★圧縮処理
         const compressedData = await compressData(historyData);
         const base64Data = btoa(String.fromCharCode(...compressedData));
-        
+
+        // ★修正ポイント: 短縮タイムスタンプを使用
+        const shortTimestamp = getShortTimestamp();
+
         await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
             [HISTORY_DOCUMENT_ID]: base64Data,
-            historyTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+            historyTimestamp: shortTimestamp // 短縮された値
         }, { merge: !0 });
-        console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} に圧縮保存しました。`);
+        console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} に圧縮保存しました (Timestamp: ${shortTimestamp})。`);
     } catch (error) {
         console.error("Firestoreへのショートカット履歴保存に失敗しました:", error);
     }
