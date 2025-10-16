@@ -18,25 +18,61 @@ const SEARCH_HISTORY_DOCUMENT_ID = 'search_history_compressed';
 const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed';
 const TEST_DOCUMENT_ID = 'test';
 
+// 修正後の compressData 関数
 async function compressData(data) {
+    // 互換性チェック（Brotliは非対応の場合でも実行を試みる）
     if (!window.CompressionStream) {
-        console.warn('CompressionStream (Brotli) is not supported in this browser.');
-        return new TextEncoder().encode(data)
+        console.warn('CompressionStream (Brotli) is not supported in this browser. Returning uncompressed data.');
+        return new TextEncoder().encode(data);
     }
-    const stream = new TextEncoder().encode(data).stream();
-    const compressedStream = stream.pipeThrough(new CompressionStream('brotli-default'));
-    const compressedBlob = await new Response(compressedStream).blob();
-    return new Uint8Array(await compressedBlob.arrayBuffer())
+    
+    // データをUint8Arrayにエンコード
+    const uint8Array = new TextEncoder().encode(data);
+    
+    // Blobにラップしてから stream() を呼び出すことで、互換性を確保
+    const stream = new Blob([uint8Array]).stream(); // ★修正ポイント: Blobを経由
+
+    try {
+        const compressedStream = stream.pipeThrough(new CompressionStream('brotli-default'));
+        
+        // Responseを使ってストリーム全体をBlobとして取得し、ArrayBufferに変換
+        const compressedBlob = await new Response(compressedStream).blob();
+        
+        return new Uint8Array(await compressedBlob.arrayBuffer());
+
+    } catch (e) {
+        // CompressionStreamが「存在する」と判断されたにもかかわらずエラーが発生した場合（例: 
+        // 'brotli-default'がサポートされていない場合など）
+        console.error("Compression Stream処理中にエラーが発生しました。非圧縮データを返します:", e);
+        return uint8Array; // エラー時は非圧縮データを返すか、エラーを再throwする
+    }
 }
+// 修正後の decompressData 関数
 async function decompressData(compressedData) {
     if (!window.DecompressionStream) {
-        console.warn('DecompressionStream (Brotli) is not supported in this browser.');
-        return new TextDecoder().decode(compressedData)
+        console.warn('DecompressionStream (Brotli) is not supported in this browser. Returning original Uint8Array decoded as text.');
+        // DecompressionStreamがない場合は、圧縮されていない（または圧縮形式が不明な）データをそのままテキストとして返します。
+        return new TextDecoder().decode(compressedData);
     }
-    const stream = new Blob([compressedData]).stream();
-    const decompressedStream = stream.pipeThrough(new DecompressionStream('brotli-with-params'));
-    const decompressedBlob = await new Response(decompressedStream).blob();
-    return await decompressedBlob.text()
+
+    // compressedDataはUint8ArrayまたはArrayBufferであることを想定
+    const blob = new Blob([compressedData]);
+    const stream = blob.stream(); // Blobからストリームを取得
+
+    try {
+        const decompressedStream = stream.pipeThrough(new DecompressionStream('brotli-with-params'));
+        
+        // Responseを使ってストリーム全体をテキストとして取得
+        const decompressedText = await new Response(decompressedStream).text();
+        
+        return decompressedText;
+        
+    } catch (e) {
+        // DecompressionStream処理中にエラーが発生した場合（例: データが破損している、または形式が不正な場合）
+        console.error("Decompression Stream処理中にエラーが発生しました。非圧縮/破損データを返します:", e);
+        // エラー時は、Uint8Arrayを強制的にテキストとしてデコードしたものを返します
+        return new TextDecoder().decode(compressedData);
+    }
 }
 
 /**
