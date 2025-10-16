@@ -17,71 +17,109 @@ const HISTORY_COLLECTION = 'newtab-history';
 const SEARCH_HISTORY_DOCUMENT_ID = 'search_history_compressed';
 const HISTORY_DOCUMENT_ID = 'shortcut_history_compressed';
 const TEST_DOCUMENT_ID = 'test';
+let pakoLoaded = !1; // pakoの読み込み状態を追跡
 
-// 修正後の compressData 関数
-async function compressData(data) {
-    // 互換性チェック（Brotliは非対応の場合でも実行を試みる）
-    if (!window.CompressionStream) {
-        console.warn('CompressionStream (Brotli) is not supported in this browser. Returning uncompressed data.');
-        return new TextEncoder().encode(data);
-    }
-    
-    // データをUint8Arrayにエンコード
-    const uint8Array = new TextEncoder().encode(data);
-    
-    // Blobにラップしてから stream() を呼び出すことで、互換性を確保
-    const stream = new Blob([uint8Array]).stream(); // ★修正ポイント: Blobを経由
-
-    try {
-        const compressedStream = stream.pipeThrough(new CompressionStream('brotli-default'));
-        
-        // Responseを使ってストリーム全体をBlobとして取得し、ArrayBufferに変換
-        const compressedBlob = await new Response(compressedStream).blob();
-        
-        return new Uint8Array(await compressedBlob.arrayBuffer());
-
-    } catch (e) {
-        // CompressionStreamが「存在する」と判断されたにもかかわらずエラーが発生した場合（例: 
-        // 'brotli-default'がサポートされていない場合など）
-        console.error("Compression Stream処理中にエラーが発生しました。非圧縮データを返します:", e);
-        return uint8Array; // エラー時は非圧縮データを返すか、エラーを再throwする
-    }
-}
-// 修正後の decompressData 関数
-async function decompressData(compressedData) {
-    if (!window.DecompressionStream) {
-        console.warn('DecompressionStream (Brotli) is not supported in this browser. Returning original Uint8Array decoded as text.');
-        // DecompressionStreamがない場合は、圧縮されていない（または圧縮形式が不明な）データをそのままテキストとして返します。
-        return new TextDecoder().decode(compressedData);
-    }
-
-    // compressedDataはUint8ArrayまたはArrayBufferであることを想定
-    const blob = new Blob([compressedData]);
-    const stream = blob.stream(); // Blobからストリームを取得
-
-    try {
-        const decompressedStream = stream.pipeThrough(new DecompressionStream('brotli-with-params'));
-        
-        // Responseを使ってストリーム全体をテキストとして取得
-        const decompressedText = await new Response(decompressedStream).text();
-        
-        return decompressedText;
-        
-    } catch (e) {
-        // DecompressionStream処理中にエラーが発生した場合（例: データが破損している、または形式が不正な場合）
-        console.error("Decompression Stream処理中にエラーが発生しました。非圧縮/破損データを返します:", e);
-        // エラー時は、Uint8Arrayを強制的にテキストとしてデコードしたものを返します
-        return new TextDecoder().decode(compressedData);
-    }
+/**
+ * pakoライブラリを動的に読み込みます。
+ */
+function loadPakoScript() {
+    return new Promise((resolve) => {
+        if (typeof pako !== 'undefined') {
+            pakoLoaded = !0;
+            return resolve();
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js';
+        script.onload = () => {
+            pakoLoaded = !0;
+            console.log("pakoライブラリを読み込みました。");
+            resolve();
+        };
+        script.onerror = () => {
+            console.error("pakoライブラリの読み込みに失敗しました。");
+            resolve(); // 失敗しても続行
+        };
+        document.head.appendChild(script);
+    });
 }
 
 /**
- * Firebase SDK (App, Auth, Firestore) を動的に読み込みます。
- * @returns {Promise<void>} SDKの読み込みが完了したら解決
+ * データを圧縮します。ネイティブのCompressionStreamを優先し、非対応の場合はpako (gzip) にフォールバックします。
+ * @param {string} data - 圧縮する文字列データ
+ * @returns {Promise<Uint8Array>} 圧縮されたデータ
  */
+async function compressData(data) {
+    const uint8Array = new TextEncoder().encode(data);
+    
+    // ネイティブの CompressionStream を試行 (brotli)
+    if (window.CompressionStream) {
+        try {
+            const stream = new Blob([uint8Array]).stream(); // Blobを経由して互換性を確保
+            const compressedStream = stream.pipeThrough(new CompressionStream('brotli-default'));
+            const compressedBlob = await new Response(compressedStream).blob();
+            console.log(`Compression: Native Brotliを使用しました。`);
+            return new Uint8Array(await compressedBlob.arrayBuffer());
+        } catch (e) {
+            console.warn(`Compression: Native Brotliが失敗しました。pako (gzip) にフォールバックします。エラー: ${e.message}`);
+        }
+    }
+    
+    // ネイティブが利用できない、または失敗した場合、pako (gzip) にフォールバック
+    if (pakoLoaded) {
+        try {
+            const compressed = pako.gzip(uint8Array);
+            console.log(`Compression: pako (gzip) を使用しました。`);
+            return compressed;
+        } catch (e) {
+            console.error("Compression: pakoによる圧縮に失敗しました。非圧縮データを返します:", e);
+        }
+    }
+
+    // すべて失敗した場合
+    console.warn('Compression: 圧縮機能が利用できませんでした。非圧縮データを返します。');
+    return uint8Array;
+}
+
+/**
+ * データを解凍します。ネイティブのDecompressionStreamを優先し、非対応の場合はpako (gzip) にフォールバックします。
+ * @param {Uint8Array} compressedData - 解凍するデータ
+ * @returns {Promise<string>} 解凍された文字列データ
+ */
+async function decompressData(compressedData) {
+    // ネイティブの DecompressionStream を試行 (brotli)
+    if (window.DecompressionStream) {
+        const blob = new Blob([compressedData]);
+        const stream = blob.stream();
+        try {
+            const decompressedStream = stream.pipeThrough(new DecompressionStream('brotli-with-params'));
+            const decompressedText = await new Response(decompressedStream).text();
+            console.log(`Decompression: Native Brotliを使用しました。`);
+            return decompressedText;
+        } catch (e) {
+            console.warn(`Decompression: Native Brotliが失敗しました。pako (gzip) にフォールバックを試みます。エラー: ${e.message}`);
+        }
+    }
+
+    // ネイティブが利用できない、または失敗した場合、pako (gzip) にフォールバック
+    if (pakoLoaded) {
+        try {
+            // pakoはgzip/deflate形式を自動で判別して解凍します
+            const result = pako.ungzip(compressedData, { to: 'string' }); 
+            console.log(`Decompression: pako (gzip/deflate) を使用しました。`);
+            return result;
+        } catch (e) {
+            console.warn("Decompression: pakoによる解凍に失敗しました。データを非圧縮としてデコードします。", e);
+        }
+    }
+
+    // すべて失敗した場合、非圧縮データと見なしてデコード
+    console.warn('Decompression: 解凍機能が利用できませんでした。非圧縮データとしてデコードを試みます。');
+    return new TextDecoder().decode(compressedData);
+}
+
+
 function loadFirebaseScripts() {
     return new Promise((resolve, reject) => {
-        // 既にFirebaseが読み込まれているか、アプリが初期化されているかを確認
         if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
             console.log("Firebase SDKは既に読み込まれています。");
             return resolve();
@@ -107,7 +145,6 @@ function loadFirebaseScripts() {
             });
         };
 
-        // SDKを順番に読み込む (App -> Auth -> Firestore)
         loadScript(sdkUrls[0])
             .then(() => loadScript(sdkUrls[1]))
             .then(() => loadScript(sdkUrls[2]))
@@ -146,9 +183,6 @@ async function initializeFirebaseAndMonitorAuth() {
             updateAuthStatusDisplay(user);
             if (user) {
                 console.log("Firebase: ユーザーログイン済み. UID:", user.uid);
-                // ★修正: 認証時の履歴自動復元を削除
-                // await restoreHistoryFromFirestore(); 
-                // await restoreSearchHistoryFromFirestore();
             } else {
                 console.log("Firebase: ユーザーログアウト済み.")
             }
@@ -166,8 +200,11 @@ async function saveSearchHistoryToFirestore() {
     if (!currentUser || !db) return;
     try {
         const searchHistoryData = localStorage.getItem(SEARCH_HISTORY_KEY) || '[]';
+        
+        // ★圧縮処理
         const compressedData = await compressData(searchHistoryData);
         const base64Data = btoa(String.fromCharCode(...compressedData));
+        
         await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
             [SEARCH_HISTORY_DOCUMENT_ID]: base64Data,
             searchTimestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -189,7 +226,10 @@ async function restoreSearchHistoryFromFirestore() {
             if (base64Data) {
                 const binaryString = atob(base64Data);
                 const compressedData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+                
+                // ★解凍処理
                 const decompressedHistory = await decompressData(compressedData);
+                
                 localStorage.setItem(SEARCH_HISTORY_KEY, decompressedHistory);
                 console.log(`Firestore: 検索履歴をユーザー ${currentUser.uid} から復元しました。`);
                 updateSearchHistoryList()
@@ -211,8 +251,11 @@ async function saveHistoryToFirestore() {
     if (!currentUser || !db) return;
     try {
         const historyData = localStorage.getItem(HISTORY_KEY) || '[]';
+        
+        // ★圧縮処理
         const compressedData = await compressData(historyData);
         const base64Data = btoa(String.fromCharCode(...compressedData));
+        
         await db.collection(HISTORY_COLLECTION).doc(currentUser.uid).set({
             [HISTORY_DOCUMENT_ID]: base64Data,
             historyTimestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -237,7 +280,10 @@ async function restoreHistoryFromFirestore() {
             if (base64Data) {
                 const binaryString = atob(base64Data);
                 const compressedData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+                
+                // ★解凍処理
                 const decompressedHistory = await decompressData(compressedData);
+                
                 localStorage.setItem(HISTORY_KEY, decompressedHistory);
                 console.log(`Firestore: ショートカット履歴をユーザー ${currentUser.uid} から復元しました。`);
                 updateHistoryDisplay(); // 復元後、表示を更新
@@ -253,28 +299,26 @@ async function restoreHistoryFromFirestore() {
 }
 
 /**
- * ★追加: ボタンクリックで手動で全履歴をFirestoreに保存する関数
+ * ボタンクリックで手動で全履歴をFirestoreに保存する関数
  */
 function manualBackupHistory() {
     if (!currentUser) {
         alert("Firebaseにログインしていません。ログイン後に実行してください。");
         return;
     }
-    // 検索履歴とショートカット履歴の両方を保存
     saveSearchHistoryToFirestore();
     saveHistoryToFirestore();
     alert("履歴のバックアップを開始しました。\nコンソールを確認してください。");
 }
 
 /**
- * ★追加: ボタンクリックで手動で全履歴をFirestoreから復元する関数
+ * ボタンクリックで手動で全履歴をFirestoreから復元する関数
  */
 function manualRestoreHistory() {
     if (!currentUser) {
         alert("Firebaseにログインしていません。ログイン後に実行してください。");
         return;
     }
-    // 検索履歴とショートカット履歴の両方を復元
     restoreSearchHistoryFromFirestore();
     restoreHistoryFromFirestore();
     alert("履歴の復元を開始しました。\n復元後、ページをリロードするとショートカットが更新されます。");
@@ -312,10 +356,6 @@ function saveSearchHistory(query) {
         searchHistory = searchHistory.slice(0, MAX_SEARCH_HISTORY)
     }
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
-    // ★修正: 自動保存を削除
-    // if (currentUser) {
-    //     saveSearchHistoryToFirestore()
-    // }
 }
 function saveToHistory(linkData) {
     let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
@@ -326,10 +366,6 @@ function saveToHistory(linkData) {
     }
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
     updateHistoryDisplay();
-    // ★修正: 自動保存を削除
-    // if (currentUser) { 
-    //     saveHistoryToFirestore();
-    // }
 }
 function updateHistoryDisplay() {
     if (!domCache.historyContainer) return;
@@ -429,10 +465,6 @@ function updateSearchHistoryDisplay() {
             const currentHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
             currentHistory.splice(index, 1);
             localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(currentHistory));
-            // ★修正: 自動保存を削除
-            // if (currentUser) {
-            //     saveSearchHistoryToFirestore()
-            // }
             updateSearchHistoryDisplay();
             updateSearchHistoryList()
         });
@@ -576,16 +608,11 @@ function setupModalEventListeners() {
     if (clearSearchHistoryBtn) {
         clearSearchHistoryBtn.addEventListener('click', () => {
             localStorage.removeItem(SEARCH_HISTORY_KEY);
-            // ★修正: 自動保存を削除
-            // if (currentUser) {
-            //     saveSearchHistoryToFirestore()
-            // }
             updateSearchHistoryDisplay();
             updateSearchHistoryList()
         })
     }
     
-    // ★追加: 手動同期ボタンのイベントリスナー
     const backupBtn = document.getElementById('historyBackupFS');
     if (backupBtn) {
         backupBtn.addEventListener('click', manualBackupHistory);
@@ -810,13 +837,17 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
     window.addEventListener('scroll', handleScroll, { passive: !0 });
-    Promise.all([loadIconsZip(), ]).then(() => {
-        loadIconsAndGenerateLinks();
-        updateHistoryDisplay();
-        updateSearchHistoryList();
-        setupModalEventListeners();
-        initializeFirebaseAndMonitorAuth();
-    })
+    
+    // ★修正: pakoの読み込みをFirebase初期化の前に確実に行う
+    loadPakoScript().then(() => {
+        Promise.all([loadIconsZip(), ]).then(() => {
+            loadIconsAndGenerateLinks();
+            updateHistoryDisplay();
+            updateSearchHistoryList();
+            setupModalEventListeners();
+            initializeFirebaseAndMonitorAuth();
+        })
+    });
 });
 const scaleSlider = document.getElementById('scale-slider');
 const cornerSlider = document.getElementById('corner-slider');
