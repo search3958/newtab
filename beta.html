@@ -79,6 +79,13 @@ if ("paintWorklet" in CSS) {
   </div>
 
         <div class="bg">
+          <div id="loginMessage" class="hide">
+            <div class="lmstrong">Newtabにログインしませんか？</div>
+            便利機能をアンロックしましょう。<br>もちろん無料です
+            <button class="prmbtn" type="button" onclick="window.location.href='https://search3958.github.io/accounts/'">アカウントを管理<md-ripple aria-hidden="true"></md-ripple></button>
+          </div>
+          <div id="loggedinMessage" class="hide">
+            <span class="material-symbols-outlined" style="font-size:32px!important">check_circle</span>ログインしています         </div>
           <div class="shortcuts">
               </div>
               <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
@@ -102,30 +109,29 @@ if ("paintWorklet" in CSS) {
     </div>
     <div class="settings-body">
       <div class="setting-item">
-        <label for="wallpaper-input">壁紙URL</label>
+        <label for="wallpaper-input">
+          <span class="settingicon material-symbols-outlined">wallpaper</span>
+          壁紙URL</label>
         <input type="text" id="wallpaper-input" placeholder="壁紙のURLを入力してください">
         <button type="button" id="apply-wallpaper">適用<md-ripple></md-ripple></button>
         <button type="button" onclick="window.location.href='https://search3958.github.io/project/images/?image-url=new'">壁紙一<md-ripple></md-ripple>覧</button>
       </div>
       <div class="setting-item">
-        <label for="wallpaper-input">3958アカウント</label>
+        <label for="wallpaper-input">
+          <span class="settingicon material-symbols-outlined">account_circle</span>3958アカウント</label>
         <button type="button" onclick="window.location.href='https://search3958.github.io/accounts/'">アカウントを管理<md-ripple></md-ripple></button>
         <button type="button" id="historyBackupFS">履歴をバックアップ<md-ripple></md-ripple></button>
         <button type="button" id="historyRestoreFS">履歴を復元<md-ripple></md-ripple></button>
       </div>
       <div class="setting-item">
-        <h4>検索履歴の管理</h4>
+        <h4>
+          <span class="settingicon material-symbols-outlined">history</span>検索履歴の管理</h4>
         <div class="search-history-list"></div>
         <button type="button" id="clear-search-history">検索履歴をクリア<md-ripple></md-ripple></button>
       </div>
-      <div class="setting-item">
-        <label>バーのサイズ調整</label>
-        <input type="range" id="scale-slider" min="0.7" max="1.3" step="0.1" value="1">
-        <label>スムースコーナーの強度</label>
-        <input type="range" id="corner-slider" min="0.3" max="6" step="0.1" value="1">
-      </div>
       <div class="setting-item full">
-        <label for="wallpaper-input">Newtab v5.1 3Beta/</label>
+        <label for="wallpaper-input">
+          <span class="settingicon material-symbols-outlined">deployed_code</span>Newtab v5.2 4Beta/</label>
         <button type="button" onclick="window.location.href='https://search3958.github.io/'">私について<md-ripple></md-ripple></button>
         <button type="button" onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法<md-ripple></md-ripple></button>
         <button type="button" onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'">簡易版<md-ripple></md-ripple></button>

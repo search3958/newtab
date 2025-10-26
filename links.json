@@ -6,10 +6,10 @@
       "links": [
         
         {
-          "name": "私について",
+          "name": "About me",
           "bg": "var(--iconbg)",
           "url": "https://search3958.github.io/",
-          "icon": "tools.webp"
+          "icon": "3958.webp"
         },
         {
           "name": "ツールボード",
@@ -130,10 +130,10 @@
           "icon": "monoxer.webp"
         },
         {
-          "name": "ChatGPT",
-          "bg": "#000000bb",
-          "url": "https://chat.openai.com/",
-          "icon": "chatgpt.webp"
+          "name": "Qwen",
+          "bg": "var(--iconbg)",
+          "url": "https://chat.qwen.ai/",
+          "icon": "qwen.webp"
         },
         {
           "name": "Copilot",

@@ -11,7 +11,7 @@
   --bgcolor:#ffffff8a;
   --searchbtnclr:rgba(255, 255, 255, 0.759);
   --primary:#00000011;
-  --radius:0.4;
+  --radius:1;
   --iconbg:rgba(255, 255, 255, 0.759);
   --battery-bg:#1088F255;
   --battery-charging-bg:#00ED4B55;
@@ -33,7 +33,7 @@
   :root {
     --bgcolor:rgba(17, 17, 17, 0.67);
     --searchbtnclr:rgba(0, 0, 0, 0.314);
-    --primary:color(display-p3 0.948 0.777 0 / 1);
+    --primary:#222;
     --iconbg:rgba(14, 14, 14, 0.435);
     --battery-bg:#1088F244;
     --battery-charging-bg:#00ED4B44;
@@ -416,6 +416,7 @@ mask-image: paint(squircle);
   justify-content: center;
   align-content: flex-start;
   transform: translateY(30vh);  /* ← margin-top の代わりに */
+  padding-top: 0px;
 }
 
 .shortcuts.show {
@@ -438,7 +439,7 @@ mask-image: paint(squircle);
   justify-content: center;
   mask-image: paint(squircle);
   background: var(--bgcolor);
-  --squircle-radius: 55px;
+  --squircle-radius: 48px;
   --squircle-smooth: var(--radius);
   align-items: flex-start;
   padding: 22px 12px;
@@ -711,9 +712,9 @@ iframe{
   color: rgba(128, 128, 128, 0.7);
 }
 
-.setting-item button {
+.setting-item button ,.prmbtn{
   background: var(--primary);
-  color: #000;
+  color: var(--textcolor);
   border: none;
   padding: 16px 24px;
   mask-image: paint(squircle);
@@ -856,6 +857,63 @@ iframe{
     margin: 0px;
 }
 
+#loginMessage.hide{
+      height: 0px;
+      padding: 0px 24px;
+}
+#loginMessage {
+  transition: all 0.6s cubic-bezier(.34,.24,0,1);
+    background: #fffa;
+    width: fit-content;
+    margin: 16px auto;
+    padding: 24px 32px;
+    text-align: center;
+  color:#0009;
+    mask-image: paint(squircle);
+    --squircle-radius: 48px;
+    --squircle-smooth: 0.6;
+    gap:8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 142px;
+}
+.lmstrong{
+  font-size:20px;
+  color:#000;
+  font-weight:500;
+}
+.prmbtn{
+      background: color(display-p3 0.948 0.777 0 / 1);
+    color: #000 !important;
+}
+#loggedinMessage.hide {
+  height:0px;
+    padding: 0px 24px;
+}
+#loggedinMessage {
+  transition: all 0.6s cubic-bezier(.34,.24,0,1);
+    background: #1CDC8944;
+    width: fit-content;
+    margin: 16px auto;
+    padding: 24px 24px;
+    text-align: center;
+  color:#002834;
+  font-size:20px;
+  font-weight:500;
+    mask-image: paint(squircle);
+    --squircle-radius: 48px;
+    --squircle-smooth: 0.25;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap:8px;
+}
+.settingicon{
+  position:relative;
+  top:6px;
+  margin-right:4px;
+}
 /* ダークモード用のスクロールバー */
 @media (prefers-color-scheme: dark) {
   ::-webkit-scrollbar {
@@ -873,5 +931,9 @@ iframe{
   
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
+  }
+  #loggedinMessage {
+  color:#d0ffea;
+    background: #005d3c8c;
   }
 }

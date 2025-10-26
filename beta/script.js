@@ -858,37 +858,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     });
 });
-const scaleSlider = document.getElementById('scale-slider');
-const cornerSlider = document.getElementById('corner-slider');
-const root = document.documentElement;
-const savedScale = localStorage.getItem('bottombar-scale');
-if (scaleSlider && document.querySelector('.bottombar')) {
-    if (savedScale) {
-        scaleSlider.value = savedScale;
-        document.querySelector('.bottombar').style.scale = `${savedScale}`
-    } else {
-        document.querySelector('.bottombar').style.scale = '1'
-    }
-    scaleSlider.addEventListener('input', () => {
-        const scale = scaleSlider.value;
-        document.querySelector('.bottombar').style.scale = `${scale}`;
-        localStorage.setItem('bottombar-scale', scale)
-    })
-}
-const savedRadius = localStorage.getItem('bottombar-radius');
-if (cornerSlider && root) {
-    if (savedRadius) {
-        cornerSlider.value = savedRadius;
-        root.style.setProperty('--radius', `${savedRadius}`)
-    } else {
-        root.style.setProperty('--radius', '1')
-    }
-    cornerSlider.addEventListener('input', () => {
-        const radius = cornerSlider.value;
-        root.style.setProperty('--radius', `${radius}`);
-        localStorage.setItem('bottombar-radius', radius)
-    })
-}(function () {
+
+(function () {
     const wrappers = document.querySelectorAll('.metaBall');
     function syncLinkedBalls() {
         wrappers.forEach(metaBall => {
