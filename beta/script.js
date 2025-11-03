@@ -4,12 +4,12 @@ const MAX_HISTORY = 4;
 const MAX_SEARCH_HISTORY = 3;
 let isAppSearchMode = !1;
 let linksData = null;
-const DEFAULT_ITEMS = [{ name: "TechPick 10", url: "https://search3958.github.io/techpick10/", icon: "techpick10.webp", bg: "rgba(255, 255, 255, 0.759)" }, { name: "Gmail", url: "https://mail.google.com/", icon: "gmail.webp", bg: "var(--iconbg)" }, { name: "ChatGPT", url: "https://chat.openai.com/", icon: "chatgpt.webp", bg: "#000000bb" }, { name: "Tools", url: "https://search3958.github.io/tools", icon: "tools.webp", bg: "var(--iconbg)" }];
+const DEFAULT_ITEMS = [{ name: "TechPick 10", url: "https://search3958.github.io/techpick10/  ", icon: "techpick10.webp", bg: "rgba(255, 255, 255, 0.759)" }, { name: "Gmail", url: "https://mail.google.com/  ", icon: "gmail.webp", bg: "var(--iconbg)" }, { name: "ChatGPT", url: "https://chat.openai.com/  ", icon: "chatgpt.webp", bg: "#000000bb" }, { name: "Tools", url: "https://search3958.github.io/tools  ", icon: "tools.webp", bg: "var(--iconbg)" }];
 const domCache = { searchInputBox: null, appSwitchIcon: null, bottomBar: null, shortcuts: null, bg: null, historyContainer: null, today: null, authStatusDisplay: null };
 const iconsMap = {};
 let iconsReady = !1;
 const iconWaiters = [];
-const firebaseConfig = { apiKey: "AIzaSyAYSzOAmqY_IJCEUNb-cJNQfp4AKt93a_A", authDomain: "couud-dashboard.firebaseapp.com", databaseURL: "https://couud-dashboard-default-rtdb.firebaseio.com", projectId: "couud-dashboard", storageBucket: "couud-dashboard.appspot.com", messagingSenderId: "163996109972", appId: "1:163996109972:web:e806be3a622a4da2a33881", measurementId: "G-XCX2C68FM6" };
+const firebaseConfig = { apiKey: "AIzaSyAYSzOAmqY_IJCEUNb-cJNQfp4AKt93a_A", authDomain: "couud-dashboard.firebaseapp.com", databaseURL: "https://couud-dashboard-default-rtdb.firebaseio.com  ", projectId: "couud-dashboard", storageBucket: "couud-dashboard.appspot.com", messagingSenderId: "163996109972", appId: "1:163996109972:web:e806be3a622a4da2a33881", measurementId: "G-XCX2C68FM6" };
 let auth;
 let db;
 let currentUser = null;
@@ -29,7 +29,7 @@ function loadPakoScript() {
             return resolve();
         }
         const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js';
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js  ';
         script.onload = () => {
             pakoLoaded = !0;
             console.log("pakoライブラリを読み込みました。");
@@ -126,9 +126,9 @@ function loadFirebaseScripts() {
         }
 
         const sdkUrls = [
-            'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js',
-            'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js',
-            'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js'
+            'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js  ',
+            'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js  ',
+            'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js  '
         ];
 
         const loadScript = (url) => {
@@ -548,11 +548,11 @@ function performSearch() {
             saveToHistory(foundApp);
             window.location.href = foundApp.url
         } else {
-            const chatgptUrl = `https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=${encodeURIComponent(query)}`;
+            const chatgptUrl = `  https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=${encodeURIComponent(query)}`;
             window.location.href = chatgptUrl
         }
     } else {
-        const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+        const url = '  https://www.google.com/search?q=' + encodeURIComponent(query);
         saveSearchHistory(query);
         window.location.href = url
     }
@@ -637,7 +637,7 @@ async function loadIconsZip() {
             console.error("JSZipが読み込まれていません。アイコンの読み込みをスキップします。");
             return
         }
-        const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
+        const zipUrl = '  https://search3958.github.io/newtab/lsr/icons-4-5.zip  ';
         const res = await fetch(zipUrl);
         if (!res.ok) throw new Error(`Failed to fetch icons-4-5.zip: ${res.status}`);
         const blob = await res.blob();
@@ -859,50 +859,71 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-(function () {
-    const wrappers = document.querySelectorAll('.metaBall');
-    function syncLinkedBalls() {
-        wrappers.forEach(metaBall => {
-            const linked = document.getElementById('linkedBalls-' + metaBall.id);
-            if (!linked) return;
-            const rect = metaBall.getBoundingClientRect();
-            const offset = 4;
-            linked.style.cssText = ` width: ${rect.width - offset}px; height: ${rect.height - offset}px; left: ${rect.left + offset / 2}px; top: ${rect.top + offset / 2}px; position: fixed; line-height: ${rect.height - offset}px; `;
-            if (metaBall.classList.contains('hide')) {
-                linked.classList.add('hide')
-            } else {
-                linked.classList.remove('hide')
-            }
-        })
-    }
-    window.addEventListener('resize', syncLinkedBalls);
-    const searchInput = document.getElementById('mainSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            const container = document.querySelector('.metaballcontainer');
-            if (searchInput.value.length > 0) {
-                wrappers.forEach(metaBall => metaBall.classList.add('hide'));
-                if (container) container.classList.add('hide')
-            } else {
-                wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
-                if (container) container.classList.remove('hide')
-            }
-            syncLinkedBalls()
-        })
-    }
+(function() {
+  const wrappers = document.querySelectorAll('.metaBall');
+  
+  let animationId;
+  function syncLinkedBalls() {
     wrappers.forEach(metaBall => {
-        let mouseTimeout;
-        metaBall.addEventListener('mousemove', () => {
-            if (mouseTimeout) return;
-            mouseTimeout = requestAnimationFrame(() => {
-                syncLinkedBalls();
-                mouseTimeout = null
-            })
-        });
-        metaBall.addEventListener('mouseleave', syncLinkedBalls)
+      const linked = document.getElementById('linkedBalls-' + metaBall.id);
+      if (!linked) return;
+      const rect = metaBall.getBoundingClientRect();
+      const offset = 4;
+      linked.style.cssText = `
+        width: ${rect.width - offset}px;
+        height: ${rect.height - offset}px;
+        left: ${rect.left + offset/2}px;
+        top: ${rect.top + offset/2}px;
+        position: fixed;
+        line-height: ${rect.height - offset}px;
+      `;
+      
+      if (metaBall.classList.contains('hide')) {
+        linked.classList.add('hide');
+      } else {
+        linked.classList.remove('hide');
+      }
     });
-    syncLinkedBalls()
+  }
+  
+  window.addEventListener('resize', syncLinkedBalls);
+
+  function syncLoop() {
+    syncLinkedBalls();
+    animationId = requestAnimationFrame(syncLoop);
+  }
+  syncLoop();
+
+  const searchInput = document.getElementById('mainSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const container = document.querySelector('.metaballcontainer');
+      if (searchInput.value.length > 0) {
+        wrappers.forEach(metaBall => metaBall.classList.add('hide'));
+        if (container) container.classList.add('hide');
+      } else {
+        wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
+        if (container) container.classList.remove('hide');
+      }
+      syncLinkedBalls();
+    });
+  }
+
+  wrappers.forEach(metaBall => {
+    let mouseTimeout;
+    metaBall.addEventListener('mousemove', () => {
+      if (mouseTimeout) return;
+      mouseTimeout = requestAnimationFrame(() => {
+        syncLinkedBalls();
+        mouseTimeout = null;
+      });
+    });
+    metaBall.addEventListener('mouseleave', syncLinkedBalls);
+  });
+
+  syncLinkedBalls();
 })();
+
 function loadLiquidJS() {
     if (window.liquidLoaded) return;
     const script = document.createElement('script');
