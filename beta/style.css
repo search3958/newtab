@@ -5,14 +5,15 @@
   font-style: normal;
   line-height: 1.5;
   text-wrap-mode: nowrap;
+  user-select: none;
 }
 
 :root{
-  --bgcolor:#ffffff8a;
+  --bgcolor:#ffffff99;
   --searchbtnclr:rgba(255, 255, 255, 0.759);
   --primary:#00000011;
   --radius:1;
-  --iconbg:rgba(255, 255, 255, 0.759);
+  --iconbg:rgba(255, 255, 255, 0.6);
   --battery-bg:#1088F255;
   --battery-charging-bg:#00ED4B55;
   --textcolor:#000;
@@ -87,10 +88,13 @@ body {
     scale:0;
     filter:blur(10px);
     transition:all 0.5s ease;
+    top:20px;
+    right:9px;
+    border-radius:100px;
 }
 
 .appswitchicon.show {
-    scale:1;
+    scale:0.8;
     filter:blur(0px);
 }
 
@@ -100,16 +104,16 @@ body {
     transition:all 0.8s cubic-bezier(.77,0,.49,1);
     position:relative;
     right:60px;
-    height:20px;
-    width:20px;
-    margin-left: -25px;
-    margin-right: -25px;
+    height:0px;
+    width:0px;
+    margin-left: 0px;
+    margin-right: 0px;
   }
   #linkedBalls-2{
     scale:0;
   }
   .metaBall.search.hide{
-    right:-40px!important;
+    right:30px!important;
   }
 }
 
@@ -120,14 +124,14 @@ body {
     right:90px;
     height:20px;
     width:20px;
-    margin-left: -25px;
-    margin-right: -25px;
+    margin-left: 0px;
+    margin-right: 0px;
   }
   #linkedBalls-3{
     scale:0;
   }
   .metaBall.search.hide{
-    right:0px!important;
+    right:3px!important;
   }
 }
 
@@ -190,9 +194,9 @@ cubic-bezier(0.17, 1.35, 0.08, 1);
     }
     .metaBall.search.hide {
       height: 110px;
-      right:-90px;
+      right:45px;
       width: 500px !important;
-      transition: all 1.3s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
+      transition: all 2s cubic-bezier(0.17, 1.35, 0.08, 1)!important;
     }
 
     .linkedBalls {
@@ -206,7 +210,7 @@ cubic-bezier(0.17, 1.35, 0.08, 1);
       transition: opacity 0.2s ease,filter 0.2s ease,scale 0.6s cubic-bezier(.21,0,.21,1);
       filter:blur(0px);
       scale:1;
-      /* 位置・サイズ・レイアウト系はJSで制御 */
+      cursor:pointer;
     }
     /* .hide時も連動 */
     .linkedBalls.hide {
@@ -225,8 +229,9 @@ cubic-bezier(0.17, 1.35, 0.08, 1);
       scale: 1 !important;;
 }
     #linkedBalls-4{
-      background:color(display-p3 0.948 0.777 0 / 1);
-      color: #000 !important;
+      background-image: conic-gradient(from 
+131deg at 57.5% 56%, rgba(0, 18, 88, 1) 0deg, rgba(0, 38, 190, 1) 177deg, rgba(0, 95, 255, 1) 265deg, rgba(146, 217, 255, 1) 323deg, rgb(248, 248, 225) 360deg);
+      color: #fff !important;
       scale: 1 !important;;
     }
     /* .hide時も連動 */
@@ -234,9 +239,9 @@ cubic-bezier(0.17, 1.35, 0.08, 1);
       opacity: 0!important;
     }
     .iconbig {
-    font-size: 50px;
+    font-size: 40px;
     position: relative;
-    top: 16%;
+    top: 14%;
   }
   .searchinput {
     width: 100%;
@@ -244,7 +249,7 @@ cubic-bezier(0.17, 1.35, 0.08, 1);
     border-radius: 100px;
     background: #0000;
     text-align: center;
-    font-size: 39px;
+    font-size: 30px;
     font-weight: 300;
     outline:none;
     position:relative;
@@ -253,7 +258,7 @@ cubic-bezier(0.17, 1.35, 0.08, 1);
     color:var(--textcolor);
   }
 .hide>.searchbutton {
-    bottom: 16px;
+    bottom: 12px;
     scale: 1;
     width: 110px;
 }
@@ -396,6 +401,14 @@ mask-image: paint(squircle);
   pointer-events: auto;
   opacity: 1;
 }
+#loginMessage,#loggedinMessage{
+  transform: translateY(35vh); 
+  transition: transform 0.6s cubic-bezier(.37,0,0,1);
+}
+.show #loginMessage,.show #loggedinMessage{
+  transform: translateY(0vh); 
+  transition: transform 0.6s cubic-bezier(.37,0,0,1);
+}
 .shortcuts {
   gap: 0px 40px;
   row-gap: 0px;
@@ -417,7 +430,7 @@ mask-image: paint(squircle);
   flex-wrap: wrap;
   justify-content: center;
   align-content: flex-start;
-  transform: translateY(30vh);  /* ← margin-top の代わりに */
+  transform: translateY(35vh);  /* ← margin-top の代わりに */
   padding-top: 0px;
 }
 
@@ -474,7 +487,7 @@ mask-image: paint(squircle);
   perspective: 800px;
   transform: translate3d(0,0,0);
   margin-bottom: 3px;
-  filter: drop-shadow(0 5px 9px #0001);
+  filter: drop-shadow(0 5px 9px #00000016);
 }
 
 .icon-wrapper {
@@ -636,10 +649,10 @@ iframe{
   --squircle-smooth:  var(--radius);
   background: paint(squircle);
   --squircle-fill: var(--modal-bg);
-  padding: 20px;
+  padding: 0px;
   max-width: 500px;
   width: 90%;
-  max-height: 80vh;
+  max-height: 640px;
   overflow-y: auto;
   filter:drop-shadow(0 20px 40px #0003);
   transition: all 0.5s cubic-bezier(.74,.1,.43,1.01);
@@ -648,7 +661,6 @@ iframe{
     top: calc(50vh - 85px);
     right: 19px;
     border-radius:250px;
-    padding-bottom:-900px;
 }
 
 .settings-modal.show .settings-modal-content {
@@ -657,7 +669,7 @@ iframe{
     top: 0;
     right: 0;
     border-radius:30px;
-    padding-bottom:20px;
+  padding: 24px;
   transition: all 0.8s cubic-bezier(.34,.12,0,1);
 }
 
@@ -673,6 +685,7 @@ iframe{
 .settings-header h3 {
   margin: 0;
   color: var(--textcolor);
+  font-size:32px;
 }
 
 .close-settings {

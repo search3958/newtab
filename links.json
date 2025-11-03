@@ -19,7 +19,7 @@
         },
         {
           "name": "TechPick 10",
-          "bg": "rgba(255, 255, 255, 0.759)",
+          "bg": "var(--iconbg)",
           "url": "https://search3958.github.io/techpick10/",
           "icon": "techpick10.webp"
         },
