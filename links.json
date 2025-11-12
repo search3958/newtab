@@ -185,7 +185,7 @@
       "links": [
         {
           "name": "Snapchat",
-          "bg": "var(--iconbg)",
+          "bg": "#fffc03bb",
           "url": "https://www.snapchat.com/web/",
           "icon": "snapchat.webp"
         },
