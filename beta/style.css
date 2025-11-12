@@ -231,13 +231,13 @@ body {
     height: 100%;
     z-index: 3;
     overflow: hidden;
-    scale: 1 !important;
+    scale: 1 !important
 }
 
 #linkedBalls-4 {
     background-image: conic-gradient(from 131deg at 57.5% 56%, rgba(0, 18, 88, 1) 0deg, rgba(0, 38, 190, 1) 177deg, rgba(0, 95, 255, 1) 265deg, rgba(146, 217, 255, 1) 323deg, rgb(248, 248, 225) 360deg);
-    color: #fff !important;
-    scale: 1 !important;
+    fill: #fff !important;
+    scale: 1 !important
 }
 
 .linkedBall.hide {
@@ -247,7 +247,7 @@ body {
 .iconbig {
     font-size: 40px;
     position: relative;
-    top: 14%
+    top: 15%
 }
 
 .searchinput {
@@ -936,7 +936,7 @@ iframe {
     background: #1CDC8944;
     width: fit-content;
     margin: 16px auto;
-    padding: 24px 24px;
+    padding: 24px 32px;
     text-align: center;
     color: #002834;
     font-size: 20px;
