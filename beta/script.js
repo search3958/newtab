@@ -5,7 +5,7 @@ let linksData = null;
 const DEFAULT_ITEMS = [
     { name: "TechPick 10", url: "https://search3958.github.io/techpick10/", icon: "techpick10.webp", bg: "rgba(255, 255, 255, 0.759)" },
     { name: "Gmail", url: "https://mail.google.com/", icon: "gmail.webp", bg: "var(--iconbg)" },
-    { name: "ChatGPT", url: "https://chat.openai.com/", icon: "chatgpt.webp", bg: "#000000bb" },
+    { name: "About me", url: "https://search3958.github.io/", icon: "3958.webp", bg: "var(--iconbg)" },
     { name: "Tools", url: "https://search3958.github.io/tools", icon: "tools.webp", bg: "var(--iconbg)" }
 ];
 

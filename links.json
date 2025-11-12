@@ -2,7 +2,7 @@
   "categories": [
 
     {
-      "title": "Search3958",
+      "title": "おすすめ",
       "links": [
         
         {
@@ -181,13 +181,13 @@
     },
 
     {
-      "title": "エンターテイメント",
+      "title": "娯楽と通信",
       "links": [
         {
-          "name": "Scratch",
+          "name": "Snapchat",
           "bg": "var(--iconbg)",
-          "url": "https://scratch.mit.edu/",
-          "icon": "scratch.webp"
+          "url": "https://www.snapchat.com/web/",
+          "icon": "snapchat.webp"
         },
         {
           "name": "poki",
