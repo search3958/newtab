@@ -416,71 +416,6 @@ async function saveCompressedTestToFirestore() {
     }
 }
 
-// -------------------- 3D メタボールアニメーション --------------------
-(function() {
-    const wrappers = document.querySelectorAll('.metaBall');
-    let animationId;
-    
-    function syncLinkedBalls() {
-        wrappers.forEach(metaBall => {
-            const linked = document.getElementById('linkedBalls-' + metaBall.id);
-            if (!linked) return;
-            const rect = metaBall.getBoundingClientRect();
-            const offset = 4;
-            linked.style.cssText = `
-                width: ${rect.width - offset}px;
-                height: ${rect.height - offset}px;
-                left: ${rect.left + offset/2}px;
-                top: ${rect.top + offset/2}px;
-                position: fixed;
-                line-height: ${rect.height - offset}px;
-            `;
-            
-            if (metaBall.classList.contains('hide')) {
-                linked.classList.add('hide');
-            } else {
-                linked.classList.remove('hide');
-            }
-        });
-    }
-    
-    window.addEventListener('resize', syncLinkedBalls);
-
-    function syncLoop() {
-        syncLinkedBalls();
-        animationId = requestAnimationFrame(syncLoop);
-    }
-    syncLoop();
-
-    const searchInput = document.getElementById('mainSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const container = document.querySelector('.metaballcontainer');
-            if (searchInput.value.length > 0) {
-                wrappers.forEach(metaBall => metaBall.classList.add('hide'));
-                if (container) container.classList.add('hide');
-            } else {
-                wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
-                if (container) container.classList.remove('hide');
-            }
-            syncLinkedBalls();
-        });
-    }
-
-    wrappers.forEach(metaBall => {
-        let mouseTimeout;
-        metaBall.addEventListener('mousemove', () => {
-            if (mouseTimeout) return;
-            mouseTimeout = requestAnimationFrame(() => {
-                syncLinkedBalls();
-                mouseTimeout = null;
-            });
-        });
-        metaBall.addEventListener('mouseleave', syncLinkedBalls);
-    });
-
-    syncLinkedBalls();
-})();
 
 // -------------------- イベントリスナー追加設定 --------------------
 function setupExtendedEventListeners() {
@@ -833,3 +768,69 @@ loadTexture(IMAGE_URL, (tex)=>{
   texture = tex;
   startLoop();
 });
+
+// -------------------- 3D メタボールアニメーション --------------------
+(function() {
+    const wrappers = document.querySelectorAll('.metaBall');
+    let animationId;
+    
+    function syncLinkedBalls() {
+        wrappers.forEach(metaBall => {
+            const linked = document.getElementById('linkedBalls-' + metaBall.id);
+            if (!linked) return;
+            const rect = metaBall.getBoundingClientRect();
+            const offset = 4;
+            linked.style.cssText = `
+                width: ${rect.width - offset}px;
+                height: ${rect.height - offset}px;
+                left: ${rect.left + offset/2}px;
+                top: ${rect.top + offset/2}px;
+                position: fixed;
+                line-height: ${rect.height - offset}px;
+            `;
+            
+            if (metaBall.classList.contains('hide')) {
+                linked.classList.add('hide');
+            } else {
+                linked.classList.remove('hide');
+            }
+        });
+    }
+    
+    window.addEventListener('resize', syncLinkedBalls);
+
+    function syncLoop() {
+        syncLinkedBalls();
+        animationId = requestAnimationFrame(syncLoop);
+    }
+    syncLoop();
+
+    const searchInput = document.getElementById('mainSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const container = document.querySelector('.metaballcontainer');
+            if (searchInput.value.length > 0) {
+                wrappers.forEach(metaBall => metaBall.classList.add('hide'));
+                if (container) container.classList.add('hide');
+            } else {
+                wrappers.forEach(metaBall => metaBall.classList.remove('hide'));
+                if (container) container.classList.remove('hide');
+            }
+            syncLinkedBalls();
+        });
+    }
+
+    wrappers.forEach(metaBall => {
+        let mouseTimeout;
+        metaBall.addEventListener('mousemove', () => {
+            if (mouseTimeout) return;
+            mouseTimeout = requestAnimationFrame(() => {
+                syncLinkedBalls();
+                mouseTimeout = null;
+            });
+        });
+        metaBall.addEventListener('mouseleave', syncLinkedBalls);
+    });
+
+    syncLinkedBalls();
+})();
