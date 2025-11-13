@@ -946,8 +946,6 @@ if (customWallpaper) {
 const canvas = document.getElementById('glcanvas');
 const gl = canvas.getContext('webgl');
 if (!gl) {
-    document.body.innerHTML = '<p style="padding:20px;color:#f88">Error:WebGL が利用できません。</p>';
-    throw new Error('WebGL not supported');
 }
 const VERT_SRC = ` attribute vec2 a_pos;varying vec2 v_uv;void main(){v_uv = a_pos * 0.5 + 0.5;gl_Position = vec4(a_pos,0.0,1.0);}`;
 const FRAG_SRC = ` precision mediump float;varying vec2 v_uv;uniform sampler2D u_tex;uniform float u_time;uniform float u_amp;uniform float u_freq;uniform float u_speed;uniform vec2 u_canvasSize;uniform vec2 u_imageSize;#define MAX_PULSES 8 uniform int u_pulseCount;uniform vec3 u_pulses[MAX_PULSES];vec2 coverUV(vec2 uv,vec2 canvasSize,vec2 imageSize){float canvasAspect = canvasSize.x / canvasSize.y;float imageAspect = imageSize.x / imageSize.y;vec2 scale;if(canvasAspect > imageAspect)scale = vec2(1.0,canvasAspect / imageAspect);else scale = vec2(imageAspect / canvasAspect,1.0);return(uv - 0.5)/ scale + 0.5;}float pulseHeight(vec2 uv,vec2 origin,float t0,float t,vec2 canvasSize){float elapsed = t - t0;if(elapsed <= 0.0)return 0.0;float aspect = canvasSize.x / canvasSize.y;vec2 correctedUV = vec2(uv.x * aspect,uv.y);vec2 correctedOrigin = vec2(origin.x * aspect,origin.y);float d = distance(correctedUV,correctedOrigin);float r = elapsed * u_speed;float diff = d - r;float phase = diff * u_freq;float env = exp(-1.5 * abs(diff))* exp(-0.8 * elapsed);float rise = smoothstep(0.0,0.3,elapsed);return sin(phase)* env * rise;}vec4 blurSample(sampler2D tex,vec2 uv,float strength){vec4 sum = vec4(0.0);float step = 0.003 * strength;const int RADIUS = 4;float count = 0.0;for(int x=-RADIUS;x<=RADIUS;x++){for(int y=-RADIUS;y<=RADIUS;y++){sum += texture2D(tex,uv + vec2(float(x)*step,float(y)*step));count += 1.0;}}return sum / count;}float gradientLayer(vec2 uv){float grad = smoothstep(-0.15,0.0,uv.y);return pow(grad,0.5);}void main(){vec2 uv = v_uv;vec2 coverUv = coverUV(uv,u_canvasSize,u_imageSize);vec4 baseColor = texture2D(u_tex,coverUv);if(u_pulseCount <= 0){gl_FragColor = baseColor;return;}float t = u_time;float h = 0.0;for(int i=0;i<MAX_PULSES;i++){if(i >= u_pulseCount)break;vec3 p = u_pulses[i];h += pulseHeight(uv,p.xy,p.z,t,u_canvasSize);}float disp = h * u_amp;vec2 displacedUv = coverUv + normalize(uv - vec2(0.5,-0.05))* disp * 0.06;float effect = clamp(abs(disp),0.0,1.0);if(effect < 0.015){gl_FragColor = baseColor;return;}vec2 offsetR = vec2(0.016,0.0)* effect;vec2 offsetB = vec2(-0.016,0.0)* effect;vec4 col;col.r = blurSample(u_tex,displacedUv + offsetR,effect).r;col.g = blurSample(u_tex,displacedUv,effect).g;col.b = blurSample(u_tex,displacedUv + offsetB,effect).b;col.a = 1.0;float gradEffect = smoothstep(0.0,1.0,abs(disp));float light = 1.0 + gradEffect * 0.6;float grad = gradientLayer(uv);baseColor.rgb = mix(baseColor.rgb,col.rgb * light,grad);gl_FragColor = baseColor;}`;
@@ -957,8 +955,6 @@ function compileShader(src, type) {
     gl.shaderSource(s, src);
     gl.compileShader(s);
     if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(s));
-        throw new Error('Shader compile error');
     }
     return s;
 }
