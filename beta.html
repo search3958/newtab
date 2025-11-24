@@ -22,7 +22,7 @@ if ("paintWorklet" in CSS) {
     body {
       margin: 0;
       font-family: sans-serif;
-      background: url('https://search3958.github.io/newtab/bgimg/3958Glass4.webp') no-repeat center center fixed;
+      background: url('https://search3958.github.io/newtab/bgimg/3958Glass6.webp') no-repeat center center fixed;
       background-size: cover;
     }
 
@@ -44,7 +44,7 @@ if ("paintWorklet" in CSS) {
       backdrop-filter:blur(24px) brightness(103%);
       height:100%;
       width:100%;
-
+      pointer-events:none;
 
       animation: bg-blur cubic-bezier(.5,0,0,1) both;
       animation-timeline: view();
@@ -65,13 +65,11 @@ animation-range: entry 100% entry 130%;
     @keyframes main-fade-anm {
       from {
         opacity:0;
-      top: 0vh;
       filter:blur(10px);
         pointer-events:none;
       }
       to {
         opacity:1;
-      top: 0vh;
       filter:blur(0px);
       pointer-events:unset;
       }
@@ -131,7 +129,7 @@ animation-range: entry 100% entry 130%;
       position:relative;
       height:105px;
       width:105px;
-      mask-image:url('data:image/svg+xml;utf8,<svg width="105" height="105" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 55C0 29.573 0 16.8595 7.65351 8.76409C8.01325 8.38358 8.38358 8.01325 8.76409 7.65351C16.8595 0 29.573 0 55 0V0C80.427 0 93.1405 0 101.236 7.65351C101.616 8.01325 101.987 8.38358 102.346 8.76409C110 16.8595 110 29.573 110 55V55C110 80.427 110 93.1405 102.346 101.236C101.987 101.616 101.616 101.987 101.236 102.346C93.1405 110 80.427 110 55 110V110C29.573 110 16.8595 110 8.76409 102.346C8.38358 101.987 8.01325 101.616 7.65351 101.236C0 93.1405 0 80.427 0 55V55Z" fill="black"/></svg>');
+      mask-image:url('data:image/svg+xml;utf8,<svg width="105" height="105" viewBox="0  0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 55C0 29.573 0 16.8595 7.65351 8.76409C8.01325 8.38358 8.38358 8.01325 8.76409 7.65351C16.8595 0 29.573 0 55 0V0C80.427 0 93.1405 0 101.236 7.65351C101.616 8.01325 101.987 8.38358 102.346 8.76409C110 16.8595 110 29.573 110 55V55C110 80.427 110 93.1405 102.346 101.236C101.987 101.616 101.616 101.987 101.236 102.346C93.1405 110 80.427 110 55 110V110C29.573 110 16.8595 110 8.76409 102.346C8.38358 101.987 8.01325 101.616 7.65351 101.236C0 93.1405 0 80.427 0 55V55Z" fill="black"/></svg>');
     }
     .appicon-img {
       height:95px;
@@ -183,13 +181,19 @@ animation-range: entry 100% entry 130%;
       left:calc(50vw - 90px);
       height:50px;
       z-index:100;
-      border-radius:25px;
+      border-radius:100px;
       width:180px;
+      /* animation: search-anm cubic-bezier(.6,0,0,1) both; */
+      /* animation-timeline: view(); */
+      /* animation-range: contain 0% contain 70%; */
+      transition:all 0.7s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1);
+    }
 
-      animation: search-anm cubic-bezier(.6,0,0,1) both;
-      animation-timeline: view();
-      animation-range: contain 0% contain 70%;
+    .search-box.show{
+      left:calc(50vw - 170px);
 
+      height:65px;
+      width:340px;
     }
 
     .search-box-in{
@@ -197,18 +201,13 @@ animation-range: entry 100% entry 130%;
       width:100%;
       height:100%;
       z-index:1001;
-      border-radius:24px;
+      border-radius:100px;
       backdrop-filter:blur(4px) brightness(130%);
       background:#fff9;
       box-shadow:var(--glass-shadow);
       display: flex;
       align-items: center;
-      justify-content: space-around;
-
-
-    mask-image: paint(squircle);
-    --squircle-radius: 25px;
-    --squircle-smooth: 0.27;
+      justify-content: center;
     }
 
     .any-box{
@@ -228,7 +227,7 @@ animation-range: entry 100% entry 130%;
       height:100%;
       z-index:1001;
       border-radius:27px;
-      backdrop-filter:blur(4px) brightness(130%);
+      backdrop-filter:blur(4px) brightness(120%);
       background:#fff9;
       box-shadow:var(--glass-shadow);
       display: flex;
@@ -238,22 +237,189 @@ animation-range: entry 100% entry 130%;
     --squircle-radius: 20px;
     --squircle-smooth: 0.4;
     }
+
+    #google-search-btn{
+      background:none;
+      border:none;
+      color:#000;
+      width: 0px;
+      text-wrap-mode: nowrap;
+      transition:all 0.7s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1);
+      filter:opacity(0) blur(4px);
+    }
+
+    .show #google-search-btn{
+      width: 60px;
+      filter:opacity(1) blur(0px);
+    }
+    #google-search-input{
+      width:calc(100% - 45px);
+      font-size:16px;
+      outline:none;
+      background:none;
+      border:none;
+      transition:all 0.7s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1);
+    }
+    .show #google-search-input{
+      width:calc(100% - 110px);
+      font-size:24px;
+    }
+
+    #___gcse_0 {
+        width: 80vw;
+        height: calc(100vh - 200px);
+        overflow: scroll;
+        position: fixed;
+        top: 0;
+      left:calc(50vw - 40vw);
+          
+      border-radius:24px;
+    }
+    .gsc-control-cse{
+      background:none!important;
+      border:none!important;
+      opacity:1;
+      transition:0.2s opacity ease,0.2s scale ease;
+    }
+    .gsc-webResult.gsc-result{
+      background:#fff5!important;
+      border:none!important;
+      backdrop-filter:blur(24px) brightness(120%);
+      margin:10px 0!important;
+      padding: 24px !important;
+      /*
+      border-radius: 32px;
+      */
+          mask-image: paint(squircle);
+    --squircle-radius: 24px;
+    --squircle-smooth: 0.4;
+    }
+    .gs-promotion .gs-visibleUrl, .gs-webResult .gs-visibleUrl {
+      color:#0008!important;
+    }
+    .gs-promotion-text-cell{
+      margin-left:0px!important;
+    }
+    
+    a.gs-title,b {
+    color: #000 !important;
+}
+.gsc-control-cse.loading{
+  opacity:0.6;
+}.gsc-control-cse.hide{
+  opacity:0!important;
+  scale:0.95;
+}
+.gsc-loading-fade .gsc-result-info, .gsc-loading-fade .gsc-loading-resultsRoot, .gsc-loading-resultsRoot, .gsc-loading-fade .gsc-loading-refinementsArea, .gsc-loading-fade .gsc-adBlock, .gsc-loading-fade .gsc-adBlockVertical, .gsc-loading-fade .gsc-adBlockNoHeight{
+  opacity:1!important;
+}
+
+form.gsc-search-box.gsc-search-box-tools,.gsc-above-wrapper-area,table.gsc-completion-container{
+  display:none!important;
+}
+.gsc-cursor-box.gs-bidi-start-align,.gcsc-more-maybe-branding-root {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.gsc-results{
+  width:100%!important;
+}
+.gsc-control-cse{
+  padding:32px 0px!important;
+}
   </style>
 </head>
 <body>
 
   <div class="search-box liquid-glass">
    <div class="search-box-in">
-    なんでも検索
+    <input type="text" id="google-search-input" placeholder="なんでも検索"/>
+    <button id="google-search-btn">検索</button>
    </div>
   </div>
+
+
+
+  
+<script async>
+  (function(opts_){/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+'use strict';var f=this||self;function g(a){return a};var h;function k(a,b){this.h=a===l&&b||"";this.g=m}function n(a){return a instanceof k&&a.constructor===k&&a.g===m?a.h:"type_error:Const"}var m={},l={};function p(a,b){this.h=b===q?a:""}p.prototype.toString=function(){return this.h+""};function r(a){return a instanceof p&&a.constructor===p?a.h:"type_error:TrustedResourceUrl"}
+function u(a,b){var c=n(a);if(!v.test(c))throw Error("Invalid TrustedResourceUrl format: "+c);a=c.replace(w,function(d,e){if(!Object.prototype.hasOwnProperty.call(b,e))throw Error('Found marker, "'+e+'", in format string, "'+c+'", but no valid label mapping found in args: '+JSON.stringify(b));d=b[e];return d instanceof k?n(d):encodeURIComponent(String(d))});return x(a)}var w=/%{(\w+)}/g,v=RegExp("^((https:)?//[0-9a-z.:[\\]-]+/|/[^/\\\\]|[^:/\\\\%]+/|[^:/\\\\%]*[?#]|about:blank#)","i"),y=/^([^?#]*)(\?[^#]*)?(#[\s\S]*)?/;
+function z(a){var b=A;a=u(B,a);a=y.exec(r(a).toString());var c=a[3]||"";return x(a[1]+C("?",a[2]||"",b)+C("#",c))}var q={};function x(a){if(void 0===h){var b=null;var c=f.trustedTypes;if(c&&c.createPolicy){try{b=c.createPolicy("goog#html",{createHTML:g,createScript:g,createScriptURL:g})}catch(d){f.console&&f.console.error(d.message)}h=b}else h=b}a=(b=h)?b.createScriptURL(a):a;return new p(a,q)}
+function C(a,b,c){if(null==c)return b;if("string"===typeof c)return c?a+encodeURIComponent(c):"";for(var d in c)if(Object.prototype.hasOwnProperty.call(c,d)){var e=c[d];e=Array.isArray(e)?e:[e];for(var t=0;t<e.length;t++){var D=e[t];null!=D&&(b||(b=a),b+=(b.length>a.length?"&":"")+encodeURIComponent(d)+"="+encodeURIComponent(String(D)))}}return b};function E(a,b){this.g=b===F?a:""}E.prototype.toString=function(){return this.g.toString()};var F={};/*
+
+ SPDX-License-Identifier: Apache-2.0
+*/
+var G;try{new URL("s://g"),G=!0}catch(a){G=!1}var H=G;var I="alternate author bookmark canonical cite help icon license next prefetch dns-prefetch prerender preconnect preload prev search subresource".split(" ");var J=new k(l,"https://www.google.com/cse/static/style/look/%{versionDir}%{versionSlash}%{theme}.css"),K=new k(l,"https://www.google.com/cse/static/element/%{versionDir}%{versionSlash}default%{experiment}+%{lang}.css"),B=new k(l,"https://www.google.com/cse/static/element/%{versionDir}%{versionSlash}cse_element__%{lang}.js"),L=new k(l,"/");window.__gcse=window.__gcse||{};window.__gcse.ct=Date.now();
+window.__gcse.scb=function(){var a=window.__gcse;M()||delete opts_.rawCss;var b=N(a.initializationCallback||a.callback);google.search.cse.element.init(opts_)&&("explicit"!==a.parsetags?"complete"===document.readyState||"interactive"===document.readyState?(google.search.cse.element.go(),null==b||b()):google.setOnLoadCallback(function(){google.search.cse.element.go();null==b||b()},!0):null==b||b())};
+function N(a){if("function"===typeof a)return a;if("string"!==typeof a)return null;a=window[a];return"function"!==typeof a?null:a}function M(){var a;return!(null==(a=window.__gcse)?0:a.plainStyle)}
+function O(a){var b=document.createElement("link");b.type="text/css";a:{if(a instanceof p)b.href=r(a).toString();else{if(-1===I.indexOf("stylesheet"))throw Error('TrustedResourceUrl href attribute required with rel="stylesheet"');if(a instanceof E)a=a instanceof E&&a.constructor===E?a.g:"type_error:SafeUrl";else{c:if(H){try{var c=new URL(a)}catch(d){c="https:";break c}c=c.protocol}else d:{c=document.createElement("a");try{c.href=a}catch(d){c=void 0;break d}c=c.protocol;c=":"===c||""===c?"https:":
+c}a="javascript:"!==c?a:void 0}if(void 0===a)break a;b.href=a}b.rel="stylesheet"}return b};var P,A=opts_.usqp?{usqp:opts_.usqp}:{},Q=opts_.language.toLowerCase();P=opts_.cselibVersion?z({versionDir:opts_.cselibVersion,versionSlash:L,lang:Q}):z({versionDir:"",versionSlash:"",lang:Q});var R=window.__gcse.scb,S=document.createElement("script");S.src=r(P);var T,U,V,W=null==(V=(U=(S.ownerDocument&&S.ownerDocument.defaultView||window).document).querySelector)?void 0:V.call(U,"script[nonce]");(T=W?W.nonce||W.getAttribute("nonce")||"":"")&&S.setAttribute("nonce",T);S.type="text/javascript";
+R&&(S.onload=R);document.getElementsByTagName("head")[0].appendChild(S);
+if(M()){document.getElementsByTagName("head")[0].appendChild(O(opts_.cselibVersion?u(K,{versionDir:opts_.cselibVersion,versionSlash:L,experiment:opts_.uiOptions.cssThemeVersion&&4!==opts_.uiOptions.cssThemeVersion?"_v"+opts_.uiOptions.cssThemeVersion:"",lang:opts_.language}):u(K,{versionDir:"",versionSlash:"",experiment:"",lang:opts_.language})));var X,Y="v"+(opts_.uiOptions.cssThemeVersion||4);X=u(J,{versionDir:Y,versionSlash:Y?L:"",theme:opts_.theme.toLowerCase().replace("v2_","")});document.getElementsByTagName("head")[0].appendChild(O(X))};
+})({
+  "cx": "368d6e1513b974fd7",
+  "language": "ja",
+  "theme": "V2_DEFAULT",
+  "uiOptions": {
+    "resultsUrl": "",
+    "enableAutoComplete": true,
+    "enableImageSearch": false,
+    "imageSearchLayout": "popup",
+    "resultSetSize": "filtered_cse",
+    "enableOrderBy": true,
+    "orderByOptions": [{
+      "label": "Relevance",
+      "key": ""
+    }, {
+      "label": "Date",
+      "key": "date"
+    }],
+    "overlayResults": false,
+    "webSearchResultSetSize": 0,
+    "webSearchExtendedRestricts": {
+      "lr": "",
+      "cr": "",
+      "gl": "",
+      "filter": 0,
+      "sort": "",
+      "as_oq": "",
+      "as_sitesearch": ""
+    },
+    "queryParameterName": "q",
+    "enableHistory": true,
+    "numTopRefinements": 5,
+    "enableRichSnippets": false,
+    "hideElementBranding": false,
+    "cssThemeVersion": 4,
+    "isSafeSearchActive": false,
+    "numTopAds": 3
+  },
+  "protocol": "https",
+  "rawCss": ".gsc-control-cse{font-family:arial, sans-serif}.gsc-control-cse .gsc-table-result{font-family:arial, sans-serif}.gsc-refinementsGradient{background:linear-gradient(to left,rgba(255,255,255,1),rgba(255,255,255,0))}",
+  "cse_token": "AEXjvhLVkGgu4xNNyr92NEPyjSc_:1763882197124",
+  "isHostedPage": false,
+  "exp": ["cc", "apo"],
+  "cselibVersion": "db2c7696979b2a96",
+  "usqp": "CAI\u003d"
+});
+</script>
+<div class="gcse-search"></div>
+
 
 
   <div class="any-box liquid-glass">
    <div class="any-box-in">
-    なんでも検索
+    anybar-test
    </div>
   </div>
+
+  
   <main id="links-container">
 
   </main>
@@ -305,8 +471,6 @@ animation-range: entry 100% entry 130%;
           (category.links || []).forEach(link => {
             const a = document.createElement('a');
             a.href = link.url || '#';
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
 
             const iconDiv = document.createElement('div');
             iconDiv.className = 'appicon-bg';
@@ -349,10 +513,215 @@ animation-range: entry 100% entry 130%;
     };
 
     loadData();
+
+    // Google検索用
+    const searchInput = document.getElementById('google-search-input');
+    const searchBtn = document.getElementById('google-search-btn');
+    const searchBox = document.querySelector('.search-box');
+    function doGoogleSearch() {
+      const q = searchInput.value.trim();
+      if(q) {
+        window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+      }
+    }
+    searchBtn.addEventListener('click', doGoogleSearch);
+    // 入力時に.showを付与/削除
+    searchInput.addEventListener('input', function() {
+      if (searchInput.value.trim()) {
+        searchBox.classList.add('show');
+      } else {
+        searchBox.classList.remove('show');
+      }
+    });
+
+    // #google-search-input → #gsc-i-id1 へリアルタイム同期（要素が無くてもエラーにならず再試行）
+    (function syncToGscInput() {
+      try {
+        const src = document.getElementById('google-search-input');
+        const dst = document.getElementById('gsc-i-id1');
+        const cse = document.querySelector('.gsc-control-cse');
+        const resultsRoot = document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive');
+        if (src && dst) {
+          // 直近の入力値とタイマー管理
+          if (!window._gscSync) window._gscSync = { lastValue: '', timer: null, lastInputTime: 0, updating: false, lastResults: '' };
+          const sync = window._gscSync;
+          // 検索結果の内容が変化したかどうか
+          let resultsChanged = false;
+          if (resultsRoot) {
+            const html = resultsRoot.innerHTML;
+            if (sync.lastResults !== undefined && sync.lastResults !== html) {
+              resultsChanged = true;
+            }
+            sync.lastResults = html;
+          }
+          // 入力内容が変わった時点でloadingを必ず付与し、結果が変わるまで絶対に外さない
+          if (dst.value !== src.value) {
+            if (cse) cse.classList.add('loading');
+            dst.value = src.value;
+            dst.dispatchEvent(new Event('input', {bubbles:true}));
+            sync.lastInputTime = Date.now();
+            sync.lastValue = src.value;
+            sync.updating = true;
+            sync.waitingForResult = true;
+          }
+          // 0.2秒間入力値が変化しなければ検索ボタンを自動クリック
+          if (sync.lastValue !== '' && Date.now() - sync.lastInputTime > 200) {
+            const btn = document.querySelector('.gsc-search-button.gsc-search-button-v2');
+            if (btn) btn.click();
+            sync.lastValue = '';
+            sync.lastInputTime = Date.now();
+            sync.waitingForResult = true;
+          }
+          // 検索結果の内容が変化したらloadingを外す
+          if (cse && resultsChanged && sync.waitingForResult) {
+            cse.classList.remove('loading');
+            sync.updating = false;
+            sync.waitingForResult = false;
+          }
+          // 絶対に結果が変わるまでloadingを外さない
+          if (cse && sync.waitingForResult) {
+            cse.classList.add('loading');
+          }
+          // 検索内容が0文字のとき.hideを付与、1文字以上なら外す
+          if (cse) {
+            if (src.value.length === 0) {
+              cse.classList.add('hide');
+            } else {
+              cse.classList.remove('hide');
+            }
+          }
+        }
+      } catch(e) { /* 無視 */ }
+      setTimeout(syncToGscInput, 100); // 常に再試行
+    })();
+
+    // スクロールベースのアニメーションをJSで管理
+    function scrollAnimUpdate() {
+      // 0vh〜50vhの間で進行度t(0〜1)
+      const scrollY = window.scrollY || window.pageYOffset;
+      const vh = window.innerHeight;
+      const from = 0;
+      const to = 0.5 * vh;
+      let t = (scrollY - from) / (to - from);
+      t = Math.max(0, Math.min(1, t));
+
+      // .search-boxアニメーション
+      const searchBox = document.querySelector('.search-box');
+      if (searchBox) {
+        // CSSアニメーションのfrom/toを再現
+        // from: scale(1), bottom:15px
+        // to:   scale(0.3,0.4), bottom:-70px
+        const scaleX = 1 - 0.7 * t;
+        const scaleY = 1 - 0.6 * t;
+        const bottom = 15 * (1 - t) + (-70) * t;
+        searchBox.style.transform = `scale(${scaleX},${scaleY})`;
+        searchBox.style.bottom = `${bottom}px`;
+      }
+      // 他のアニメーションも同様にここで管理可能
+    }
+    window.addEventListener('scroll', scrollAnimUpdate);
+    window.addEventListener('resize', scrollAnimUpdate);
+    document.addEventListener('DOMContentLoaded', function() {
+      scrollAnimUpdate(); // 即時実行
+      setTimeout(scrollAnimUpdate, 0); // レイアウト確定後にも即時実行
+    });
   </script>
 
   <script>// Liquid Glass JS
-    function createBorderMask(w,h,radius,border){const innerW = w - border * 2;const innerH = h - border * 2;const innerRadius = Math.max(radius - border,0);const svg = ` <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"> <defs> <mask id="m"> <rect width="${w}" height="${h}" rx="${radius}" ry="${radius}" fill="white"/> <rect x="${border}" y="${border}" width="${innerW}" height="${innerH}" rx="${innerRadius}" ry="${innerRadius}" fill="black"/> </mask> </defs> <rect width="${w}" height="${h}" mask="url(#m)" /> </svg> `;return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;}function applyLiquidGlassEffect(container){const outerCount = 20;const outerStep = 2;const borderThickness = 6;const masks = [];function updateMasks(){masks.forEach(mask => mask.remove());masks.length = 0;const computedStyle = window.getComputedStyle(container);const width = parseFloat(computedStyle.width);const height = parseFloat(computedStyle.height);const borderRadius = parseFloat(computedStyle.borderRadius)|| 0;for(let i = 0;i < outerCount;i++){const inset = i * outerStep;const normalizedPosition =(outerCount - i)/ outerCount;const blur = Math.pow(normalizedPosition,3.5)* 40;const currentWidth = width - inset * 2;const currentHeight = height - inset * 2;const currentRadius = Math.max(borderRadius - inset,0);if(currentWidth <= 0 || currentHeight <= 0)continue;const mask = document.createElement('div');mask.className = 'mask';mask.style.position = 'absolute';mask.style.inset = `${inset}px`;mask.style.width = `${currentWidth}px`;mask.style.height = `${currentHeight}px`;mask.style.borderRadius = `${currentRadius}px`;mask.style.backdropFilter = `blur(${blur}px)`;mask.style.webkitBackdropFilter = `blur(${blur}px)`;mask.style.pointerEvents = 'none';mask.style.zIndex = `${outerCount - i}`;mask.style.mask = createBorderMask(currentWidth,currentHeight,currentRadius,borderThickness);mask.style.webkitMask = createBorderMask(currentWidth,currentHeight,currentRadius,borderThickness);container.appendChild(mask);masks.push(mask);}}updateMasks();const resizeObserver = new ResizeObserver(()=>{updateMasks();});resizeObserver.observe(container);container._resizeObserver = resizeObserver;}document.querySelectorAll('.liquid-glass').forEach(el =>{applyLiquidGlassEffect(el);});
-  </script>
+
+
+function applyLiquidGlassEffect(container) {
+    const outerCount = 20;
+    const outerStep = 2;
+    const borderThickness = 6;
+    
+    // 既存のマスク要素があれば再利用のために取得、なければ配列を初期化
+    let masks = container._glassMasks || [];
+    
+    // 初回実行時のみ要素を作成（DOM生成コストを初回のみにする）
+    if (masks.length === 0) {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < outerCount; i++) {
+            const mask = document.createElement('div');
+            // 静的なスタイル（変化しないもの）はここで設定
+            Object.assign(mask.style, {
+                position: 'absolute',
+                pointerEvents: 'none',
+                zIndex: `${outerCount - i}`,
+                // CSS Mask Compositeを使ってSVG無しで「中抜きの枠」を作る（超高速）
+                border: `${borderThickness}px solid transparent`,
+                mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                maskComposite: 'exclude',
+                webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                webkitMaskComposite: 'xor', // Chrome/Safari用
+            });
+            
+            fragment.appendChild(mask);
+            masks.push(mask);
+        }
+        container.appendChild(fragment);
+        container._glassMasks = masks; // 参照を保存
+    }
+
+    // アニメーションフレーム管理用フラグ
+    let rafId = null;
+
+    const updateLayout = () => {
+        // コンテナの現在のサイズとスタイルを取得
+        // getComputedStyleはリフローを誘発するため、ループの外で一回だけ呼ぶ
+        const style = window.getComputedStyle(container);
+        const width = parseFloat(style.width);
+        const height = parseFloat(style.height);
+        const baseRadius = parseFloat(style.borderRadius) || 0;
+
+        // ループ処理（DOMの生成・削除は行わず、styleの書き換えのみ行う）
+        for (let i = 0; i < outerCount; i++) {
+            const mask = masks[i];
+            const inset = i * outerStep;
+            
+            // サイズが小さくなりすぎる場合は隠す
+            if (width - inset * 2 <= 0 || height - inset * 2 <= 0) {
+                mask.style.display = 'none';
+                continue;
+            }
+            
+            const normalizedPosition = (outerCount - i) / outerCount;
+            const blur = Math.pow(normalizedPosition, 3.5) * 40;
+            const currentRadius = Math.max(baseRadius - inset, 0);
+
+            // transformやopacityなどのGPUプロパティ以外の変更をバッチ処理的に行う
+            // 文字列連結のコストを減らすため、必要なプロパティだけ更新
+            mask.style.display = 'block';
+            mask.style.inset = `${inset}px`; // position:relativeなしでも、親のパディングボックス基準または配置文脈に従う
+            mask.style.borderRadius = `${currentRadius}px`;
+            mask.style.backdropFilter = `blur(${blur}px)`;
+            mask.style.webkitBackdropFilter = `blur(${blur}px)`;
+        }
+        rafId = null;
+    };
+
+    // ResizeObserverの設定
+    const resizeObserver = new ResizeObserver(() => {
+        // RequestAnimationFrameを使って描画更新をモニタのリフレッシュレートに同期させる
+        // これにより無駄な計算（1フレームに複数回の計算）を間引きます
+        if (!rafId) {
+            rafId = requestAnimationFrame(updateLayout);
+        }
+    });
+
+    resizeObserver.observe(container);
+    container._resizeObserver = resizeObserver;
+    
+    // 初回描画
+    updateLayout();
+}
+
+// 実行
+document.querySelectorAll('.liquid-glass').forEach(el => {
+    applyLiquidGlassEffect(el);
+});
+
+
+</script>
 </body>
 </html>
