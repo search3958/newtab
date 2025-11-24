@@ -4,16 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>リンク集</title>
-  <script>
-if ("paintWorklet" in CSS) {
-  const workletCode = `
-    const drawSquircle=(ctx,geom,radii,smooth,lineWidth,color)=>{const defaultFill=color;const lineWidthOffset=lineWidth/2;ctx.beginPath();ctx.lineTo(radii[0],lineWidthOffset);ctx.lineTo(geom.width-radii[1],lineWidthOffset);ctx.bezierCurveTo(geom.width-radii[1]/smooth,lineWidthOffset,geom.width-lineWidthOffset,radii[1]/smooth,geom.width-lineWidthOffset,radii[1]);ctx.lineTo(geom.width-lineWidthOffset,geom.height-radii[2]);ctx.bezierCurveTo(geom.width-lineWidthOffset,geom.height-radii[2]/smooth,geom.width-radii[2]/smooth,geom.height-lineWidthOffset,geom.width-radii[2],geom.height-lineWidthOffset);ctx.lineTo(radii[3],geom.height-lineWidthOffset);ctx.bezierCurveTo(radii[3]/smooth,geom.height-lineWidthOffset,lineWidthOffset,geom.height-radii[3]/smooth,lineWidthOffset,geom.height-radii[3]);ctx.lineTo(lineWidthOffset,radii[0]);ctx.bezierCurveTo(lineWidthOffset,radii[0]/smooth,radii[0]/smooth,lineWidthOffset,radii[0],lineWidthOffset);ctx.closePath();if(lineWidth){ctx.strokeStyle=defaultFill;ctx.lineWidth=lineWidth;ctx.stroke()}else{ctx.fillStyle=defaultFill;ctx.fill()}};class SquircleClass{static get contextOptions(){return{alpha:true}}static get inputProperties(){return["--squircle-radius","--squircle-radius-top-left","--squircle-radius-top-right","--squircle-radius-bottom-right","--squircle-radius-bottom-left","--squircle-smooth","--squircle-outline","--squircle-fill"]}paint(ctx,geom,properties){const smoothRatio=10;const distanceRatio=1.8;const squircleSmooth=parseFloat(properties.get("--squircle-smooth")*smoothRatio);const individualRadiiProps=SquircleClass.inputProperties.slice(1,5);let squircleRadii=individualRadiiProps.map(prop=>{const value=properties.get(prop);return value?parseInt(value,10)*distanceRatio:NaN});let shorthand_R;if(squircleRadii.some(isNaN)){const radiusRegex=/([0-9]+[a-z%]*)/g;const radius_shorthand=properties.get("--squircle-radius").toString();const matches=radius_shorthand.match(radiusRegex);if(matches){shorthand_R=matches.map(val=>parseInt(val,10)*distanceRatio);while(shorthand_R.length<4){if(shorthand_R.length===1){shorthand_R.push(shorthand_R[0])}else if(shorthand_R.length===2){shorthand_R=[shorthand_R[0],shorthand_R[1],shorthand_R[0],shorthand_R[1]]}else if(shorthand_R.length===3){shorthand_R=[shorthand_R[0],shorthand_R[1],shorthand_R[2],shorthand_R[1]]}}}else{const defaultRadius=squircleRadii.every(isNaN)?8*distanceRatio:0;shorthand_R=[defaultRadius,defaultRadius,defaultRadius,defaultRadius]}}squircleRadii=squircleRadii.map((val,i)=>isNaN(val)?shorthand_R[i]:val);const squrcleOutline=parseFloat(properties.get("--squircle-outline"),10);const squrcleColor=properties.get("--squircle-fill").toString();const isSmooth=()=>{if(typeof properties.get("--squircle-smooth")[0]!=="undefined"){if(squircleSmooth===0){return 1}return squircleSmooth}else{return 10}};const isOutline=()=>{if(squrcleOutline){return squrcleOutline}else{return 0}};const isColor=()=>{if(squrcleColor){return squrcleColor}else{return"#f45"}};const maxRadius=Math.max(...squircleRadii);if(maxRadius<geom.width/2&&maxRadius<geom.height/2){drawSquircle(ctx,geom,squircleRadii,isSmooth(),isOutline(),isColor())}else{const minRadius=Math.min(geom.width/2,geom.height/2);drawSquircle(ctx,geom,squircleRadii.map(()=>minRadius),isSmooth(),isOutline(),isColor())}}}if(typeof registerPaint!=="undefined"){registerPaint("squircle",SquircleClass)}
-  `;
-  const blob = new Blob([workletCode], { type: 'application/javascript' });
-  const blobURL = URL.createObjectURL(blob);
-  CSS.paintWorklet.addModule(blobURL);
-}
-</script>
   <style>
     :root{
       --iconbg:#fff9;
@@ -50,7 +40,19 @@ if ("paintWorklet" in CSS) {
       animation-timeline: view();
 animation-range: entry 100% entry 130%;
     }
-    * { scrollbar-width: none; }
+    * { 
+      scrollbar-width: none;
+    line-height: 1.5!important;
+    font-family:
+  "Yu Gothic UI",
+  "Yu Gothic",
+  "Hiragino Sans",
+  "Hiragino Kaku Gothic ProN",
+  "Meiryo",
+  "Noto Sans JP",
+  sans-serif;
+
+     }
     *::-webkit-scrollbar { display: none; }
 
 
@@ -100,7 +102,7 @@ animation-range: entry 100% entry 130%;
       max-width:875px;
     
 }
-    .category-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; width:100vw; text-align:center;}
+    .category-title { font-size: 18px; font-weight: 400; margin-bottom: 10px; width:100vw; text-align:center;}
 
 
 
@@ -108,20 +110,20 @@ animation-range: entry 100% entry 130%;
     .appicon-bg {
       display: block;
       padding: 0px;
-      border-radius: 8px;
+      border-radius: 800px;
       text-align: center;
       width: 100px;
       position:relative;
       height:105px;
       width:105px;
-      mask-image:url('data:image/svg+xml;utf8,<svg width="105" height="105" viewBox="0  0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 55C0 29.573 0 16.8595 7.65351 8.76409C8.01325 8.38358 8.38358 8.01325 8.76409 7.65351C16.8595 0 29.573 0 55 0V0C80.427 0 93.1405 0 101.236 7.65351C101.616 8.01325 101.987 8.38358 102.346 8.76409C110 16.8595 110 29.573 110 55V55C110 80.427 110 93.1405 102.346 101.236C101.987 101.616 101.616 101.987 101.236 102.346C93.1405 110 80.427 110 55 110V110C29.573 110 16.8595 110 8.76409 102.346C8.38358 101.987 8.01325 101.616 7.65351 101.236C0 93.1405 0 80.427 0 55V55Z" fill="black"/></svg>');
-    }
+
+      corner-shape: squircle;
+        }
     .appicon-img {
       height:95px;
       width:95px;
       margin:5px;
       object-fit: cover;
-      border-radius: 4px;
     }
     .appicon-label {
       font-size: 12px;
@@ -132,7 +134,8 @@ animation-range: entry 100% entry 130%;
       backdrop-filter: brightness(100%);
       padding:4px;
       background:#fff0;
-      border-radius:10px;
+      border-radius:100px;
+      corner-shape: squircle;
       scale:0.9;
       color:#0000;
       transition:all 0.5s cubic-bezier(.34,.24,0,1);
@@ -193,6 +196,7 @@ animation-range: entry 100% entry 130%;
       display: flex;
       align-items: center;
       justify-content: center;
+      corner-shape: superellipse(1.2);
     }
 
     .any-box{
@@ -211,16 +215,14 @@ animation-range: entry 100% entry 130%;
       width:100%;
       height:100%;
       z-index:1001;
-      border-radius:27px;
+      border-radius:48px;
       backdrop-filter:blur(4px) brightness(120%);
       background:#fff9;
       box-shadow:var(--glass-shadow);
       display: flex;
       align-items: center;
       justify-content: space-around;
-    mask-image: paint(squircle);
-    --squircle-radius: 24px;
-    --squircle-smooth: 0.4;
+      corner-shape: squircle;
     }
 
     #google-search-btn{
@@ -250,6 +252,7 @@ animation-range: entry 100% entry 130%;
       font-size:24px;
     }
 
+
     #___gcse_0 {
         width: 80vw;
         height: calc(100vh - 200px);
@@ -257,9 +260,22 @@ animation-range: entry 100% entry 130%;
         position: fixed;
         top: 0;
       left:calc(50vw - 40vw);
+      opacity:1;
+      transition:opacity 0.2s ease;
           
-      border-radius:24px;
-    }
+      border-radius:48px;
+      corner-shape: squircle;
+
+      animation: gsc-hide-anm cubic-bezier(.6,0,0,1) both;
+      animation-timeline: view();
+      animation-range: 70% contain 100%;
+}
+
+#___gcse_0.hide {
+  opacity:0;
+  pointer-events:none;
+}
+
     .gsc-control-cse{
       background:none!important;
       border:none!important;
@@ -272,12 +288,8 @@ animation-range: entry 100% entry 130%;
       backdrop-filter:blur(24px) brightness(120%);
       margin:10px 0!important;
       padding: 24px !important;
-      /*
-      border-radius: 32px;
-      */
-          mask-image: paint(squircle);
-    --squircle-radius: 24px;
-    --squircle-smooth: 0.4;
+      border-radius: 64px;
+            corner-shape: squircle;
     }
     .gs-promotion .gs-visibleUrl, .gs-webResult .gs-visibleUrl {
       color:#0008!important;
@@ -289,8 +301,13 @@ animation-range: entry 100% entry 130%;
     a.gs-title,b {
     color: #000 !important;
 }
+.gsc-control-cse{
+  padding:32px 0px!important;
+}
+
 .gsc-control-cse.loading{
   opacity:0.6;
+  pointer-events:none;
 }.gsc-control-cse.hide{
   opacity:0!important;
   scale:0.95;
@@ -310,9 +327,6 @@ form.gsc-search-box.gsc-search-box-tools,.gsc-above-wrapper-area,table.gsc-compl
 }
 .gsc-results{
   width:100%!important;
-}
-.gsc-control-cse{
-  padding:32px 0px!important;
 }
   </style>
 </head>
@@ -534,8 +548,14 @@ searchBtn.addEventListener('click', doGoogleSearch);
 searchInput.addEventListener('input', function() {
   if (searchInput.value.trim()) {
     searchBox.classList.add('show');
+    // 検索ボックスが空でない場合は pointer-events を戻す
+    const gcse = document.getElementById('___gcse_0');
+    if (gcse) gcse.style.pointerEvents = '';
   } else {
     searchBox.classList.remove('show');
+    // 検索ボックスが空のとき pointer-events:none を付与
+    const gcse = document.getElementById('___gcse_0');
+    if (gcse) gcse.style.pointerEvents = 'none';
   }
 });
 
@@ -650,6 +670,21 @@ function loadAfterloadJS() {
 
 window.addEventListener('DOMContentLoaded', loadAfterloadJS);
 window.addEventListener('load', loadAfterloadJS);
+
+function updateGcseHideByScroll() {
+  const gcse = document.getElementById('___gcse_0');
+  if (!gcse) return;
+  const scrollY = window.scrollY || window.pageYOffset;
+  const threshold = window.innerHeight * 0.25;
+  if (scrollY >= threshold) {
+    gcse.classList.add('hide');
+  } else {
+    gcse.classList.remove('hide');
+  }
+}
+window.addEventListener('scroll', updateGcseHideByScroll);
+window.addEventListener('resize', updateGcseHideByScroll);
+document.addEventListener('DOMContentLoaded', updateGcseHideByScroll);
 
   </script>
 </body>
