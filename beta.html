@@ -65,12 +65,10 @@ animation-range: entry 100% entry 130%;
     @keyframes main-fade-anm {
       from {
         opacity:0;
-      filter:blur(10px);
         pointer-events:none;
       }
       to {
         opacity:1;
-      filter:blur(0px);
       pointer-events:unset;
       }
     }
@@ -100,23 +98,10 @@ animation-range: entry 100% entry 130%;
       flex-wrap: wrap;
       flex-direction: row;
       max-width:875px;
-
-      animation: size-anm-a cubic-bezier(.41,0,0,1) both;
-      animation-timeline: view();
-      animation-range: contain -30% contain 20%;
     
 }
     .category-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; width:100vw; text-align:center;}
 
-
-    @keyframes size-anm-a {
-      from {
-        filter:blur(5px);
-      }
-      to {
-        filter:blur(0px);
-      }
-    }
 
 
 
@@ -234,7 +219,7 @@ animation-range: entry 100% entry 130%;
       align-items: center;
       justify-content: space-around;
     mask-image: paint(squircle);
-    --squircle-radius: 20px;
+    --squircle-radius: 24px;
     --squircle-smooth: 0.4;
     }
 
@@ -309,6 +294,7 @@ animation-range: entry 100% entry 130%;
 }.gsc-control-cse.hide{
   opacity:0!important;
   scale:0.95;
+  pointer-events:none;
 }
 .gsc-loading-fade .gsc-result-info, .gsc-loading-fade .gsc-loading-resultsRoot, .gsc-loading-resultsRoot, .gsc-loading-fade .gsc-loading-refinementsArea, .gsc-loading-fade .gsc-adBlock, .gsc-loading-fade .gsc-adBlockVertical, .gsc-loading-fade .gsc-adBlockNoHeight{
   opacity:1!important;
@@ -334,7 +320,7 @@ form.gsc-search-box.gsc-search-box-tools,.gsc-above-wrapper-area,table.gsc-compl
 
   <div class="search-box liquid-glass">
    <div class="search-box-in">
-    <input type="text" id="google-search-input" placeholder="なんでも検索"/>
+    <input type="text" id="google-search-input" placeholder="検索，計算，質問"/>
     <button id="google-search-btn">検索</button>
    </div>
   </div>
@@ -428,300 +414,243 @@ if(M()){document.getElementsByTagName("head")[0].appendChild(O(opts_.cselibVersi
   <script>
     const getFileName = (path) => path.split('/').pop();
 
-    const loadZip = async (url) => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('ZIP fetch failed');
-        const buffer = await response.arrayBuffer();
-        const files = fflate.unzipSync(new Uint8Array(buffer));
-        const imageMap = {};
-        for (const [path, data] of Object.entries(files)) {
-          const fileName = getFileName(path);
-          const blob = new Blob([data.buffer], { type: 'image/webp' });
-          imageMap[fileName] = URL.createObjectURL(blob);
-        }
-        return imageMap;
-      } catch (err) {
-        console.error('loadZip error', err);
-        return {};
-      }
-    };
-
-    const loadData = async () => {
-      try {
-        const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
-        const imageMap = await loadZip(zipUrl);
-
-        const jsonUrl = 'https://search3958.github.io/newtab/links.json';
-        const res = await fetch(jsonUrl);
-        if (!res.ok) throw new Error('links.json fetch failed');
-        const data = await res.json();
-
-        const container = document.getElementById('links-container');
-
-        (data.categories || []).forEach(category => {
-          const categoryDiv = document.createElement('div');
-          categoryDiv.className = 'category';
-
-          const title = document.createElement('h2');
-          title.className = 'category-title';
-          title.textContent = category.title || '無題';
-          categoryDiv.appendChild(title);
-
-          (category.links || []).forEach(link => {
-            const a = document.createElement('a');
-            a.href = link.url || '#';
-
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'appicon-bg';
-            if (link.bg) iconDiv.style.background = link.bg;
-
-            const img = document.createElement('img');
-            img.className = 'appicon-img';
-            const src = imageMap[link.icon];
-            img.alt = link.name || '';
-            img.src = src || link.icon || '';
-
-            const label = document.createElement('div');
-            label.className = 'appicon-label';
-            label.textContent = link.name || '';
-
-            iconDiv.appendChild(img);
-            iconDiv.appendChild(label);
-            a.appendChild(iconDiv);
-            categoryDiv.appendChild(a);
-          });
-
-          container.appendChild(categoryDiv);
-        });
-
-        // スクロール位置に応じて透明度切り替え
-        const checkVisibility = () => {
-          const rect = container.getBoundingClientRect();
-          if (rect.top <= 0) {
-            container.classList.add('visible');
-          } else {
-            container.classList.remove('visible');
-          }
-        };
-
-        window.addEventListener('scroll', checkVisibility);
-        checkVisibility();
-      } catch (err) {
-        console.error('loadData error', err);
-      }
-    };
-
-    loadData();
-
-    // Google検索用
-    const searchInput = document.getElementById('google-search-input');
-    const searchBtn = document.getElementById('google-search-btn');
-    const searchBox = document.querySelector('.search-box');
-    function doGoogleSearch() {
-      const q = searchInput.value.trim();
-      if(q) {
-        window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
-      }
+const loadZip = async (url) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('ZIP fetch failed');
+    const buffer = await response.arrayBuffer();
+    const files = fflate.unzipSync(new Uint8Array(buffer));
+    
+    const imageMap = {};
+    const entries = Object.entries(files);
+    
+    for (let i = 0; i < entries.length; i++) {
+      const [path, data] = entries[i];
+      const fileName = getFileName(path);
+      const blob = new Blob([data.buffer], { type: 'image/webp' });
+      imageMap[fileName] = URL.createObjectURL(blob);
+      
+      if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
     }
-    searchBtn.addEventListener('click', doGoogleSearch);
-    // 入力時に.showを付与/削除
-    searchInput.addEventListener('input', function() {
-      if (searchInput.value.trim()) {
-        searchBox.classList.add('show');
-      } else {
-        searchBox.classList.remove('show');
-      }
+    return imageMap;
+  } catch (err) {
+    console.error('loadZip error', err);
+    return {};
+  }
+};
+
+const loadData = async () => {
+  try {
+    const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
+    const imageMap = await loadZip(zipUrl);
+
+    const jsonUrl = 'https://search3958.github.io/newtab/links.json';
+    const res = await fetch(jsonUrl);
+    if (!res.ok) throw new Error('links.json fetch failed');
+    const data = await res.json();
+
+    const container = document.getElementById('links-container');
+
+    (data.categories || []).forEach(category => {
+      const categoryDiv = document.createElement('div');
+      categoryDiv.className = 'category';
+
+      const title = document.createElement('h2');
+      title.className = 'category-title';
+      title.textContent = category.title || '無題';
+      categoryDiv.appendChild(title);
+
+      (category.links || []).forEach(link => {
+        const a = document.createElement('a');
+        a.href = link.url || '#';
+
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'appicon-bg';
+        if (link.bg) iconDiv.style.background = link.bg;
+
+        const img = document.createElement('img');
+        img.className = 'appicon-img';
+        const src = imageMap[link.icon];
+        img.alt = link.name || '';
+        img.src = src || link.icon || '';
+
+        const label = document.createElement('div');
+        label.className = 'appicon-label';
+        label.textContent = link.name || '';
+
+        iconDiv.appendChild(img);
+        iconDiv.appendChild(label);
+        a.appendChild(iconDiv);
+        categoryDiv.appendChild(a);
+      });
+
+      container.appendChild(categoryDiv);
     });
 
-    // #google-search-input → #gsc-i-id1 へリアルタイム同期（要素が無くてもエラーにならず再試行）
-    (function syncToGscInput() {
-      try {
-        const src = document.getElementById('google-search-input');
-        const dst = document.getElementById('gsc-i-id1');
-        const cse = document.querySelector('.gsc-control-cse');
-        const resultsRoot = document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive');
-        if (src && dst) {
-          // 直近の入力値とタイマー管理
-          if (!window._gscSync) window._gscSync = { lastValue: '', timer: null, lastInputTime: 0, updating: false, lastResults: '' };
-          const sync = window._gscSync;
-          // 検索結果の内容が変化したかどうか
-          let resultsChanged = false;
-          if (resultsRoot) {
-            const html = resultsRoot.innerHTML;
-            if (sync.lastResults !== undefined && sync.lastResults !== html) {
-              resultsChanged = true;
-            }
-            sync.lastResults = html;
-          }
-          // 入力内容が変わった時点でloadingを必ず付与し、結果が変わるまで絶対に外さない
-          if (dst.value !== src.value) {
-            if (cse) cse.classList.add('loading');
-            dst.value = src.value;
-            dst.dispatchEvent(new Event('input', {bubbles:true}));
-            sync.lastInputTime = Date.now();
-            sync.lastValue = src.value;
-            sync.updating = true;
-            sync.waitingForResult = true;
-          }
-          // 0.2秒間入力値が変化しなければ検索ボタンを自動クリック
-          if (sync.lastValue !== '' && Date.now() - sync.lastInputTime > 200) {
-            const btn = document.querySelector('.gsc-search-button.gsc-search-button-v2');
-            if (btn) btn.click();
-            sync.lastValue = '';
-            sync.lastInputTime = Date.now();
-            sync.waitingForResult = true;
-          }
-          // 検索結果の内容が変化したらloadingを外す
-          if (cse && resultsChanged && sync.waitingForResult) {
-            cse.classList.remove('loading');
-            sync.updating = false;
-            sync.waitingForResult = false;
-          }
-          // 絶対に結果が変わるまでloadingを外さない
-          if (cse && sync.waitingForResult) {
-            cse.classList.add('loading');
-          }
-          // 検索内容が0文字のとき.hideを付与、1文字以上なら外す
-          if (cse) {
-            if (src.value.length === 0) {
-              cse.classList.add('hide');
-            } else {
-              cse.classList.remove('hide');
-            }
-          }
-        }
-      } catch(e) { /* 無視 */ }
-      setTimeout(syncToGscInput, 100); // 常に再試行
-    })();
+    let cachedRect = null;
+    let lastScrollY = -1;
 
-    // スクロールベースのアニメーションをJSで管理
-    function scrollAnimUpdate() {
-      // 0vh〜50vhの間で進行度t(0〜1)
-      const scrollY = window.scrollY || window.pageYOffset;
-      const vh = window.innerHeight;
-      const from = 0;
-      const to = 0.5 * vh;
-      let t = (scrollY - from) / (to - from);
-      t = Math.max(0, Math.min(1, t));
-
-      // .search-boxアニメーション
-      const searchBox = document.querySelector('.search-box');
-      if (searchBox) {
-        // CSSアニメーションのfrom/toを再現
-        // from: scale(1), bottom:15px
-        // to:   scale(0.3,0.4), bottom:-70px
-        const scaleX = 1 - 0.7 * t;
-        const scaleY = 1 - 0.6 * t;
-        const bottom = 15 * (1 - t) + (-70) * t;
-        searchBox.style.transform = `scale(${scaleX},${scaleY})`;
-        searchBox.style.bottom = `${bottom}px`;
+    const checkVisibility = () => {
+      const currentScrollY = window.scrollY || window.pageYOffset;
+      
+      if (lastScrollY === currentScrollY && cachedRect) {
+        const isVisible = cachedRect.top <= 0;
+        container.classList.toggle('visible', isVisible);
+        return;
       }
-      // 他のアニメーションも同様にここで管理可能
-    }
-    window.addEventListener('scroll', scrollAnimUpdate);
-    window.addEventListener('resize', scrollAnimUpdate);
-    document.addEventListener('DOMContentLoaded', function() {
-      scrollAnimUpdate(); // 即時実行
-      setTimeout(scrollAnimUpdate, 0); // レイアウト確定後にも即時実行
-    });
-  </script>
-
-  <script>// Liquid Glass JS
-
-
-function applyLiquidGlassEffect(container) {
-    const outerCount = 20;
-    const outerStep = 2;
-    const borderThickness = 6;
-    
-    // 既存のマスク要素があれば再利用のために取得、なければ配列を初期化
-    let masks = container._glassMasks || [];
-    
-    // 初回実行時のみ要素を作成（DOM生成コストを初回のみにする）
-    if (masks.length === 0) {
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < outerCount; i++) {
-            const mask = document.createElement('div');
-            // 静的なスタイル（変化しないもの）はここで設定
-            Object.assign(mask.style, {
-                position: 'absolute',
-                pointerEvents: 'none',
-                zIndex: `${outerCount - i}`,
-                // CSS Mask Compositeを使ってSVG無しで「中抜きの枠」を作る（超高速）
-                border: `${borderThickness}px solid transparent`,
-                mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-                maskComposite: 'exclude',
-                webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-                webkitMaskComposite: 'xor', // Chrome/Safari用
-            });
-            
-            fragment.appendChild(mask);
-            masks.push(mask);
-        }
-        container.appendChild(fragment);
-        container._glassMasks = masks; // 参照を保存
-    }
-
-    // アニメーションフレーム管理用フラグ
-    let rafId = null;
-
-    const updateLayout = () => {
-        // コンテナの現在のサイズとスタイルを取得
-        // getComputedStyleはリフローを誘発するため、ループの外で一回だけ呼ぶ
-        const style = window.getComputedStyle(container);
-        const width = parseFloat(style.width);
-        const height = parseFloat(style.height);
-        const baseRadius = parseFloat(style.borderRadius) || 0;
-
-        // ループ処理（DOMの生成・削除は行わず、styleの書き換えのみ行う）
-        for (let i = 0; i < outerCount; i++) {
-            const mask = masks[i];
-            const inset = i * outerStep;
-            
-            // サイズが小さくなりすぎる場合は隠す
-            if (width - inset * 2 <= 0 || height - inset * 2 <= 0) {
-                mask.style.display = 'none';
-                continue;
-            }
-            
-            const normalizedPosition = (outerCount - i) / outerCount;
-            const blur = Math.pow(normalizedPosition, 3.5) * 40;
-            const currentRadius = Math.max(baseRadius - inset, 0);
-
-            // transformやopacityなどのGPUプロパティ以外の変更をバッチ処理的に行う
-            // 文字列連結のコストを減らすため、必要なプロパティだけ更新
-            mask.style.display = 'block';
-            mask.style.inset = `${inset}px`; // position:relativeなしでも、親のパディングボックス基準または配置文脈に従う
-            mask.style.borderRadius = `${currentRadius}px`;
-            mask.style.backdropFilter = `blur(${blur}px)`;
-            mask.style.webkitBackdropFilter = `blur(${blur}px)`;
-        }
-        rafId = null;
+      
+      cachedRect = container.getBoundingClientRect();
+      lastScrollY = currentScrollY;
+      
+      const isVisible = cachedRect.top <= 0;
+      container.classList.toggle('visible', isVisible);
     };
 
-    // ResizeObserverの設定
-    const resizeObserver = new ResizeObserver(() => {
-        // RequestAnimationFrameを使って描画更新をモニタのリフレッシュレートに同期させる
-        // これにより無駄な計算（1フレームに複数回の計算）を間引きます
-        if (!rafId) {
-            rafId = requestAnimationFrame(updateLayout);
-        }
-    });
+    window.addEventListener('scroll', checkVisibility);
+    checkVisibility();
 
-    resizeObserver.observe(container);
-    container._resizeObserver = resizeObserver;
-    
-    // 初回描画
-    updateLayout();
+    if (window.addLinksAdIfNeeded) {
+      window.addLinksAdIfNeeded(container);
+    }
+  } catch (err) {
+    console.error('loadData error', err);
+  }
+};
+
+loadData();
+
+const searchInput = document.getElementById('google-search-input');
+const searchBtn = document.getElementById('google-search-btn');
+const searchBox = document.querySelector('.search-box');
+
+function doGoogleSearch() {
+  const q = searchInput.value.trim();
+  if(q) {
+    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+  }
 }
 
-// 実行
-document.querySelectorAll('.liquid-glass').forEach(el => {
-    applyLiquidGlassEffect(el);
+searchBtn.addEventListener('click', doGoogleSearch);
+searchInput.addEventListener('input', function() {
+  if (searchInput.value.trim()) {
+    searchBox.classList.add('show');
+  } else {
+    searchBox.classList.remove('show');
+  }
 });
 
+(function syncToGscInput() {
+  try {
+    const src = document.getElementById('google-search-input');
+    const dst = document.getElementById('gsc-i-id1');
+    const cse = document.querySelector('.gsc-control-cse');
+    const resultsRoot = document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive');
+    if (src && dst) {
+      if (!window._gscSync) window._gscSync = { lastValue: '', timer: null, lastInputTime: 0, updating: false, lastResults: '' };
+      const sync = window._gscSync;
+      let resultsChanged = false;
+      if (resultsRoot) {
+        const html = resultsRoot.innerHTML;
+        if (sync.lastResults !== undefined && sync.lastResults !== html) {
+          resultsChanged = true;
+        }
+        sync.lastResults = html;
+      }
+      if (dst.value !== src.value) {
+        if (cse) cse.classList.add('loading');
+        dst.value = src.value;
+        dst.dispatchEvent(new Event('input', {bubbles:true}));
+        sync.lastInputTime = Date.now();
+        sync.lastValue = src.value;
+        sync.updating = true;
+        sync.waitingForResult = true;
+      }
+      if (sync.lastValue !== '' && Date.now() - sync.lastInputTime > 200) {
+        const btn = document.querySelector('.gsc-search-button.gsc-search-button-v2');
+        if (btn) btn.click();
+        sync.lastValue = '';
+        sync.lastInputTime = Date.now();
+        sync.waitingForResult = true;
+      }
+      if (cse && resultsChanged && sync.waitingForResult) {
+        cse.classList.remove('loading');
+        sync.updating = false;
+        sync.waitingForResult = false;
+      }
+      if (cse && sync.waitingForResult) {
+        cse.classList.add('loading');
+      }
+      if (cse) {
+        if (src.value.length === 0) {
+          cse.classList.add('hide');
+        } else {
+          cse.classList.remove('hide');
+        }
+      }
+    }
+  } catch(e) { /* 無視 */ }
+  setTimeout(syncToGscInput, 100);
+})();
 
-</script>
+let lastResultsHTML = '';
+const observer = new MutationObserver(() => {
+  const resultsRoot = document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive');
+  if (resultsRoot) {
+    const currentHTML = resultsRoot.innerHTML;
+    if (lastResultsHTML && lastResultsHTML !== currentHTML) {
+      const cse = document.querySelector('.gsc-control-cse');
+      if (cse) cse.classList.remove('loading');
+      window._gscSync.waitingForResult = false;
+    }
+    lastResultsHTML = currentHTML;
+  }
+});
+
+if (document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive')) {
+  observer.observe(document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive'), {
+    childList: true,
+    subtree: true
+  });
+}
+
+function scrollAnimUpdate() {
+  const scrollY = window.scrollY || window.pageYOffset;
+  const vh = window.innerHeight;
+  const from = 0;
+  const to = 0.5 * vh;
+  let t = (scrollY - from) / (to - from);
+  t = Math.max(0, Math.min(1, t));
+
+  const searchBox = document.querySelector('.search-box');
+  if (searchBox) {
+    const scaleX = 1 - 0.7 * t;
+    const scaleY = 1 - 0.6 * t;
+    const bottom = 15 * (1 - t) + (-70) * t;
+    searchBox.style.transform = `scale(${scaleX},${scaleY})`;
+    searchBox.style.bottom = `${bottom}px`;
+  }
+}
+
+window.addEventListener('scroll', scrollAnimUpdate);
+window.addEventListener('resize', scrollAnimUpdate);
+document.addEventListener('DOMContentLoaded', function() {
+  scrollAnimUpdate();
+  setTimeout(scrollAnimUpdate, 0);
+});
+
+function loadAfterloadJS() {
+  if (window._afterloadLoaded) return;
+  window._afterloadLoaded = true;
+  setTimeout(function() {
+    var s = document.createElement('script');
+    s.src = 'beta/afterload.js';
+    document.body.appendChild(s);
+  }, 200);
+}
+
+window.addEventListener('DOMContentLoaded', loadAfterloadJS);
+window.addEventListener('load', loadAfterloadJS);
+
+  </script>
 </body>
 </html>
