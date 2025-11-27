@@ -132,7 +132,7 @@ animation-range: entry 100% entry 130%;
       bottom:10px;
       left:10px;
       backdrop-filter: brightness(100%);
-      padding:4px;
+      padding:6px;
       background:#fff0;
       border-radius:100px;
       corner-shape: squircle;
@@ -148,7 +148,7 @@ animation-range: entry 100% entry 130%;
     
     .appicon-bg:hover>.appicon-label {
       backdrop-filter: brightness(160%) blur(8px);
-      background:#fff6;
+      background:#fff9;
       scale:0.999;
       color:#000f;
       opacity:1;
@@ -426,6 +426,45 @@ if(M()){document.getElementsByTagName("head")[0].appendChild(O(opts_.cselibVersi
 
   <script src="https://unpkg.com/fflate@0.8.2/umd/index.js"></script>
   <script>
+    // --- gsc.qやgscが含まれるURLパラメータ・window変数のクリア ---
+    document.addEventListener('DOMContentLoaded', function() {
+      // URLクエリパラメータからgsc.qやgscが含まれるものを除去
+      const url = new URL(window.location.href);
+      let changed = false;
+      for (const key of Array.from(url.searchParams.keys())) {
+        if (key === 'gsc.q' || key.includes('gsc')) {
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      }
+      // ハッシュ部分も同様に除去
+      if (url.hash && url.hash.includes('gsc')) {
+        const hash = url.hash.substring(1); // 先頭#を除く
+        const params = new URLSearchParams(hash);
+        let hashChanged = false;
+        for (const key of Array.from(params.keys())) {
+          if (key === 'gsc.q' || key.includes('gsc')) {
+            params.delete(key);
+            hashChanged = true;
+          }
+        }
+        if (hashChanged) {
+          const newHash = params.toString();
+          url.hash = newHash ? ('#' + newHash) : '';
+          changed = true;
+        }
+      }
+      if (changed) {
+        history.replaceState(null, '', url.pathname + url.search + url.hash);
+      }
+      // windowオブジェクトのgscが含まれるプロパティを削除
+      Object.keys(window).forEach(k => {
+        if (k === 'gsc' || k.startsWith('gsc') || k.includes('gsc')) {
+          try { delete window[k]; } catch(e) {}
+        }
+      });
+    });
+
     const getFileName = (path) => path.split('/').pop();
 
 const loadZip = async (url) => {
@@ -609,7 +648,7 @@ searchInput.addEventListener('input', function() {
       }
     }
   } catch(e) { /* 無視 */ }
-  setTimeout(syncToGscInput, 100);
+  setTimeout(syncToGscInput, 260);
 })();
 
 let lastResultsHTML = '';

@@ -25,9 +25,9 @@
 
   gtag('config', 'G-7N56NHPY3C');
 </script>
-<title>Newtab 5.3</title>
-<link rel="icon" href="https://search3958.github.io/icons/newtab.svg"><link rel="stylesheet" href="v5.3/style.css">
-<style>body{background-image: url('https://search3958.github.io/newtab/bgimg/3958Glass4.webp');}</style>
+<title>Newtab 5</title>
+<link rel="icon" href="https://search3958.github.io/icons/newtab.svg"><link rel="stylesheet" href="style.css">
+<style>body{background-image: url('bgimg/plate3.webp');}</style>
 <script>
 if ("paintWorklet" in CSS) {
   const workletCode = `
@@ -73,7 +73,7 @@ if ("paintWorklet" in CSS) {
   <div class="bottombar">
     <div class="shortcuthistory"></div>
     <div class="info">
-      <iframe class="today" src="v5.3/card.html"></iframe>
+      <iframe class="today" src="card.html"></iframe>
 
     </div>
   </div>
@@ -108,6 +108,10 @@ if ("paintWorklet" in CSS) {
         <button type="button" onclick="window.location.href='https://search3958.github.io/project/images/?image-url=new'">壁紙一<md-ripple></md-ripple>覧</button>
       </div>
       <div class="setting-item">
+        <label for="wallpaper-input">同期機能(今後追加)</label>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/accounts/'">アカウントの管理<md-ripple></md-ripple></button>
+      </div>
+      <div class="setting-item">
         <h4>検索履歴の管理</h4>
         <div class="search-history-list"></div>
         <button type="button" id="clear-search-history">検索履歴をクリア<md-ripple></md-ripple></button>
@@ -119,20 +123,11 @@ if ("paintWorklet" in CSS) {
         <input type="range" id="corner-slider" min="0.3" max="6" step="0.1" value="1">
       </div>
       <div class="setting-item full">
-        <label for="wallpaper-input">Newtab v5.3(緊急修正)</label>
-        <small><p>以前のバージョンでパフォーマンスが急激に悪化したため，<br>v5.1をベースに一部を置き換えて過去のバージョンに戻しました。<br>多くの機能はv5.2と同じようにご利用いただけます。</p></small>
+        <label for="wallpaper-input">Newtab v5</label>
         <button type="button" onclick="window.location.href='https://search3958.github.io/'">私について<md-ripple></md-ripple></button>
         <button type="button" onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法<md-ripple></md-ripple></button>
         <button type="button" onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'">簡易版<md-ripple></md-ripple></button>
-        <button type="button" onclick="window.location.href='https://search3958.github.io/newtab/beta'">v6 Beta版<md-ripple></md-ripple></button>
-      </div>
-    </div>
-    <div class="setting-item full">
-        <label for="wallpaper-input">
-          重要情報</label>
-        <button type="button" onclick="window.location.href='https://search3958.github.io/policies/trems'">利用規約<md-ripple></md-ripple></button>
-        <button type="button" onclick="window.location.href='https://search3958.github.io/policies/privacy'">プライバシーポリシー<md-ripple></md-ripple></button>
-        <button type="button" onclick="window.location.href='https://search3958.github.io/entry'">同意の撤回<md-ripple></md-ripple></button>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/newtab/beta'">Beta版<md-ripple></md-ripple></button>
       </div>
     </div>
   </div>
@@ -157,7 +152,7 @@ if ("paintWorklet" in CSS) {
     }
   });
 </script>
-<script src="v5.3/script.js"></script>
+<script src="script.js"></script>
 
 
 
