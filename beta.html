@@ -3,43 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>リンク集</title>
+  <title>Newtab v6 Beta</title>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '@material/web/ripple/ripple.js';
+    import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+
+
   <style>
     :root{
       --iconbg:#fff9;
       --glass-shadow: #fffb 0px 1.5px 3px inset,#fff7 0px -1.5px 3px inset;
+      --text-color:#000;
     }
     body {
       margin: 0;
-      font-family: sans-serif;
-      background: url('https://search3958.github.io/newtab/bgimg/3958Glass6.webp') no-repeat center center fixed;
+      background: url('https://search3958.github.io/newtab/bgimg/bg1.webp') no-repeat center center fixed;
       background-size: cover;
     }
 
 
-
-    @keyframes bg-blur {
-      from {
-        backdrop-filter:blur(0px) brightness(100%);
-      }
-      to {
-        backdrop-filter:blur(24px) brightness(106%);
-      }
-    }
-
-
-    body:before{
-      content:" ";
-      position:fixed;
-      backdrop-filter:blur(24px) brightness(103%);
-      height:100%;
-      width:100%;
-      pointer-events:none;
-
-      animation: bg-blur cubic-bezier(.5,0,0,1) both;
-      animation-timeline: view();
-animation-range: entry 100% entry 130%;
-    }
     * { 
       scrollbar-width: none;
     line-height: 1.5!important;
@@ -51,50 +44,136 @@ animation-range: entry 100% entry 130%;
   "Meiryo",
   "Noto Sans JP",
   sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 
      }
     *::-webkit-scrollbar { display: none; }
-
-
-    main#links-container {
-        display: flex;
-        flex-direction: column;
-        align-content: center;
-        align-items: center;
-        
+    .first{
+      
+    position: fixed;
+    top: calc(50% - 56px);
+    left: 50%;
+    transform: translate(-50%, -50px);
+    display:flex;
+    gap:16px;
     }
-
-    @keyframes main-fade-anm {
-      from {
-        opacity:0;
-        pointer-events:none;
-      }
-      to {
-        opacity:1;
-      pointer-events:unset;
-      }
-    }
-
-
-    #links-container {
-      opacity: 0;
-      transition: opacity 0.2s;
-      padding-bottom:300px;
+    .search{
+      width:fit-content;
       position:relative;
-      padding-top:50vh;
-
-      animation: main-fade-anm cubic-bezier(.5,0,0,.7) both;
-      animation-timeline: view();
-      animation-range: entry 100% entry 150%;
-
+      border-radius:35px;
+      scale:1;
+      transition:scale 0.3s cubic-bezier(.34,.24,.18,1);
     }
-    #links-container.visible {
-      opacity: 1;
+    .search:active{
+      scale:1.03;
     }
+    .search-in{
+      position:relative;
+      z-index:1001;
+      background:#fff4;
+      padding:13px;
+      corner-shape: superellipse(2.4);
+      border-radius:90px;
+      backdrop-filter:blur(4px) brightness(1.15);
+      transition:backdrop-filter 0.3s cubic-bezier(.34,.24,.18,1);
+      overflow:hidden;
+      --md-ripple-hover-color:#fff0;
+      --md-ripple-pressed-color:#fff2;
+      --md-ripple-pressed-opacity:1;
+    }
+
+    .search-in:active{
+      backdrop-filter:blur(4px) brightness(1.2);
+    }
+    .search-rp{
+      border-radius:0px;
+    }
+    
+    .search-input,.search-button{
+      background:none;
+      outline:none;
+      border:none;
+      color:var(--text-color);
+      font-size:16px;
+    }
+    .search-input{
+      width:200px;
+    }
+    .search-box{
+      padding:16px;
+      background:#fff7;
+      corner-shape: superellipse(1.6);
+      border-radius:29px;
+      border:#fff6 1px solid;
+    }
+    .control-button{
+      padding:16px;
+      background:#fff7;
+      corner-shape: superellipse(1.6);
+      border-radius:14px;
+      border:#fff6 1px solid;
+      width:100%;
+    }
+    .control-button:first-child{
+      border-radius:29px 14px 14px 29px;
+    }
+    .control-button:last-child{
+      border-radius:14px 29px 29px 14px;
+    }
+    .search-control{
+      margin-top:8px;
+      display:flex;
+      gap:6px;
+    }
+    svg{
+      margin-bottom:-5px;
+    }
+
+
+
+    .applist{
+      width:fit-content;
+      position:relative;
+      border-radius:35px;
+      scale:1;
+      transition:scale 0.3s cubic-bezier(.34,.24,.18,1),box-shadow 0.3s cubic-bezier(.34,.24,.18,1);
+      box-shadow:#0002 0px 0px 0px;
+    }
+    .applist:hover{
+      scale:1.3;
+      box-shadow:#0002 0px 8px 16px;
+    }
+    .applist:active{
+      scale:2.03;
+    }
+    .applist-in{
+      position:relative;
+      z-index:1001;
+      background:#fff4;
+      padding:13px 0px;
+      corner-shape: superellipse(2.4);
+      border-radius:90px;
+      backdrop-filter:blur(4px) brightness(1.15);
+      transition:backdrop-filter 0.3s cubic-bezier(.34,.24,.18,1);
+      overflow:scroll;
+      --md-ripple-hover-color:#fff0;
+      --md-ripple-pressed-color:#fff3;
+      --md-ripple-pressed-opacity:1;
+      height:calc(100% - 13*2px);
+      width:154px;
+      height:128px;
+    }
+
+    .applist-in:active{
+      backdrop-filter:blur(4px) brightness(1.2);
+    }
+
+
+
 
     .category {
-      margin-bottom: 20px;
-      gap: 16px;
+      margin-bottom: 8px;
+      gap: 8px;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
@@ -102,7 +181,7 @@ animation-range: entry 100% entry 130%;
       max-width:875px;
     
 }
-    .category-title { font-size: 18px; font-weight: 400; margin-bottom: 10px; width:100vw; text-align:center;}
+    .category-title { font-size: 16px; font-weight: 400; margin:0px;margin-bottom: 3px; width:100%; text-align:center;}
 
 
 
@@ -114,358 +193,88 @@ animation-range: entry 100% entry 130%;
       text-align: center;
       width: 100px;
       position:relative;
-      height:105px;
-      width:105px;
-
-      corner-shape: squircle;
+      height:40px;
+      width:40px;
         }
     .appicon-img {
-      height:95px;
-      width:95px;
-      margin:5px;
+      height:40px;
+      width:40px;
       object-fit: cover;
     }
     .appicon-label {
       font-size: 12px;
       margin-top: 4px;
       position:absolute;
-      bottom:10px;
-      left:10px;
+      top:20px;
+      left:-10px;
       backdrop-filter: brightness(100%);
       padding:6px;
       background:#fff0;
       border-radius:100px;
       corner-shape: squircle;
-      scale:0.9;
+      scale:0.5;
       color:#0000;
-      transition:all 0.5s cubic-bezier(.34,.24,0,1);
+      transition:all 0.3s cubic-bezier(.34,.24,0,1);
       max-width: 75px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       opacity:0;
+      pointer-events:none;
+      z-index:10;
+      box-shadow:#0002 0px 8px 16px;
     }
     
     .appicon-bg:hover>.appicon-label {
+      top:40px;
       backdrop-filter: brightness(160%) blur(8px);
       background:#fff9;
-      scale:0.999;
+      scale:0.8;
       color:#000f;
       opacity:1;
+      transition-delay:0.5s;
     }
 
-    @keyframes search-anm {
-      from {
-        scale:1;
-      bottom:15px;
-      }
-      to {
-        scale:0.3 0.4;
-      bottom:-70px;
-      }
-    }
-    .search-box{
-      position:fixed;
-      left:calc(50vw - 90px);
-      height:50px;
-      z-index:100;
-      border-radius:100px;
-      width:180px;
-      /* animation: search-anm cubic-bezier(.6,0,0,1) both; */
-      /* animation-timeline: view(); */
-      /* animation-range: contain 0% contain 70%; */
-      transition:all 0.7s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1);
-    }
-
-    .search-box.show{
-      left:calc(50vw - 170px);
-
-      height:65px;
-      width:340px;
-    }
-
-    .search-box-in{
-      position:absolute;
-      width:100%;
-      height:100%;
-      z-index:1001;
-      border-radius:100px;
-      backdrop-filter:blur(4px) brightness(130%);
-      background:#fff9;
-      box-shadow:var(--glass-shadow);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      corner-shape: superellipse(1.2);
-    }
-
-    .any-box{
-      position:fixed;
-      left:calc(50vw - 150px);
-      bottom:80px;
-      height:110px;
-      z-index:100;
-      border-radius:36px;
-      width:300px;
-    }
-
-
-    .any-box-in{
-      position:absolute;
-      width:100%;
-      height:100%;
-      z-index:1001;
-      border-radius:48px;
-      backdrop-filter:blur(4px) brightness(120%);
-      background:#fff9;
-      box-shadow:var(--glass-shadow);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      corner-shape: squircle;
-    }
-
-    #google-search-btn{
-      background:none;
-      border:none;
-      color:#000;
-      width: 0px;
-      text-wrap-mode: nowrap;
-      transition:all 0.7s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1);
-      filter:opacity(0) blur(4px);
-    }
-
-    .show #google-search-btn{
-      width: 60px;
-      filter:opacity(1) blur(0px);
-    }
-    #google-search-input{
-      width:calc(100% - 45px);
-      font-size:16px;
-      outline:none;
-      background:none;
-      border:none;
-      transition:all 0.7s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1);
-    }
-    .show #google-search-input{
-      width:calc(100% - 110px);
-      font-size:24px;
-    }
-
-
-    #___gcse_0 {
-        width: 80vw;
-        height: calc(100vh - 200px);
-        overflow: scroll;
-        position: fixed;
-        top: 0;
-      left:calc(50vw - 40vw);
-      opacity:1;
-      transition:opacity 0.2s ease;
-          
-      border-radius:48px;
-      corner-shape: squircle;
-
-      animation: gsc-hide-anm cubic-bezier(.6,0,0,1) both;
-      animation-timeline: view();
-      animation-range: 70% contain 100%;
-}
-
-#___gcse_0.hide {
-  opacity:0;
-  pointer-events:none;
-}
-
-    .gsc-control-cse{
-      background:none!important;
-      border:none!important;
-      opacity:1;
-      transition:0.2s opacity ease,0.2s scale ease;
-    }
-    .gsc-webResult.gsc-result{
-      background:#fff5!important;
-      border:none!important;
-      backdrop-filter:blur(24px) brightness(120%);
-      margin:10px 0!important;
-      padding: 24px !important;
-      border-radius: 64px;
-            corner-shape: squircle;
-    }
-    .gs-promotion .gs-visibleUrl, .gs-webResult .gs-visibleUrl {
-      color:#0008!important;
-    }
-    .gs-promotion-text-cell{
-      margin-left:0px!important;
-    }
-    
-    a.gs-title,b {
-    color: #000 !important;
-}
-.gsc-control-cse{
-  padding:32px 0px!important;
-}
-
-.gsc-control-cse.loading{
-  opacity:0.6;
-  pointer-events:none;
-}.gsc-control-cse.hide{
-  opacity:0!important;
-  scale:0.95;
-  pointer-events:none;
-}
-.gsc-loading-fade .gsc-result-info, .gsc-loading-fade .gsc-loading-resultsRoot, .gsc-loading-resultsRoot, .gsc-loading-fade .gsc-loading-refinementsArea, .gsc-loading-fade .gsc-adBlock, .gsc-loading-fade .gsc-adBlockVertical, .gsc-loading-fade .gsc-adBlockNoHeight{
-  opacity:1!important;
-}
-
-form.gsc-search-box.gsc-search-box-tools,.gsc-above-wrapper-area,table.gsc-completion-container{
-  display:none!important;
-}
-.gsc-cursor-box.gs-bidi-start-align,.gcsc-more-maybe-branding-root {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}
-.gsc-results{
-  width:100%!important;
-}
   </style>
 </head>
 <body>
 
-  <div class="search-box liquid-glass">
-   <div class="search-box-in">
-    <input type="text" id="google-search-input" placeholder="検索，計算，質問"/>
-    <button id="google-search-btn">検索</button>
-   </div>
-  </div>
-
-
-
-  
-<script async>
-  (function(opts_){/*
-
- Copyright The Closure Library Authors.
- SPDX-License-Identifier: Apache-2.0
-*/
-'use strict';var f=this||self;function g(a){return a};var h;function k(a,b){this.h=a===l&&b||"";this.g=m}function n(a){return a instanceof k&&a.constructor===k&&a.g===m?a.h:"type_error:Const"}var m={},l={};function p(a,b){this.h=b===q?a:""}p.prototype.toString=function(){return this.h+""};function r(a){return a instanceof p&&a.constructor===p?a.h:"type_error:TrustedResourceUrl"}
-function u(a,b){var c=n(a);if(!v.test(c))throw Error("Invalid TrustedResourceUrl format: "+c);a=c.replace(w,function(d,e){if(!Object.prototype.hasOwnProperty.call(b,e))throw Error('Found marker, "'+e+'", in format string, "'+c+'", but no valid label mapping found in args: '+JSON.stringify(b));d=b[e];return d instanceof k?n(d):encodeURIComponent(String(d))});return x(a)}var w=/%{(\w+)}/g,v=RegExp("^((https:)?//[0-9a-z.:[\\]-]+/|/[^/\\\\]|[^:/\\\\%]+/|[^:/\\\\%]*[?#]|about:blank#)","i"),y=/^([^?#]*)(\?[^#]*)?(#[\s\S]*)?/;
-function z(a){var b=A;a=u(B,a);a=y.exec(r(a).toString());var c=a[3]||"";return x(a[1]+C("?",a[2]||"",b)+C("#",c))}var q={};function x(a){if(void 0===h){var b=null;var c=f.trustedTypes;if(c&&c.createPolicy){try{b=c.createPolicy("goog#html",{createHTML:g,createScript:g,createScriptURL:g})}catch(d){f.console&&f.console.error(d.message)}h=b}else h=b}a=(b=h)?b.createScriptURL(a):a;return new p(a,q)}
-function C(a,b,c){if(null==c)return b;if("string"===typeof c)return c?a+encodeURIComponent(c):"";for(var d in c)if(Object.prototype.hasOwnProperty.call(c,d)){var e=c[d];e=Array.isArray(e)?e:[e];for(var t=0;t<e.length;t++){var D=e[t];null!=D&&(b||(b=a),b+=(b.length>a.length?"&":"")+encodeURIComponent(d)+"="+encodeURIComponent(String(D)))}}return b};function E(a,b){this.g=b===F?a:""}E.prototype.toString=function(){return this.g.toString()};var F={};/*
-
- SPDX-License-Identifier: Apache-2.0
-*/
-var G;try{new URL("s://g"),G=!0}catch(a){G=!1}var H=G;var I="alternate author bookmark canonical cite help icon license next prefetch dns-prefetch prerender preconnect preload prev search subresource".split(" ");var J=new k(l,"https://www.google.com/cse/static/style/look/%{versionDir}%{versionSlash}%{theme}.css"),K=new k(l,"https://www.google.com/cse/static/element/%{versionDir}%{versionSlash}default%{experiment}+%{lang}.css"),B=new k(l,"https://www.google.com/cse/static/element/%{versionDir}%{versionSlash}cse_element__%{lang}.js"),L=new k(l,"/");window.__gcse=window.__gcse||{};window.__gcse.ct=Date.now();
-window.__gcse.scb=function(){var a=window.__gcse;M()||delete opts_.rawCss;var b=N(a.initializationCallback||a.callback);google.search.cse.element.init(opts_)&&("explicit"!==a.parsetags?"complete"===document.readyState||"interactive"===document.readyState?(google.search.cse.element.go(),null==b||b()):google.setOnLoadCallback(function(){google.search.cse.element.go();null==b||b()},!0):null==b||b())};
-function N(a){if("function"===typeof a)return a;if("string"!==typeof a)return null;a=window[a];return"function"!==typeof a?null:a}function M(){var a;return!(null==(a=window.__gcse)?0:a.plainStyle)}
-function O(a){var b=document.createElement("link");b.type="text/css";a:{if(a instanceof p)b.href=r(a).toString();else{if(-1===I.indexOf("stylesheet"))throw Error('TrustedResourceUrl href attribute required with rel="stylesheet"');if(a instanceof E)a=a instanceof E&&a.constructor===E?a.g:"type_error:SafeUrl";else{c:if(H){try{var c=new URL(a)}catch(d){c="https:";break c}c=c.protocol}else d:{c=document.createElement("a");try{c.href=a}catch(d){c=void 0;break d}c=c.protocol;c=":"===c||""===c?"https:":
-c}a="javascript:"!==c?a:void 0}if(void 0===a)break a;b.href=a}b.rel="stylesheet"}return b};var P,A=opts_.usqp?{usqp:opts_.usqp}:{},Q=opts_.language.toLowerCase();P=opts_.cselibVersion?z({versionDir:opts_.cselibVersion,versionSlash:L,lang:Q}):z({versionDir:"",versionSlash:"",lang:Q});var R=window.__gcse.scb,S=document.createElement("script");S.src=r(P);var T,U,V,W=null==(V=(U=(S.ownerDocument&&S.ownerDocument.defaultView||window).document).querySelector)?void 0:V.call(U,"script[nonce]");(T=W?W.nonce||W.getAttribute("nonce")||"":"")&&S.setAttribute("nonce",T);S.type="text/javascript";
-R&&(S.onload=R);document.getElementsByTagName("head")[0].appendChild(S);
-if(M()){document.getElementsByTagName("head")[0].appendChild(O(opts_.cselibVersion?u(K,{versionDir:opts_.cselibVersion,versionSlash:L,experiment:opts_.uiOptions.cssThemeVersion&&4!==opts_.uiOptions.cssThemeVersion?"_v"+opts_.uiOptions.cssThemeVersion:"",lang:opts_.language}):u(K,{versionDir:"",versionSlash:"",experiment:"",lang:opts_.language})));var X,Y="v"+(opts_.uiOptions.cssThemeVersion||4);X=u(J,{versionDir:Y,versionSlash:Y?L:"",theme:opts_.theme.toLowerCase().replace("v2_","")});document.getElementsByTagName("head")[0].appendChild(O(X))};
-})({
-  "cx": "368d6e1513b974fd7",
-  "language": "ja",
-  "theme": "V2_DEFAULT",
-  "uiOptions": {
-    "resultsUrl": "",
-    "enableAutoComplete": true,
-    "enableImageSearch": false,
-    "imageSearchLayout": "popup",
-    "resultSetSize": "filtered_cse",
-    "enableOrderBy": true,
-    "orderByOptions": [{
-      "label": "Relevance",
-      "key": ""
-    }, {
-      "label": "Date",
-      "key": "date"
-    }],
-    "overlayResults": false,
-    "webSearchResultSetSize": 0,
-    "webSearchExtendedRestricts": {
-      "lr": "",
-      "cr": "",
-      "gl": "",
-      "filter": 0,
-      "sort": "",
-      "as_oq": "",
-      "as_sitesearch": ""
-    },
-    "queryParameterName": "q",
-    "enableHistory": true,
-    "numTopRefinements": 5,
-    "enableRichSnippets": false,
-    "hideElementBranding": false,
-    "cssThemeVersion": 4,
-    "isSafeSearchActive": false,
-    "numTopAds": 3
-  },
-  "protocol": "https",
-  "rawCss": ".gsc-control-cse{font-family:arial, sans-serif}.gsc-control-cse .gsc-table-result{font-family:arial, sans-serif}.gsc-refinementsGradient{background:linear-gradient(to left,rgba(255,255,255,1),rgba(255,255,255,0))}",
-  "cse_token": "AEXjvhLVkGgu4xNNyr92NEPyjSc_:1763882197124",
-  "isHostedPage": false,
-  "exp": ["cc", "apo"],
-  "cselibVersion": "db2c7696979b2a96",
-  "usqp": "CAI\u003d"
-});
-</script>
-<div class="gcse-search"></div>
-
-
-
-  <div class="any-box liquid-glass">
-   <div class="any-box-in">
-    anybar-test
-   </div>
-  </div>
-
-  
-  <main id="links-container">
-
-  </main>
-
   <script src="https://unpkg.com/fflate@0.8.2/umd/index.js"></script>
-  <script>
-    // --- gsc.qやgscが含まれるURLパラメータ・window変数のクリア ---
-    document.addEventListener('DOMContentLoaded', function() {
-      // URLクエリパラメータからgsc.qやgscが含まれるものを除去
-      const url = new URL(window.location.href);
-      let changed = false;
-      for (const key of Array.from(url.searchParams.keys())) {
-        if (key === 'gsc.q' || key.includes('gsc')) {
-          url.searchParams.delete(key);
-          changed = true;
-        }
-      }
-      // ハッシュ部分も同様に除去
-      if (url.hash && url.hash.includes('gsc')) {
-        const hash = url.hash.substring(1); // 先頭#を除く
-        const params = new URLSearchParams(hash);
-        let hashChanged = false;
-        for (const key of Array.from(params.keys())) {
-          if (key === 'gsc.q' || key.includes('gsc')) {
-            params.delete(key);
-            hashChanged = true;
-          }
-        }
-        if (hashChanged) {
-          const newHash = params.toString();
-          url.hash = newHash ? ('#' + newHash) : '';
-          changed = true;
-        }
-      }
-      if (changed) {
-        history.replaceState(null, '', url.pathname + url.search + url.hash);
-      }
-      // windowオブジェクトのgscが含まれるプロパティを削除
-      Object.keys(window).forEach(k => {
-        if (k === 'gsc' || k.startsWith('gsc') || k.includes('gsc')) {
-          try { delete window[k]; } catch(e) {}
-        }
-      });
-    });
 
-    const getFileName = (path) => path.split('/').pop();
+<div class="first">
+  <div class="search liquid-glass">
+    <div class="search-in">
+      <md-ripple class="search-rp"></md-ripple>
+      <div class="search-box">
+        <input class="search-input" placeholder="検索や計算・質問・アプリ">
+        <button class="search-button">検索</button>
+      </div>
+      <div class="search-control">
+        <button id="" class="control-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M710-150q-63 0-106.5-43.5T560-300q0-63 43.5-106.5T710-450q63 0 106.5 43.5T860-300q0 63-43.5 106.5T710-150Zm0-80q29 0 49.5-20.5T780-300q0-29-20.5-49.5T710-370q-29 0-49.5 20.5T640-300q0 29 20.5 49.5T710-230Zm-550-30v-80h320v80H160Zm90-250q-63 0-106.5-43.5T100-660q0-63 43.5-106.5T250-810q63 0 106.5 43.5T400-660q0 63-43.5 106.5T250-510Zm0-80q29 0 49.5-20.5T320-660q0-29-20.5-49.5T250-730q-29 0-49.5 20.5T180-660q0 29 20.5 49.5T250-590Zm230-30v-80h320v80H480Zm230 320ZM250-660Z"/></svg>
+        </button>
+        <button id="" class="control-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M320-160h320v-120q0-66-47-113t-113-47q-66 0-113 47t-47 113v120Zm160-360q66 0 113-47t47-113v-120H320v120q0 66 47 113t113 47ZM160-80v-80h80v-120q0-61 28.5-114.5T348-480q-51-32-79.5-85.5T240-680v-120h-80v-80h640v80h-80v120q0 61-28.5 114.5T612-480q51 32 79.5 85.5T720-280v120h80v80H160Zm320-80Zm0-640Z"/></svg>
+        </button>
+        <button id="" class="control-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M331-651 211-771l57-57 120 120-57 57Zm149-95v-170h80v170h-80Zm291 535L651-331l57-57 120 120-57 57Zm-63-440-57-57 120-120 57 57-120 120Zm38 171v-80h170v80H746ZM205-92 92-205q-12-12-12-28t12-28l363-364q35-35 85-35t85 35q35 35 35 85t-35 85L261-92q-12 12-28 12t-28-12Zm279-335-14.5-14-14.5-14-14-14-14-14 28 28 29 28ZM233-176l251-251-57-56-250 250 56 57Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="applist liquid-glass">
+    <div class="applist-in">
+      <md-ripple class="search-rp"></md-ripple>
+    </div>
+  </div>
+</div>
+
+
+</body>
+<script>
+  const getFileName = (path) => path.split('/').pop();
 
 const loadZip = async (url) => {
   try {
@@ -494,15 +303,19 @@ const loadZip = async (url) => {
 
 const loadData = async () => {
   try {
-    const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
+    const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip  ';
     const imageMap = await loadZip(zipUrl);
 
-    const jsonUrl = 'https://search3958.github.io/newtab/links.json';
+    const jsonUrl = 'https://search3958.github.io/newtab/links.json  ';
     const res = await fetch(jsonUrl);
     if (!res.ok) throw new Error('links.json fetch failed');
     const data = await res.json();
 
-    const container = document.getElementById('links-container');
+    const container = document.querySelector('.applist-in');
+    if (!container) {
+      console.error('Element with class "applist-in" not found.');
+      return;
+    }
 
     (data.categories || []).forEach(category => {
       const categoryDiv = document.createElement('div');
@@ -571,160 +384,99 @@ const loadData = async () => {
 };
 
 loadData();
-
-const searchInput = document.getElementById('google-search-input');
-const searchBtn = document.getElementById('google-search-btn');
-const searchBox = document.querySelector('.search-box');
-
-function doGoogleSearch() {
-  const q = searchInput.value.trim();
-  if(q) {
-    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
-  }
-}
-
-searchBtn.addEventListener('click', doGoogleSearch);
-searchInput.addEventListener('input', function() {
-  if (searchInput.value.trim()) {
-    searchBox.classList.add('show');
-    // 検索ボックスが空でない場合は pointer-events を戻す
-    const gcse = document.getElementById('___gcse_0');
-    if (gcse) gcse.style.pointerEvents = '';
-  } else {
-    searchBox.classList.remove('show');
-    // 検索ボックスが空のとき pointer-events:none を付与
-    const gcse = document.getElementById('___gcse_0');
-    if (gcse) gcse.style.pointerEvents = 'none';
-  }
-});
-
-(function syncToGscInput() {
-  try {
-    const src = document.getElementById('google-search-input');
-    const dst = document.getElementById('gsc-i-id1');
-    const cse = document.querySelector('.gsc-control-cse');
-    const resultsRoot = document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive');
-    if (src && dst) {
-      if (!window._gscSync) window._gscSync = { lastValue: '', timer: null, lastInputTime: 0, updating: false, lastResults: '' };
-      const sync = window._gscSync;
-      let resultsChanged = false;
-      if (resultsRoot) {
-        const html = resultsRoot.innerHTML;
-        if (sync.lastResults !== undefined && sync.lastResults !== html) {
-          resultsChanged = true;
+</script>
+<script>
+  function applyLiquidGlassEffect(container) {
+    const outerCount = 10;
+    const outerStep = 4;
+    const borderThickness = 6;
+    
+    // 既存のマスク要素があれば再利用のために取得、なければ配列を初期化
+    let masks = container._glassMasks || [];
+    
+    // 初回実行時のみ要素を作成（DOM生成コストを初回のみにする）
+    if (masks.length === 0) {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < outerCount; i++) {
+            const mask = document.createElement('div');
+            // 静的なスタイル（変化しないもの）はここで設定
+            Object.assign(mask.style, {
+                position: 'absolute',
+                pointerEvents: 'none',
+                zIndex: `${outerCount - i}`,
+                // CSS Mask Compositeを使ってSVG無しで「中抜きの枠」を作る（超高速）
+                border: `${borderThickness}px solid transparent`,
+                mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                maskComposite: 'exclude',
+                webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+                webkitMaskComposite: 'xor', // Chrome/Safari用
+            });
+            
+            fragment.appendChild(mask);
+            masks.push(mask);
         }
-        sync.lastResults = html;
-      }
-      if (dst.value !== src.value) {
-        if (cse) cse.classList.add('loading');
-        dst.value = src.value;
-        dst.dispatchEvent(new Event('input', {bubbles:true}));
-        sync.lastInputTime = Date.now();
-        sync.lastValue = src.value;
-        sync.updating = true;
-        sync.waitingForResult = true;
-      }
-      if (sync.lastValue !== '' && Date.now() - sync.lastInputTime > 200) {
-        const btn = document.querySelector('.gsc-search-button.gsc-search-button-v2');
-        if (btn) btn.click();
-        sync.lastValue = '';
-        sync.lastInputTime = Date.now();
-        sync.waitingForResult = true;
-      }
-      if (cse && resultsChanged && sync.waitingForResult) {
-        cse.classList.remove('loading');
-        sync.updating = false;
-        sync.waitingForResult = false;
-      }
-      if (cse && sync.waitingForResult) {
-        cse.classList.add('loading');
-      }
-      if (cse) {
-        if (src.value.length === 0) {
-          cse.classList.add('hide');
-        } else {
-          cse.classList.remove('hide');
+        container.appendChild(fragment);
+        container._glassMasks = masks; // 参照を保存
+    }
+
+    // アニメーションフレーム管理用フラグ
+    let rafId = null;
+
+    const updateLayout = () => {
+        // コンテナの現在のサイズとスタイルを取得
+        // getComputedStyleはリフローを誘発するため、ループの外で一回だけ呼ぶ
+        const style = window.getComputedStyle(container);
+        const width = parseFloat(style.width);
+        const height = parseFloat(style.height);
+        const baseRadius = parseFloat(style.borderRadius) || 0;
+
+        // ループ処理（DOMの生成・削除は行わず、styleの書き換えのみ行う）
+        for (let i = 0; i < outerCount; i++) {
+            const mask = masks[i];
+            const inset = i * outerStep;
+            
+            // サイズが小さくなりすぎる場合は隠す
+            if (width - inset * 2 <= 0 || height - inset * 2 <= 0) {
+                mask.style.display = 'none';
+                continue;
+            }
+            
+            const normalizedPosition = (outerCount - i) / outerCount;
+            const blur = Math.pow(normalizedPosition, 3.5) * 40;
+            const currentRadius = Math.max(baseRadius - inset, 0);
+
+            // transformやopacityなどのGPUプロパティ以外の変更をバッチ処理的に行う
+            // 文字列連結のコストを減らすため、必要なプロパティだけ更新
+            mask.style.display = 'block';
+            mask.style.inset = `${inset}px`; // position:relativeなしでも、親のパディングボックス基準または配置文脈に従う
+            mask.style.borderRadius = `${currentRadius}px`;
+            mask.style.backdropFilter = `blur(${blur}px)`;
+            mask.style.webkitBackdropFilter = `blur(${blur}px)`;
         }
-      }
-    }
-  } catch(e) { /* 無視 */ }
-  setTimeout(syncToGscInput, 260);
-})();
+        rafId = null;
+    };
 
-let lastResultsHTML = '';
-const observer = new MutationObserver(() => {
-  const resultsRoot = document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive');
-  if (resultsRoot) {
-    const currentHTML = resultsRoot.innerHTML;
-    if (lastResultsHTML && lastResultsHTML !== currentHTML) {
-      const cse = document.querySelector('.gsc-control-cse');
-      if (cse) cse.classList.remove('loading');
-      window._gscSync.waitingForResult = false;
-    }
-    lastResultsHTML = currentHTML;
-  }
+    // ResizeObserverの設定
+    const resizeObserver = new ResizeObserver(() => {
+        // RequestAnimationFrameを使って描画更新をモニタのリフレッシュレートに同期させる
+        // これにより無駄な計算（1フレームに複数回の計算）を間引きます
+        if (!rafId) {
+            rafId = requestAnimationFrame(updateLayout);
+        }
+    });
+
+    resizeObserver.observe(container);
+    container._resizeObserver = resizeObserver;
+    
+    // 初回描画
+    updateLayout();
+}
+
+// 実行
+document.querySelectorAll('.liquid-glass').forEach(el => {
+    applyLiquidGlassEffect(el);
 });
 
-if (document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive')) {
-  observer.observe(document.querySelector('.gsc-resultsRoot.gsc-tabData.gsc-tabdActive'), {
-    childList: true,
-    subtree: true
-  });
-}
 
-function scrollAnimUpdate() {
-  const scrollY = window.scrollY || window.pageYOffset;
-  const vh = window.innerHeight;
-  const from = 0;
-  const to = 0.5 * vh;
-  let t = (scrollY - from) / (to - from);
-  t = Math.max(0, Math.min(1, t));
-
-  const searchBox = document.querySelector('.search-box');
-  if (searchBox) {
-    const scaleX = 1 - 0.7 * t;
-    const scaleY = 1 - 0.6 * t;
-    const bottom = 15 * (1 - t) + (-70) * t;
-    searchBox.style.transform = `scale(${scaleX},${scaleY})`;
-    searchBox.style.bottom = `${bottom}px`;
-  }
-}
-
-window.addEventListener('scroll', scrollAnimUpdate);
-window.addEventListener('resize', scrollAnimUpdate);
-document.addEventListener('DOMContentLoaded', function() {
-  scrollAnimUpdate();
-  setTimeout(scrollAnimUpdate, 0);
-});
-
-function loadAfterloadJS() {
-  if (window._afterloadLoaded) return;
-  window._afterloadLoaded = true;
-  setTimeout(function() {
-    var s = document.createElement('script');
-    s.src = 'beta/afterload.js';
-    document.body.appendChild(s);
-  }, 200);
-}
-
-window.addEventListener('DOMContentLoaded', loadAfterloadJS);
-window.addEventListener('load', loadAfterloadJS);
-
-function updateGcseHideByScroll() {
-  const gcse = document.getElementById('___gcse_0');
-  if (!gcse) return;
-  const scrollY = window.scrollY || window.pageYOffset;
-  const threshold = window.innerHeight * 0.25;
-  if (scrollY >= threshold) {
-    gcse.classList.add('hide');
-  } else {
-    gcse.classList.remove('hide');
-  }
-}
-window.addEventListener('scroll', updateGcseHideByScroll);
-window.addEventListener('resize', updateGcseHideByScroll);
-document.addEventListener('DOMContentLoaded', updateGcseHideByScroll);
-
-  </script>
-</body>
+</script>
 </html>
