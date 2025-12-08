@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Newtab v6 Beta</title>
-
+<!--
   <script type="importmap">
     {
       "imports": {
@@ -18,13 +18,14 @@
 
     document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
   </script>
-
+-->
 
   <style>
     :root{
       --iconbg:#fff9;
       --glass-shadow: #fffb 0px 1.5px 3px inset,#fff7 0px -1.5px 3px inset;
       --text-color:#000;
+      --bound:linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
     }
     body {
       margin: 0;
@@ -45,6 +46,8 @@
   "Noto Sans JP",
   sans-serif;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+          text-wrap-mode: nowrap;
+          user-select: none;
 
      }
     *::-webkit-scrollbar { display: none; }
@@ -97,7 +100,8 @@
       font-size:16px;
     }
     .search-input{
-      width:200px;
+      width:155px;
+      transition:width 1s var(--bound);
     }
     .search-box{
       padding:16px;
@@ -105,6 +109,7 @@
       corner-shape: superellipse(1.6);
       border-radius:29px;
       border:#fff6 1px solid;
+      display:flex;
     }
     .control-button{
       padding:16px;
@@ -136,7 +141,7 @@
       position:relative;
       border-radius:35px;
       scale:1;
-      transition:scale 0.3s cubic-bezier(.34,.24,.18,1),box-shadow 0.3s cubic-bezier(.34,.24,.18,1);
+      transition:scale 0.6s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1),box-shadow 0.3s cubic-bezier(.34,.24,.18,1);
       box-shadow:#0002 0px 0px 0px;
     }
     .applist:hover{
@@ -144,7 +149,7 @@
       box-shadow:#0002 0px 8px 16px;
     }
     .applist:active{
-      scale:2.03;
+      scale:1.35;
     }
     .applist-in{
       position:relative;
@@ -160,7 +165,7 @@
       --md-ripple-pressed-color:#fff3;
       --md-ripple-pressed-opacity:1;
       height:calc(100% - 13*2px);
-      width:154px;
+      width:202px;
       height:128px;
     }
 
@@ -235,6 +240,24 @@
       transition-delay:0.5s;
     }
 
+
+    @media screen and (min-width: 700px) {
+      .search-input {
+          width: 200px;
+      }
+    }
+    @media screen and (min-width: 1100px) {
+      .search-input {
+          width: 250px;
+      }
+    }
+    @media screen and (max-width: 515px) {
+      .first{
+
+    flex-direction: column;
+    align-items: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -246,7 +269,7 @@
     <div class="search-in">
       <md-ripple class="search-rp"></md-ripple>
       <div class="search-box">
-        <input class="search-input" placeholder="検索や計算・質問・アプリ">
+        <input class="search-input" placeholder="検索や計算・質問">
         <button class="search-button">検索</button>
       </div>
       <div class="search-control">
