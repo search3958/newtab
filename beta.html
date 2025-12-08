@@ -29,8 +29,9 @@
     }
     body {
       margin: 0;
-      background: url('https://search3958.github.io/newtab/bgimg/bg1.webp') no-repeat center center fixed;
+      background: url('bgimg/material3d1.webp') no-repeat center center fixed;
       background-size: cover;
+      overflow:hidden;
     }
 
 
@@ -73,11 +74,11 @@
     .search-in{
       position:relative;
       z-index:1001;
-      background:#fff4;
+      background:#fff8;
       padding:13px;
       corner-shape: superellipse(2.4);
       border-radius:90px;
-      backdrop-filter:blur(4px) brightness(1.15);
+      backdrop-filter:blur(4px) brightness(1.5);
       transition:backdrop-filter 0.3s cubic-bezier(.34,.24,.18,1);
       overflow:hidden;
       --md-ripple-hover-color:#fff0;
@@ -86,7 +87,7 @@
     }
 
     .search-in:active{
-      backdrop-filter:blur(4px) brightness(1.2);
+      backdrop-filter:blur(4px) brightness(1.7);
     }
     .search-rp{
       border-radius:0px;
@@ -118,12 +119,18 @@
       border-radius:14px;
       border:#fff6 1px solid;
       width:100%;
+      transition:all 0.3s cubic-bezier(.34,.24,.18,1);
     }
     .control-button:first-child{
       border-radius:29px 14px 14px 29px;
     }
     .control-button:last-child{
       border-radius:14px 29px 29px 14px;
+    }
+    .control-button.active{
+      corner-shape: superellipse(1.1);
+      border-radius:29.5px;
+
     }
     .search-control{
       margin-top:8px;
@@ -154,11 +161,11 @@
     .applist-in{
       position:relative;
       z-index:1001;
-      background:#fff4;
+      background:#fff8;
       padding:13px 0px;
       corner-shape: superellipse(2.4);
       border-radius:90px;
-      backdrop-filter:blur(4px) brightness(1.15);
+      backdrop-filter:blur(4px) brightness(1.5);
       transition:backdrop-filter 0.3s cubic-bezier(.34,.24,.18,1);
       overflow:scroll;
       --md-ripple-hover-color:#fff0;
@@ -170,7 +177,7 @@
     }
 
     .applist-in:active{
-      backdrop-filter:blur(4px) brightness(1.2);
+      backdrop-filter:blur(4px) brightness(1.7);
     }
 
 
@@ -261,6 +268,37 @@
   </style>
 </head>
 <body>
+
+<!-- 検索履歴ダイアログ -->
+<div id="history-dialog" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:#0005;backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:24px;min-width:240px;max-width:90vw;box-shadow:0 4px 24px #0003;">
+    <h3 style="margin-top:0;">検索履歴</h3>
+    <ul id="history-list" style="list-style:none;padding:0;margin:0 0 16px 0;"></ul>
+    <button onclick="document.getElementById('history-dialog').style.display='none'">閉じる</button>
+  </div>
+</div>
+
+<!-- 壁紙・履歴ダイアログ -->
+<div id="settings-dialog" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:#0005;backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:24px;min-width:240px;max-width:90vw;box-shadow:0 4px 24px #0003;">
+    <h3 style="margin-top:0;">設定</h3>
+    <div style="margin-bottom:12px;">
+      <label>壁紙を選択:
+        <select id="bg-select">
+          <option value="material3d1.webp">Material3D</option>
+          <option value="3958bg1.webp">3958bg1</option>
+          <option value="3958bg2.webp">3958bg2</option>
+          <option value="3958bg3.webp">3958bg3</option>
+        </select>
+      </label>
+      <button id="bg-apply">適用</button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <button id="clear-history">検索履歴を削除</button>
+    </div>
+    <button onclick="document.getElementById('settings-dialog').style.display='none'">閉じる</button>
+  </div>
+</div>
 
   <script src="https://unpkg.com/fflate@0.8.2/umd/index.js"></script>
 
@@ -500,6 +538,28 @@ document.querySelectorAll('.liquid-glass').forEach(el => {
     applyLiquidGlassEffect(el);
 });
 
-
+// 壁紙変更機能
+function setBg(name) {
+  document.body.style.backgroundImage = `url('bgimg/${name}')`;
+  localStorage.setItem('bgimg', name);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const bg = localStorage.getItem('bgimg') || 'material3d1.webp';
+  setBg(bg);
+  document.getElementById('bg-select').value = bg;
+  document.getElementById('bg-apply').onclick = () => {
+    const val = document.getElementById('bg-select').value;
+    setBg(val);
+  };
+});
+// afterload.jsを200ms遅延読込
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const s = document.createElement('script');
+    s.src = 'beta/afterload.js';
+    document.body.appendChild(s);
+  }, 200);
+});
 </script>
 </html>
+``` 

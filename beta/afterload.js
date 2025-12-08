@@ -1,223 +1,110 @@
-(function insertAdsOnExpansionAreaChange() {
-  const adHtml = `\
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874" crossorigin="anonymous"></script>\n<ins class="adsbygoogle" style="display:block" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-ad-client="ca-pub-6151036058675874" data-ad-slot="3356431274"></ins>\n<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>\n`;
+// ...既存のコード...
 
-  const linksAdHtml = `\
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874" crossorigin="anonymous"></script>\n<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>\n<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>\n`;
-
-  function insertAdElements(htmlString, parentElement) {
-    const temp = document.createElement('div');
-    temp.innerHTML = htmlString;
-    
-    Array.from(temp.childNodes).forEach(node => {
-      if (node.tagName === 'SCRIPT') {
-        const script = document.createElement('script');
-        if (node.src) script.src = node.src;
-        if (node.async) script.async = true;
-        if (node.crossOrigin) script.crossOrigin = node.crossOrigin;
-        if (node.textContent) script.textContent = node.textContent;
-        parentElement.appendChild(script);
-      } else if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE) {
-        parentElement.appendChild(node.cloneNode(true));
-      }
-    });
+(function() {
+  // 検索履歴管理
+  const HISTORY_KEY = 'search_history_v2';
+  function getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    } catch { return []; }
+  }
+  function addHistory(q) {
+    if (!q) return;
+    let h = getHistory();
+    h = h.filter(e => e !== q);
+    h.unshift(q);
+    if (h.length > 5) h = h.slice(0, 5);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
+  function clearHistory() {
+    localStorage.removeItem(HISTORY_KEY);
   }
 
-  function createAdElement(htmlString) {
-    const temp = document.createElement('div');
-    temp.innerHTML = htmlString;
-    const container = document.createElement('div');
-    
-    Array.from(temp.childNodes).forEach(node => {
-      if (node.tagName === 'SCRIPT') {
-        const script = document.createElement('script');
-        if (node.src) script.src = node.src;
-        if (node.async) script.async = true;
-        if (node.crossOrigin) script.crossOrigin = node.crossOrigin;
-        if (node.textContent) script.textContent = node.textContent;
-        container.appendChild(script);
+  // 検索モード管理
+  let searchMode = 'google'; // 'google' or 'chatgpt'
+  const searchInput = document.querySelector('.search-input');
+  const searchBtn = document.querySelector('.search-button');
+  const controlBtns = document.querySelectorAll('.search-control .control-button');
+
+  // 検索実行
+  function doSearch() {
+    const q = searchInput.value.trim();
+    if (!q) return;
+    addHistory(q);
+    if (searchMode === 'google') {
+      window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+    } else {
+      window.open('https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q), '_blank');
+    }
+  }
+  if (searchBtn) searchBtn.onclick = doSearch;
+  if (searchInput) searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+
+  // 検索モード切替（3つ目ボタン）
+  if (controlBtns[2]) {
+    controlBtns[2].onclick = function() {
+      if (searchMode === 'google') {
+        searchMode = 'chatgpt';
+        this.classList.add('active');
       } else {
-        container.appendChild(node.cloneNode(true));
+        searchMode = 'google';
+        this.classList.remove('active');
       }
-    });
-    
-    return container;
-  }
-
-  function addAdIfNeeded(area) {
-    if (!area) return;
-    
-    // すでに広告が存在するかチェック
-    const existingAds = area.querySelectorAll('.adsbygoogle[data-ad-slot="3356431274"]');
-    
-    // 検索結果を取得
-    const results = area.querySelectorAll('.gsc-webResult, .gs-webResult');
-    
-    // 5番目の要素の後に広告を挿入
-    if (results.length >= 5 && existingAds.length === 0) {
-      const fifthResult = results[4];
-      const adElement = createAdElement(adHtml);
-      fifthResult.parentNode.insertBefore(adElement, fifthResult.nextSibling);
-    }
-    
-    // 最後に広告を追加（既存の動作を維持）
-    if (existingAds.length < 2) {
-      const adElement = createAdElement(adHtml);
-      area.appendChild(adElement);
-    }
-  }
-
-  function addLinksAdIfNeeded(container) {
-    if (!container) return;
-    
-    // 既存の広告を全て削除
-    const existingAds = container.querySelectorAll('.adsbygoogle[data-ad-slot="9559715307"]');
-    existingAds.forEach(ad => {
-      // 広告要素とその前後のscriptタグも削除
-      let node = ad;
-      while (node) {
-        let next = node.nextSibling;
-        if (node.tagName === 'SCRIPT' || node.classList?.contains('adsbygoogle')) {
-          node.remove();
-        }
-        if (next === ad || !next) break;
-        node = next;
-      }
-      // 前のscriptタグも削除
-      let prev = ad.previousSibling;
-      while (prev && prev.tagName === 'SCRIPT') {
-        let toRemove = prev;
-        prev = prev.previousSibling;
-        toRemove.remove();
-      }
-      ad.remove();
-    });
-    
-    // 最後に新しい広告を追加
-    insertAdElements(linksAdHtml, container);
-  }
-
-  function observeArea() {
-    const area = document.querySelector('.gsc-expansionArea');
-    if (!area) {
-      setTimeout(observeArea, 200);
-      return;
-    }
-    
-    setTimeout(() => addAdIfNeeded(area), 200);
-    
-    const observer = new MutationObserver(() => {
-      setTimeout(() => addAdIfNeeded(area), 200);
-    });
-    observer.observe(area, { childList: true, subtree: true });
-  }
-
-  function observeLinksContainer() {
-    const linksContainer = document.querySelector('#links-container');
-    if (!linksContainer) {
-      setTimeout(observeLinksContainer, 200);
-      return;
-    }
-    // setTimeout(() => addLinksAdIfNeeded(linksContainer), 200); // ← 広告追加処理を削除
-    // const observer = new MutationObserver(() => {
-    //   setTimeout(() => addLinksAdIfNeeded(linksContainer), 200);
-    // });
-    // observer.observe(linksContainer, { childList: true, subtree: true });
-  }
-  
-  observeArea();
-  observeLinksContainer();
-})();
-
-
-function applyLiquidGlassEffect(container) {
-    const outerCount = 10;
-    const outerStep = 4;
-    const borderThickness = 6;
-    
-    // 既存のマスク要素があれば再利用のために取得、なければ配列を初期化
-    let masks = container._glassMasks || [];
-    
-    // 初回実行時のみ要素を作成（DOM生成コストを初回のみにする）
-    if (masks.length === 0) {
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < outerCount; i++) {
-            const mask = document.createElement('div');
-            // 静的なスタイル（変化しないもの）はここで設定
-            Object.assign(mask.style, {
-                position: 'absolute',
-                pointerEvents: 'none',
-                zIndex: `${outerCount - i}`,
-                // CSS Mask Compositeを使ってSVG無しで「中抜きの枠」を作る（超高速）
-                border: `${borderThickness}px solid transparent`,
-                mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-                maskComposite: 'exclude',
-                webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-                webkitMaskComposite: 'xor', // Chrome/Safari用
-            });
-            
-            fragment.appendChild(mask);
-            masks.push(mask);
-        }
-        container.appendChild(fragment);
-        container._glassMasks = masks; // 参照を保存
-    }
-
-    // アニメーションフレーム管理用フラグ
-    let rafId = null;
-
-    const updateLayout = () => {
-        // コンテナの現在のサイズとスタイルを取得
-        // getComputedStyleはリフローを誘発するため、ループの外で一回だけ呼ぶ
-        const style = window.getComputedStyle(container);
-        const width = parseFloat(style.width);
-        const height = parseFloat(style.height);
-        const baseRadius = parseFloat(style.borderRadius) || 0;
-
-        // ループ処理（DOMの生成・削除は行わず、styleの書き換えのみ行う）
-        for (let i = 0; i < outerCount; i++) {
-            const mask = masks[i];
-            const inset = i * outerStep;
-            
-            // サイズが小さくなりすぎる場合は隠す
-            if (width - inset * 2 <= 0 || height - inset * 2 <= 0) {
-                mask.style.display = 'none';
-                continue;
-            }
-            
-            const normalizedPosition = (outerCount - i) / outerCount;
-            const blur = Math.pow(normalizedPosition, 3.5) * 40;
-            const currentRadius = Math.max(baseRadius - inset, 0);
-
-            // transformやopacityなどのGPUプロパティ以外の変更をバッチ処理的に行う
-            // 文字列連結のコストを減らすため、必要なプロパティだけ更新
-            mask.style.display = 'block';
-            mask.style.inset = `${inset}px`; // position:relativeなしでも、親のパディングボックス基準または配置文脈に従う
-            mask.style.borderRadius = `${currentRadius}px`;
-            mask.style.backdropFilter = `blur(${blur}px)`;
-            mask.style.webkitBackdropFilter = `blur(${blur}px)`;
-        }
-        rafId = null;
     };
+  }
 
-    // ResizeObserverの設定
-    const resizeObserver = new ResizeObserver(() => {
-        // RequestAnimationFrameを使って描画更新をモニタのリフレッシュレートに同期させる
-        // これにより無駄な計算（1フレームに複数回の計算）を間引きます
-        if (!rafId) {
-            rafId = requestAnimationFrame(updateLayout);
-        }
+  // 履歴ダイアログ（2つ目ボタン）
+  const historyDialog = document.getElementById('history-dialog');
+  const historyList = document.getElementById('history-list');
+  if (controlBtns[1]) {
+    controlBtns[1].onclick = function() {
+      const h = getHistory();
+      historyList.innerHTML = '';
+      if (h.length === 0) {
+        historyList.innerHTML = '<li style="color:#888;">履歴なし</li>';
+      } else {
+        h.forEach(q => {
+          const li = document.createElement('li');
+          li.style.cursor = 'pointer';
+          li.style.padding = '4px 0';
+          li.textContent = q;
+          li.onclick = () => {
+            searchInput.value = q;
+            historyDialog.style.display = 'none';
+            doSearch();
+          };
+          historyList.appendChild(li);
+        });
+      }
+      historyDialog.style.display = 'flex';
+    };
+  }
+
+  // 設定ダイアログ（1つ目ボタン）
+  const settingsDialog = document.getElementById('settings-dialog');
+  if (controlBtns[0]) {
+    controlBtns[0].onclick = function() {
+      settingsDialog.style.display = 'flex';
+    };
+  }
+  // 履歴削除ボタン
+  const clearBtn = document.getElementById('clear-history');
+  if (clearBtn) {
+    clearBtn.onclick = function() {
+      clearHistory();
+      alert('検索履歴を削除しました');
+      settingsDialog.style.display = 'none';
+    };
+  }
+
+  // ダイアログ外クリックで閉じる
+  [historyDialog, settingsDialog].forEach(dlg => {
+    if (!dlg) return;
+    dlg.addEventListener('click', e => {
+      if (e.target === dlg) dlg.style.display = 'none';
     });
-
-    resizeObserver.observe(container);
-    container._resizeObserver = resizeObserver;
-    
-    // 初回描画
-    updateLayout();
-}
-
-// 実行
-document.querySelectorAll('.liquid-glass').forEach(el => {
-    applyLiquidGlassEffect(el);
-});
-
+  });
+})();
+// ...既存のコード...
