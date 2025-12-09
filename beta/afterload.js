@@ -1,5 +1,3 @@
-// ...既存のコード...
-
 (function() {
   // 検索履歴管理
   const HISTORY_KEY = 'search_history_v2';
@@ -30,13 +28,21 @@
   function doSearch() {
     const q = searchInput.value.trim();
     if (!q) return;
-    addHistory(q);
+    
+    // 履歴を保存
+    addHistory(q); 
+
+    let url;
     if (searchMode === 'google') {
-      window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+      url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
     } else {
-      window.open('https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q), '_blank');
+      url = 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
     }
+    
+    // ⭐ 変更点: window.location.href を使用して現在のタブで遷移
+    window.location.href = url;
   }
+  
   if (searchBtn) searchBtn.onclick = doSearch;
   if (searchInput) searchInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') doSearch();
@@ -73,7 +79,8 @@
           li.onclick = () => {
             searchInput.value = q;
             historyDialog.style.display = 'none';
-            doSearch();
+            // 履歴から選択した場合も doSearch() が呼ばれ、現在のタブで遷移します。
+            doSearch(); 
           };
           historyList.appendChild(li);
         });
