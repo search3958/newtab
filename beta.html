@@ -505,61 +505,49 @@
 
 </body>
 <script>
-  // ================================================================
-// IndexedDB 設定
-// ================================================================
+  // main.js (またはHTMLに直接記述するスクリプト)
+
+// =================================================================
+// 1. IndexedDBの定数とオープン関数
+// =================================================================
 const DB_NAME = 'WallpaperDB';
 const STORE_NAME = 'images';
 const DB_VERSION = 1;
 
-// ================================================================
-// IndexedDB open
-// ================================================================
 function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
         request.onupgradeneeded = (event) => {
-            const db = event.target?.result;
-            if (!db) {
-                console.error('onupgradeneeded: db が取得できません');
-                return;
-            }
-
+            const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME);
-                console.log(`ObjectStore "${STORE_NAME}" を作成しました`);
+                // キーパスなしでオブジェクトストアを作成
+                db.createObjectStore(STORE_NAME); 
             }
         };
 
         request.onsuccess = (event) => {
-            const db = event.target?.result;
-            if (!db) {
-                console.error('onsuccess: db が取得できません');
-                reject('DB_NULL');
-                return;
-            }
-            console.log('IndexedDB 接続成功');
-            resolve(db);
+            resolve(event.target.result);
         };
 
         request.onerror = (event) => {
-            console.error('IndexedDB open error:', event.target?.error);
+            console.error("IndexedDB open error:", event.target.errorCode);
             reject('INDEXEDDB_ERROR');
         };
     });
 }
 
-// ================================================================
-// IndexedDB get
-// ================================================================
+// =================================================================
+// 2. IndexedDBからのデータ取得と壁紙適用関数
+// =================================================================
+
 async function getFromIndexedDB(key) {
     let db;
     try {
         db = await openDB();
     } catch (e) {
         console.error('DB接続失敗:', e);
-        return undefined;
+        return;
     }
 
     return new Promise((resolve) => {
@@ -568,227 +556,95 @@ async function getFromIndexedDB(key) {
         const request = store.get(key);
 
         request.onsuccess = (event) => {
-            console.log(`IndexedDB 取得成功: key=${key}`);
-            resolve(event.target?.result);
+            // 例: { light: Blob, dark: Blob } の形式で返される
+            resolve(event.target.result); 
         };
 
         request.onerror = (event) => {
-            console.error(`IndexedDB 取得エラー: key=${key}`, event.target?.error);
-            resolve(undefined);
+            console.error(`IndexedDBからの ${key} 取得エラー:`, event.target.error);
+            resolve(undefined); // エラー時は undefined を返す
         };
     });
 }
 
-// ================================================================
-// Wallpaper apply
-// ================================================================
 function applyWallpaper(lightBlob, darkBlob = null) {
-    const body = document.body;
-    if (!body) {
-        console.error('applyWallpaper: document.body が存在しません');
-        return;
-    }
-
-    const existingLightUrl = body.dataset.lightUrl;
-    const existingDarkUrl = body.dataset.darkUrl;
-
+    // 既存のURLがあれば解放 (メモリリーク防止)
+    const existingLightUrl = document.body.dataset.lightUrl;
+    const existingDarkUrl = document.body.dataset.darkUrl;
+    
     if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
     if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
+    
+    delete document.body.dataset.lightUrl;
+    delete document.body.dataset.darkUrl;
 
-    delete body.dataset.lightUrl;
-    delete body.dataset.darkUrl;
-
+    // 1. ライトモード用壁紙の設定
     if (lightBlob) {
         const lightUrl = URL.createObjectURL(lightBlob);
-        body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-        body.dataset.lightUrl = lightUrl;
+        document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
+        document.body.dataset.lightUrl = lightUrl; // 解放用にURLを保持
     } else {
-        body.style.setProperty(
-            '--user-wallpaper-light',
-            `url('bgimg/material3d1.webp')`
-        );
+        // 設定がない場合はフォールバックのCSS変数（デフォルト壁紙）を使用
+        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/material3d1.webp')`); 
     }
 
+    // 2. ダークモード用壁紙の設定
     if (darkBlob) {
         const darkUrl = URL.createObjectURL(darkBlob);
-        body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
-        body.dataset.darkUrl = darkUrl;
+        document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
+        document.body.dataset.darkUrl = darkUrl; // 解放用にURLを保持
     } else {
-        body.style.setProperty(
-            '--user-wallpaper-dark',
-            `var(--user-wallpaper-light)`
-        );
+        // ダーク設定がない場合はライト壁紙を参照させる (CSSで対応)
+        document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
     }
-
-    console.log(
-        `壁紙適用完了 Light=${!!lightBlob} Dark=${!!darkBlob}`
-    );
+    
+    console.log(`壁紙を適用しました: Light=${!!lightBlob}, Dark=${!!darkBlob}`);
 }
 
-// ================================================================
-// Wallpaper load main
-// ================================================================
-async function loadAndApplyCurrentWallpaper() {
-    const newtabData = await getFromIndexedDB('newtab');
 
+/**
+ * 起動時または設定変更時に、IndexedDBから壁紙を読み込み適用するメイン関数
+ */
+async function loadAndApplyCurrentWallpaper() {
+    // 優先度 1: Newtabに設定された壁紙の確認
+    const newtabData = await getFromIndexedDB('newtab');
     if (newtabData && newtabData.light) {
-        applyWallpaper(
-            newtabData.light,
-            newtabData.dark || newtabData.light
-        );
+        // Newtab設定が最優先。ライト画像は必須。
+        const lightBlob = newtabData.light;
+        
+        // ダーク画像があればそれを使用。なければライト画像をダークのフォールバックとする。
+        const darkBlob = newtabData.dark || lightBlob;
+        
+        applyWallpaper(lightBlob, darkBlob);
         return;
     }
 
+    // 優先度 2 & 3: 個別のライト/ダーク設定の確認
     const lightData = await getFromIndexedDB('light');
     const darkData = await getFromIndexedDB('dark');
 
-    const finalLightBlob = lightData?.light || null;
-    const finalDarkBlob = darkData?.dark || null;
-
+    const finalLightBlob = lightData ? lightData.light : null;
+    const finalDarkBlob = darkData ? darkData.dark : null;
+    
+    // lightData と darkData を組み合わせて適用
     applyWallpaper(finalLightBlob, finalDarkBlob);
 }
 
-// ================================================================
-// focus utility
-// ================================================================
-function focusElementBySelector(selector) {
-    if (!selector || typeof selector !== 'string') {
-        console.error('focusElementBySelector: selector 不正', selector);
-        return;
-    }
 
-    const el = document.querySelector(selector);
-    if (!el) {
-        console.warn(`focusElementBySelector: 要素なし (${selector})`);
-        return;
-    }
+// =================================================================
+// 3. アプリケーション起動時の処理 (壁紙とafterload.jsの遅延読み込み)
+// =================================================================
 
-    if (typeof el.focus !== 'function') {
-        console.warn(`focusElementBySelector: focus 不可 (${selector})`);
-        return;
-    }
-
-    requestAnimationFrame(() => {
-        el.focus({ preventScroll: true });
-        console.log(`フォーカス成功: ${selector}`);
-    });
-}
-
-// ================================================================
-// ZIP / link load
-// ================================================================
-const getFileName = (path) => path.split('/').pop();
-
-const loadZip = async (url) => {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('ZIP fetch failed');
-
-        const buffer = await response.arrayBuffer();
-        const files = fflate.unzipSync(new Uint8Array(buffer));
-        const imageMap = {};
-
-        const entries = Object.entries(files);
-        for (let i = 0; i < entries.length; i++) {
-            const [path, data] = entries[i];
-            const fileName = getFileName(path);
-
-            const blob = new Blob([data.buffer], { type: 'image/webp' });
-            imageMap[fileName] = URL.createObjectURL(blob);
-
-            if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
-        }
-
-        console.log('ZIP 読み込み完了');
-        return imageMap;
-    } catch (err) {
-        console.error('loadZip error', err);
-        return {};
-    }
-};
-
-const loadData = async () => {
-    try {
-        const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
-        const jsonUrl = 'https://search3958.github.io/newtab/links.json';
-
-        const imageMap = await loadZip(zipUrl);
-
-        const res = await fetch(jsonUrl);
-        if (!res.ok) throw new Error('links.json fetch failed');
-        const data = await res.json();
-
-        const container = document.querySelector('.applist-in');
-        if (!container) {
-            console.error('.applist-in が見つかりません');
-            return;
-        }
-
-        (data.categories || []).forEach(category => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'category';
-
-            const title = document.createElement('h2');
-            title.className = 'category-title';
-            title.textContent = category.title || '無題';
-            categoryDiv.appendChild(title);
-
-            (category.links || []).forEach(link => {
-                const a = document.createElement('a');
-                a.href = link.url || '#';
-                a.target = '_self';
-
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'appicon-bg';
-                if (link.bg) iconDiv.style.background = link.bg;
-
-                const img = document.createElement('img');
-                img.className = 'appicon-img';
-                img.src = imageMap[link.icon] || link.icon || '';
-                img.alt = link.name || '';
-
-                const label = document.createElement('div');
-                label.className = 'appicon-label';
-                label.textContent = link.name || '';
-
-                iconDiv.appendChild(img);
-                iconDiv.appendChild(label);
-                a.appendChild(iconDiv);
-                categoryDiv.appendChild(a);
-            });
-
-            container.appendChild(categoryDiv);
-        });
-
-        console.log('アプリ一覧 読み込み完了');
-    } catch (err) {
-        console.error('loadData error', err);
-    }
-};
-
-// ================================================================
-// DOMContentLoaded
-// ================================================================
 window.addEventListener('DOMContentLoaded', () => {
+    // 1. IndexedDBから壁紙を読み込み、CSS変数を設定して適用 (最優先で実行)
     loadAndApplyCurrentWallpaper();
-    loadData();
-
-    // ★ 即フォーカス
-    focusElementBySelector('.search-input');
-
-    // afterload.js
+    
+    // 2. afterload.jsを200ms遅延読込 (重い処理を遅延させる)
     setTimeout(() => {
         const s = document.createElement('script');
-        if (!s) {
-            console.error('script 要素生成失敗');
-            return;
-        }
-
-        s.src = 'beta/afterload.js';
+        s.src = 'beta/afterload.js'; // パスは元のコードと同じ
         document.body.appendChild(s);
-        console.log('afterload.js 読み込み');
     }, 200);
 });
-
 </script>
 </html>

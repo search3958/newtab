@@ -542,3 +542,188 @@ function applyLiquidGlassEffect(container) {
 document.querySelectorAll('.liquid-glass').forEach(el => {
     applyLiquidGlassEffect(el);
 });
+
+
+// beta/afterload.js
+
+// =================================================================
+// 1. fflateの動的インポート関数
+// =================================================================
+
+/**
+ * fflateライブラリをCDNから動的にインポートする
+ * @returns {Promise<Object>} fflateオブジェクト
+ */
+const importFflate = () => {
+    return new Promise((resolve, reject) => {
+        // グローバルにfflateが存在するか確認
+        if (typeof fflate !== 'undefined') {
+            return resolve(fflate);
+        }
+        
+        const script = document.createElement('script');
+        // 🌟 必要に応じてGoogle Fontsの読み込みもここに追加できます
+        // const fontLink = document.createElement('link');
+        // fontLink.rel = 'stylesheet';
+        // fontLink.href = 'https://fonts.googleapis.com/css2?family=Roboto&display=swap'; 
+        // document.head.appendChild(fontLink); 
+        
+        script.src = 'https://unpkg.com/fflate@0.8.2/umd/index.js';
+        script.onload = () => {
+            // 読み込み後、fflateがグローバルに利用可能になる
+            resolve(fflate);
+        };
+        script.onerror = (err) => {
+            console.error('fflate load failed', err);
+            reject(new Error('fflate load failed'));
+        };
+        document.head.appendChild(script);
+    });
+};
+
+// =================================================================
+// 2. ZIPおよびJSONデータの読み込みとアプリ一覧の構築
+// =================================================================
+
+const getFileName = (path) => path.split('/').pop();
+
+/**
+ * ZIPファイルをフェッチ、unzipSyncで展開し、Blob/ObjectURLのマップを返す
+ * @param {string} url - ZIPファイルのURL
+ * @returns {Promise<Object>} ファイル名からObject URLへのマップ
+ */
+const loadZip = async (url) => {
+    // fflateがグローバルに存在することが前提となる (loadDataでimportFflateを先に実行する)
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('ZIP fetch failed');
+        const buffer = await response.arrayBuffer();
+        
+        // fflate.unzipSync の使用
+        const files = fflate.unzipSync(new Uint8Array(buffer));
+        
+        const imageMap = {};
+        const entries = Object.entries(files);
+        
+        for (let i = 0; i < entries.length; i++) {
+            const [path, data] = entries[i];
+            const fileName = getFileName(path);
+            // 注意: 'image/webp' はZIP内のファイル形式に合わせる必要があります
+            const blob = new Blob([data.buffer], { type: 'image/webp' }); 
+            imageMap[fileName] = URL.createObjectURL(blob);
+            
+            // UIの応答性を確保するためのチャンク処理 (10件ごと)
+            if (i % 10 === 0) await new Promise(r => setTimeout(r, 0)); 
+        }
+        return imageMap;
+    } catch (err) {
+        console.error('loadZip error', err);
+        return {};
+    }
+};
+
+/**
+ * リンクデータとアイコンを読み込み、アプリ一覧を構築するメイン処理
+ */
+const loadData = async () => {
+    try {
+        // 1. fflateの読み込み
+        await importFflate();
+
+        // 2. ZIPファイルの読み込みとアイコンマップの生成
+        const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-4-5.zip';
+        const imageMap = await loadZip(zipUrl);
+
+        // 3. JSONデータの読み込み
+        const jsonUrl = 'https://search3958.github.io/newtab/links.json';
+        const res = await fetch(jsonUrl);
+        if (!res.ok) throw new Error('links.json fetch failed');
+        const data = await res.json();
+
+        const container = document.querySelector('.applist-in');
+        if (!container) {
+            console.error('Element with class "applist-in" not found.');
+            return;
+        }
+
+        // 4. アプリ一覧のDOM構築
+        (data.categories || []).forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category';
+
+            const title = document.createElement('h2');
+            title.className = 'category-title';
+            title.textContent = category.title || '無題';
+            categoryDiv.appendChild(title);
+
+            const linksContainer = document.createElement('div'); // リンクをまとめるコンテナを追加しても良い
+            linksContainer.className = 'category-links-wrapper'; 
+
+            (category.links || []).forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url || '#';
+                a.target = '_self'; // 明示的に_selfを設定
+
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'appicon-bg';
+                if (link.bg) iconDiv.style.background = link.bg;
+
+                const img = document.createElement('img');
+                img.className = 'appicon-img';
+                const src = imageMap[link.icon];
+                img.alt = link.name || '';
+                // ZIPからロードしたObject URLを使用、またはフォールバック
+                img.src = src || link.icon || ''; 
+
+                const label = document.createElement('div');
+                label.className = 'appicon-label';
+                label.textContent = link.name || '';
+
+                iconDiv.appendChild(img);
+                iconDiv.appendChild(label);
+                a.appendChild(iconDiv);
+                linksContainer.appendChild(a);
+            });
+            
+            categoryDiv.appendChild(linksContainer);
+            container.appendChild(categoryDiv);
+        });
+
+        // 5. スクロール監視ロジックの追加
+        let cachedRect = null;
+        let lastScrollY = -1;
+
+        const checkVisibility = () => {
+            const currentScrollY = window.scrollY || window.pageYOffset;
+            
+            if (lastScrollY === currentScrollY && cachedRect) {
+                const isVisible = cachedRect.top <= 0;
+                container.classList.toggle('visible', isVisible);
+                return;
+            }
+            
+            cachedRect = container.getBoundingClientRect();
+            lastScrollY = currentScrollY;
+            
+            const isVisible = cachedRect.top <= 0;
+            container.classList.toggle('visible', isVisible);
+        };
+
+        window.addEventListener('scroll', checkVisibility);
+        checkVisibility();
+
+        if (window.addLinksAdIfNeeded) {
+            window.addLinksAdIfNeeded(container);
+        }
+    } catch (err) {
+        console.error('loadData error', err);
+    }
+};
+
+// afterload.jsの起動処理
+// DOMContentLoadedイベントを待つ必要はないが、安全のためDOMが構築されていることを確認
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', loadData);
+} else {
+    loadData();
+}
