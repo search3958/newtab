@@ -12,40 +12,40 @@
           "icon": "3958.webp"
         },
         {
-          "name": "ツールボード",
-          "bg": "var(--iconbg)",
-          "url": "https://search3958.github.io/toolboard",
-          "icon": "toolboard.webp"
-        },
-        {
           "name": "文字カウンター",
-          "bg": "var(--iconbg)",
-          "url": "https://search3958.github.io/3dspace/",
-          "icon": "3dspace.webp"
+          "bg": "#fffc",
+          "url": "https://search3958.github.io/tools/counter.html",
+          "icon": "counter.webp"
         },
         {
           "name": "タイマー",
           "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "url": "https://search3958.github.io/tools/timer/ja.html",
+          "icon": "timer.webp"
         },
         {
           "name": "ストップウォッチ",
           "bg": "var(--iconbg)",
-          "url": "https://paypayfleamarket.yahoo.co.jp/",
-          "icon": "pfm.webp"
+          "url": "https://search3958.github.io/tools/stopwatch/ja.html",
+          "icon": "stopwatch.webp"
         },
         {
           "name": "デジタル時計",
           "bg": "var(--iconbg)",
-          "url": "https://www.aliexpress.com/",
-          "icon": "aliexpress.webp"
+          "url": "https://search3958.github.io/tools/dclock/ja.html",
+          "icon": "dclock.webp"
+        },
+        {
+          "name": "アナログ時計",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/tools/aclock/ja.html",
+          "icon": "aclock.webp"
         },
         {
           "name": "ToolBoard",
           "bg": "var(--iconbg)",
-          "url": "https://www.aliexpress.com/",
-          "icon": "aliexpress.webp"
+          "url": "https://search3958.github.io/toolboard",
+          "icon": "toolboard.webp"
         }
       ]
     },
@@ -117,12 +117,6 @@
           "bg": "var(--iconbg)",
           "url": "https://drive.google.com/",
           "icon": "drive.webp"
-        },
-        {
-          "name": "Product",
-          "bg": "var(--iconbg)",
-          "url": "https://about.google/products/",
-          "icon": "products.webp"
         }
       ]
     },
@@ -321,56 +315,56 @@
         {
           "name": "Zenn",
           "bg": "var(--iconbg)",
-          "url": "https://www.aliexpress.com/",
-          "icon": "aliexpress.webp"
+          "url": "https://zenn.dev//",
+          "icon": "zenn.webp"
         },
         {
           "name": "ChatGPT",
-          "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "bg": "#fff9",
+          "url": "https://chatgpt.com/",
+          "icon": "chatgpt.webp"
         },
         {
           "name": "NotebookLM",
-          "bg": "var(--iconbg)",
-          "url": "https://paypayfleamarket.yahoo.co.jp/",
-          "icon": "pfm.webp"
+          "bg": "#fff9",
+          "url": "https://notebooklm.google.com/?icid=home_maincta",
+          "icon": "notebooklm.webp"
         },
         {
           "name": "Scratch",
           "bg": "var(--iconbg)",
-          "url": "https://www.aliexpress.com/",
-          "icon": "aliexpress.webp"
+          "url": "https:/scratch.mit.edu/",
+          "icon": "scratch.webp"
         },
         {
           "name": "Photos",
           "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "url": "https://photos.google.com/",
+          "icon": "photos.webp"
         },
         {
           "name": "Forms",
           "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "url": "https://docs.google.com/forms/",
+          "icon": "forms.webp"
         },
         {
           "name": "Wikipedia",
-          "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "bg": "#fff9",
+          "url": "https://ja.wikipedia.org/wiki/",
+          "icon": "wikipedia.webp"
         },
         {
           "name": "Google AI検索",
           "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "url": "https://www.google.com/search?q=&sca_esv=b5f8bcc5c9e9d517&sxsrf=AE3TifOLFMGi2WEgIHToTWbz6pxHrjaJKA%3A1765700172965&source=hp&ei=THI-adCJOPefvr0PnN3g2Ak&iflsig=AOw8s4IAAAAAaT6AXAWcMaV5a1YrcKo_owUU2NFfS4yC&aep=22&udm=50&ved=0ahUKEwjQ39jc0byRAxX3j68BHZwuGJsQteYPCBQ&oq=&gs_lp=Egdnd3Mtd2l6IgBIAFAAWABwAHgAkAEAmAEAoAEAqgEAuAEByAEAmAIAoAIAmAMAkgcAoAcAsgcAuAcAwgcAyAcAgAgA&sclient=gws-wiz",
+          "icon": "products.webp"
         },
         {
           "name": "Qiita",
           "bg": "var(--iconbg)",
-          "url": "https://www.mercari.com/jp/",
-          "icon": "mercari.webp"
+          "url": "https://qiita.com/",
+          "icon": "qitta.webp"
         }
       ]
     }

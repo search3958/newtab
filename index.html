@@ -371,7 +371,7 @@
     }
 
     .intelligence-answer{
-      font-size:32px;
+      font-size:24px;
       transition:all 0.6s cubic-bezier(.27,.07,0,1);
       position:relative;
       top:0;
@@ -430,6 +430,19 @@
           background:#000;
           color:#fff;
         }
+      }
+
+      @keyframes rotate-icon {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(180deg);
+        }
+      }
+
+      .intelligence.animate-icon .intelligence-icon {
+        animation: rotate-icon 1s cubic-bezier(.34,.24,0,1);
       }
   </style>
 </head>
@@ -505,7 +518,7 @@
 
 </body>
 <script>
-  // main.js (またはHTMLに直接記述するスクリプト)
+ // main.js
 
 // =================================================================
 // 1. IndexedDBの定数とオープン関数
@@ -646,5 +659,7 @@ window.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(s);
     }, 200);
 });
+
+
 </script>
 </html>
