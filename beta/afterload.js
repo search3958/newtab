@@ -365,24 +365,37 @@
     }
   };
   
-  // --- 広告挿入ヘルパー ---
-  const insertAd = (container) => {
-      const adContainer = document.createElement('div');
-      adContainer.className = 'ad-container';
-      adContainer.innerHTML = `
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-              crossorigin="anonymous"></script>
-          <ins class="adsbygoogle"
-              style="display:inline-block;width:244px;height:110px"
-              data-ad-client="ca-pub-6151036058675874"
-              data-ad-slot="2788469305"></ins>
-          <script>
-              (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
-      `;
-      container.appendChild(adContainer);
-  };
-  // --------------------------
+// --- 広告挿入ヘルパー (修正後) ---
+const insertAd = (container) => {
+    // 1. 広告コンテナを作成
+    const adContainer = document.createElement('div');
+    adContainer.className = 'ad-container';
+
+    // 2. <ins> タグ (広告ユニット) を作成
+    const ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    Object.assign(ins.style, {
+        display: 'inline-block',
+        width: '244px',
+        height: '110px'
+    });
+    ins.setAttribute('data-ad-client', 'ca-pub-6151036058675874');
+    ins.setAttribute('data-ad-slot', '2788469305');
+    
+    // 3. コンテナに挿入
+    adContainer.appendChild(ins);
+    container.appendChild(adContainer);
+
+    // 4. 広告レンダリングをトリガーする (最重要！)
+    // window.adsbygoogle が存在するか確認してから push を呼び出す
+    if (window.adsbygoogle && typeof window.adsbygoogle.push === 'function') {
+        window.adsbygoogle.push({});
+    } else {
+        // adsbygoogle.js がまだロードされていない場合のフォールバック/エラー処理
+        console.warn('window.adsbygoogle is not available. Ensure adsbygoogle.js is loaded.');
+    }
+};
+// --------------------------
 
 
   const loadData = async () => {
