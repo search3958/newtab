@@ -1,10 +1,8 @@
 {
   "categories": [
-
     {
       "title": "Sentaro",
       "links": [
-        
         {
           "name": "私について",
           "bg": "var(--iconbg)",
@@ -50,6 +48,35 @@
       ]
     },
     {
+      "title": "学習と教育",
+      "links": [
+        {
+          "name": "Classroom",
+          "bg": "var(--iconbg)",
+          "url": "https://classroom.google.com/",
+          "icon": "classroom.webp"
+        },
+        {
+          "name": "Monoxer",
+          "bg": "#0073ffbb",
+          "url": "https://app.monoxer.com/",
+          "icon": "monoxer.webp"
+        },
+        {
+          "name": "Kahoot",
+          "bg": "#1b00a8bb",
+          "url": "https://kahoot.it/",
+          "icon": "kahoot.webp"
+        },
+        {
+          "name": "Scratch",
+          "bg": "var(--iconbg)",
+          "url": "https://scratch.mit.edu/",
+          "icon": "scratch.webp"
+        }
+      ]
+    },
+    {
       "title": "Google",
       "links": [
         {
@@ -63,18 +90,6 @@
           "bg": "var(--iconbg)",
           "url": "https://keep.google.com/",
           "icon": "keep.webp"
-        },
-        {
-          "name": "Classroom",
-          "bg": "var(--iconbg)",
-          "url": "https://classroom.google.com/",
-          "icon": "classroom.webp"
-        },
-        {
-          "name": "Youtube",
-          "bg": "var(--iconbg)",
-          "url": "https://www.youtube.com/",
-          "icon": "youtube.webp"
         },
         {
           "name": "ドキュメント",
@@ -95,11 +110,34 @@
           "icon": "spreadsheet.webp"
         },
         {
-          "name": "翻訳",
+          "name": "ドライブ",
           "bg": "var(--iconbg)",
-          "url": "https://translate.google.com/",
-          "icon": "translate.webp"
+          "url": "https://drive.google.com/",
+          "icon": "drive.webp"
         },
+        {
+          "name": "Photos",
+          "bg": "var(--iconbg)",
+          "url": "https://photos.google.com/",
+          "icon": "photos.webp"
+        },
+        {
+          "name": "Forms",
+          "bg": "var(--iconbg)",
+          "url": "https://docs.google.com/forms/",
+          "icon": "forms.webp"
+        },
+        {
+          "name": "リモート",
+          "bg": "var(--iconbg)",
+          "url": "https://remotedesktop.google.com/",
+          "icon": "remotedesktop.webp"
+        }
+      ]
+    },
+    {
+      "title": "作業効率化",
+      "links": [
         {
           "name": "Gemini",
           "bg": "var(--iconbg)",
@@ -107,27 +145,10 @@
           "icon": "gemini.webp"
         },
         {
-          "name": "リモート",
-          "bg": "var(--iconbg)",
-          "url": "https://remotedesktop.google.com/",
-          "icon": "remotedesktop.webp"
-        },
-        {
-          "name": "ドライブ",
-          "bg": "var(--iconbg)",
-          "url": "https://drive.google.com/",
-          "icon": "drive.webp"
-        }
-      ]
-    },
-    {
-      "title": "学習と作業効率化",
-      "links": [
-        {
-          "name": "Monoxer",
-          "bg": "#0073ffbb",
-          "url": "https://app.monoxer.com/",
-          "icon": "monoxer.webp"
+          "name": "ChatGPT",
+          "bg": "#fff9",
+          "url": "https://chatgpt.com/",
+          "icon": "chatgpt.webp"
         },
         {
           "name": "Qwen",
@@ -148,6 +169,12 @@
           "icon": "claude.webp"
         },
         {
+          "name": "NotebookLM",
+          "bg": "#fff9",
+          "url": "https://notebooklm.google.com/?icid=home_maincta",
+          "icon": "notebooklm.webp"
+        },
+        {
           "name": "Canva",
           "bg": "var(--iconbg)",
           "url": "https://www.canva.com/",
@@ -160,40 +187,27 @@
           "icon": "microsodt.webp"
         },
         {
-          "name": "TurboWarp",
+          "name": "翻訳",
           "bg": "var(--iconbg)",
-          "url": "https://turbowarp.org/",
-          "icon": "turbowarp.webp"
-        },
-        {
-          "name": "Kahoot",
-          "bg": "#1b00a8bb",
-          "url": "https://kahoot.it/",
-          "icon": "kahoot.webp"
-        },
+          "url": "https://translate.google.com/",
+          "icon": "translate.webp"
+        }
+      ]
+    },
+    {
+      "title": "コミュニケーション",
+      "links": [
         {
           "name": "Discord",
           "bg": "#5618ffbb",
           "url": "https://discord.com/app",
           "icon": "discord.webp"
-        }
-      ]
-    },
-
-    {
-      "title": "娯楽と通信",
-      "links": [
+        },
         {
           "name": "Snapchat",
           "bg": "#fffc03bb",
           "url": "https://www.snapchat.com/web/",
           "icon": "snapchat.webp"
-        },
-        {
-          "name": "poki",
-          "bg": "rgba(255, 255, 255, 0.759)",
-          "url": "https://poki.com/",
-          "icon": "poki.webp"
         },
         {
           "name": "TikTok",
@@ -208,10 +222,21 @@
           "icon": "instagram.webp"
         },
         {
-          "name": "Apple Music",
-          "bg": "#FB4058bb",
-          "url": "https://music.apple.com/jp/new",
-          "icon": "applemusic.webp"
+          "name": "Weverse",
+          "bg": "#27ffbfbb",
+          "url": "https://weverse.io/",
+          "icon": "weverse.webp"
+        }
+      ]
+    },
+    {
+      "title": "エンターテイメント",
+      "links": [
+        {
+          "name": "Youtube",
+          "bg": "var(--iconbg)",
+          "url": "https://www.youtube.com/",
+          "icon": "youtube.webp"
         },
         {
           "name": "Netflix",
@@ -220,28 +245,46 @@
           "icon": "netflix.webp"
         },
         {
-          "name": "Weverse",
-          "bg": "#27ffbfbb",
-          "url": "https://weverse.io/",
-          "icon": "weverse.webp"
-        },
-        {
           "name": "Prime Video",
           "bg": "#0398ffbb",
           "url": "https://www.amazon.co.jp/Prime-Video/",
           "icon": "primevideo.webp"
         },
         {
+          "name": "Apple Music",
+          "bg": "#FB4058bb",
+          "url": "https://music.apple.com/jp/new",
+          "icon": "applemusic.webp"
+        },
+        {
           "name": "Spotify",
           "bg": "var(--iconbg)",
           "url": "https://www.spotify.com/",
           "icon": "spotify.webp"
+        },
+        {
+          "name": "poki",
+          "bg": "rgba(255, 255, 255, 0.759)",
+          "url": "https://poki.com/",
+          "icon": "poki.webp"
         }
       ]
     },
     {
-      "title": "開発",
+      "title": "開発・技術",
       "links": [
+        {
+          "name": "GitHub",
+          "bg": "var(--iconbg)",
+          "url": "https://github.com/",
+          "icon": "github.webp"
+        },
+        {
+          "name": "Figma",
+          "bg": "var(--iconbg)",
+          "url": "https://www.figma.com/",
+          "icon": "figma.webp"
+        },
         {
           "name": "Firebase",
           "bg": "var(--iconbg)",
@@ -255,16 +298,10 @@
           "icon": "codepen.webp"
         },
         {
-          "name": "Figma",
+          "name": "TurboWarp",
           "bg": "var(--iconbg)",
-          "url": "https://www.figma.com/",
-          "icon": "figma.webp"
-        },
-        {
-          "name": "GitHub",
-          "bg": "var(--iconbg)",
-          "url": "https://github.com/",
-          "icon": "github.webp"
+          "url": "https://turbowarp.org/",
+          "icon": "turbowarp.webp"
         },
         {
           "name": "AdSense",
@@ -310,43 +347,13 @@
       ]
     },
     {
-      "title": "その他",
+      "title": "情報収集と知識",
       "links": [
         {
-          "name": "Zenn",
+          "name": "Google AI検索",
           "bg": "var(--iconbg)",
-          "url": "https://zenn.dev//",
-          "icon": "zenn.webp"
-        },
-        {
-          "name": "ChatGPT",
-          "bg": "#fff9",
-          "url": "https://chatgpt.com/",
-          "icon": "chatgpt.webp"
-        },
-        {
-          "name": "NotebookLM",
-          "bg": "#fff9",
-          "url": "https://notebooklm.google.com/?icid=home_maincta",
-          "icon": "notebooklm.webp"
-        },
-        {
-          "name": "Scratch",
-          "bg": "var(--iconbg)",
-          "url": "https://scratch.mit.edu/",
-          "icon": "scratch.webp"
-        },
-        {
-          "name": "Photos",
-          "bg": "var(--iconbg)",
-          "url": "https://photos.google.com/",
-          "icon": "photos.webp"
-        },
-        {
-          "name": "Forms",
-          "bg": "var(--iconbg)",
-          "url": "https://docs.google.com/forms/",
-          "icon": "forms.webp"
+          "url": "https://www.google.com/search?q=&sca_esv=b5f8bcc5c9e9d517&sxsrf=AE3TifOLFMGi2WEgIHToTWbz6pxHrjaJKA%3A1765700172965&source=hp&ei=THI-adCJOPefvr0PnN3g2Ak&iflsig=AOw8s4IAAAAAaT6AXAWcMaV5a1YrcKo_owUU2NFfS4yC&aep=22&udm=50&ved=0ahUKEwjQ39jc0byRAxX3j68BHZwuGJsQteYPCBQ&oq=&gs_lp=Egdnd3Mtd2l6IgBIAFAAWABwAHgAkAEAmAEAoAEAqgEAuAEByAEAmAIAoAIAmAMAkgcAoAcAsgcAuAcAwgcAyAcAgAgA&sclient=gws-wiz",
+          "icon": "products.webp"
         },
         {
           "name": "Wikipedia",
@@ -355,10 +362,10 @@
           "icon": "wikipedia.webp"
         },
         {
-          "name": "Google AI検索",
+          "name": "Zenn",
           "bg": "var(--iconbg)",
-          "url": "https://www.google.com/search?q=&sca_esv=b5f8bcc5c9e9d517&sxsrf=AE3TifOLFMGi2WEgIHToTWbz6pxHrjaJKA%3A1765700172965&source=hp&ei=THI-adCJOPefvr0PnN3g2Ak&iflsig=AOw8s4IAAAAAaT6AXAWcMaV5a1YrcKo_owUU2NFfS4yC&aep=22&udm=50&ved=0ahUKEwjQ39jc0byRAxX3j68BHZwuGJsQteYPCBQ&oq=&gs_lp=Egdnd3Mtd2l6IgBIAFAAWABwAHgAkAEAmAEAoAEAqgEAuAEByAEAmAIAoAIAmAMAkgcAoAcAsgcAuAcAwgcAyAcAgAgA&sclient=gws-wiz",
-          "icon": "products.webp"
+          "url": "https://zenn.dev//",
+          "icon": "zenn.webp"
         },
         {
           "name": "Qiita",
@@ -369,4 +376,4 @@
       ]
     }
   ]
-} 
+}
