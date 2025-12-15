@@ -376,8 +376,8 @@ const insertAd = (container) => {
     ins.className = 'adsbygoogle';
     Object.assign(ins.style, {
         display: 'inline-block',
-        width: '244px',
-        height: '110px'
+        width: '202px',
+        height: '170px'
     });
     ins.setAttribute('data-ad-client', 'ca-pub-6151036058675874');
     ins.setAttribute('data-ad-slot', '2788469305');
