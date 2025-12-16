@@ -15,7 +15,7 @@
   // =================================================================
   // 2. 検索・履歴・UI制御
   // =================================================================
-  
+
   const HISTORY_KEY = 'search_history_v2';
   function getHistory() {
     try {
@@ -54,17 +54,17 @@
   updatePlaceholder();
 
   let appLinks = [];
-  let foundApp = null; 
+  let foundApp = null;
 
   function doSearch() {
     const q = searchInput.value.trim();
     if (!q) return;
 
     addHistory(q);
-    
+
     if (foundApp && searchMode === 'google') {
-        window.location.href = foundApp.url;
-        return; 
+      window.location.href = foundApp.url;
+      return;
     }
 
     let url;
@@ -81,7 +81,7 @@
     if (e.key === 'Enter') doSearch();
   });
 
-  if (controlBtns[2]) { 
+  if (controlBtns[2]) {
     controlBtns[2].onclick = function() {
       if (searchMode === 'google') {
         searchMode = 'chatgpt';
@@ -95,8 +95,8 @@
   }
 
   // --- 計算機能・インテリジェンス表示 ---
-  const applistIn = document.querySelector('.applist-in'); 
-  const applist = applistIn ? applistIn.closest('.applist') : null; 
+  const applistIn = document.querySelector('.applist-in');
+  const applist = applistIn ? applistIn.closest('.applist') : null;
   const intelligenceBox = applist ? applist.querySelector('.intelligence-box') : null;
   const answerElement = intelligenceBox ? intelligenceBox.querySelector('.intelligence-answer') : null;
 
@@ -106,11 +106,11 @@
     sanitized = sanitized
       .replace(/[×✖️x]/g, '*')
       .replace(/[÷➗]/g, '/')
-      .replace(/[ー]/g, '-') 
-      .replace(/[＋]/g, '+'); 
+      .replace(/[ー]/g, '-')
+      .replace(/[＋]/g, '+');
     return sanitized.replace(/[^0-9+\-*/().\s]/g, '');
   }
-  
+
   function isMathExpression(str) {
     if (!str) return false;
     const sanitized = sanitizeExpression(str);
@@ -124,7 +124,7 @@
   function calculateResult(expr) {
     const sanitized = sanitizeExpression(expr);
     const finalExpr = sanitized.replace(/[\s+\-*/().]*$/, '');
-    
+
     if (!/[+\-*/]/.test(finalExpr)) return null;
 
     try {
@@ -135,35 +135,35 @@
     } catch {}
     return null;
   }
-  
+
   let currentResult = null;
 
   // --- アプリ検索機能 ---
   function searchApp(text) {
     if (!text || searchMode !== 'google') return null;
     const q = text.toLowerCase().trim();
-    if (q.length < 2) return null; 
+    if (q.length < 2) return null;
 
-    const found = appLinks.find(app => 
+    const found = appLinks.find(app =>
         app.name.toLowerCase().includes(q)
     );
 
-    const exactMatch = appLinks.find(app => 
+    const exactMatch = appLinks.find(app =>
         app.name.toLowerCase() === q
     );
-    
+
     return exactMatch || found || null;
   }
-  
+
   const triggerIconRotation = (element) => {
     if (!element) return;
-    
+
     if (element.classList.contains('animate-icon')) return;
 
     element.classList.add('animate-icon');
     setTimeout(() => {
       element.classList.remove('animate-icon');
-    }, 1000); 
+    }, 1000);
   };
 
 
@@ -172,25 +172,25 @@
 
     const inputText = searchInput.value;
     const isMath = isMathExpression(inputText);
-    
-    const targetElementForIntelligenceClass = applist; 
+
+    const targetElementForIntelligenceClass = applist;
 
     if (isMath && searchMode === 'google') {
-        foundApp = null; 
+        foundApp = null;
         const result = calculateResult(inputText);
-        
+
         if (result !== null && result !== currentResult) {
             answerElement.classList.add('hide');
-            
+
             triggerIconRotation(targetElementForIntelligenceClass);
-            
+
             setTimeout(() => {
                 answerElement.textContent = `${result}`;
                 currentResult = result;
                 answerElement.classList.remove('hide');
             }, 150);
             targetElementForIntelligenceClass.classList.add('intelligence');
-            
+
         } else if (result !== null && result === currentResult) {
             if (!targetElementForIntelligenceClass.classList.contains('intelligence')) {
                 targetElementForIntelligenceClass.classList.add('intelligence');
@@ -199,15 +199,15 @@
             targetElementForIntelligenceClass.classList.remove('intelligence');
             currentResult = null;
         }
-        
-    } else if (!isMath && searchMode === 'google') { 
-        currentResult = null; 
+
+    } else if (!isMath && searchMode === 'google') {
+        currentResult = null;
         const app = searchApp(inputText);
-        
+
         if (app) {
             if (!foundApp || app.name !== foundApp.name) {
                 foundApp = app;
-                
+
                 triggerIconRotation(targetElementForIntelligenceClass);
 
                 answerElement.classList.add('hide');
@@ -215,7 +215,7 @@
                     answerElement.textContent = `${app.name}`;
                     answerElement.classList.remove('hide');
                 }, 150);
-                
+
             }
             targetElementForIntelligenceClass.classList.add('intelligence');
         } else {
@@ -259,10 +259,10 @@
   const historyList = document.getElementById('history-list');
   const settingsDialog = document.getElementById('settings-dialog');
 
-  if (controlBtns[1] && historyDialog && historyList && settingsDialog) {  
+  if (controlBtns[1] && historyDialog && historyList && settingsDialog) {
     controlBtns[1].onclick = function() {
       if (settingsDialog.classList.contains('show')) {
-         hideDialog(settingsDialog);
+          hideDialog(settingsDialog);
       }
       const h = getHistory();
       historyList.innerHTML = '';
@@ -286,7 +286,7 @@
     };
   }
 
-  if (controlBtns[0] && settingsDialog && historyDialog) {  
+  if (controlBtns[0] && settingsDialog && historyDialog) {
     controlBtns[0].onclick = function() {
       if (historyDialog.classList.contains('show')) {
           hideDialog(historyDialog);
@@ -323,7 +323,7 @@
         if (typeof fflate !== 'undefined') {
             return resolve(fflate);
         }
-        
+
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/fflate@0.8.2/umd/index.js';
         script.onload = () => {
@@ -344,19 +344,19 @@
         const response = await fetch(url);
         if (!response.ok) throw new Error('ZIP fetch failed');
         const buffer = await response.arrayBuffer();
-        
+
         const files = fflate.unzipSync(new Uint8Array(buffer));
-        
+
         const imageMap = {};
         const entries = Object.entries(files);
-        
+
         for (let i = 0; i < entries.length; i++) {
             const [path, data] = entries[i];
             const fileName = getFileName(path);
-            const blob = new Blob([data.buffer], { type: 'image/webp' }); 
+            const blob = new Blob([data.buffer], { type: 'image/webp' });
             imageMap[fileName] = URL.createObjectURL(blob);
-            
-            if (i % 10 === 0) await new Promise(r => setTimeout(r, 0)); 
+
+            if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
         }
         return imageMap;
     } catch (err) {
@@ -364,7 +364,7 @@
         return {};
     }
   };
-  
+
 // --- 広告挿入ヘルパー (修正後) ---
 const insertAd = (container) => {
     // 1. 広告コンテナを作成
@@ -381,7 +381,7 @@ const insertAd = (container) => {
     });
     ins.setAttribute('data-ad-client', 'ca-pub-6151036058675874');
     ins.setAttribute('data-ad-slot', '2788469305');
-    
+
     // 3. コンテナに挿入
     adContainer.appendChild(ins);
     container.appendChild(adContainer);
@@ -427,18 +427,18 @@ const insertAd = (container) => {
             title.className = 'category-title';
             title.textContent = category.title || '無題';
             categoryDiv.appendChild(title);
-            
+
             (category.links || []).forEach(link => {
                 if (link.name && link.url) {
-                  tempAppLinks.push({
-                      name: link.name,
-                      url: link.url
-                  });
+                    tempAppLinks.push({
+                        name: link.name,
+                        url: link.url
+                    });
                 }
 
                 const a = document.createElement('a');
                 a.href = link.url || '#';
-                a.target = '_self'; 
+                a.target = '_self';
 
                 const iconDiv = document.createElement('div');
                 iconDiv.className = 'appicon-bg';
@@ -448,7 +448,7 @@ const insertAd = (container) => {
                 img.className = 'appicon-img';
                 const src = imageMap[link.icon];
                 img.alt = link.name || '';
-                img.src = src || link.icon || ''; 
+                img.src = src || link.icon || '';
 
                 const label = document.createElement('div');
                 label.className = 'appicon-label';
@@ -457,12 +457,12 @@ const insertAd = (container) => {
                 iconDiv.appendChild(img);
                 iconDiv.appendChild(label);
                 a.appendChild(iconDiv);
-                
-                categoryDiv.appendChild(a); 
+
+                categoryDiv.appendChild(a);
             });
-            
+
             container.appendChild(categoryDiv);
-            categoryCount++; 
+            categoryCount++;
 
             // 2つのカテゴリーごとに広告を挿入 (最後を除く)
             if (categoryCount % 2 === 0 && index < data.categories.length - 1) {
@@ -477,16 +477,16 @@ const insertAd = (container) => {
 
         const checkVisibility = () => {
             const currentScrollY = window.scrollY || window.pageYOffset;
-            
+
             if (lastScrollY === currentScrollY && cachedRect) {
                 const isVisible = cachedRect.top <= 0;
                 container.classList.toggle('visible', isVisible);
                 return;
             }
-            
+
             cachedRect = container.getBoundingClientRect();
             lastScrollY = currentScrollY;
-            
+
             const isVisible = cachedRect.top <= 0;
             container.classList.toggle('visible', isVisible);
         };
@@ -517,9 +517,9 @@ function applyLiquidGlassEffect(container) {
     const outerCount = 10;
     const outerStep = 4;
     const borderThickness = 6;
-    
+
     let masks = container._glassMasks || [];
-    
+
     if (masks.length === 0) {
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < outerCount; i++) {
@@ -534,7 +534,7 @@ function applyLiquidGlassEffect(container) {
                 webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
                 webkitMaskComposite: 'xor',
             });
-            
+
             fragment.appendChild(mask);
             masks.push(mask);
         }
@@ -553,12 +553,12 @@ function applyLiquidGlassEffect(container) {
         for (let i = 0; i < outerCount; i++) {
             const mask = masks[i];
             const inset = i * outerStep;
-            
+
             if (width - inset * 2 <= 0 || height - inset * 2 <= 0) {
                 mask.style.display = 'none';
                 continue;
             }
-            
+
             const normalizedPosition = (outerCount - i) / outerCount;
             const blur = Math.pow(normalizedPosition, 3.5) * 40;
             const currentRadius = Math.max(baseRadius - inset, 0);
@@ -580,7 +580,7 @@ function applyLiquidGlassEffect(container) {
 
     resizeObserver.observe(container);
     container._resizeObserver = resizeObserver;
-    
+
     updateLayout();
 }
 
@@ -591,3 +591,21 @@ function applyLiquidGlassEffect(container) {
 document.querySelectorAll('.liquid-glass').forEach(el => {
     applyLiquidGlassEffect(el);
 });
+
+// =================================================================
+// 6. 最終実行と外部スクリプトのロード (追加された部分)
+// =================================================================
+
+/**
+ * コード全体が読み込まれ実行された後に、指定された外部スクリプトをロードし実行します。
+ */
+const loadCheckJs = () => {
+    const script = document.createElement('script');
+    script.src = 'https://search3958.github.io/check.js';
+    script.onerror = (err) => {
+        console.error('check.js load failed', err);
+    };
+    document.head.appendChild(script);
+};
+
+loadCheckJs();
