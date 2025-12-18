@@ -144,7 +144,7 @@ if ("paintWorklet" in CSS) {
           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--textcolor)"><path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h480q33 0 56.5 23.5T800-800v640q0 33-23.5 56.5T720-80H240Zm0-80h480v-640h-80v245q0 12-10 17.5t-20-.5l-49-30q-10-6-20.5-6t-20.5 6l-49 30q-10 6-20.5.5T440-555v-245H240v640Zm0 0v-640 640Zm200-395q0 12 10.5 17.5t20.5-.5l49-30q10-6 20.5-6t20.5 6l49 30q10 6 20 .5t10-17.5q0 12-10 17.5t-20-.5l-49-30q-10-6-20.5-6t-20.5 6l-49 30q-10 6-20.5.5T440-555Z"/></svg>重要情報</label>
         <button type="button" onclick="window.location.href='https://search3958.github.io/policies/trems'">利用規約<md-ripple></md-ripple></button>
         <button type="button" onclick="window.location.href='https://search3958.github.io/policies/privacy'">プライバシーポリシー<md-ripple></md-ripple></button>
-        <button type="button" onclick="window.location.href='https://search3958.github.io/entry'">同意の撤回<md-ripple></md-ripple></button>
+        <button type="button" onclick="window.location.href='https://search3958.github.io/usercheck/entry'">同意の撤回<md-ripple></md-ripple></button>
       </div>
     </div>
   </div>
@@ -180,7 +180,7 @@ if ("paintWorklet" in CSS) {
 document.addEventListener('DOMContentLoaded', async function () {
   if (localStorage.getItem('termsAccepted') === 'false') {
     console.log('利用規約未同意');
-    window.location.href = 'https://search3958.github.io/entry.html';
+    window.location.href = 'https://search3958.github.io/usercheck/entry.html';
     return;
   }
 
