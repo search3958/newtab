@@ -365,6 +365,7 @@
     }
   };
 
+  
 // --- 広告挿入ヘルパー (修正後) ---
 const insertAd = (container) => {
     // 1. 広告コンテナを作成
@@ -377,7 +378,7 @@ const insertAd = (container) => {
     Object.assign(ins.style, {
         display: 'inline-block',
         width: '202px',
-        height: '170px'
+        height:/* '170px'*/'1px'
     });
     ins.setAttribute('data-ad-client', 'ca-pub-6151036058675874');
     ins.setAttribute('data-ad-slot', '2788469305');
