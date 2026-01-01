@@ -31,7 +31,6 @@
       img.src = imageUrl;
       img.onload = () => {
         try {
-          console.log("画像の色抽出を開始します");
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           canvas.width = 50; 
@@ -45,15 +44,11 @@
             b += data[i+2];
           }
           const count = data.length / 4;
-          const avgR = r / count;
-          const avgG = g / count;
-          const avgB = b / count;
-          const deg = rgbToHue(avgR, avgG, avgB);
+          const deg = rgbToHue(r/count, g/count, b/count);
           
           // CSS変数に即座に反映
           document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
           console.log(`壁紙から色をスキャンして適用: ${deg}deg`);
-          console.log(`平均RGB値: R=${avgR}, G=${avgG}, B=${avgB}`);
           resolve(deg);
         } catch (e) {
           console.error("Color scan failed:", e);
@@ -74,8 +69,6 @@
       scanAndApplyColor(lightUrl).catch(e => {
         console.log("色のスキャンに失敗、デフォルト色を使用");
       });
-    } else {
-      console.log("壁紙が設定されていません");
     }
   }
 
@@ -99,7 +92,7 @@
     if (document.getElementById('google-fonts-link')) return;
     const link = document.createElement('link');
     link.id = 'google-fonts-link';
-    link.href = 'https://fonts.googleapis.com/css2?family=Google+Sans  :wght@400&display=swap';
+    link.href = 'https://fonts.googleapis.com/css2?family=Google+Sans:wght@400&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
   }
@@ -159,8 +152,8 @@
       return;
     }
     let url = (searchMode === 'google') 
-      ? 'https://www.google.com/search?q=  ' + encodeURIComponent(q)
-      : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=  ' + encodeURIComponent(q);
+      ? 'https://www.google.com/search?q=' + encodeURIComponent(q)
+      : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
     window.location.href = url;
   }
 
@@ -367,7 +360,7 @@
     infoDiv.innerHTML = `
       <div class="info-time" style="font-size:5em; margin:0px; font-family:'Google Sans', sans-serif;">--:--</div>
       <div class="info-details">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 35t35 85v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
         <span class="info-date">----年--月--日</span>
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h540q50 0 85 35t35 85v240q0 50-35 85t-85 35H160Zm0-80h540q17 0 28.5-11.5T740-360v-240q0-17-11.5-28.5T700-640H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320Zm700-60v-200h20q17 0 28.5-11.5T920-540v120q0 17-11.5 28.5T880-380h-20Zm-700 20v-240h540v240H160Z"/></svg>
         <span class="info-battery">バッテリー --%</span>
@@ -457,7 +450,7 @@
       adDiv.innerHTML = `<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>`;
       container.appendChild(adDiv);
       const s = document.createElement('script');
-      s.async = true; s.src = "https://pagead2.googlesyndication.com/pagead2/js/adsbygoogle.js?client=ca-pub-6151036058675874  ";
+      s.async = true; s.src = "https://pagead2.googlesyndication.com/pagead2/js/adsbygoogle.js?client=ca-pub-6151036058675874";
       document.head.appendChild(s);
       (window.adsbygoogle = window.adsbygoogle || []).push({});
 
@@ -471,6 +464,6 @@
   }
 
   const checkScript = document.createElement('script');
-  checkScript.src = 'https://search3958.github.io/check.js  ';
+  checkScript.src = 'https://search3958.github.io/check.js';
   document.head.appendChild(checkScript);
 })();

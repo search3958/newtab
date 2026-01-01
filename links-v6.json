@@ -139,12 +139,6 @@
       "title": "作業効率化",
       "links": [
         {
-          "name": "Gemini",
-          "bg": "var(--iconbg)",
-          "url": "https://gemini.google.com/",
-          "icon": "gemini.webp"
-        },
-        {
           "name": "ChatGPT",
           "bg": "#fff9",
           "url": "https://chatgpt.com/",
