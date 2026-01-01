@@ -337,7 +337,7 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
     <h4>検索履歴</h4>
     <button id="clear-history">検索履歴を削除</button>
     
-    <h4>Newtab v6.1</h4>
+    <h4>Newtab v6.1 beta</h4>
     <p>ご利用いただく場合，利用規約と<br>プライバシーポリシーの方針に同意するものとみなします。</p>
     <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
     <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
@@ -385,7 +385,7 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
 
 </body>
 <script>
- // main.js
+// main.js
 
 // =================================================================
 // 1. IndexedDBの定数とオープン関数
@@ -397,58 +397,61 @@ const DB_VERSION = 1;
 function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
-
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
-                // キーパスなしでオブジェクトストアを作成
                 db.createObjectStore(STORE_NAME); 
             }
         };
-
-        request.onsuccess = (event) => {
-            resolve(event.target.result);
-        };
-
-        request.onerror = (event) => {
-            console.error("IndexedDB open error:", event.target.errorCode);
-            reject('INDEXEDDB_ERROR');
-        };
+        request.onsuccess = (event) => resolve(event.target.result);
+        request.onerror = (event) => reject('INDEXEDDB_ERROR');
     });
 }
 
 // =================================================================
-// 2. IndexedDBからのデータ取得と壁紙適用関数
+// 2. 色抽出の補助関数 (CSS変数更新用)
 // =================================================================
 
-async function getFromIndexedDB(key) {
-    let db;
-    try {
-        db = await openDB();
-    } catch (e) {
-        console.error('DB接続失敗:', e);
-        return;
+function rgbToHue(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0;
+    if (max !== min) {
+        if (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / (max - min) + 2;
+        else if (max === b) h = (r - g) / (max - min) + 4;
+        h /= 6;
     }
+    return Math.round(h * 360);
+}
 
-    return new Promise((resolve) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.get(key);
-
-        request.onsuccess = (event) => {
-            // 例: { light: Blob, dark: Blob } の形式で返される
-            resolve(event.target.result); 
+async function extractMainColorDeg(imageUrl) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 50; canvas.height = 50;
+            ctx.drawImage(img, 0, 0, 50, 50);
+            const data = ctx.getImageData(0, 0, 50, 50).data;
+            let r = 0, g = 0, b = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                r += data[i]; g += data[i+1]; b += data[i+2];
+            }
+            const count = data.length / 4;
+            resolve(rgbToHue(r/count, g/count, b/count));
         };
-
-        request.onerror = (event) => {
-            console.error(`IndexedDBからの ${key} 取得エラー:`, event.target.error);
-            resolve(undefined); // エラー時は undefined を返す
-        };
+        img.onerror = reject;
     });
 }
+
+// =================================================================
+// 3. 壁紙適用関数 (ここがメインの修正箇所)
+// =================================================================
 
 async function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. 標準値の適用 (CSS変数のみ) ---
+    // --- 1. 最初は標準値を適用 (復元) ---
     document.documentElement.style.setProperty('--color-deg', '15deg');
 
     // 既存URLの解放
@@ -475,10 +478,11 @@ async function applyWallpaper(lightBlob, darkBlob = null) {
         document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
     }
 
-    // --- 3. スキャン結果をCSS変数にのみ反映 (LocalStorageへの保存はしない) ---
+    // --- 3. 画像をスキャンしてCSS変数のみを更新 ---
     if (lightBlob) {
         try {
             const deg = await extractMainColorDeg(lightUrl);
+            // LocalStorageには保存せず、現在のセッション（CSS変数）のみを書き換える
             document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
         } catch (e) {
             console.error("Color scan failed:", e);
@@ -486,48 +490,39 @@ async function applyWallpaper(lightBlob, darkBlob = null) {
     }
 }
 
+// =================================================================
+// 4. データ取得と初期化
+// =================================================================
 
-/**
- * 起動時または設定変更時に、IndexedDBから壁紙を読み込み適用するメイン関数
- */
+async function getFromIndexedDB(key) {
+    let db;
+    try { db = await openDB(); } catch (e) { return; }
+    return new Promise((resolve) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get(key);
+        request.onsuccess = (event) => resolve(event.target.result);
+        request.onerror = () => resolve(undefined);
+    });
+}
+
 async function loadAndApplyCurrentWallpaper() {
-    // 優先度 1: Newtabに設定された壁紙の確認
     const newtabData = await getFromIndexedDB('newtab');
     if (newtabData && newtabData.light) {
-        // Newtab設定が最優先。ライト画像は必須。
-        const lightBlob = newtabData.light;
-        
-        // ダーク画像があればそれを使用。なければライト画像をダークのフォールバックとする。
-        const darkBlob = newtabData.dark || lightBlob;
-        
-        applyWallpaper(lightBlob, darkBlob);
+        applyWallpaper(newtabData.light, newtabData.dark || newtabData.light);
         return;
     }
 
-    // 優先度 2 & 3: 個別のライト/ダーク設定の確認
     const lightData = await getFromIndexedDB('light');
     const darkData = await getFromIndexedDB('dark');
-
-    const finalLightBlob = lightData ? lightData.light : null;
-    const finalDarkBlob = darkData ? darkData.dark : null;
-    
-    // lightData と darkData を組み合わせて適用
-    applyWallpaper(finalLightBlob, finalDarkBlob);
+    applyWallpaper(lightData ? lightData.light : null, darkData ? darkData.dark : null);
 }
 
-
-// =================================================================
-// 3. アプリケーション起動時の処理 (壁紙とafterload.jsの遅延読み込み)
-// =================================================================
-
 window.addEventListener('DOMContentLoaded', () => {
-    // 1. IndexedDBから壁紙を読み込み、CSS変数を設定して適用 (最優先で実行)
     loadAndApplyCurrentWallpaper();
-    
-    // 2. afterload.jsを200ms遅延読込 (重い処理を遅延させる)
     setTimeout(() => {
         const s = document.createElement('script');
-        s.src = 'beta/afterload.js'; // パスは元のコードと同じ
+        s.src = 'beta/afterload.js';
         document.body.appendChild(s);
     }, 200);
 });
