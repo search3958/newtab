@@ -387,9 +387,6 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
 <script>
 // main.js
 
-// =================================================================
-// 1. IndexedDBの定数とオープン関数
-// =================================================================
 const DB_NAME = 'WallpaperDB';
 const STORE_NAME = 'images';
 const DB_VERSION = 1;
@@ -399,68 +396,44 @@ function openDB() {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME); 
-            }
+            if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
         };
         request.onsuccess = (event) => resolve(event.target.result);
-        request.onerror = (event) => reject('INDEXEDDB_ERROR');
+        request.onerror = () => reject('INDEXEDDB_ERROR');
+    });
+}
+
+async function getFromIndexedDB(key) {
+    let db;
+    try { db = await openDB(); } catch (e) { return; }
+    return new Promise((resolve) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get(key);
+        request.onsuccess = (event) => resolve(event.target.result);
+        request.onerror = () => resolve(undefined);
     });
 }
 
 // =================================================================
-// 2. 色抽出の補助関数 (CSS変数更新用)
+// 壁紙適用関数 (色の復元と壁紙セットのみ)
 // =================================================================
-
-function rgbToHue(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0;
-    if (max !== min) {
-        if (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
-        else if (max === g) h = (b - r) / (max - min) + 2;
-        else if (max === b) h = (r - g) / (max - min) + 4;
-        h /= 6;
-    }
-    return Math.round(h * 360);
-}
-
-async function extractMainColorDeg(imageUrl) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = imageUrl;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 50; canvas.height = 50;
-            ctx.drawImage(img, 0, 0, 50, 50);
-            const data = ctx.getImageData(0, 0, 50, 50).data;
-            let r = 0, g = 0, b = 0;
-            for (let i = 0; i < data.length; i += 4) {
-                r += data[i]; g += data[i+1]; b += data[i+2];
-            }
-            const count = data.length / 4;
-            resolve(rgbToHue(r/count, g/count, b/count));
-        };
-        img.onerror = reject;
-    });
-}
-
-// =================================================================
-// 3. 壁紙適用関数 (ここがメインの修正箇所)
-// =================================================================
-
-async function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. 最初は標準値を適用 (復元) ---
-    document.documentElement.style.setProperty('--color-deg', '15deg');
-
+async function applyWallpaper(data) {
     // 既存URLの解放
     const existingLightUrl = document.body.dataset.lightUrl;
     const existingDarkUrl = document.body.dataset.darkUrl;
     if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
     if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
 
-    // --- 2. 壁紙の設定 ---
+    // データの展開 (渡されたオブジェクトから取得)
+    const lightBlob = data?.light || null;
+    const darkBlob = data?.dark || null;
+    const savedDeg = data?.deg || '15'; // 保存された値を優先
+
+    // --- 【色の即時復元】 ---
+    document.documentElement.style.setProperty('--color-deg', `${savedDeg}deg`);
+
+    // --- 【壁紙の設定】 ---
     let lightUrl = 'bgimg/chips1.png';
     if (lightBlob) {
         lightUrl = URL.createObjectURL(lightBlob);
@@ -477,56 +450,41 @@ async function applyWallpaper(lightBlob, darkBlob = null) {
     } else {
         document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
     }
-
-    // --- 3. 画像をスキャンしてCSS変数のみを更新 ---
-    if (lightBlob) {
-        try {
-            const deg = await extractMainColorDeg(lightUrl);
-            // LocalStorageには保存せず、現在のセッション（CSS変数）のみを書き換える
-            document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
-        } catch (e) {
-            console.error("Color scan failed:", e);
-        }
-    }
-}
-
-// =================================================================
-// 4. データ取得と初期化
-// =================================================================
-
-async function getFromIndexedDB(key) {
-    let db;
-    try { db = await openDB(); } catch (e) { return; }
-    return new Promise((resolve) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.get(key);
-        request.onsuccess = (event) => resolve(event.target.result);
-        request.onerror = () => resolve(undefined);
-    });
 }
 
 async function loadAndApplyCurrentWallpaper() {
+    // 1. newtab キーをチェック
     const newtabData = await getFromIndexedDB('newtab');
     if (newtabData && newtabData.light) {
-        applyWallpaper(newtabData.light, newtabData.dark || newtabData.light);
+        await applyWallpaper(newtabData);
         return;
     }
 
+    // 2. なければ light/dark キーを統合
     const lightData = await getFromIndexedDB('light');
     const darkData = await getFromIndexedDB('dark');
-    applyWallpaper(lightData ? lightData.light : null, darkData ? darkData.dark : null);
+    
+    if (lightData) {
+        await applyWallpaper({
+            light: lightData.light,
+            dark: darkData ? darkData.dark : null,
+            deg: lightData.deg
+        });
+    } else {
+        // 全くなければデフォルト
+        await applyWallpaper(null);
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     loadAndApplyCurrentWallpaper();
+    // 200ms後にスキャンとUI構築担当の afterload.js を読み込む
     setTimeout(() => {
         const s = document.createElement('script');
         s.src = 'beta/afterload.js';
         document.body.appendChild(s);
     }, 200);
 });
-
 
 </script>
 </html>
