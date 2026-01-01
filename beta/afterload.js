@@ -2,95 +2,6 @@
 
 (function() {
   // =================================================================
-  // 0. 壁紙とテーマカラーの制御ロジック
-  // =================================================================
-
-  /**
-   * RGBからHue(色相)を算出
-   */
-  function rgbToHue(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0;
-    if (max !== min) {
-      if (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
-      else if (max === g) h = (b - r) / (max - min) + 2;
-      else if (max === b) h = (r - g) / (max - min) + 4;
-      h /= 6;
-    }
-    return Math.round(h * 360);
-  }
-
-  /**
-   * 画像URLからメインカラー(Hue)を抽出
-   */
-  async function extractMainColorDeg(imageUrl) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = imageUrl;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 50; canvas.height = 50; // 解析用に縮小
-        ctx.drawImage(img, 0, 0, 50, 50);
-        const data = ctx.getImageData(0, 0, 50, 50).data;
-        let r = 0, g = 0, b = 0;
-        for (let i = 0; i < data.length; i += 4) {
-          r += data[i]; g += data[i+1]; b += data[i+2];
-        }
-        const count = data.length / 4;
-        resolve(rgbToHue(r/count, g/count, b/count));
-      };
-      img.onerror = reject;
-    });
-  }
-
-  /**
-   * 壁紙の適用と色の復元・スキャン
-   */
-  async function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. ローカルストレージからの復元 ---
-    const savedDeg = localStorage.getItem('user-wallpaper-deg') || '15';
-    document.documentElement.style.setProperty('--color-deg', `${savedDeg}deg`);
-
-    // 既存URLの解放
-    const existingLightUrl = document.body.dataset.lightUrl;
-    const existingDarkUrl = document.body.dataset.darkUrl;
-    if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
-    if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
-
-    // --- 2. 壁紙の設定 ---
-    let lightUrl = 'bgimg/chips1.png'; // デフォルト
-    if (lightBlob) {
-      lightUrl = URL.createObjectURL(lightBlob);
-      document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-      document.body.dataset.lightUrl = lightUrl;
-    } else {
-      document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`); 
-    }
-
-    if (darkBlob) {
-      const darkUrl = URL.createObjectURL(darkBlob);
-      document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
-      document.body.dataset.darkUrl = darkUrl;
-    } else {
-      document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
-    }
-
-    // --- 3. 画像をスキャンして色を更新 ---
-    if (lightBlob) {
-      try {
-        const deg = await extractMainColorDeg(lightUrl);
-        document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
-        localStorage.setItem('user-wallpaper-deg', deg);
-      } catch (e) {
-        console.error("Color scan failed:", e);
-      }
-    }
-  }
-
-  // =================================================================
   // 1. Google Fonts の動的読み込み
   // =================================================================
   function loadGoogleFont() {
@@ -415,8 +326,8 @@
   };
 
   const loadData = async () => {
-    // 壁紙の初期復元
-    applyWallpaper(null); 
+    // 【重要】ここの applyWallpaper(null) を削除しました。
+    // 壁紙の復元は main.js 側で行われます。
 
     const container = document.querySelector('.applist-in');
     if (!container) return;
