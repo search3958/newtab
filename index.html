@@ -8,446 +8,316 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
      crossorigin="anonymous"></script>
 <style>
-    :root{
-      --iconbg:#fff9;
-      --glass-shadow: #fffb 0px 1.5px 3px inset,#fff7 0px -1.5px 3px inset;
-      --text-color:#000;
-      --bound:linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
-      --ease:cubic-bezier(.34,.24,.18,1);
-    }
-    body {
-      margin: 0;
-      overflow:hidden;
-          -webkit-font-smoothing: antialiased;
-    }
-    body {
-      background-color:#fff;
-        /* デフォルトはライトモードの壁紙を使用 */
-        background-image: var(--user-wallpaper-light);
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: cover;
-        background-attachment: fixed;
-    }
+   :root {
+  --iconbg: #fff9;
+  --glass-shadow: #fffb 0px 1.5px 3px inset, #fff7 0px -1.5px 3px inset;
+  --text-color: #000;
+  --bound: linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
+  --ease: cubic-bezier(.34, .24, .18, 1);
+  --color-deg:15deg;
+}
 
+/* Base Styles */
+body {
+  margin: 0;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fff;
+  background-image: var(--user-wallpaper-light);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
 
-    * { 
-      scrollbar-width: none;
-    line-height: 1.5!important;
-    font-family:
-  "Yu Gothic UI",
-  "Yu Gothic",
-  "Hiragino Sans",
-  "Hiragino Kaku Gothic ProN",
-  "Meiryo",
-  "Noto Sans JP",
-  sans-serif;
-      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-          text-wrap-mode: nowrap;
-          user-select: none;
+body:before {
+  background: #fff3;
+  content: " ";
+  height: 100vh;
+  width: 100vw;
+  display: block;
+  backdrop-filter: brightness(1.2);
+}
 
-     }
-    /* ... 既存のCSSルールの続き ... */
-    *::-webkit-scrollbar { display: none; }
-    .first{
-      
-    position: fixed;
-    top: calc(50% - 56px);
-    left: 50%;
-    transform: translate(-50%, -50px);
-    display:flex;
-    gap:16px;
-    }
-    .search{
-      width:fit-content;
-      position:relative;
-      border-radius:35px;
-      scale:1;
-      transition:scale 0.3s var(--ease);
-    }
-    .search:active{
-      scale:1.03;
-    }
-    .search-in{
-      position:relative;
-      z-index:1001;
-      background:#fff8;
-      padding:13px;
-      corner-shape: superellipse(2.4);
-      border-radius:90px;
-      backdrop-filter:blur(4px) brightness(1.15);
-      transition:backdrop-filter 0.3s var(--ease);
-      overflow:hidden;
-      --md-ripple-hover-color:#fff0;
-      --md-ripple-pressed-color:#fff2;
-      --md-ripple-pressed-opacity:1;
-    }
+* {
+  scrollbar-width: none;
+  line-height: 1.5 !important;
+  font-family: "Google Sans","Yu Gothic UI", "Yu Gothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
+  text-wrap-mode: nowrap;
+  user-select: none;
+}
 
-    .search-in:active{
-      backdrop-filter:blur(4px) brightness(1.3);
-    }
-    .search-rp{
-      border-radius:0px;
-    }
-    
-    .search-input,.search-button{
-      background:none;
-      outline:none;
-      border:none;
-      color:var(--text-color);
-      font-size:16px;
-    }
-    .search-input{
-      width:155px;
-      transition:width 1s var(--bound);
-      font-family: 'Google Sans', sans-serif;
-    }
-    .search-box{
-      padding:16px;
-      background:#fff7;
-      corner-shape: superellipse(1.6);
-      border-radius:29px;
-      border:#fff6 1px solid;
-      display:flex;
-    }
-    .control-button{
-      padding:16px;
-      background:#fff7;
-      corner-shape: superellipse(1.6);
-      border-radius:14px;
-      border:#fff6 1px solid;
-      width:100%;
-      transition:all 0.3s var(--ease);
-    }
-    .control-button:first-child{
-      border-radius:29px 14px 14px 29px;
-    }
-    .control-button:last-child{
-      border-radius:14px 29px 29px 14px;
-    }
-    .control-button.active{
-      corner-shape: superellipse(1.04);
-      border-radius:29.5px;
+*::-webkit-scrollbar {
+  display: none;
+}
 
-    }
-    .search-control{
-      margin-top:8px;
-      display:flex;
-      gap:6px;
-    }
-    svg{
-      margin-bottom:-5px;
-    }
+/* Search Bar */
+.search-in {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: #fffa;
+  padding: 8px;
+  corner-shape: superellipse(1.6);
+  border-radius: 24px;
+  backdrop-filter: blur(8px) brightness(1.15);
+  transition: backdrop-filter 0.3s var(--ease);
+  overflow: hidden;
+  display: flex;
+  gap: 8px;
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+}
 
+.search-input {
+  width: 155px;
+  background: #ffffff82;
+  outline: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 16px;
+  padding: 12px 12px 12px 16px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  transition: width 1s var(--bound);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+}
 
+.search-button {
+  background: hsl(var(--color-deg) 54.4% 49.02%);
+  outline: none;
+  border: none;
+  color: #fff;
+  padding: 12px 13px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+}
 
-    .applist{
-      width:fit-content;
-      position:relative;
-      border-radius:35px;
-      scale:1;
-      transition:scale 0.6s linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.021 33%, 1.037 41.1%, 1.005 72.8%, 1),box-shadow 0.3s var(--ease);
-      box-shadow:#0002 0px 0px 0px;
-    }
-    .applist:hover{
-      scale:1.7;
-      box-shadow:#0002 0px 8px 16px;
-    }
-    .applist:active{
-      scale:1.75;
-    }
+.control-button {
+  border: none;
+  background: #0000;
+  padding: 12px 13px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  transition: all 0.3s var(--ease);
+}
 
-    .intelligence.applist:hover{
-      scale:1;
-      box-shadow:#0000 0px 0px 0px;
-    }
-    .intelligence.applist:active{
-      scale:1.03;
-    }
+.control-button:hover {
+  background: #0001;
+}
 
-    .applist-in{
-      position:relative;
-      z-index:1001;
-      background:#fff8;
-      padding:13px 0px;
-      corner-shape: superellipse(2.4);
-      border-radius:90px;
-      backdrop-filter:blur(4px) brightness(1.15);
-      transition:backdrop-filter 0.3s var(--ease);
-      overflow:scroll;
-      --md-ripple-hover-color:#fff0;
-      --md-ripple-pressed-color:#fff3;
-      --md-ripple-pressed-opacity:1;
-      height:calc(100% - 13*2px);
-      width:202px;
-      height:128px;
-    }
+.control-button.active{
+  background: hsl(var(--color-deg) 100% 60% / 10%);
+}
 
-    .applist-in:active{
-      backdrop-filter:blur(4px) brightness(1.3);
-    }
+.active svg{
+  fill: hsl(var(--color-deg) 100% 30%);
+}
 
+/* App List Area */
+.applist-in {
+  position: fixed;
+  top: 0;
+  left: 24px;
+  width: calc(100vw - 48px);
+  height: calc(100vh - 124px);
+  padding: 24px 0 100px 0;
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+.category {
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
+.category-title {
+  font-size: 21px;
+  font-weight: 500;
+  margin: 0 0 3px 0;
+  width: 100%;
+}
 
-    .category {
-      margin-bottom: 8px;
-      gap: 8px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      flex-direction: row;
-      max-width:875px;
-      opacity:1;
-      transition:opacity 0.2s ease;
-    }
-    .intelligence .category{
-      opacity:0;
-      pointer-events:none;
-    }
-    .category-title { font-size: 16px; font-weight: 400; margin:0px;margin-bottom: 3px; width:100%; text-align:center;}
+a {
+  width: calc(100% / 3 - 6px);
+  text-decoration: none;
+  color: var(--text-color);
+}
 
+.appicon-bg {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.6);
+  backdrop-filter: blur(10px);
 
+}
 
+.appicon-img {
+  height: 50px;
+  width: 50px;
+  object-fit: cover;
+}
 
-    .appicon-bg {
-      display: block;
-      padding: 0px;
-      border-radius: 800px;
-      text-align: center;
-      width: 100px;
-      position:relative;
-      height:40px;
-      width:40px;
-        }
-    .appicon-img {
-      height:40px;
-      width:40px;
-      object-fit: cover;
-    }
-    .appicon-label {
-      font-size: 12px;
-      margin-top: 4px;
-      position:absolute;
-      top:20px;
-      left:-10px;
-      backdrop-filter: brightness(100%);
-      padding:6px;
-      background:#fff0;
-      border-radius:100px;
-      corner-shape: squircle;
-      scale:0.5;
-      color:#0000;
-      transition:all 0.3s cubic-bezier(.34,.24,0,1);
-      max-width: 75px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      opacity:0;
-      pointer-events:none;
-      z-index:10;
-      box-shadow:#0002 0px 8px 16px;
-    }
-    
-    .appicon-bg:hover>.appicon-label {
-      top:40px;
-      backdrop-filter: brightness(160%) blur(8px);
-      background:#fff9;
-      scale:0.8;
-      color:#000f;
-      opacity:1;
-      transition-delay:0.5s;
-    }
+/* Intelligence Box */
+.intelligence-box {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  z-index: 1;
+  background: #fffa;
+  padding: 16px;
+  border-radius: 24px;
+  corner-shape: superellipse(1.6);
+  backdrop-filter: blur(8px) brightness(1.15);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: bottom 0.5s cubic-bezier(.34, .24, 0, 1);
+}
 
+.intelligence-box.active {
+  bottom: 110px;
+}
 
-    @media screen and (min-width: 700px) {
-      .search-input {
-          width: 200px;
-      }
-    }
-    @media screen and (min-width: 1100px) {
-      .search-input {
-          width: 250px;
-      }
-    }
-    @media screen and (max-width: 515px) {
-      .first{
+.intelligence-icon {
+  height: 32px;
+  aspect-ratio: 1 / 1;
+  background: #108cdf;
+  border-radius: 99px;
+  corner-shape: superellipse(-1);
+  transition: all 0.5s ease;
+}
 
-    flex-direction: column;
-    align-items: center;
-      }
-    }
+.intelligence-answer {
+  font-size: 20px;
+  text-align: center;
+  width: 100%;
+  color: #000;
+  transition: all 0.6s cubic-bezier(.27, .07, 0, 1);
+}
 
+.intelligence-answer.hide {
+  color: #0059ff;
+  filter: blur(4px);
+  opacity: 0;
+  top: 16px;
+}
 
+.intelligence.animate-icon .intelligence-icon {
+  animation: rotate-icon 1s cubic-bezier(.34, .24, 0, 1);
+}
 
-    #history-dialog,#settings-dialog {
-        position: fixed;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 100vh;
-        background: #0005;
-        backdrop-filter: blur(0px);
-        align-items: center;
-        justify-content: center;
-        transition:all 0.4s ease;
-        opacity:0;
-        pointer-events:none;
-    }
+/* Dialogs */
+#history-dialog, #settings-dialog {
+  pointer-events: none;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background: #0000;
+  z-index: 5;
+  transition: background 0.3s ease;
+}
 
-    #history-dialog.show,#settings-dialog.show {
-        background: #0005;
-        backdrop-filter: blur(10px);
-        align-items: center;
-        justify-content: center;
-        opacity:1;
-        pointer-events:unset;
-    }
-    .dialog-box {
-        scale: 0.8;
-        transition: all 0.6s cubic-bezier(.43,0,.24,.69);
-        background: #ffffffd9;
-        padding: 32px;
-        min-width:300px;
-          corner-shape: superellipse(1.6);
-          border-radius:64px;
-    }
-    .show .dialog-box{
-      scale:1;
-        transition: all 0.6s var(--ease);
-    }
-    h3{
-      font-weight:400;
-      font-size:2em;
-      margin:0px;
-      margin-bottom:16px;
-    }
-    h4{
-      font-weight:400;
-      font-size:1.2em;
-      margin:4px 0px;
-        font-family: 'Google Sans', sans-serif;
-    }
-    .dialog-box button{
-      background:#fff;
-      color:#000;
-      border:none;
-      padding:16px 24px;
-          corner-shape: superellipse(1.4);
-          border-radius:48px;
-          margin-bottom:8px;
-    }
-    #clear-history{
-      background:color(display-p3 0.677 0 0.021 / 1)!important;
-      color:#fff!important;
-    }
-    .intelligence-box{
-      opacity:0;
-      position:absolute;
-      top:0;left:0;
-      scale:0.7;
-      filter:blur(8px);
-      transition:all 0.5s ease;
-      height:100%;
-      width:100%;
-      display:flex;
-      gap:8px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index:1002;
-    pointer-events:none;
-    }
-    .intelligence .intelligence-box{
-      opacity:1;
-      scale:1;
-      filter:blur(0px);
-    }
-    .intelligence-icon{
-          corner-shape: superellipse(-1);
-          border-radius:99px;
-          height:32px;
-          width:32px;
-          background:#108cdf;
-      transition:all 0.5s ease;
-    }
+#history-dialog.show, #settings-dialog.show {
+  pointer-events: unset;
+  background: #0001;
+}
 
-    .intelligence-answer{
-      font-size:24px;
-      transition:all 0.6s cubic-bezier(.27,.07,0,1);
-      position:relative;
-      top:0;
-      color:#000;
-      filter:blur(0px);
-      scale:1;
-      opacity:1;
-      font-family: 'Google Sans', sans-serif;
-    }
-    .intelligence-answer.hide{
-      transition:all 0.15s cubic-bezier(.43,0,1,.55);
-      top:16px;
-      color:#0059ff;
-      filter:blur(4px);
-      scale:0.7;
-      opacity:0;
-    }
+.dialog-box {
+  position: fixed;
+  left: 50vw;
+  bottom: -600px;
+  transform: translateX(-50%);
+  min-width: 300px;
+  padding: 24px;
+  background: #fffad9; /* ベース色 */
+  background: #fffa;
+  backdrop-filter: blur(24px) brightness(1.15);
+  border-radius: 24px;
+  corner-shape: superellipse(1.6);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+  transition: all 0.3s cubic-bezier(.26, 0, .91, .54);
+}
 
+.show .dialog-box {
+  bottom: 110px;
+  transition: all 0.5s cubic-bezier(.34, .24, 0, 1);
+}
 
+.dialog-box button {
+  background: #ffffff82;
+  color: #000;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  margin-bottom: 8px;
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+}
 
+#clear-history {
+  background: color(display-p3 0.677 0 0.021 / 1) !important;
+  color: #fff !important;
+}
 
+/* UI Elements */
+h3 { font-weight: 400; font-size: 2em; margin: 0 0 16px 0; }
+h4 { font-weight: 400; font-size: 1.2em; margin: 4px 0; }
+svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
 
-    /* システムがダークモードを要求し、かつダーク壁紙が設定されている場合に上書き */
-    @media (prefers-color-scheme: dark) {
-      :root{
-         --iconbg:#0009;
-      }
-        body {
-      background-color:#000;
-            /* ダーク壁紙が設定されていればそれを適用 */
-            background-image: var(--user-wallpaper-dark);
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root { --iconbg: #0009; }
+  body { background-color: #000; background-image: var(--user-wallpaper-dark); }
+  .search-button, svg, .search-input, .dialog-box, .intelligence-answer ,.category-title ,.appicon-label ,.info{ color: #fff; fill: #fff; }
+  .dialog-box { background: #0c0c0cd0; backdrop-filter: blur(8px) brightness(0.85);}
+  .dialog-box button{ background: #000; color: #fff; }
+  .search-in,.intelligence-box {background: #000a; backdrop-filter: blur(8px) brightness(0.85);}
+  .search-input{background: #00000082;}
+  body:before {
+    background: #0003;backdrop-filter: brightness(0.9);}
+    .active svg{fill: hsl(var(--color-deg) 100% 80%);}
+}
 
-        }
+/* Animations */
+@keyframes rotate-icon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
 
-        .applist-in,.search-in{
-          background:#0007;
-          backdrop-filter: blur(4px) brightness(0.7);
-          color:#fff;
-        }
+/* Responsive Queries */
+@media screen and (min-width: 480px) { .search-input { width: 150px; } }
+@media screen and (min-width: 700px) { .search-input { width: 200px; } }
+@media screen and (min-width: 1100px) { .search-input { width: 250px; } }
 
-        .applist-in:active,.search-in:active{
-            backdrop-filter: blur(4px) brightness(0.9);
-        }
-        .search-box,.control-button{
-          background:#0004;
-          border: #fff3 1px solid;
-        }
-        .search-button,svg,.search-input,.dialog-box,.intelligence-answer{
-          color:#fff;
-          fill:#fff;
-        }
-        .dialog-box{
-          background:#0c0c0cd0;
-        }
-        .dialog-box button{
-          background:#000;
-          color:#fff;
-        }
-      }
+@media screen and (max-width: 680px) { a { width: calc(100% / 2 - 6px); } }
+@media screen and (max-width: 480px) { a { width: 100%; } }
 
-      @keyframes rotate-icon {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(180deg);
-        }
-      }
+.info{
+    width: 100%;
+    max-width: 800px;
+    margin-bottom:24px;
+}
+</style>
 
-      .intelligence.animate-icon .intelligence-icon {
-        animation: rotate-icon 1s cubic-bezier(.34,.24,0,1);
-      }
-  </style>
 </head>
 <body>
 
@@ -467,7 +337,7 @@
     <h4>検索履歴</h4>
     <button id="clear-history">検索履歴を削除</button>
     
-    <h4>Newtab v6 満血版</h4>
+    <h4>Newtab v6.1</h4>
     <p>ご利用いただく場合，利用規約と<br>プライバシーポリシーの方針に同意するものとみなします。</p>
     <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
     <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
@@ -484,30 +354,25 @@
 
   <script src="https://unpkg.com/fflate@0.8.2/umd/index.js"></script>
 
-<div class="first">
-  <div class="search liquid-glass">
     <div class="search-in">
-      <md-ripple class="search-rp"></md-ripple>
-      <div class="search-box">
-        <input class="search-input" placeholder="検索や計算・アプリ" autocomplete="off">
-        <button class="search-button">検索</button>
-      </div>
-      <div class="search-control">
-        <button id="" class="control-button">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M710-150q-63 0-106.5-43.5T560-300q0-63 43.5-106.5T710-450q63 0 106.5 43.5T860-300q0 63-43.5 106.5T710-150Zm0-80q29 0 49.5-20.5T780-300q0-29-20.5-49.5T710-370q-29 0-49.5 20.5T640-300q0 29 20.5 49.5T710-230Zm-550-30v-80h320v80H160Zm90-250q-63 0-106.5-43.5T100-660q0-63 43.5-106.5T250-810q63 0 106.5 43.5T400-660q0 63-43.5 106.5T250-510Zm0-80q29 0 49.5-20.5T320-660q0-29-20.5-49.5T250-730q-29 0-49.5 20.5T180-660q0 29 20.5 49.5T250-590Zm230-30v-80h320v80H480Zm230 320ZM250-660Z"/></svg>
+
+        <button class="control-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M440-96q-17 0-29-10t-15-26l-15-78q-23-9-44.5-21T296-259l-75 26q-15 5-30.5-.5T167-253l-40-70q-8-14-5-29.5t15-26.5l59-52q-2-12-3-24t-1-25q0-13 1-25t3-24l-59-52q-12-11-15-26.5t5-29.5l40-70q8-14 23.5-19.5t30.5-.5l75 26q19-16 40.5-28t44.5-21l15-78q3-16 15-26t29-10h80q17 0 29 10t15 26l15 78q23 9 44.5 21t40.5 28l75-26q15-5 30.5.5T793-707l40 70q8 14 5 29.5T823-581l-59 52q2 12 3 24t1 25q0 13-1 25t-3 24l59 52q12 11 15 26.5t-5 29.5l-40 70q-8 14-23.5 19.5t-30.5.5l-75-26q-19 16-40.5 28T579-210l-15 78q-3 16-15 26t-29 10h-80Zm22-72h36l19-99q38-7 71-26t57-48l96 32 18-30-76-67q6-17 9.5-35.5T696-480q0-20-3.5-38.5T683-554l76-67-18-30-96 32q-24-29-57-48t-71-26l-19-99h-36l-19 99q-38 7-71 26t-57 48l-96-32-18 30 76 67q-6 17-9.5 35.5T264-480q0 20 3.5 38.5T277-406l-76 67 18 30 96-32q24 29 57 48t71 26l19 99Zm18-168q60 0 102-42t42-102q0-60-42-102t-102-42q-60 0-102 42t-42 102q0 60 42 102t102 42Zm0-144Z"/></svg>
         </button>
-        <button id="" class="control-button">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M320-160h320v-120q0-66-47-113t-113-47q-66 0-113 47t-47 113v120Zm160-360q66 0 113-47t47-113v-120H320v120q0 66 47 113t113 47ZM160-80v-80h80v-120q0-61 28.5-114.5T348-480q-51-32-79.5-85.5T240-680v-120h-80v-80h640v80h-80v120q0 61-28.5 114.5T612-480q51 32 79.5 85.5T720-280v120h80v80H160Zm320-80Zm0-640Z"/></svg>
+        <button class="control-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M480-144q-132 0-226.5-87.5T146-447q-2-14 8.5-23.5t25.44-9.5q14.06 0 25.06 8 11 8 13 22 11 99 85.5 166.5T480-216q109 0 186.5-77.5T744-480q0-109-77.5-186.5T480-744q-62 0-114.55 25.6Q312.91-692.8 277-648h71q15.3 0 25.65 10.29Q384-627.42 384-612.21t-10.35 25.71Q363.3-576 348-576H180q-15.3 0-25.65-10.35Q144-596.7 144-612v-168q0-15.3 10.29-25.65Q164.58-816 179.79-816t25.71 10.35Q216-795.3 216-780v94q46-60 114.5-95T480-816q70 0 131.13 26.6 61.14 26.6 106.4 71.87 45.27 45.26 71.87 106.4Q816-550 816-480t-26.6 131.13q-26.6 61.14-71.87 106.4-45.26 45.27-106.4 71.87Q550-144 480-144Zm36-366 90 90q11 11 10.5 25T605-370q-11 11-25.5 11T554-370l-98.71-98.71Q450-474 447-480.69q-3-6.69-3-13.82v-141.81q0-15.17 10.5-25.42Q465-672 480-672t25.5 10.35Q516-651.3 516-636v126Z"/></svg>
         </button>
-        <button id="" class="control-button">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="M331-651 211-771l57-57 120 120-57 57Zm149-95v-170h80v170h-80Zm291 535L651-331l57-57 120 120-57 57Zm-63-440-57-57 120-120 57 57-120 120Zm38 171v-80h170v80H746ZM205-92 92-205q-12-12-12-28t12-28l363-364q35-35 85-35t85 35q35 35 35 85t-35 85L261-92q-12 12-28 12t-28-12Zm279-335-14.5-14-14.5-14-14-14-14-14 28 28 29 28ZM233-176l251-251-57-56-250 250 56 57Z"/></svg>
+        <button class="control-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="m352-294 128-76 129 76-34-144 111-95-147-13-59-137-59 137-147 13 112 95-34 144Zm128 8-164 98q-11 6-21.5 5t-18.5-7q-8-6-12-16.5t-1-21.5l43-183-145-123q-9-8-11-18.5t1-20.5q3-10 11-16.5t20-7.5l190-17 75-174q5-11 14-16.5t19-5.5q10 0 19 5.5t14 16.5l75 175 190 16q12 1 20 8t11 17q3 10 .5 20T798-534L654-411l43 183q3 11-1 21.5T684-190q-8 6-18.5 7t-21.5-5l-164-98Zm274-433-62 36q-5 3-10.5-.5T678-693l17-68-54-45q-5-4-3-9.5t8-6.5l72-6 28-65q2-5 8-5t8 5l29 65 71 6q6 1 8 6.5t-3 9.5l-54 45 16 68q2 6-3 9.5t-10 .5l-62-36ZM480-489Z"/></svg>
         </button>
-      </div>
+
+        <input class="search-input" placeholder="検索や計算・アプリ" autocomplete="off" autofocus>
+        <button class="search-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff"><path d="M630-444H227.98q-15.29 0-25.64-10.29Q192-464.58 192-479.79t10.34-25.71q10.35-10.5 25.64-10.5H630L453.79-692.21Q443-703 443-717.5t11-25.98Q465-754 479.5-754t25.31 10.82L742.6-505.09q5.4 5.41 7.9 11.72 2.5 6.31 2.5 13.53 0 7.21-2.5 13.53Q748-460 743-455L505-217q-11 11-25 10.5t-25-11.02q-11-11.48-11-26.15 0-14.66 11-25.33l175-175Z"/></svg>
+        </button>
     </div>
-  </div>
 
 
-  <div class="applist liquid-glass">
     <div class="applist-in">
       <md-ripple class="search-rp"></md-ripple>
     </div>
@@ -515,154 +380,111 @@
         <div class="intelligence-icon"></div>
         <div class="intelligence-answer hide">7.27</div>
       </div>
-  </div>
-</div>
+
 
 
 </body>
 <script>
- // main.js
-
+// main.js
 // =================================================================
-// 1. IndexedDBの定数とオープン関数
+// 1. IndexedDB管理 (シングルトン化)
 // =================================================================
-const DB_NAME = 'WallpaperDB';
-const STORE_NAME = 'images';
-const DB_VERSION = 1;
-
-function openDB() {
+let dbInstance = null;
+async function getDB() {
+    if (dbInstance) return dbInstance;
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                // キーパスなしでオブジェクトストアを作成
-                db.createObjectStore(STORE_NAME); 
+        const request = indexedDB.open('WallpaperDB', 1);
+        request.onupgradeneeded = (e) => {
+            if (!e.target.result.objectStoreNames.contains('images')) {
+                e.target.result.createObjectStore('images');
             }
         };
-
-        request.onsuccess = (event) => {
-            resolve(event.target.result);
+        request.onsuccess = (e) => {
+            dbInstance = e.target.result;
+            resolve(dbInstance);
         };
-
-        request.onerror = (event) => {
-            console.error("IndexedDB open error:", event.target.errorCode);
-            reject('INDEXEDDB_ERROR');
-        };
+        request.onerror = () => reject();
     });
 }
 
-// =================================================================
-// 2. IndexedDBからのデータ取得と壁紙適用関数
-// =================================================================
-
-async function getFromIndexedDB(key) {
-    let db;
+async function getWallpaperData(key) {
     try {
-        db = await openDB();
-    } catch (e) {
-        console.error('DB接続失敗:', e);
-        return;
-    }
-
-    return new Promise((resolve) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.get(key);
-
-        request.onsuccess = (event) => {
-            // 例: { light: Blob, dark: Blob } の形式で返される
-            resolve(event.target.result); 
-        };
-
-        request.onerror = (event) => {
-            console.error(`IndexedDBからの ${key} 取得エラー:`, event.target.error);
-            resolve(undefined); // エラー時は undefined を返す
-        };
-    });
+        const db = await getDB();
+        return new Promise((resolve) => {
+            const transaction = db.transaction(['images'], 'readonly');
+            const request = transaction.objectStore('images').get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => resolve(null);
+        });
+    } catch { return null; }
 }
 
+// =================================================================
+// 2. 壁紙適用 (描画優先)
+// =================================================================
 function applyWallpaper(lightBlob, darkBlob = null) {
-    // 既存のURLがあれば解放 (メモリリーク防止)
-    const existingLightUrl = document.body.dataset.lightUrl;
-    const existingDarkUrl = document.body.dataset.darkUrl;
-    
-    if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
-    if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
-    
-    delete document.body.dataset.lightUrl;
-    delete document.body.dataset.darkUrl;
+    // 既存URLの解放
+    ['lightUrl', 'darkUrl'].forEach(key => {
+        if (document.body.dataset[key]) URL.revokeObjectURL(document.body.dataset[key]);
+    });
 
-    // 1. ライトモード用壁紙の設定
-    if (lightBlob) {
-        const lightUrl = URL.createObjectURL(lightBlob);
-        document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-        document.body.dataset.lightUrl = lightUrl; // 解放用にURLを保持
-    } else {
-        // 設定がない場合はフォールバックのCSS変数（デフォルト壁紙）を使用
-        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/material3d1.webp')`); 
-    }
+    const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips1.webp';
+    const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips1.webp');
 
-    // 2. ダークモード用壁紙の設定
-    if (darkBlob) {
-        const darkUrl = URL.createObjectURL(darkBlob);
-        document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
-        document.body.dataset.darkUrl = darkUrl; // 解放用にURLを保持
-    } else {
-        // ダーク設定がない場合はライト壁紙を参照させる (CSSで対応)
-        document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
-    }
+    document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
+    document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
     
-    console.log(`壁紙を適用しました: Light=${!!lightBlob}, Dark=${!!darkBlob}`);
+    // 解析用にURLを保持
+    document.body.dataset.lightUrl = lightUrl;
+    document.body.dataset.darkUrl = darkUrl;
 }
 
-
-/**
- * 起動時または設定変更時に、IndexedDBから壁紙を読み込み適用するメイン関数
- */
-async function loadAndApplyCurrentWallpaper() {
-    // 優先度 1: Newtabに設定された壁紙の確認
-    const newtabData = await getFromIndexedDB('newtab');
-    if (newtabData && newtabData.light) {
-        // Newtab設定が最優先。ライト画像は必須。
-        const lightBlob = newtabData.light;
-        
-        // ダーク画像があればそれを使用。なければライト画像をダークのフォールバックとする。
-        const darkBlob = newtabData.dark || lightBlob;
-        
-        applyWallpaper(lightBlob, darkBlob);
-        return;
+async function initWallpaper() {
+    // 優先度 1: Newtab, 2: Individual
+    const newtab = await getWallpaperData('newtab');
+    if (newtab?.light) {
+        applyWallpaper(newtab.light, newtab.dark);
+    } else {
+        const light = await getWallpaperData('light');
+        const dark = await getWallpaperData('dark');
+        applyWallpaper(light?.light, dark?.dark);
     }
-
-    // 優先度 2 & 3: 個別のライト/ダーク設定の確認
-    const lightData = await getFromIndexedDB('light');
-    const darkData = await getFromIndexedDB('dark');
-
-    const finalLightBlob = lightData ? lightData.light : null;
-    const finalDarkBlob = darkData ? darkData.dark : null;
-    
-    // lightData と darkData を組み合わせて適用
-    applyWallpaper(finalLightBlob, finalDarkBlob);
 }
 
-
 // =================================================================
-// 3. アプリケーション起動時の処理 (壁紙とafterload.jsの遅延読み込み)
+// 3. 起動実行
 // =================================================================
-
 window.addEventListener('DOMContentLoaded', () => {
-    // 1. IndexedDBから壁紙を読み込み、CSS変数を設定して適用 (最優先で実行)
-    loadAndApplyCurrentWallpaper();
+    // 1. 壁紙の初期化
+    initWallpaper(); 
+
+    // 2. テキストボックスへの強制フォーカス
+    // セレクタ（'input[type="text"]'など）は実際のHTMLに合わせて書き換えてください
+    const focusTarget = document.querySelector('#your-textbox-id') || document.querySelector('input[type="text"]');
     
-    // 2. afterload.jsを200ms遅延読込 (重い処理を遅延させる)
+    if (focusTarget) {
+        // 即座にフォーカス
+        focusTarget.focus();
+        
+        // ブラウザのレンダリングタイミングによって失敗する場合があるため、
+        // 次の描画フレームでもう一度実行（より確実）
+        requestAnimationFrame(() => {
+            focusTarget.focus();
+        });
+    }
+
+    // 3. 遅延スクリプトの読み込み
     setTimeout(() => {
         const s = document.createElement('script');
-        s.src = 'v6/afterload.js'; // パスは元のコードと同じ
+        s.src = 'v6.1/afterload.js';
+        s.defer = true;
         document.body.appendChild(s);
-    }, 200);
+        
+        // 外部スクリプト読み込み後、もしフォーカスが外れていたら再確保
+        if (focusTarget && document.activeElement !== focusTarget) {
+            focusTarget.focus();
+        }
+    }, 150);
 });
-
-
 </script>
 </html>

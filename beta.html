@@ -428,8 +428,8 @@ function applyWallpaper(lightBlob, darkBlob = null) {
         if (document.body.dataset[key]) URL.revokeObjectURL(document.body.dataset[key]);
     });
 
-    const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips3.webp';
-    const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips3.webp');
+    const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips1.webp';
+    const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips1.webp');
 
     document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
     document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);

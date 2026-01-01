@@ -1,4 +1,4 @@
-// beta/afterload.js
+// v6.1/afterload.js
 
 (function() {
   // =================================================================
@@ -473,7 +473,7 @@
     script.src = "/xml/lang.js";
     
     // data-xml 属性を設定
-    script.setAttribute('data-xml', '/xml/beta.xml');
+    script.setAttribute('data-xml', '/xml/index.xml');
     
     // 読み込み完了時の処理（必要であれば）
     script.onload = function() {

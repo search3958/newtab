@@ -403,10 +403,10 @@ const insertAd = (container) => {
     try {
         await importFflate();
 
-        const zipUrl = 'lsr/icons-6.zip';
+        const zipUrl = 'https://search3958.github.io/newtab/lsr/icons-6.zip';
         const imageMap = await loadZip(zipUrl);
 
-        const jsonUrl = 'links-v6.json';
+        const jsonUrl = 'https://search3958.github.io/newtab/links-v6.json';
         const res = await fetch(jsonUrl);
         if (!res.ok) throw new Error('links.json fetch failed');
         const data = await res.json();
