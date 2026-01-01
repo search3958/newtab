@@ -385,7 +385,7 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
 
 </body>
 <script>
- // main.js
+// main.js
 
 // =================================================================
 // 1. IndexedDBの定数とオープン関数
@@ -401,7 +401,6 @@ function openDB() {
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
-                // キーパスなしでオブジェクトストアを作成
                 db.createObjectStore(STORE_NAME); 
             }
         };
@@ -436,22 +435,19 @@ async function getFromIndexedDB(key) {
         const request = store.get(key);
 
         request.onsuccess = (event) => {
-            // 例: { light: Blob, dark: Blob } の形式で返される
             resolve(event.target.result); 
         };
 
         request.onerror = (event) => {
             console.error(`IndexedDBからの ${key} 取得エラー:`, event.target.error);
-            resolve(undefined); // エラー時は undefined を返す
+            resolve(undefined);
         };
     });
 }
 
 function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. ストレージからの復元処理 ---
-    // ローカルストレージに保存された色(deg)があれば適用し、なければ標準(15deg)を使用
-    const savedDeg = localStorage.getItem('user-wallpaper-deg') || '15';
-    document.documentElement.style.setProperty('--color-deg', `${savedDeg}deg`);
+    // --- 1. デフォルトカラーを設定 (15deg) ---
+    document.documentElement.style.setProperty('--color-deg', '15deg');
 
     // --- 2. 既存URLの解放 (メモリリーク防止) ---
     const existingLightUrl = document.body.dataset.lightUrl;
@@ -468,11 +464,14 @@ function applyWallpaper(lightBlob, darkBlob = null) {
         const lightUrl = URL.createObjectURL(lightBlob);
         document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
         document.body.dataset.lightUrl = lightUrl;
+        
+        // --- 4. 壁紙から色を抽出してCSS変数を更新 ---
+        extractAndApplyColor(lightUrl);
     } else {
-        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/chips1.png')`); 
+        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/wabe3.webp')`); 
     }
 
-    // --- 4. ダークモード用壁紙の設定 ---
+    // --- 5. ダークモード用壁紙の設定 ---
     if (darkBlob) {
         const darkUrl = URL.createObjectURL(darkBlob);
         document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
@@ -481,8 +480,89 @@ function applyWallpaper(lightBlob, darkBlob = null) {
         document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
     }
     
-    console.log(`壁紙を適用し、保存された色(${savedDeg}deg)を復元しました。`);
+    console.log('壁紙を適用しました');
 }
+
+/**
+ * RGBからHue(色相)を算出
+ */
+function rgbToHue(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0;
+    if (max !== min) {
+        if (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / (max - min) + 2;
+        else if (max === b) h = (r - g) / (max - min) + 4;
+        h /= 6;
+    }
+    return Math.round(h * 360);
+}
+
+/**
+ * 画像URLから色を抽出してCSS変数--color-degに適用
+ */
+function extractAndApplyColor(imageUrl) {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = imageUrl;
+    
+    img.onload = () => {
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 50;
+            canvas.width = size;
+            canvas.height = size;
+            
+            ctx.drawImage(img, 0, 0, size, size);
+            
+            const imageData = ctx.getImageData(0, 0, size, size);
+            const data = imageData.data;
+            
+            let r = 0, g = 0, b = 0;
+            let count = 0;
+            
+            // 画像の中心部分（20x20px）から色を抽出
+            const centerX = Math.floor(size / 2);
+            const centerY = Math.floor(size / 2);
+            const sampleSize = 10;
+            
+            for (let y = centerY - sampleSize; y < centerY + sampleSize; y++) {
+                for (let x = centerX - sampleSize; x < centerX + sampleSize; x++) {
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        const index = (y * size + x) * 4;
+                        r += data[index];
+                        g += data[index + 1];
+                        b += data[index + 2];
+                        count++;
+                    }
+                }
+            }
+            
+            if (count > 0) {
+                const avgR = r / count;
+                const avgG = g / count;
+                const avgB = b / count;
+                
+                const deg = rgbToHue(avgR, avgG, avgB);
+                
+                // CSS変数を更新
+                document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
+                console.log(`壁紙から色を抽出: ${deg}deg`);
+            } else {
+                console.error("色抽出に失敗: 有効なピクセルがありません");
+            }
+        } catch (e) {
+            console.error("色の抽出に失敗:", e);
+        }
+    };
+    
+    img.onerror = () => {
+        console.error("画像の読み込みに失敗");
+    };
+}
+
 
 
 /**
@@ -492,10 +572,7 @@ async function loadAndApplyCurrentWallpaper() {
     // 優先度 1: Newtabに設定された壁紙の確認
     const newtabData = await getFromIndexedDB('newtab');
     if (newtabData && newtabData.light) {
-        // Newtab設定が最優先。ライト画像は必須。
         const lightBlob = newtabData.light;
-        
-        // ダーク画像があればそれを使用。なければライト画像をダークのフォールバックとする。
         const darkBlob = newtabData.dark || lightBlob;
         
         applyWallpaper(lightBlob, darkBlob);
@@ -509,7 +586,6 @@ async function loadAndApplyCurrentWallpaper() {
     const finalLightBlob = lightData ? lightData.light : null;
     const finalDarkBlob = darkData ? darkData.dark : null;
     
-    // lightData と darkData を組み合わせて適用
     applyWallpaper(finalLightBlob, finalDarkBlob);
 }
 
@@ -525,11 +601,10 @@ window.addEventListener('DOMContentLoaded', () => {
     // 2. afterload.jsを200ms遅延読込 (重い処理を遅延させる)
     setTimeout(() => {
         const s = document.createElement('script');
-        s.src = 'beta/afterload.js'; // パスは元のコードと同じ
+        s.src = 'beta/afterload.js';
         document.body.appendChild(s);
     }, 200);
 });
-
 
 </script>
 </html>
