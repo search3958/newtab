@@ -445,44 +445,6 @@ async function getFromIndexedDB(key) {
     });
 }
 
-function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. デフォルトカラーを設定 (15deg) ---
-    document.documentElement.style.setProperty('--color-deg', '15deg');
-
-    // --- 2. 既存URLの解放 (メモリリーク防止) ---
-    const existingLightUrl = document.body.dataset.lightUrl;
-    const existingDarkUrl = document.body.dataset.darkUrl;
-    
-    if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
-    if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
-    
-    delete document.body.dataset.lightUrl;
-    delete document.body.dataset.darkUrl;
-
-    // --- 3. ライトモード用壁紙の設定 ---
-    if (lightBlob) {
-        const lightUrl = URL.createObjectURL(lightBlob);
-        document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-        document.body.dataset.lightUrl = lightUrl;
-        
-        // --- 4. 壁紙から色を抽出してCSS変数を更新 ---
-        extractAndApplyColor(lightUrl);
-    } else {
-        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/wabe3.webp')`); 
-    }
-
-    // --- 5. ダークモード用壁紙の設定 ---
-    if (darkBlob) {
-        const darkUrl = URL.createObjectURL(darkBlob);
-        document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
-        document.body.dataset.darkUrl = darkUrl;
-    } else {
-        document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
-    }
-    
-    console.log('壁紙を適用しました');
-}
-
 /**
  * RGBからHue(色相)を算出
  */
@@ -509,6 +471,7 @@ function extractAndApplyColor(imageUrl) {
     
     img.onload = () => {
         try {
+            console.log("画像の色抽出を開始します");
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             const size = 50;
@@ -550,6 +513,7 @@ function extractAndApplyColor(imageUrl) {
                 // CSS変数を更新
                 document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
                 console.log(`壁紙から色を抽出: ${deg}deg`);
+                console.log(`平均RGB値: R=${avgR}, G=${avgG}, B=${avgB}`);
             } else {
                 console.error("色抽出に失敗: 有効なピクセルがありません");
             }
@@ -563,7 +527,46 @@ function extractAndApplyColor(imageUrl) {
     };
 }
 
+function applyWallpaper(lightBlob, darkBlob = null) {
+    // --- 1. デフォルトカラーを設定 (15deg) ---
+    document.documentElement.style.setProperty('--color-deg', '15deg');
 
+    // --- 2. 既存URLの解放 (メモリリーク防止) ---
+    const existingLightUrl = document.body.dataset.lightUrl;
+    const existingDarkUrl = document.body.dataset.darkUrl;
+    
+    if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
+    if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
+    
+    delete document.body.dataset.lightUrl;
+    delete document.body.dataset.darkUrl;
+
+    // --- 3. ライトモード用壁紙の設定 ---
+    if (lightBlob) {
+        const lightUrl = URL.createObjectURL(lightBlob);
+        document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
+        document.body.dataset.lightUrl = lightUrl;
+        
+        // --- 4. 壁紙から色を抽出してCSS変数を更新 ---
+        extractAndApplyColor(lightUrl);
+    } else {
+        // --- 4. デフォルト壁紙の設定 ---
+        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/wabe3.webp')`);
+        // --- 5. デフォルト壁紙から色を抽出 ---
+        extractAndApplyColor('bgimg/wabe3.webp');
+    }
+
+    // --- 6. ダークモード用壁紙の設定 ---
+    if (darkBlob) {
+        const darkUrl = URL.createObjectURL(darkBlob);
+        document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
+        document.body.dataset.darkUrl = darkUrl;
+    } else {
+        document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
+    }
+    
+    console.log('壁紙を適用しました');
+}
 
 /**
  * 起動時または設定変更時に、IndexedDBから壁紙を読み込み適用するメイン関数
@@ -605,6 +608,5 @@ window.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(s);
     }, 200);
 });
-
 </script>
 </html>
