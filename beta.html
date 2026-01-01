@@ -8,413 +8,313 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
      crossorigin="anonymous"></script>
 <style>
-    :root{
-      --iconbg:#fff9;
-      --glass-shadow: #fffb 0px 1.5px 3px inset,#fff7 0px -1.5px 3px inset;
-      --text-color:#000;
-      --bound:linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
-      --ease:cubic-bezier(.34,.24,.18,1);
-    }
-    body {
-      margin: 0;
-      overflow:hidden;
-      -webkit-font-smoothing: antialiased;
-      background-color:#fff;
-        /* デフォルトはライトモードの壁紙を使用 */
-        background-image: var(--user-wallpaper-light);
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: cover;
-        background-attachment: fixed;
-    }
+   :root {
+  --iconbg: #fff9;
+  --glass-shadow: #fffb 0px 1.5px 3px inset, #fff7 0px -1.5px 3px inset;
+  --text-color: #000;
+  --bound: linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
+  --ease: cubic-bezier(.34, .24, .18, 1);
+  --color-deg:15deg;
+}
 
+/* Base Styles */
+body {
+  margin: 0;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fff;
+  background-image: var(--user-wallpaper-light);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+}
 
-    * { 
-      scrollbar-width: none;
-    line-height: 1.5!important;
-    font-family:
-  "Yu Gothic UI",
-  "Yu Gothic",
-  "Hiragino Sans",
-  "Hiragino Kaku Gothic ProN",
-  "Meiryo",
-  "Noto Sans JP",
-  sans-serif;
-      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-          text-wrap-mode: nowrap;
-          user-select: none;
+body:before {
+  background: #fff3;
+  content: " ";
+  height: 100vh;
+  width: 100vw;
+  display: block;
+  backdrop-filter: brightness(1.2);
+}
 
-     }
-    /* ... 既存のCSSルールの続き ... */
-    *::-webkit-scrollbar { display: none; }
-    .search-in{
-      position:relative;
-      z-index:1001;
-      background:#fff8;
-      padding:13px;
-      corner-shape: superellipse(2.4);
-      border-radius:24px;
-      backdrop-filter:blur(4px) brightness(1.15);
-      transition:backdrop-filter 0.3s var(--ease);
-      overflow:hidden;
-      --md-ripple-hover-color:#fff0;
-      --md-ripple-pressed-color:#fff2;
-      --md-ripple-pressed-opacity:1;
-    }
+* {
+  scrollbar-width: none;
+  line-height: 1.5 !important;
+  font-family: "Google Sans","Yu Gothic UI", "Yu Gothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
+  text-wrap-mode: nowrap;
+  user-select: none;
+}
 
-    .search-rp{
-      border-radius:0px;
-    }
-    
-    .search-input,.search-button{
-      background:none;
-      outline:none;
-      border:none;
-      color:var(--text-color);
-      font-size:16px;
-    }
-    .search-input{
-      width:155px;
-      transition:width 1s var(--bound);
-      font-family: 'Google Sans', sans-serif;
-    }
-    
-    svg{
-      margin-bottom:-5px;
-    }
+*::-webkit-scrollbar {
+  display: none;
+}
 
-    .category {
-      margin-bottom: 8px;
-      gap: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: row;
-      max-width:875px;
-      opacity:1;
-      transition:opacity 0.2s ease;
-    }
-
-    .appicon-bg {
-      display: block;
-      padding: 0px;
-      border-radius: 800px;
-      text-align: center;
-      width: 100px;
-      position:relative;
-      height:40px;
-      width:40px;
-        }
-    .appicon-img {
-      height:40px;
-      width:40px;
-      object-fit: cover;
-    }
-
-    @media screen and (min-width: 480px) {
-      .search-input {
-          width: 150px;
-      }
-    }
-    @media screen and (min-width: 700px) {
-      .search-input {
-          width: 200px;
-      }
-    }
-    @media screen and (min-width: 1100px) {
-      .search-input {
-          width: 250px;
-      }
-    }
-
-
-    #history-dialog,#settings-dialog {
-        pointer-events:none;
-        height:100vh;
-        width:100vw;
-          position:fixed;
-          left:0;
-          bottom:0;
-          background:#0000;
-          z-index:5;
-          transition:background 0.3s ease;
-    }
-    #history-dialog.show,#settings-dialog.show {
-        pointer-events:unset;
-          background:#0001;
-    }
-    .dialog-box {
-        transition: all 0.3s cubic-bezier(.26,0,.91,.54);
-        background: #ffffffd9;
-        padding: 24px;
-        min-width:300px;
-          corner-shape: superellipse(1.6);
-          border-radius:64px;
-          position:fixed;
-          left:50vw;
-          bottom:-600px;
-    transform: translateX(-50%);
-    }
-    .show .dialog-box{
-        transition: all 0.5s cubic-bezier(.34,.24,0,1);
-          bottom:110px;
-    }
-    h3{
-      font-weight:400;
-      font-size:2em;
-      margin:0px;
-      margin-bottom:16px;
-    }
-    h4{
-      font-weight:400;
-      font-size:1.2em;
-      margin:4px 0px;
-        font-family: 'Google Sans', sans-serif;
-    }
-    .dialog-box button{
-      background:#ffffff82;
-      color:#000;
-      border:none;
-      padding:16px 24px;
-          corner-shape: superellipse(1.8);
-          border-radius:16px;
-          margin-bottom:8px;
-              box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
-    }
-    #clear-history{
-      background:color(display-p3 0.677 0 0.021 / 1)!important;
-      color:#fff!important;
-    }
-
-
-
-
-
-    /* システムがダークモードを要求し、かつダーク壁紙が設定されている場合に上書き */
-    @media (prefers-color-scheme: dark) {
-      :root{
-         --iconbg:#0009;
-      }
-        body {
-      background-color:#000;
-            /* ダーク壁紙が設定されていればそれを適用 */
-            background-image: var(--user-wallpaper-dark);
-
-        }
-        .search-button,svg,.search-input,.dialog-box,.intelligence-answer{
-          color:#fff;
-          fill:#fff;
-        }
-        .dialog-box{
-          background:#0c0c0cd0;
-        }
-        .dialog-box button{
-          background:#000;
-          color:#fff;
-        }
-      }
-
-      @keyframes rotate-icon {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(180deg);
-        }
-      }
-
-      .intelligence.animate-icon .intelligence-icon {
-        animation: rotate-icon 1s cubic-bezier(.34,.24,0,1);
-      }
-  </style>
-
-
-<style>
+/* Search Bar */
 .search-in {
-    position: fixed;
-    z-index: 10;
-    background: #fffa;
-    padding: 8px;
-    corner-shape: superellipse(1.6);
-    border-radius: 24px;
-    backdrop-filter: blur(8px) brightness(1.15);
-    transition: backdrop-filter 0.3s var(--ease);
-    overflow: hidden;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap:8px;
-    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background: #fffa;
+  padding: 8px;
+  corner-shape: superellipse(1.6);
+  border-radius: 24px;
+  backdrop-filter: blur(8px) brightness(1.15);
+  transition: backdrop-filter 0.3s var(--ease);
+  overflow: hidden;
+  display: flex;
+  gap: 8px;
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
 }
-.control-button {
-    corner-shape: superellipse(1.8);
-    border-radius: 14px;
-    transition: all 0.3s var(--ease);
-    padding: 12px 13px;
-    border: none;
-    border-radius: 16px;
-    background: #0000;
-}
-.control-button:hover{
-    background: #0001;
-}
+
 .search-input {
-    corner-shape: superellipse(1.8);
-    background: #ffffff82;
-    border-radius: 16px;
-    padding:12px;
-    padding-left: 16px;
-    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+  width: 155px;
+  background: #ffffff82;
+  outline: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 16px;
+  padding: 12px 12px 12px 16px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  transition: width 1s var(--bound);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
 }
 
 .search-button {
-    corner-shape: superellipse(1.8);
-    background: #c15b39;
-    border-radius: 16px;
-    padding: 12px 13px;
-    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
-    color: #fff;
+  background: hsl(var(--color-deg) 54.4% 49.02%);
+  outline: none;
+  border: none;
+  color: #fff;
+  padding: 12px 13px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
 }
 
-.applist-in{
-    position: fixed;
-    top: 0px;
-    left: 24px;
-    width: calc(100vw - 48px);
-    height: calc(100vh - 124px);
-    z-index: 0;
-    padding-top: 24px;
-    padding-bottom: 100px;
-    overflow: scroll;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.control-button {
+  border: none;
+  background: #0000;
+  padding: 12px 13px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  transition: all 0.3s var(--ease);
 }
+
+.control-button:hover {
+  background: #0001;
+}
+
+.control-button.active{
+  background: hsl(var(--color-deg) 100% 60% / 10%);
+}
+
+.active svg{
+  fill: hsl(var(--color-deg) 100% 30%);
+}
+
+/* App List Area */
+.applist-in {
+  position: fixed;
+  top: 0;
+  left: 24px;
+  width: calc(100vw - 48px);
+  height: calc(100vh - 124px);
+  padding: 24px 0 100px 0;
+  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .category {
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-title {
+  font-size: 21px;
+  font-weight: 500;
+  margin: 0 0 3px 0;
+  width: 100%;
+}
+
+a {
+  width: calc(100% / 3 - 6px);
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.appicon-bg {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.6);
+  backdrop-filter: blur(10px);
+
+}
+
+.appicon-img {
+  height: 50px;
+  width: 50px;
+  object-fit: cover;
+}
+
+/* Intelligence Box */
+.intelligence-box {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  z-index: 1;
+  background: #fffa;
+  padding: 16px;
+  border-radius: 24px;
+  corner-shape: superellipse(1.6);
+  backdrop-filter: blur(8px) brightness(1.15);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: bottom 0.5s cubic-bezier(.34, .24, 0, 1);
+}
+
+.intelligence-box.active {
+  bottom: 110px;
+}
+
+.intelligence-icon {
+  height: 32px;
+  aspect-ratio: 1 / 1;
+  background: #108cdf;
+  border-radius: 99px;
+  corner-shape: superellipse(-1);
+  transition: all 0.5s ease;
+}
+
+.intelligence-answer {
+  font-size: 20px;
+  text-align: center;
+  width: 100%;
+  color: #000;
+  transition: all 0.6s cubic-bezier(.27, .07, 0, 1);
+}
+
+.intelligence-answer.hide {
+  color: #0059ff;
+  filter: blur(4px);
+  opacity: 0;
+  top: 16px;
+}
+
+.intelligence.animate-icon .intelligence-icon {
+  animation: rotate-icon 1s cubic-bezier(.34, .24, 0, 1);
+}
+
+/* Dialogs */
+#history-dialog, #settings-dialog {
+  pointer-events: none;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background: #0000;
+  z-index: 5;
+  transition: background 0.3s ease;
+}
+
+#history-dialog.show, #settings-dialog.show {
+  pointer-events: unset;
+  background: #0001;
+}
+
+.dialog-box {
+  position: fixed;
+  left: 50vw;
+  bottom: -600px;
+  transform: translateX(-50%);
+  min-width: 300px;
+  padding: 24px;
+  background: #fffad9; /* ベース色 */
+  background: #fffa;
+  backdrop-filter: blur(24px) brightness(1.15);
+  border-radius: 24px;
+  corner-shape: superellipse(1.6);
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+  transition: all 0.3s cubic-bezier(.26, 0, .91, .54);
+}
+
+.show .dialog-box {
+  bottom: 110px;
+  transition: all 0.5s cubic-bezier(.34, .24, 0, 1);
+}
+
+.dialog-box button {
+  background: #ffffff82;
+  color: #000;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 16px;
+  corner-shape: superellipse(1.8);
+  margin-bottom: 8px;
+  box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+}
+
+#clear-history {
+  background: color(display-p3 0.677 0 0.021 / 1) !important;
+  color: #fff !important;
+}
+
+/* UI Elements */
+h3 { font-weight: 400; font-size: 2em; margin: 0 0 16px 0; }
+h4 { font-weight: 400; font-size: 1.2em; margin: 4px 0; }
+svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root { --iconbg: #0009; }
+  body { background-color: #000; background-image: var(--user-wallpaper-dark); }
+  .search-button, svg, .search-input, .dialog-box, .intelligence-answer ,.category-title ,.appicon-label ,.info{ color: #fff; fill: #fff; }
+  .dialog-box { background: #0c0c0cd0; backdrop-filter: blur(8px) brightness(0.85);}
+  .dialog-box button{ background: #000; color: #fff; }
+  .search-in,.intelligence-box {background: #000a; backdrop-filter: blur(8px) brightness(0.85);}
+  .search-input{background: #00000082;}
+  body:before {
+    background: #0003;backdrop-filter: brightness(0.9);}
+    .active svg{fill: hsl(var(--color-deg) 100% 80%);}
+}
+
+/* Animations */
+@keyframes rotate-icon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+
+/* Responsive Queries */
+@media screen and (min-width: 480px) { .search-input { width: 150px; } }
+@media screen and (min-width: 700px) { .search-input { width: 200px; } }
+@media screen and (min-width: 1100px) { .search-input { width: 250px; } }
+
+@media screen and (max-width: 680px) { a { width: calc(100% / 2 - 6px); } }
+@media screen and (max-width: 480px) { a { width: 100%; } }
+
+.info{
     width: 100%;
     max-width: 800px;
-}
-.category-title {
-    font-size: 21px;
-    font-weight: 500;
-    margin: 0px;
-    margin-bottom: 3px;
-    width: 100%;
-        font-family: 'Google Sans', sans-serif;
-}
-body:before{
-  background:#fff3;
-  content:" ";
-  height:100vh;
-  width:100vw;
-  display:block;
-  backdrop-filter: brightness(1.2);
-}
-a {
-    width: calc(100% / 3 - 6px);
-    background: #fff0;
-    text-decoration: none;
-    color:var(--text-color);
-        font-family: 'Google Sans', sans-serif;
-}
-.appicon-img {
-    height: 50px;
-    width: 50px;
-    object-fit: cover;
-}
-.appicon-bg {
-    height: 50px;
-    width: 50px;
-    border-radius:16px;
-    corner-shape: superellipse(1.6);
-        display: flex;
-    align-items: center;
-    gap:16px;
-}
-
-    @media screen and (max-width: 680px) {
-      a {
-    width: calc(100% / 2 - 6px);
-    background: #fff0;
-    text-decoration: none;
-    color:var(--text-color);
-}
-    }
-    @media screen and (max-width: 480px) {
-      a {
-    width: 100%;
-    background: #fff0;
-    text-decoration: none;
-    color:var(--text-color);
-}
-    }
-
-
-
-
-    .intelligence-box{
-    bottom: -100px;
-    position: fixed;
-    z-index: 1;
-    background: #fffa;
-    padding: 16px;
-    corner-shape: superellipse(1.6);
-    border-radius: 24px;
-    backdrop-filter: blur(8px) brightness(1.15);
-    transition: backdrop-filter 0.3s var(--ease);
-    overflow: hidden;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap:8px;
-    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
-          align-items: center;
-      width:200px;
-      transition:bottom 0.5s cubic-bezier(.34,.24,0,1);
-
-    }
-    .intelligence-box.active{
-    bottom: 110px;
-        }
-    .intelligence .intelligence-box{
-      opacity:1;
-      scale:1;
-      filter:blur(0px);
-    }
-    .intelligence-icon{
-          corner-shape: superellipse(-1);
-          border-radius:99px;
-          height:32px;
-          aspect-ratio: 1 / 1;
-          background:#108cdf;
-      transition:all 0.5s ease;
-    }
-
-    .intelligence-answer{
-      font-size:20px;
-      transition:all 0.6s cubic-bezier(.27,.07,0,1);
-      position:relative;
-      top:0;
-      color:#000;
-      filter:blur(0px);
-      scale:1;
-      opacity:1;
-      font-family: 'Google Sans', sans-serif;
-      text-align:center;
-      width:100%;
-    }
-    .intelligence-answer.hide{
-      transition:all 0.15s cubic-bezier(.43,0,1,.55);
-      top:16px;
-      color:#0059ff;
-      filter:blur(4px);
-      opacity:0;
-    }
-.dialog-box {
-    background: #fffa;
-    backdrop-filter: blur(24px) brightness(1.15);
-    border-radius: 24px;
-    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
+    margin-bottom:24px;
 }
 </style>
 
@@ -548,7 +448,12 @@ async function getFromIndexedDB(key) {
 }
 
 function applyWallpaper(lightBlob, darkBlob = null) {
-    // 既存のURLがあれば解放 (メモリリーク防止)
+    // --- 1. ストレージからの復元処理 ---
+    // ローカルストレージに保存された色(deg)があれば適用し、なければ標準(15deg)を使用
+    const savedDeg = localStorage.getItem('user-wallpaper-deg') || '15';
+    document.documentElement.style.setProperty('--color-deg', `${savedDeg}deg`);
+
+    // --- 2. 既存URLの解放 (メモリリーク防止) ---
     const existingLightUrl = document.body.dataset.lightUrl;
     const existingDarkUrl = document.body.dataset.darkUrl;
     
@@ -558,27 +463,25 @@ function applyWallpaper(lightBlob, darkBlob = null) {
     delete document.body.dataset.lightUrl;
     delete document.body.dataset.darkUrl;
 
-    // 1. ライトモード用壁紙の設定
+    // --- 3. ライトモード用壁紙の設定 ---
     if (lightBlob) {
         const lightUrl = URL.createObjectURL(lightBlob);
         document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-        document.body.dataset.lightUrl = lightUrl; // 解放用にURLを保持
+        document.body.dataset.lightUrl = lightUrl;
     } else {
-        // 設定がない場合はフォールバックのCSS変数（デフォルト壁紙）を使用
         document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/chips1.png')`); 
     }
 
-    // 2. ダークモード用壁紙の設定
+    // --- 4. ダークモード用壁紙の設定 ---
     if (darkBlob) {
         const darkUrl = URL.createObjectURL(darkBlob);
         document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
-        document.body.dataset.darkUrl = darkUrl; // 解放用にURLを保持
+        document.body.dataset.darkUrl = darkUrl;
     } else {
-        // ダーク設定がない場合はライト壁紙を参照させる (CSSで対応)
         document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
     }
     
-    console.log(`壁紙を適用しました: Light=${!!lightBlob}, Dark=${!!darkBlob}`);
+    console.log(`壁紙を適用し、保存された色(${savedDeg}deg)を復元しました。`);
 }
 
 
