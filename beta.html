@@ -447,32 +447,26 @@ async function getFromIndexedDB(key) {
     });
 }
 
-function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. ストレージからの復元処理 ---
-    // ローカルストレージに保存された色(deg)があれば適用し、なければ標準(15deg)を使用
-    const savedDeg = localStorage.getItem('user-wallpaper-deg') || '15';
-    document.documentElement.style.setProperty('--color-deg', `${savedDeg}deg`);
+async function applyWallpaper(lightBlob, darkBlob = null) {
+    // --- 1. 標準値の適用 (CSS変数のみ) ---
+    document.documentElement.style.setProperty('--color-deg', '15deg');
 
-    // --- 2. 既存URLの解放 (メモリリーク防止) ---
+    // 既存URLの解放
     const existingLightUrl = document.body.dataset.lightUrl;
     const existingDarkUrl = document.body.dataset.darkUrl;
-    
     if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
     if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
-    
-    delete document.body.dataset.lightUrl;
-    delete document.body.dataset.darkUrl;
 
-    // --- 3. ライトモード用壁紙の設定 ---
+    // --- 2. 壁紙の設定 ---
+    let lightUrl = 'bgimg/chips1.png';
     if (lightBlob) {
-        const lightUrl = URL.createObjectURL(lightBlob);
+        lightUrl = URL.createObjectURL(lightBlob);
         document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
         document.body.dataset.lightUrl = lightUrl;
     } else {
-        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/chips1.png')`); 
+        document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`); 
     }
 
-    // --- 4. ダークモード用壁紙の設定 ---
     if (darkBlob) {
         const darkUrl = URL.createObjectURL(darkBlob);
         document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
@@ -480,8 +474,16 @@ function applyWallpaper(lightBlob, darkBlob = null) {
     } else {
         document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
     }
-    
-    console.log(`壁紙を適用し、保存された色(${savedDeg}deg)を復元しました。`);
+
+    // --- 3. スキャン結果をCSS変数にのみ反映 (LocalStorageへの保存はしない) ---
+    if (lightBlob) {
+        try {
+            const deg = await extractMainColorDeg(lightUrl);
+            document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
+        } catch (e) {
+            console.error("Color scan failed:", e);
+        }
+    }
 }
 
 
