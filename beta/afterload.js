@@ -5,7 +5,9 @@
   // 1. Google Fonts の動的読み込み
   // =================================================================
   function loadGoogleFont() {
+    if (document.getElementById('google-fonts-link')) return;
     const link = document.createElement('link');
+    link.id = 'google-fonts-link';
     link.href = 'https://fonts.googleapis.com/css2?family=Google+Sans:wght@400&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
@@ -13,14 +15,23 @@
   loadGoogleFont();
 
   // =================================================================
-  // 2. 検索・履歴・UI制御
+  // 2. 検索・履歴・UI制御 & インテリジェンス
   // =================================================================
   const HISTORY_KEY = 'search_history_v2';
+  const searchInput = document.querySelector('.search-input');
+  const searchBtn = document.querySelector('.search-button');
+  const controlBtns = document.querySelectorAll('.control-button'); 
+
+  const intelligenceBox = document.querySelector('.intelligence-box');
+  const intelligenceIcon = document.querySelector('.intelligence-icon');
+  const answerElement = document.querySelector('.intelligence-answer');
+
+  if (intelligenceBox) intelligenceBox.style.display = 'none';
+
   function getHistory() {
-    try {
-      return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-    } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch { return []; }
   }
+
   function addHistory(q) {
     if (!q) return;
     let h = getHistory();
@@ -29,15 +40,12 @@
     if (h.length > 5) h = h.slice(0, 5);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
   }
+
   function clearHistory() {
     localStorage.removeItem(HISTORY_KEY);
   }
 
   let searchMode = 'google';
-  const searchInput = document.querySelector('.search-input');
-  const searchBtn = document.querySelector('.search-button');
-  const controlBtns = document.querySelectorAll('.search-control .control-button');
-
   const DEFAULT_PLACEHOLDER = '検索や計算・アプリ';
   const CHATGPT_PLACEHOLDER = 'ChatGPTに質問';
 
@@ -45,10 +53,11 @@
     if (!searchInput) return;
     searchInput.placeholder = (searchMode === 'chatgpt') ? CHATGPT_PLACEHOLDER : DEFAULT_PLACEHOLDER;
   }
-  updatePlaceholder();
 
-  let appLinks = []; 
+  let appLinks = [];
   let foundApp = null;
+  let currentResult = null;
+  let hideTimeout = null; 
 
   function doSearch() {
     const q = searchInput.value.trim();
@@ -65,102 +74,107 @@
   }
 
   if (searchBtn) searchBtn.onclick = doSearch;
-  if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-
-  if (controlBtns[2]) {
-    controlBtns[2].onclick = function() {
-      searchMode = (searchMode === 'google') ? 'chatgpt' : 'google';
-      this.classList.toggle('active', searchMode === 'chatgpt');
-      updatePlaceholder();
-    };
+  if (searchInput) {
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+    });
   }
 
-  // --- 計算機能・インテリジェンス表示 ---
-  const applistIn = document.querySelector('.applist-in');
-  const applist = applistIn ? applistIn.closest('.applist') : null;
-  const intelligenceBox = applist ? applist.querySelector('.intelligence-box') : null;
-  const answerElement = intelligenceBox ? intelligenceBox.querySelector('.intelligence-answer') : null;
+  function toggleIntelligenceActive(show) {
+    if (!intelligenceIcon || !answerElement || !intelligenceBox) return;
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+
+    if (show) {
+      intelligenceBox.style.display = 'flex';
+      requestAnimationFrame(() => {
+        intelligenceBox.classList.add('active'); 
+        intelligenceIcon.classList.add('active');
+        answerElement.classList.add('active');
+      });
+    } else {
+      intelligenceBox.classList.remove('active');
+      intelligenceIcon.classList.remove('active');
+      answerElement.classList.remove('active');
+      // ボックスを消す時は即座にhideも付けておく
+      answerElement.classList.add('hide');
+      hideTimeout = setTimeout(() => {
+        if (!intelligenceBox.classList.contains('active')) {
+          intelligenceBox.style.display = 'none';
+        }
+        hideTimeout = null;
+      }, 500); 
+    }
+  }
 
   function sanitizeExpression(expr) {
-    let s = expr.replace(/[０-９]/g, m => String.fromCharCode(m.charCodeAt(0) - 0xFEE0));
-    s = s.replace(/[×✖️x]/g, '*').replace(/[÷➗]/g, '/').replace(/[ー]/g, '-').replace(/[＋]/g, '+');
-    return s.replace(/[^0-9+\-*/().\s]/g, '');
+    let sanitized = expr.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+    sanitized = sanitized.replace(/[×✖️xX]/g, '*').replace(/[÷➗]/g, '/').replace(/[ー]/g, '-').replace(/[＋]/g, '+');
+    return sanitized.replace(/[^0-9+\-*/().\s]/g, '');
   }
 
   function isMathExpression(str) {
     if (!str) return false;
-    const s = sanitizeExpression(str);
-    return /^[\d\s+\-*/().]+$/.test(s) && /[+\-*/]/.test(s.replace(/[\s+\-*/().]*$/, ''));
+    const sanitized = sanitizeExpression(str);
+    const checkExpr = sanitized.replace(/[\s+\-*/().]*$/, '');
+    return /^[\d\s+\-*/().]+$/.test(sanitized) && /[+\-*/]/.test(checkExpr);
   }
 
   function calculateResult(expr) {
-    const s = sanitizeExpression(expr).replace(/[\s+\-*/().]*$/, '');
+    const sanitized = sanitizeExpression(expr).replace(/[\s+\-*/().]*$/, '');
     try {
-      const res = Function('"use strict"; return (' + s + ')')();
-      if (typeof res === 'number' && !isNaN(res) && isFinite(res)) return res;
-    } catch {}
-    return null;
+      const result = Function('"use strict"; return (' + sanitized + ')')();
+      return (typeof result === 'number' && !isNaN(result) && isFinite(result)) ? result : null;
+    } catch { return null; }
   }
 
-  let currentResult = null;
   function searchApp(text) {
     if (!text || searchMode !== 'google') return null;
     const q = text.toLowerCase().trim();
     if (q.length < 2) return null;
-    return appLinks.find(app => app.name.toLowerCase() === q) || 
-           appLinks.find(app => app.name.toLowerCase().includes(q)) || null;
+    return appLinks.find(app => app.name.toLowerCase() === q || app.name.toLowerCase().includes(q)) || null;
   }
 
-  const triggerIconRotation = (el) => {
-    if (!el || el.classList.contains('animate-icon')) return;
-    el.classList.add('animate-icon');
-    setTimeout(() => el.classList.remove('animate-icon'), 1000);
-  };
+  function triggerIconRotation() {
+    if (!intelligenceIcon) return;
+    intelligenceIcon.classList.remove('animate-icon');
+    void intelligenceIcon.offsetWidth; 
+    intelligenceIcon.classList.add('animate-icon');
+  }
 
+  // --- 指示通りの更新フロー：答えが変わる時のみ実行 ---
   function updateCalculationDisplay() {
-    if (!searchInput || !applist || !answerElement) return;
-    const inputText = searchInput.value;
-    const isMath = isMathExpression(inputText);
-    const target = applist;
+    if (!searchInput || !intelligenceIcon || !answerElement) return;
 
-    if (isMath && searchMode === 'google') {
-      foundApp = null;
-      const res = calculateResult(inputText);
-      if (res !== null && res !== currentResult) {
+    const inputText = searchInput.value.trim();
+    const result = isMathExpression(inputText) ? calculateResult(inputText) : null;
+    const app = (!result) ? searchApp(inputText) : null;
+    const newValue = result !== null ? String(result) : (app ? app.name : null);
+
+    if (searchMode === 'google' && newValue !== null) {
+      // 答えが変わる場合
+      if (newValue !== currentResult) {
+        // 1. hideを与える
         answerElement.classList.add('hide');
-        triggerIconRotation(target);
+        triggerIconRotation();
+
+        // 2. 0.15秒待つ
         setTimeout(() => {
-          answerElement.textContent = `${res}`;
-          currentResult = res;
+          // 3. 答えを変える
+          answerElement.textContent = newValue;
+          currentResult = newValue;
+          foundApp = app;
+
+          // 4. hideを消す
           answerElement.classList.remove('hide');
         }, 150);
-        target.classList.add('intelligence');
-      } else if (res !== null) {
-        target.classList.add('intelligence');
-      } else {
-        target.classList.remove('intelligence');
-        currentResult = null;
       }
-    } else if (!isMath && searchMode === 'google') {
-      currentResult = null;
-      const app = searchApp(inputText);
-      if (app) {
-        if (!foundApp || app.name !== foundApp.name) {
-          foundApp = app;
-          triggerIconRotation(target);
-          answerElement.classList.add('hide');
-          setTimeout(() => {
-            answerElement.textContent = `${app.name}`;
-            answerElement.classList.remove('hide');
-          }, 150);
-        }
-        target.classList.add('intelligence');
-      } else {
-        foundApp = null;
-        target.classList.remove('intelligence');
-      }
+      toggleIntelligenceActive(true);
     } else {
-      target.classList.remove('intelligence');
+      // 答えがない場合は非表示へ
+      toggleIntelligenceActive(false);
       currentResult = null;
       foundApp = null;
     }
@@ -169,76 +183,63 @@
   if (searchInput) searchInput.addEventListener('input', updateCalculationDisplay);
 
   // --- ダイアログ制御 ---
-  function showDialog(el) {
-    if (!el) return;
-    el.style.display = 'flex';
-    requestAnimationFrame(() => el.classList.add('show'));
-  }
-  function hideDialog(el) {
-    if (!el) return;
-    el.classList.remove('show');
-    setTimeout(() => { if (!el.classList.contains('show')) el.style.display = 'none'; }, 1000);
+  function showDialog(dlg) {
+    if (!dlg) return;
+    dlg.style.display = 'flex';
+    requestAnimationFrame(() => dlg.classList.add('show'));
   }
 
-  const historyDialog = document.getElementById('history-dialog');
-  const historyList = document.getElementById('history-list');
-  const settingsDialog = document.getElementById('settings-dialog');
+  function hideDialog(dlg) {
+    if (!dlg) return;
+    dlg.classList.remove('show');
+    setTimeout(() => { if (!dlg.classList.contains('show')) dlg.style.display = 'none'; }, 500);
+  }
 
-  if (controlBtns[1] && historyDialog && historyList) {
-    controlBtns[1].onclick = function() {
-      if (settingsDialog?.classList.contains('show')) hideDialog(settingsDialog);
+  if (controlBtns[0]) controlBtns[0].onclick = () => showDialog(document.getElementById('settings-dialog'));
+  if (controlBtns[1]) {
+    controlBtns[1].onclick = () => {
+      const historyList = document.getElementById('history-list');
       const h = getHistory();
-      historyList.innerHTML = h.length === 0 ? '<li style="color:#888;">履歴なし</li>' : '';
+      historyList.innerHTML = h.length ? '' : '<li style="color:#888;">履歴なし</li>';
       h.forEach(q => {
         const li = document.createElement('li');
-        li.style.cssText = 'cursor:pointer; padding:4px 0;';
         li.textContent = q;
-        li.onclick = () => { searchInput.value = q; hideDialog(historyDialog); doSearch(); };
+        li.style.cssText = 'cursor:pointer; padding:8px 0;';
+        li.onclick = () => {
+          searchInput.value = q;
+          hideDialog(document.getElementById('history-dialog'));
+          doSearch();
+        };
         historyList.appendChild(li);
       });
-      showDialog(historyDialog);
+      showDialog(document.getElementById('history-dialog'));
+    };
+  }
+  if (controlBtns[2]) {
+    controlBtns[2].onclick = function() {
+      searchMode = (searchMode === 'google') ? 'chatgpt' : 'google';
+      this.classList.toggle('active', searchMode === 'chatgpt');
+      updatePlaceholder();
+      updateCalculationDisplay();
     };
   }
 
-  if (controlBtns[0] && settingsDialog) {
-    controlBtns[0].onclick = function() {
-      if (historyDialog?.classList.contains('show')) hideDialog(historyDialog);
-      showDialog(settingsDialog);
-    };
-  }
-
-  const clearBtn = document.getElementById('clear-history');
-  if (clearBtn) {
-    clearBtn.onclick = function() {
-      clearHistory();
-      alert('検索履歴を削除しました');
-      hideDialog(settingsDialog);
-    };
-  }
-
-  [historyDialog, settingsDialog].forEach(dlg => {
-    if (!dlg) return;
-    dlg.style.display = 'none';
+  document.querySelectorAll('#history-dialog, #settings-dialog').forEach(dlg => {
     dlg.addEventListener('click', e => { if (e.target === dlg) hideDialog(dlg); });
   });
 
-  // =================================================================
-  // 3. アプリ一覧の構築（奇数行要素数減・インラインスタイル削除版）
-  // =================================================================
-  let cachedData = null;
-  let cachedImageMap = {};
+  const clearHistoryBtn = document.getElementById('clear-history');
+  if (clearHistoryBtn) {
+    clearHistoryBtn.onclick = () => {
+      clearHistory();
+      alert('検索履歴を削除しました');
+      hideDialog(document.getElementById('settings-dialog'));
+    };
+  }
 
-  const importFflate = () => {
-    return new Promise((resolve, reject) => {
-      if (typeof fflate !== 'undefined') return resolve(fflate);
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/fflate@0.8.2/umd/index.js';
-      script.onload = () => resolve(fflate);
-      script.onerror = () => reject(new Error('fflate load failed'));
-      document.head.appendChild(script);
-    });
-  };
-
+  // =================================================================
+  // 3. アプリ一覧構築 & 広告挿入
+  // =================================================================
   const loadZip = async (url) => {
     try {
       const response = await fetch(url);
@@ -246,142 +247,58 @@
       const files = fflate.unzipSync(new Uint8Array(buffer));
       const imageMap = {};
       for (const [path, data] of Object.entries(files)) {
-        const blob = new Blob([data.buffer], { type: 'image/webp' });
-        imageMap[path.split('/').pop()] = URL.createObjectURL(blob);
+        const fileName = path.split('/').pop();
+        if (!fileName) continue;
+        imageMap[fileName] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
       }
       return imageMap;
-    } catch (err) { return {}; }
+    } catch (e) { return {}; }
   };
-
-  function renderAppList() {
-    const container = document.querySelector('.applist-in');
-    if (!container || !cachedData) return;
-
-    container.innerHTML = '';
-    const containerWidth = container.clientWidth;
-    const baseCols = Math.max(2, Math.floor(containerWidth / 125)); // 基本の列数
-
-    const allLinks = [];
-    (cachedData.categories || []).forEach(cat => {
-      (cat.links || []).forEach(link => {
-        if (link.name && link.url) allLinks.push(link);
-      });
-    });
-    appLinks = allLinks;
-
-    let linkIndex = 0;
-    let rowIndex = 0;
-
-    while (linkIndex < allLinks.length) {
-      // 奇数行(rowIndex 0, 2, 4...)は baseCols - 1
-      // 偶数行(rowIndex 1, 3, 5...)は baseCols
-      // ※「奇数行は要素数を減らす」というご要望に基づき、1行目(index 0)を減らしています
-      const isOddRow = rowIndex % 2 === 0; 
-      const currentCols = isOddRow ? Math.max(1, baseCols - 1) : baseCols;
-
-      const currentRow = document.createElement('div');
-      currentRow.className = 'app-row';
-      if (isOddRow) currentRow.classList.add('row-odd');
-      container.appendChild(currentRow);
-
-      for (let i = 0; i < currentCols && linkIndex < allLinks.length; i++) {
-        const link = allLinks[linkIndex++];
-        const a = document.createElement('a');
-        a.href = link.url || '#';
-        a.target = '_self';
-
-        const iconDiv = document.createElement('div');
-        iconDiv.className = 'appicon-bg';
-        if (link.bg) iconDiv.style.background = link.bg;
-
-        const img = document.createElement('img');
-        img.className = 'appicon-img';
-        img.src = cachedImageMap[link.icon] || link.icon || '';
-        img.alt = link.name || '';
-
-        const label = document.createElement('div');
-        label.className = 'appicon-label';
-        label.textContent = link.name || '';
-
-        iconDiv.appendChild(img);
-        iconDiv.appendChild(label);
-        a.appendChild(iconDiv);
-        currentRow.appendChild(a);
-      }
-      rowIndex++;
-    }
-  }
 
   const loadData = async () => {
+    const container = document.querySelector('.applist-in');
+    if (!container) return;
     try {
-      await importFflate();
-      cachedImageMap = await loadZip('lsr/icons-6.zip');
+      const imageMap = await loadZip('lsr/icons-6.zip');
       const res = await fetch('links-v6.json');
-      cachedData = await res.json();
-
-      renderAppList();
-
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(renderAppList, 200);
+      const data = await res.json();
+      
+      const fragment = document.createDocumentFragment();
+      (data.categories || []).forEach((category) => {
+        const catDiv = document.createElement('div');
+        catDiv.className = 'category';
+        catDiv.innerHTML = `<h2 class="category-title">${category.title || '無題'}</h2>`;
+        (category.links || []).forEach(link => {
+          appLinks.push({ name: link.name, url: link.url });
+          const a = document.createElement('a');
+          a.href = link.url || '#';
+          a.innerHTML = `
+            <div class="appicon-bg" style="background:${link.bg || '#eee'}">
+              <img class="appicon-img" src="${imageMap[link.icon] || link.icon || ''}" alt="${link.name}">
+              <div class="appicon-label">${link.name}</div>
+            </div>
+          `;
+          catDiv.appendChild(a);
+        });
+        fragment.appendChild(catDiv);
       });
+      container.appendChild(fragment);
 
-      const container = document.querySelector('.applist-in');
-      const checkVisibility = () => {
-        const rect = container.getBoundingClientRect();
-        container.classList.toggle('visible', rect.top <= 0);
-      };
-      window.addEventListener('scroll', checkVisibility);
-      checkVisibility();
+      const adDiv = document.createElement('div');
+      adDiv.style.cssText = 'width:100%; margin-top:20px;';
+      adDiv.innerHTML = `<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>`;
+      container.appendChild(adDiv);
+      const s = document.createElement('script');
+      s.async = true; s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874";
+      document.head.appendChild(s);
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
 
-    } catch (err) { console.error('loadData error', err); }
+    } catch (e) { console.error(e); }
   };
 
-  if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', loadData);
-  } else {
-    loadData();
-  }
+  if (document.readyState === 'loading') { window.addEventListener('DOMContentLoaded', loadData); } else { loadData(); }
 
-  // =================================================================
-  // 4. Liquid Glass エフェクト & 5. 外部スクリプト
-  // =================================================================
-  function applyLiquidGlassEffect(container) {
-    const outerCount = 10, outerStep = 4, borderThickness = 6;
-    let masks = [];
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < outerCount; i++) {
-      const mask = document.createElement('div');
-      Object.assign(mask.style, {
-        position: 'absolute', pointerEvents: 'none', zIndex: `${outerCount - i}`,
-        border: `${borderThickness}px solid transparent`,
-        mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-        maskComposite: 'exclude', webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-        webkitMaskComposite: 'xor',
-      });
-      fragment.appendChild(mask);
-      masks.push(mask);
-    }
-    container.appendChild(fragment);
-    const updateLayout = () => {
-      const style = window.getComputedStyle(container);
-      const w = parseFloat(style.width), h = parseFloat(style.height), r = parseFloat(style.borderRadius) || 0;
-      masks.forEach((mask, i) => {
-        const inset = i * outerStep;
-        if (w - inset * 2 <= 0 || h - inset * 2 <= 0) { mask.style.display = 'none'; return; }
-        const blurVal = Math.pow((outerCount - i) / outerCount, 3.5) * 40;
-        mask.style.cssText += `display:block; inset:${inset}px; border-radius:${Math.max(r - inset, 0)}px; backdrop-filter:blur(${blurVal}px); -webkit-backdrop-filter:blur(${blurVal}px);`;
-      });
-    };
-    new ResizeObserver(updateLayout).observe(container);
-    updateLayout();
-  }
-
-  document.querySelectorAll('.liquid-glass').forEach(applyLiquidGlassEffect);
-
-  const script = document.createElement('script');
-  script.src = 'https://search3958.github.io/check.js';
-  document.head.appendChild(script);
-
+  const checkScript = document.createElement('script');
+  checkScript.src = 'https://search3958.github.io/check.js';
+  document.head.appendChild(checkScript);
 })();
