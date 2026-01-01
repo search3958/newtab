@@ -2,8 +2,12 @@
 
 (function() {
   // =================================================================
-  // 1. 色相スキャン・永続化保存ロジック (ここに集約)
+  // 0. 壁紙とテーマカラーの制御ロジック
   // =================================================================
+
+  /**
+   * RGBからHue(色相)を算出
+   */
   function rgbToHue(r, g, b) {
     r /= 255; g /= 255; b /= 255;
     const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -17,52 +21,77 @@
     return Math.round(h * 360);
   }
 
-  async function extractAndSaveColor() {
-    const lightUrl = document.body.dataset.lightUrl;
-    if (!lightUrl || lightUrl.includes('bgimg/chips1.png')) return;
-
-    try {
-      const deg = await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = lightUrl;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = 50; canvas.height = 50;
-          ctx.drawImage(img, 0, 0, 50, 50);
-          const data = ctx.getImageData(0, 0, 50, 50).data;
-          let r = 0, g = 0, b = 0;
-          for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i+1]; b += data[i+2]; }
-          resolve(rgbToHue(r/(data.length/4), g/(data.length/4), b/(data.length/4)));
-        };
-        img.onerror = reject;
-      });
-
-      // 現在のCSS変数を更新
-      document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
-
-      // IndexedDBに保存 (次回の起動時にmain.jsがこれを使う)
-      const req = indexedDB.open('WallpaperDB', 1);
-      req.onsuccess = () => {
-        const db = req.result;
-        const tx = db.transaction(['images'], 'readwrite');
-        const store = tx.objectStore('images');
-        ['newtab', 'light'].forEach(key => {
-          const getReq = store.get(key);
-          getReq.onsuccess = () => {
-            const record = getReq.result;
-            if (record && record.light) {
-              record.deg = deg;
-              store.put(record, key);
-            }
-          };
-        });
+  /**
+   * 画像URLからメインカラー(Hue)を抽出
+   */
+  async function extractMainColorDeg(imageUrl) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.src = imageUrl;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 50; canvas.height = 50; // 解析用に縮小
+        ctx.drawImage(img, 0, 0, 50, 50);
+        const data = ctx.getImageData(0, 0, 50, 50).data;
+        let r = 0, g = 0, b = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i]; g += data[i+1]; b += data[i+2];
+        }
+        const count = data.length / 4;
+        resolve(rgbToHue(r/count, g/count, b/count));
       };
-    } catch (e) { console.error("Afterload scan failed:", e); }
+      img.onerror = reject;
+    });
+  }
+
+  /**
+   * 壁紙の適用と色の復元・スキャン
+   */
+  async function applyWallpaper(lightBlob, darkBlob = null) {
+    // --- 1. ローカルストレージからの復元 ---
+    const savedDeg = localStorage.getItem('user-wallpaper-deg') || '15';
+    document.documentElement.style.setProperty('--color-deg', `${savedDeg}deg`);
+
+    // 既存URLの解放
+    const existingLightUrl = document.body.dataset.lightUrl;
+    const existingDarkUrl = document.body.dataset.darkUrl;
+    if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
+    if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
+
+    // --- 2. 壁紙の設定 ---
+    let lightUrl = 'bgimg/chips1.png'; // デフォルト
+    if (lightBlob) {
+      lightUrl = URL.createObjectURL(lightBlob);
+      document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
+      document.body.dataset.lightUrl = lightUrl;
+    } else {
+      document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`); 
+    }
+
+    if (darkBlob) {
+      const darkUrl = URL.createObjectURL(darkBlob);
+      document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
+      document.body.dataset.darkUrl = darkUrl;
+    } else {
+      document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
+    }
+
+    // --- 3. 画像をスキャンして色を更新 ---
+    if (lightBlob) {
+      try {
+        const deg = await extractMainColorDeg(lightUrl);
+        document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
+        localStorage.setItem('user-wallpaper-deg', deg);
+      } catch (e) {
+        console.error("Color scan failed:", e);
+      }
+    }
   }
 
   // =================================================================
-  // 2. Google Fonts & UI・検索・計算・インテリジェンス
+  // 1. Google Fonts の動的読み込み
   // =================================================================
   function loadGoogleFont() {
     if (document.getElementById('google-fonts-link')) return;
@@ -74,10 +103,14 @@
   }
   loadGoogleFont();
 
+  // =================================================================
+  // 2. 検索・履歴・UI制御 & インテリジェンス
+  // =================================================================
   const HISTORY_KEY = 'search_history_v2';
   const searchInput = document.querySelector('.search-input');
   const searchBtn = document.querySelector('.search-button');
   const controlBtns = document.querySelectorAll('.control-button'); 
+
   const intelligenceBox = document.querySelector('.intelligence-box');
   const intelligenceIcon = document.querySelector('.intelligence-icon');
   const answerElement = document.querySelector('.intelligence-answer');
@@ -90,13 +123,16 @@
 
   function addHistory(q) {
     if (!q) return;
-    let h = getHistory().filter(e => e !== q);
+    let h = getHistory();
+    h = h.filter(e => e !== q);
     h.unshift(q);
     if (h.length > 5) h = h.slice(0, 5);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
   }
 
-  function clearHistory() { localStorage.removeItem(HISTORY_KEY); }
+  function clearHistory() {
+    localStorage.removeItem(HISTORY_KEY);
+  }
 
   let searchMode = 'google';
   const DEFAULT_PLACEHOLDER = '検索や計算・アプリ';
@@ -128,12 +164,17 @@
 
   if (searchBtn) searchBtn.onclick = doSearch;
   if (searchInput) {
-    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+    });
   }
 
   function toggleIntelligenceActive(show) {
     if (!intelligenceIcon || !answerElement || !intelligenceBox) return;
-    if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
 
     if (show) {
       intelligenceBox.style.display = 'flex';
@@ -148,7 +189,9 @@
       answerElement.classList.remove('active');
       answerElement.classList.add('hide');
       hideTimeout = setTimeout(() => {
-        if (!intelligenceBox.classList.contains('active')) intelligenceBox.style.display = 'none';
+        if (!intelligenceBox.classList.contains('active')) {
+          intelligenceBox.style.display = 'none';
+        }
         hideTimeout = null;
       }, 500); 
     }
@@ -191,6 +234,7 @@
 
   function updateCalculationDisplay() {
     if (!searchInput || !intelligenceIcon || !answerElement) return;
+
     const inputText = searchInput.value.trim();
     const result = isMathExpression(inputText) ? calculateResult(inputText) : null;
     const app = (!result) ? searchApp(inputText) : null;
@@ -222,7 +266,11 @@
   const historyDlg = document.getElementById('history-dialog');
 
   function hideAllDialogs() {
-    [settingsDlg, historyDlg].forEach(dlg => { if (dlg && dlg.classList.contains('show')) hideDialog(dlg); });
+    [settingsDlg, historyDlg].forEach(dlg => {
+      if (dlg && dlg.classList.contains('show')) {
+        hideDialog(dlg);
+      }
+    });
   }
 
   function showDialog(dlg, btn) {
@@ -238,17 +286,31 @@
   function hideDialog(dlg) {
     if (!dlg) return;
     dlg.classList.remove('show');
-    controlBtns.forEach(b => { if (b === controlBtns[2] && searchMode === 'chatgpt') return; b.classList.remove('active'); });
-    setTimeout(() => { if (!dlg.classList.contains('show')) dlg.style.display = 'none'; }, 500);
+    controlBtns.forEach(b => {
+      if (b === controlBtns[2] && searchMode === 'chatgpt') return;
+      b.classList.remove('active');
+    });
+    setTimeout(() => { 
+      if (!dlg.classList.contains('show')) dlg.style.display = 'none'; 
+    }, 500);
   }
 
   if (controlBtns[0]) {
-    controlBtns[0].onclick = () => settingsDlg.classList.contains('show') ? hideDialog(settingsDlg) : showDialog(settingsDlg, controlBtns[0]);
+    controlBtns[0].onclick = () => {
+      if (settingsDlg.classList.contains('show')) {
+        hideDialog(settingsDlg);
+      } else {
+        showDialog(settingsDlg, controlBtns[0]);
+      }
+    };
   }
 
   if (controlBtns[1]) {
     controlBtns[1].onclick = () => {
-      if (historyDlg.classList.contains('show')) { hideDialog(historyDlg); return; }
+      if (historyDlg.classList.contains('show')) {
+        hideDialog(historyDlg);
+        return;
+      }
       const historyList = document.getElementById('history-list');
       const h = getHistory();
       historyList.innerHTML = h.length ? '' : '<li style="color:#888;">履歴なし</li>';
@@ -256,7 +318,11 @@
         const li = document.createElement('li');
         li.textContent = q;
         li.style.cssText = 'cursor:pointer; padding:8px 0;';
-        li.onclick = () => { searchInput.value = q; hideDialog(historyDlg); doSearch(); };
+        li.onclick = () => {
+          searchInput.value = q;
+          hideDialog(historyDlg);
+          doSearch();
+        };
         historyList.appendChild(li);
       });
       showDialog(historyDlg, controlBtns[1]);
@@ -273,11 +339,21 @@
     };
   }
 
-  [settingsDlg, historyDlg].forEach(dlg => { if (dlg) dlg.onclick = e => { if (e.target === dlg) hideDialog(dlg); }; });
+  [settingsDlg, historyDlg].forEach(dlg => {
+    if (dlg) {
+      dlg.addEventListener('click', e => { 
+        if (e.target === dlg) hideDialog(dlg); 
+      });
+    }
+  });
 
   const clearHistoryBtn = document.getElementById('clear-history');
   if (clearHistoryBtn) {
-    clearHistoryBtn.onclick = () => { clearHistory(); alert('履歴を削除しました'); hideDialog(settingsDlg); };
+    clearHistoryBtn.onclick = () => {
+      clearHistory();
+      alert('検索履歴を削除しました');
+      hideDialog(settingsDlg);
+    };
   }
 
   // =================================================================
@@ -297,41 +373,61 @@
     `;
     container.prepend(infoDiv);
 
-    const tEl = infoDiv.querySelector('.info-time'), dEl = infoDiv.querySelector('.info-date'), bEl = infoDiv.querySelector('.info-battery');
+    const timeEl = infoDiv.querySelector('.info-time');
+    const dateEl = infoDiv.querySelector('.info-date');
+    const battEl = infoDiv.querySelector('.info-battery');
+
     function update() {
       const now = new Date();
-      tEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      dEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+      if (timeEl) timeEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      if (dateEl) dateEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
     }
-    if (navigator.getBattery) {
-      navigator.getBattery().then(b => {
-        const ref = () => bEl.textContent = `バッテリー ${Math.round(b.level * 100)}%`;
-        ref(); b.onlevelchange = ref;
-      });
+
+    async function initBattery() {
+      if (!navigator.getBattery) return;
+      const b = await navigator.getBattery();
+      const ref = () => { if (battEl) battEl.textContent = `バッテリー ${Math.round(b.level * 100)}%`; };
+      ref();
+      b.addEventListener('levelchange', ref);
     }
-    update(); setInterval(update, 1000);
+
+    update();
+    setInterval(update, 1000);
+    initBattery();
   }
 
   // =================================================================
-  // 4. アプリ一覧構築 & 最終初期化
+  // 4. アプリ一覧構築 & 初期化
   // =================================================================
   const loadZip = async (url) => {
-    const res = await fetch(url), buf = await res.arrayBuffer();
-    const files = fflate.unzipSync(new Uint8Array(buf)), map = {};
-    for (const [p, d] of Object.entries(files)) {
-      const n = p.split('/').pop(); if (n) map[n] = URL.createObjectURL(new Blob([d.buffer], { type: 'image/webp' }));
-    }
-    return map;
+    try {
+      const response = await fetch(url);
+      const buffer = await response.arrayBuffer();
+      const files = fflate.unzipSync(new Uint8Array(buffer));
+      const imageMap = {};
+      for (const [path, data] of Object.entries(files)) {
+        const fileName = path.split('/').pop();
+        if (!fileName) continue;
+        imageMap[fileName] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
+      }
+      return imageMap;
+    } catch (e) { return {}; }
   };
 
   const loadData = async () => {
+    // 壁紙の初期復元
+    applyWallpaper(null); 
+
     const container = document.querySelector('.applist-in');
     if (!container) return;
+    
     setupInfoSection(container);
 
     try {
       const imageMap = await loadZip('lsr/icons-6.zip');
-      const res = await fetch('links-v6.json'), data = await res.json();
+      const res = await fetch('links-v6.json');
+      const data = await res.json();
+      
       const fragment = document.createDocumentFragment();
       (data.categories || []).forEach((category) => {
         const catDiv = document.createElement('div');
@@ -339,8 +435,14 @@
         catDiv.innerHTML = `<h2 class="category-title">${category.title || '無題'}</h2>`;
         (category.links || []).forEach(link => {
           appLinks.push({ name: link.name, url: link.url });
-          const a = document.createElement('a'); a.href = link.url || '#';
-          a.innerHTML = `<div class="appicon-bg" style="background:${link.bg || '#eee'}"><img class="appicon-img" src="${imageMap[link.icon] || link.icon || ''}" alt="${link.name}"><div class="appicon-label">${link.name}</div></div>`;
+          const a = document.createElement('a');
+          a.href = link.url || '#';
+          a.innerHTML = `
+            <div class="appicon-bg" style="background:${link.bg || '#eee'}">
+              <img class="appicon-img" src="${imageMap[link.icon] || link.icon || ''}" alt="${link.name}">
+              <div class="appicon-label">${link.name}</div>
+            </div>
+          `;
           catDiv.appendChild(a);
         });
         fragment.appendChild(catDiv);
@@ -348,19 +450,25 @@
       container.appendChild(fragment);
 
       // Ads
-      const adDiv = document.createElement('div'); adDiv.style.cssText = 'width:100%; margin-top:20px;';
+      const adDiv = document.createElement('div');
+      adDiv.style.cssText = 'width:100%; margin-top:20px;';
       adDiv.innerHTML = `<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>`;
       container.appendChild(adDiv);
-      const s = document.createElement('script'); s.async = true; s.src = "https://pagead2.googlesyndication.com/pagead2/js/adsbygoogle.js?client=ca-pub-6151036058675874";
+      const s = document.createElement('script');
+      s.async = true; s.src = "https://pagead2.googlesyndication.com/pagead2/js/adsbygoogle.js?client=ca-pub-6151036058675874";
       document.head.appendChild(s);
       (window.adsbygoogle = window.adsbygoogle || []).push({});
-
-      // --- 【最重要】UI構築後に画像を解析して、新しい色を保存 & CSS適用 ---
-      extractAndSaveColor();
 
     } catch (e) { console.error(e); }
   };
 
-  loadData();
-  const cs = document.createElement('script'); cs.src = 'https://search3958.github.io/check.js'; document.head.appendChild(cs);
+  if (document.readyState === 'loading') { 
+    window.addEventListener('DOMContentLoaded', loadData); 
+  } else { 
+    loadData(); 
+  }
+
+  const checkScript = document.createElement('script');
+  checkScript.src = 'https://search3958.github.io/check.js';
+  document.head.appendChild(checkScript);
 })();
