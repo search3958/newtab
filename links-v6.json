@@ -267,6 +267,12 @@
           "bg": "rgba(255, 255, 255, 0.759)",
           "url": "https://poki.com/",
           "icon": "poki.webp"
+        },
+        {
+          "name": "小红书",
+          "bg": "var(--iconbg)",
+          "url": "https://www.xiaohongshu.com/explore",
+          "icon": "xiaohongshu.webp"
         }
       ]
     },

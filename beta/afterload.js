@@ -15,7 +15,6 @@
   // =================================================================
   // 2. 検索・履歴・UI制御
   // =================================================================
-
   const HISTORY_KEY = 'search_history_v2';
   function getHistory() {
     try {
@@ -44,52 +43,34 @@
 
   function updatePlaceholder() {
     if (!searchInput) return;
-    if (searchMode === 'chatgpt') {
-      searchInput.placeholder = CHATGPT_PLACEHOLDER;
-    } else {
-      searchInput.placeholder = DEFAULT_PLACEHOLDER;
-    }
+    searchInput.placeholder = (searchMode === 'chatgpt') ? CHATGPT_PLACEHOLDER : DEFAULT_PLACEHOLDER;
   }
-
   updatePlaceholder();
 
-  let appLinks = [];
+  let appLinks = []; 
   let foundApp = null;
 
   function doSearch() {
     const q = searchInput.value.trim();
     if (!q) return;
-
     addHistory(q);
-
     if (foundApp && searchMode === 'google') {
       window.location.href = foundApp.url;
       return;
     }
-
-    let url;
-    if (searchMode === 'google') {
-      url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
-    } else {
-      url = 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
-    }
+    let url = (searchMode === 'google') 
+      ? 'https://www.google.com/search?q=' + encodeURIComponent(q)
+      : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
     window.location.href = url;
   }
 
   if (searchBtn) searchBtn.onclick = doSearch;
-  if (searchInput) searchInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch();
-  });
+  if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
   if (controlBtns[2]) {
     controlBtns[2].onclick = function() {
-      if (searchMode === 'google') {
-        searchMode = 'chatgpt';
-        this.classList.add('active');
-      } else {
-        searchMode = 'google';
-        this.classList.remove('active');
-      }
+      searchMode = (searchMode === 'google') ? 'chatgpt' : 'google';
+      this.classList.toggle('active', searchMode === 'chatgpt');
       updatePlaceholder();
     };
   }
@@ -101,202 +82,133 @@
   const answerElement = intelligenceBox ? intelligenceBox.querySelector('.intelligence-answer') : null;
 
   function sanitizeExpression(expr) {
-    let sanitized = expr
-      .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
-    sanitized = sanitized
-      .replace(/[×✖️x]/g, '*')
-      .replace(/[÷➗]/g, '/')
-      .replace(/[ー]/g, '-')
-      .replace(/[＋]/g, '+');
-    return sanitized.replace(/[^0-9+\-*/().\s]/g, '');
+    let s = expr.replace(/[０-９]/g, m => String.fromCharCode(m.charCodeAt(0) - 0xFEE0));
+    s = s.replace(/[×✖️x]/g, '*').replace(/[÷➗]/g, '/').replace(/[ー]/g, '-').replace(/[＋]/g, '+');
+    return s.replace(/[^0-9+\-*/().\s]/g, '');
   }
 
   function isMathExpression(str) {
     if (!str) return false;
-    const sanitized = sanitizeExpression(str);
-    const checkExpr = sanitized.replace(/[\s+\-*/().]*$/, '');
-    const containsOperator = /[+\-*/]/.test(checkExpr);
-    const isValidChar = /^[\d\s+\-*/().]+$/.test(sanitized);
-
-    return isValidChar && containsOperator;
+    const s = sanitizeExpression(str);
+    return /^[\d\s+\-*/().]+$/.test(s) && /[+\-*/]/.test(s.replace(/[\s+\-*/().]*$/, ''));
   }
 
   function calculateResult(expr) {
-    const sanitized = sanitizeExpression(expr);
-    const finalExpr = sanitized.replace(/[\s+\-*/().]*$/, '');
-
-    if (!/[+\-*/]/.test(finalExpr)) return null;
-
+    const s = sanitizeExpression(expr).replace(/[\s+\-*/().]*$/, '');
     try {
-      const result = Function('"use strict"; return (' + finalExpr + ')')();
-      if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
-        return result;
-      }
+      const res = Function('"use strict"; return (' + s + ')')();
+      if (typeof res === 'number' && !isNaN(res) && isFinite(res)) return res;
     } catch {}
     return null;
   }
 
   let currentResult = null;
-
-  // --- アプリ検索機能 ---
   function searchApp(text) {
     if (!text || searchMode !== 'google') return null;
     const q = text.toLowerCase().trim();
     if (q.length < 2) return null;
-
-    const found = appLinks.find(app =>
-        app.name.toLowerCase().includes(q)
-    );
-
-    const exactMatch = appLinks.find(app =>
-        app.name.toLowerCase() === q
-    );
-
-    return exactMatch || found || null;
+    return appLinks.find(app => app.name.toLowerCase() === q) || 
+           appLinks.find(app => app.name.toLowerCase().includes(q)) || null;
   }
 
-  const triggerIconRotation = (element) => {
-    if (!element) return;
-
-    if (element.classList.contains('animate-icon')) return;
-
-    element.classList.add('animate-icon');
-    setTimeout(() => {
-      element.classList.remove('animate-icon');
-    }, 1000);
+  const triggerIconRotation = (el) => {
+    if (!el || el.classList.contains('animate-icon')) return;
+    el.classList.add('animate-icon');
+    setTimeout(() => el.classList.remove('animate-icon'), 1000);
   };
 
-
   function updateCalculationDisplay() {
-    if (!searchInput || !applist || !intelligenceBox || !answerElement) return;
-
+    if (!searchInput || !applist || !answerElement) return;
     const inputText = searchInput.value;
     const isMath = isMathExpression(inputText);
-
-    const targetElementForIntelligenceClass = applist;
+    const target = applist;
 
     if (isMath && searchMode === 'google') {
-        foundApp = null;
-        const result = calculateResult(inputText);
-
-        if (result !== null && result !== currentResult) {
-            answerElement.classList.add('hide');
-
-            triggerIconRotation(targetElementForIntelligenceClass);
-
-            setTimeout(() => {
-                answerElement.textContent = `${result}`;
-                currentResult = result;
-                answerElement.classList.remove('hide');
-            }, 150);
-            targetElementForIntelligenceClass.classList.add('intelligence');
-
-        } else if (result !== null && result === currentResult) {
-            if (!targetElementForIntelligenceClass.classList.contains('intelligence')) {
-                targetElementForIntelligenceClass.classList.add('intelligence');
-            }
-        } else {
-            targetElementForIntelligenceClass.classList.remove('intelligence');
-            currentResult = null;
-        }
-
+      foundApp = null;
+      const res = calculateResult(inputText);
+      if (res !== null && res !== currentResult) {
+        answerElement.classList.add('hide');
+        triggerIconRotation(target);
+        setTimeout(() => {
+          answerElement.textContent = `${res}`;
+          currentResult = res;
+          answerElement.classList.remove('hide');
+        }, 150);
+        target.classList.add('intelligence');
+      } else if (res !== null) {
+        target.classList.add('intelligence');
+      } else {
+        target.classList.remove('intelligence');
+        currentResult = null;
+      }
     } else if (!isMath && searchMode === 'google') {
-        currentResult = null;
-        const app = searchApp(inputText);
-
-        if (app) {
-            if (!foundApp || app.name !== foundApp.name) {
-                foundApp = app;
-
-                triggerIconRotation(targetElementForIntelligenceClass);
-
-                answerElement.classList.add('hide');
-                setTimeout(() => {
-                    answerElement.textContent = `${app.name}`;
-                    answerElement.classList.remove('hide');
-                }, 150);
-
-            }
-            targetElementForIntelligenceClass.classList.add('intelligence');
-        } else {
-            foundApp = null;
-            targetElementForIntelligenceClass.classList.remove('intelligence');
+      currentResult = null;
+      const app = searchApp(inputText);
+      if (app) {
+        if (!foundApp || app.name !== foundApp.name) {
+          foundApp = app;
+          triggerIconRotation(target);
+          answerElement.classList.add('hide');
+          setTimeout(() => {
+            answerElement.textContent = `${app.name}`;
+            answerElement.classList.remove('hide');
+          }, 150);
         }
-
-    } else {
-        targetElementForIntelligenceClass.classList.remove('intelligence');
-        currentResult = null;
+        target.classList.add('intelligence');
+      } else {
         foundApp = null;
+        target.classList.remove('intelligence');
+      }
+    } else {
+      target.classList.remove('intelligence');
+      currentResult = null;
+      foundApp = null;
     }
   }
 
-  updateCalculationDisplay();
-
-  if (searchInput) {
-    searchInput.addEventListener('input', updateCalculationDisplay);
-  }
+  if (searchInput) searchInput.addEventListener('input', updateCalculationDisplay);
 
   // --- ダイアログ制御 ---
-  function showDialog(dialogElement) {
-    if (!dialogElement) return;
-    dialogElement.style.display = 'flex';
-    requestAnimationFrame(() => {
-      dialogElement.classList.add('show');
-    });
+  function showDialog(el) {
+    if (!el) return;
+    el.style.display = 'flex';
+    requestAnimationFrame(() => el.classList.add('show'));
   }
-
-  function hideDialog(dialogElement) {
-    if (!dialogElement) return;
-    dialogElement.classList.remove('show');
-    setTimeout(() => {
-      if (!dialogElement.classList.contains('show')) {
-        dialogElement.style.display = 'none';
-      }
-    }, 1000);
+  function hideDialog(el) {
+    if (!el) return;
+    el.classList.remove('show');
+    setTimeout(() => { if (!el.classList.contains('show')) el.style.display = 'none'; }, 1000);
   }
 
   const historyDialog = document.getElementById('history-dialog');
   const historyList = document.getElementById('history-list');
   const settingsDialog = document.getElementById('settings-dialog');
 
-  if (controlBtns[1] && historyDialog && historyList && settingsDialog) {
+  if (controlBtns[1] && historyDialog && historyList) {
     controlBtns[1].onclick = function() {
-      if (settingsDialog.classList.contains('show')) {
-          hideDialog(settingsDialog);
-      }
+      if (settingsDialog?.classList.contains('show')) hideDialog(settingsDialog);
       const h = getHistory();
-      historyList.innerHTML = '';
-      if (h.length === 0) {
-        historyList.innerHTML = '<li style="color:#888;">履歴なし</li>';
-      } else {
-        h.forEach(q => {
-          const li = document.createElement('li');
-          li.style.cursor = 'pointer';
-          li.style.padding = '4px 0';
-          li.textContent = q;
-          li.onclick = () => {
-            searchInput.value = q;
-            hideDialog(historyDialog);
-            doSearch();
-          };
-          historyList.appendChild(li);
-        });
-      }
+      historyList.innerHTML = h.length === 0 ? '<li style="color:#888;">履歴なし</li>' : '';
+      h.forEach(q => {
+        const li = document.createElement('li');
+        li.style.cssText = 'cursor:pointer; padding:4px 0;';
+        li.textContent = q;
+        li.onclick = () => { searchInput.value = q; hideDialog(historyDialog); doSearch(); };
+        historyList.appendChild(li);
+      });
       showDialog(historyDialog);
     };
   }
 
-  if (controlBtns[0] && settingsDialog && historyDialog) {
+  if (controlBtns[0] && settingsDialog) {
     controlBtns[0].onclick = function() {
-      if (historyDialog.classList.contains('show')) {
-          hideDialog(historyDialog);
-      }
+      if (historyDialog?.classList.contains('show')) hideDialog(historyDialog);
       showDialog(settingsDialog);
     };
   }
 
   const clearBtn = document.getElementById('clear-history');
-  if (clearBtn && settingsDialog) {
+  if (clearBtn) {
     clearBtn.onclick = function() {
       clearHistory();
       alert('検索履歴を削除しました');
@@ -307,306 +219,169 @@
   [historyDialog, settingsDialog].forEach(dlg => {
     if (!dlg) return;
     dlg.style.display = 'none';
-    dlg.addEventListener('click', e => {
-      if (e.target === dlg) {
-        hideDialog(dlg);
-      }
-    });
+    dlg.addEventListener('click', e => { if (e.target === dlg) hideDialog(dlg); });
   });
 
   // =================================================================
-  // 3. fflateの動的インポートとアプリ一覧の構築
+  // 3. アプリ一覧の構築（奇数行要素数減・インラインスタイル削除版）
   // =================================================================
+  let cachedData = null;
+  let cachedImageMap = {};
 
   const importFflate = () => {
     return new Promise((resolve, reject) => {
-        if (typeof fflate !== 'undefined') {
-            return resolve(fflate);
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/fflate@0.8.2/umd/index.js';
-        script.onload = () => {
-            resolve(fflate);
-        };
-        script.onerror = (err) => {
-            console.error('fflate load failed', err);
-            reject(new Error('fflate load failed'));
-        };
-        document.head.appendChild(script);
+      if (typeof fflate !== 'undefined') return resolve(fflate);
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/fflate@0.8.2/umd/index.js';
+      script.onload = () => resolve(fflate);
+      script.onerror = () => reject(new Error('fflate load failed'));
+      document.head.appendChild(script);
     });
   };
-
-  const getFileName = (path) => path.split('/').pop();
 
   const loadZip = async (url) => {
     try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('ZIP fetch failed');
-        const buffer = await response.arrayBuffer();
-
-        const files = fflate.unzipSync(new Uint8Array(buffer));
-
-        const imageMap = {};
-        const entries = Object.entries(files);
-
-        for (let i = 0; i < entries.length; i++) {
-            const [path, data] = entries[i];
-            const fileName = getFileName(path);
-            const blob = new Blob([data.buffer], { type: 'image/webp' });
-            imageMap[fileName] = URL.createObjectURL(blob);
-
-            if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
-        }
-        return imageMap;
-    } catch (err) {
-        console.error('loadZip error', err);
-        return {};
-    }
+      const response = await fetch(url);
+      const buffer = await response.arrayBuffer();
+      const files = fflate.unzipSync(new Uint8Array(buffer));
+      const imageMap = {};
+      for (const [path, data] of Object.entries(files)) {
+        const blob = new Blob([data.buffer], { type: 'image/webp' });
+        imageMap[path.split('/').pop()] = URL.createObjectURL(blob);
+      }
+      return imageMap;
+    } catch (err) { return {}; }
   };
 
-  
-// --- 広告挿入ヘルパー (修正後) ---
-const insertAd = (container) => {
-    // 1. 広告コンテナを作成
-    const adContainer = document.createElement('div');
-    adContainer.className = 'ad-container';
+  function renderAppList() {
+    const container = document.querySelector('.applist-in');
+    if (!container || !cachedData) return;
 
-    // 2. <ins> タグ (広告ユニット) を作成
-    const ins = document.createElement('ins');
-    ins.className = 'adsbygoogle';
-    Object.assign(ins.style, {
-        display: 'inline-block',
-        width: '202px',
-        height:/* '170px'*/'1px'
+    container.innerHTML = '';
+    const containerWidth = container.clientWidth;
+    const baseCols = Math.max(2, Math.floor(containerWidth / 125)); // 基本の列数
+
+    const allLinks = [];
+    (cachedData.categories || []).forEach(cat => {
+      (cat.links || []).forEach(link => {
+        if (link.name && link.url) allLinks.push(link);
+      });
     });
-    ins.setAttribute('data-ad-client', 'ca-pub-6151036058675874');
-    ins.setAttribute('data-ad-slot', '2788469305');
+    appLinks = allLinks;
 
-    // 3. コンテナに挿入
-    adContainer.appendChild(ins);
-    container.appendChild(adContainer);
+    let linkIndex = 0;
+    let rowIndex = 0;
 
-    // 4. 広告レンダリングをトリガーする (最重要！)
-    // window.adsbygoogle が存在するか確認してから push を呼び出す
-    if (window.adsbygoogle && typeof window.adsbygoogle.push === 'function') {
-        window.adsbygoogle.push({});
-    } else {
-        // adsbygoogle.js がまだロードされていない場合のフォールバック/エラー処理
-        console.warn('window.adsbygoogle is not available. Ensure adsbygoogle.js is loaded.');
+    while (linkIndex < allLinks.length) {
+      // 奇数行(rowIndex 0, 2, 4...)は baseCols - 1
+      // 偶数行(rowIndex 1, 3, 5...)は baseCols
+      // ※「奇数行は要素数を減らす」というご要望に基づき、1行目(index 0)を減らしています
+      const isOddRow = rowIndex % 2 === 0; 
+      const currentCols = isOddRow ? Math.max(1, baseCols - 1) : baseCols;
+
+      const currentRow = document.createElement('div');
+      currentRow.className = 'app-row';
+      if (isOddRow) currentRow.classList.add('row-odd');
+      container.appendChild(currentRow);
+
+      for (let i = 0; i < currentCols && linkIndex < allLinks.length; i++) {
+        const link = allLinks[linkIndex++];
+        const a = document.createElement('a');
+        a.href = link.url || '#';
+        a.target = '_self';
+
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'appicon-bg';
+        if (link.bg) iconDiv.style.background = link.bg;
+
+        const img = document.createElement('img');
+        img.className = 'appicon-img';
+        img.src = cachedImageMap[link.icon] || link.icon || '';
+        img.alt = link.name || '';
+
+        const label = document.createElement('div');
+        label.className = 'appicon-label';
+        label.textContent = link.name || '';
+
+        iconDiv.appendChild(img);
+        iconDiv.appendChild(label);
+        a.appendChild(iconDiv);
+        currentRow.appendChild(a);
+      }
+      rowIndex++;
     }
-};
-// --------------------------
-
+  }
 
   const loadData = async () => {
     try {
-        await importFflate();
+      await importFflate();
+      cachedImageMap = await loadZip('lsr/icons-6.zip');
+      const res = await fetch('links-v6.json');
+      cachedData = await res.json();
 
-        const zipUrl = 'lsr/icons-6.zip';
-        const imageMap = await loadZip(zipUrl);
+      renderAppList();
 
-        const jsonUrl = 'links-v6.json';
-        const res = await fetch(jsonUrl);
-        if (!res.ok) throw new Error('links.json fetch failed');
-        const data = await res.json();
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(renderAppList, 200);
+      });
 
-        const container = document.querySelector('.applist-in');
-        if (!container) {
-            console.error('Element with class "applist-in" not found.');
-            return;
-        }
+      const container = document.querySelector('.applist-in');
+      const checkVisibility = () => {
+        const rect = container.getBoundingClientRect();
+        container.classList.toggle('visible', rect.top <= 0);
+      };
+      window.addEventListener('scroll', checkVisibility);
+      checkVisibility();
 
-        const tempAppLinks = [];
-        let categoryCount = 0; // カテゴリーのカウント
-
-        (data.categories || []).forEach((category, index) => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'category';
-
-            const title = document.createElement('h2');
-            title.className = 'category-title';
-            title.textContent = category.title || '無題';
-            categoryDiv.appendChild(title);
-
-            (category.links || []).forEach(link => {
-                if (link.name && link.url) {
-                    tempAppLinks.push({
-                        name: link.name,
-                        url: link.url
-                    });
-                }
-
-                const a = document.createElement('a');
-                a.href = link.url || '#';
-                a.target = '_self';
-
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'appicon-bg';
-                if (link.bg) iconDiv.style.background = link.bg;
-
-                const img = document.createElement('img');
-                img.className = 'appicon-img';
-                const src = imageMap[link.icon];
-                img.alt = link.name || '';
-                img.src = src || link.icon || '';
-
-                const label = document.createElement('div');
-                label.className = 'appicon-label';
-                label.textContent = link.name || '';
-
-                iconDiv.appendChild(img);
-                iconDiv.appendChild(label);
-                a.appendChild(iconDiv);
-
-                categoryDiv.appendChild(a);
-            });
-
-            container.appendChild(categoryDiv);
-            categoryCount++;
-
-            // 2つのカテゴリーごとに広告を挿入 (最後を除く)
-            if (categoryCount % 2 === 0 && index < data.categories.length - 1) {
-                insertAd(container);
-            }
-        });
-
-        appLinks = tempAppLinks;
-
-        let cachedRect = null;
-        let lastScrollY = -1;
-
-        const checkVisibility = () => {
-            const currentScrollY = window.scrollY || window.pageYOffset;
-
-            if (lastScrollY === currentScrollY && cachedRect) {
-                const isVisible = cachedRect.top <= 0;
-                container.classList.toggle('visible', isVisible);
-                return;
-            }
-
-            cachedRect = container.getBoundingClientRect();
-            lastScrollY = currentScrollY;
-
-            const isVisible = cachedRect.top <= 0;
-            container.classList.toggle('visible', isVisible);
-        };
-
-        window.addEventListener('scroll', checkVisibility);
-        checkVisibility();
-
-        if (window.addLinksAdIfNeeded) {
-            window.addLinksAdIfNeeded(container);
-        }
-    } catch (err) {
-        console.error('loadData error', err);
-    }
+    } catch (err) { console.error('loadData error', err); }
   };
 
   if (document.readyState === 'loading') {
-      window.addEventListener('DOMContentLoaded', loadData);
+    window.addEventListener('DOMContentLoaded', loadData);
   } else {
-      loadData();
+    loadData();
   }
-})();
 
-
-// =================================================================
-// 4. Liquid Glass エフェクト
-// =================================================================
-function applyLiquidGlassEffect(container) {
-    const outerCount = 10;
-    const outerStep = 4;
-    const borderThickness = 6;
-
-    let masks = container._glassMasks || [];
-
-    if (masks.length === 0) {
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < outerCount; i++) {
-            const mask = document.createElement('div');
-            Object.assign(mask.style, {
-                position: 'absolute',
-                pointerEvents: 'none',
-                zIndex: `${outerCount - i}`,
-                border: `${borderThickness}px solid transparent`,
-                mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-                maskComposite: 'exclude',
-                webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
-                webkitMaskComposite: 'xor',
-            });
-
-            fragment.appendChild(mask);
-            masks.push(mask);
-        }
-        container.appendChild(fragment);
-        container._glassMasks = masks;
+  // =================================================================
+  // 4. Liquid Glass エフェクト & 5. 外部スクリプト
+  // =================================================================
+  function applyLiquidGlassEffect(container) {
+    const outerCount = 10, outerStep = 4, borderThickness = 6;
+    let masks = [];
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < outerCount; i++) {
+      const mask = document.createElement('div');
+      Object.assign(mask.style, {
+        position: 'absolute', pointerEvents: 'none', zIndex: `${outerCount - i}`,
+        border: `${borderThickness}px solid transparent`,
+        mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+        maskComposite: 'exclude', webkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)',
+        webkitMaskComposite: 'xor',
+      });
+      fragment.appendChild(mask);
+      masks.push(mask);
     }
-
-    let rafId = null;
-
+    container.appendChild(fragment);
     const updateLayout = () => {
-        const style = window.getComputedStyle(container);
-        const width = parseFloat(style.width);
-        const height = parseFloat(style.height);
-        const baseRadius = parseFloat(style.borderRadius) || 0;
-
-        for (let i = 0; i < outerCount; i++) {
-            const mask = masks[i];
-            const inset = i * outerStep;
-
-            if (width - inset * 2 <= 0 || height - inset * 2 <= 0) {
-                mask.style.display = 'none';
-                continue;
-            }
-
-            const normalizedPosition = (outerCount - i) / outerCount;
-            const blur = Math.pow(normalizedPosition, 3.5) * 40;
-            const currentRadius = Math.max(baseRadius - inset, 0);
-
-            mask.style.display = 'block';
-            mask.style.inset = `${inset}px`;
-            mask.style.borderRadius = `${currentRadius}px`;
-            mask.style.backdropFilter = `blur(${blur}px)`;
-            mask.style.webkitBackdropFilter = `blur(${blur}px)`;
-        }
-        rafId = null;
+      const style = window.getComputedStyle(container);
+      const w = parseFloat(style.width), h = parseFloat(style.height), r = parseFloat(style.borderRadius) || 0;
+      masks.forEach((mask, i) => {
+        const inset = i * outerStep;
+        if (w - inset * 2 <= 0 || h - inset * 2 <= 0) { mask.style.display = 'none'; return; }
+        const blurVal = Math.pow((outerCount - i) / outerCount, 3.5) * 40;
+        mask.style.cssText += `display:block; inset:${inset}px; border-radius:${Math.max(r - inset, 0)}px; backdrop-filter:blur(${blurVal}px); -webkit-backdrop-filter:blur(${blurVal}px);`;
+      });
     };
-
-    const resizeObserver = new ResizeObserver(() => {
-        if (!rafId) {
-            rafId = requestAnimationFrame(updateLayout);
-        }
-    });
-
-    resizeObserver.observe(container);
-    container._resizeObserver = resizeObserver;
-
+    new ResizeObserver(updateLayout).observe(container);
     updateLayout();
-}
+  }
 
-// =================================================================
-// 5. 実行ロジック
-// =================================================================
+  document.querySelectorAll('.liquid-glass').forEach(applyLiquidGlassEffect);
 
-document.querySelectorAll('.liquid-glass').forEach(el => {
-    applyLiquidGlassEffect(el);
-});
+  const script = document.createElement('script');
+  script.src = 'https://search3958.github.io/check.js';
+  document.head.appendChild(script);
 
-// =================================================================
-// 6. 最終実行と外部スクリプトのロード (追加された部分)
-// =================================================================
-
-/**
- * コード全体が読み込まれ実行された後に、指定された外部スクリプトをロードし実行します。
- */
-const loadCheckJs = () => {
-    const script = document.createElement('script');
-    script.src = 'https://search3958.github.io/check.js';
-    script.onerror = (err) => {
-        console.error('check.js load failed', err);
-    };
-    document.head.appendChild(script);
-};
-
-loadCheckJs();
+})();

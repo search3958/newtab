@@ -205,7 +205,7 @@
       opacity:0;
       pointer-events:none;
     }
-    .category-title { font-size: 16px; font-weight: 400; margin:0px;margin-bottom: 0px; width:100%; text-align:center;}
+    .category-title { font-size: 16px; font-weight: 400; margin:0px;margin-bottom: 3px; width:100%; text-align:center;}
 
 
 
@@ -475,9 +475,9 @@
     <button onclick="window.location.href='https://search3958.github.io/newtab/beta'">Beta</button>
 
     <h4>重要情報</h4>
-    <button onclick="window.location.href='https://search3958.github.io/policies/trems'">利用規約</button>
-    <button onclick="window.location.href='https://search3958.github.io/policies/privacy'">プライバシーポリシー</button>
+    <button onclick="window.location.href='https://search3958.github.io/policies/'">利用規約とプライバシーポリシー</button>
     <button onclick="window.location.href='https://search3958.github.io/usercheck/entry'">同意を撤回</button>
+    <button onclick="window.location.href='https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/'">Language</button>
 
   </div>
 </div>
@@ -658,7 +658,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // 2. afterload.jsを200ms遅延読込 (重い処理を遅延させる)
     setTimeout(() => {
         const s = document.createElement('script');
-        s.src = 'beta/afterload.js'; // パスは元のコードと同じ
+        s.src = 'v6/afterload.js'; // パスは元のコードと同じ
         document.body.appendChild(s);
     }, 200);
 });
