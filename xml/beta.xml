@@ -1,0 +1,27 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<dictionary>
+    <lang id="ja">
+        <text key="t1">おすすめ</text>
+    </lang>
+
+    <lang id="en">
+        <text key="t1">Home</text>
+    </lang>
+
+    <lang id="zh-CN">
+        <text key="t1">首页</text>
+    </lang>
+
+    <lang id="zh-TW">
+        <text key="t1">首頁</text>
+    </lang>
+
+    <lang id="ko">
+        <text key="t1">홈</text>
+    </lang>
+
+    <lang id="ko-KP">
+        <text key="t1">홈</text>
+    </lang>
+</dictionary>

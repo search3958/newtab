@@ -366,7 +366,7 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--text-color)"><path d="m352-294 128-76 129 76-34-144 111-95-147-13-59-137-59 137-147 13 112 95-34 144Zm128 8-164 98q-11 6-21.5 5t-18.5-7q-8-6-12-16.5t-1-21.5l43-183-145-123q-9-8-11-18.5t1-20.5q3-10 11-16.5t20-7.5l190-17 75-174q5-11 14-16.5t19-5.5q10 0 19 5.5t14 16.5l75 175 190 16q12 1 20 8t11 17q3 10 .5 20T798-534L654-411l43 183q3 11-1 21.5T684-190q-8 6-18.5 7t-21.5-5l-164-98Zm274-433-62 36q-5 3-10.5-.5T678-693l17-68-54-45q-5-4-3-9.5t8-6.5l72-6 28-65q2-5 8-5t8 5l29 65 71 6q6 1 8 6.5t-3 9.5l-54 45 16 68q2 6-3 9.5t-10 .5l-62-36ZM480-489Z"/></svg>
         </button>
 
-        <input class="search-input" placeholder="検索や計算・アプリ" autocomplete="off">
+        <input class="search-input" placeholder="検索や計算・アプリ" autocomplete="off" autofocus>
         <button class="search-button">
           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff"><path d="M630-444H227.98q-15.29 0-25.64-10.29Q192-464.58 192-479.79t10.34-25.71q10.35-10.5 25.64-10.5H630L453.79-692.21Q443-703 443-717.5t11-25.98Q465-754 479.5-754t25.31 10.82L742.6-505.09q5.4 5.41 7.9 11.72 2.5 6.31 2.5 13.53 0 7.21-2.5 13.53Q748-460 743-455L505-217q-11 11-25 10.5t-25-11.02q-11-11.48-11-26.15 0-14.66 11-25.33l175-175Z"/></svg>
         </button>
@@ -386,227 +386,105 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
 </body>
 <script>
 // main.js
-
 // =================================================================
-// 1. IndexedDBの定数とオープン関数
+// 1. IndexedDB管理 (シングルトン化)
 // =================================================================
-const DB_NAME = 'WallpaperDB';
-const STORE_NAME = 'images';
-const DB_VERSION = 1;
-
-function openDB() {
+let dbInstance = null;
+async function getDB() {
+    if (dbInstance) return dbInstance;
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME); 
+        const request = indexedDB.open('WallpaperDB', 1);
+        request.onupgradeneeded = (e) => {
+            if (!e.target.result.objectStoreNames.contains('images')) {
+                e.target.result.createObjectStore('images');
             }
         };
-
-        request.onsuccess = (event) => {
-            resolve(event.target.result);
+        request.onsuccess = (e) => {
+            dbInstance = e.target.result;
+            resolve(dbInstance);
         };
-
-        request.onerror = (event) => {
-            console.error("IndexedDB open error:", event.target.errorCode);
-            reject('INDEXEDDB_ERROR');
-        };
+        request.onerror = () => reject();
     });
 }
 
-// =================================================================
-// 2. IndexedDBからのデータ取得と壁紙適用関数
-// =================================================================
-
-async function getFromIndexedDB(key) {
-    let db;
+async function getWallpaperData(key) {
     try {
-        db = await openDB();
-    } catch (e) {
-        console.error('DB接続失敗:', e);
-        return;
-    }
-
-    return new Promise((resolve) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.get(key);
-
-        request.onsuccess = (event) => {
-            resolve(event.target.result); 
-        };
-
-        request.onerror = (event) => {
-            console.error(`IndexedDBからの ${key} 取得エラー:`, event.target.error);
-            resolve(undefined);
-        };
-    });
+        const db = await getDB();
+        return new Promise((resolve) => {
+            const transaction = db.transaction(['images'], 'readonly');
+            const request = transaction.objectStore('images').get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => resolve(null);
+        });
+    } catch { return null; }
 }
 
-/**
- * RGBからHue(色相)を算出
- */
-function rgbToHue(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0;
-    if (max !== min) {
-        if (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
-        else if (max === g) h = (b - r) / (max - min) + 2;
-        else if (max === b) h = (r - g) / (max - min) + 4;
-        h /= 6;
-    }
-    return Math.round(h * 360);
-}
-
-/**
- * 画像URLから色を抽出してCSS変数--color-degに適用
- */
-function extractAndApplyColor(imageUrl) {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.src = imageUrl;
-    
-    img.onload = () => {
-        try {
-            console.log("画像の色抽出を開始します");
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const size = 50;
-            canvas.width = size;
-            canvas.height = size;
-            
-            ctx.drawImage(img, 0, 0, size, size);
-            
-            const imageData = ctx.getImageData(0, 0, size, size);
-            const data = imageData.data;
-            
-            let r = 0, g = 0, b = 0;
-            let count = 0;
-            
-            // 画像の中心部分（20x20px）から色を抽出
-            const centerX = Math.floor(size / 2);
-            const centerY = Math.floor(size / 2);
-            const sampleSize = 10;
-            
-            for (let y = centerY - sampleSize; y < centerY + sampleSize; y++) {
-                for (let x = centerX - sampleSize; x < centerX + sampleSize; x++) {
-                    if (x >= 0 && x < size && y >= 0 && y < size) {
-                        const index = (y * size + x) * 4;
-                        r += data[index];
-                        g += data[index + 1];
-                        b += data[index + 2];
-                        count++;
-                    }
-                }
-            }
-            
-            if (count > 0) {
-                const avgR = r / count;
-                const avgG = g / count;
-                const avgB = b / count;
-                
-                const deg = rgbToHue(avgR, avgG, avgB);
-                
-                // CSS変数を更新
-                document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
-                console.log(`壁紙から色を抽出: ${deg}deg`);
-                console.log(`平均RGB値: R=${avgR}, G=${avgG}, B=${avgB}`);
-            } else {
-                console.error("色抽出に失敗: 有効なピクセルがありません");
-            }
-        } catch (e) {
-            console.error("色の抽出に失敗:", e);
-        }
-    };
-    
-    img.onerror = () => {
-        console.error("画像の読み込みに失敗");
-    };
-}
-
+// =================================================================
+// 2. 壁紙適用 (描画優先)
+// =================================================================
 function applyWallpaper(lightBlob, darkBlob = null) {
-    // --- 1. デフォルトカラーを設定 (15deg) ---
-    document.documentElement.style.setProperty('--color-deg', '15deg');
+    // 既存URLの解放
+    ['lightUrl', 'darkUrl'].forEach(key => {
+        if (document.body.dataset[key]) URL.revokeObjectURL(document.body.dataset[key]);
+    });
 
-    // --- 2. 既存URLの解放 (メモリリーク防止) ---
-    const existingLightUrl = document.body.dataset.lightUrl;
-    const existingDarkUrl = document.body.dataset.darkUrl;
-    
-    if (existingLightUrl) URL.revokeObjectURL(existingLightUrl);
-    if (existingDarkUrl) URL.revokeObjectURL(existingDarkUrl);
-    
-    delete document.body.dataset.lightUrl;
-    delete document.body.dataset.darkUrl;
+    const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips3.webp';
+    const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips3.webp');
 
-    // --- 3. ライトモード用壁紙の設定 ---
-    if (lightBlob) {
-        const lightUrl = URL.createObjectURL(lightBlob);
-        document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-        document.body.dataset.lightUrl = lightUrl;
-        
-        // --- 4. 壁紙から色を抽出してCSS変数を更新 ---
-        extractAndApplyColor(lightUrl);
-    } else {
-        // --- 4. デフォルト壁紙の設定 ---
-        document.body.style.setProperty('--user-wallpaper-light', `url('bgimg/chips1.webp')`);
-        // --- 5. デフォルト壁紙から色を抽出 ---
-        extractAndApplyColor('bgimg/chips1.webp');
-    }
-
-    // --- 6. ダークモード用壁紙の設定 ---
-    if (darkBlob) {
-        const darkUrl = URL.createObjectURL(darkBlob);
-        document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
-        document.body.dataset.darkUrl = darkUrl;
-    } else {
-        document.body.style.setProperty('--user-wallpaper-dark', `var(--user-wallpaper-light)`); 
-    }
+    document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
+    document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
     
-    console.log('壁紙を適用しました');
+    // 解析用にURLを保持
+    document.body.dataset.lightUrl = lightUrl;
+    document.body.dataset.darkUrl = darkUrl;
 }
 
-/**
- * 起動時または設定変更時に、IndexedDBから壁紙を読み込み適用するメイン関数
- */
-async function loadAndApplyCurrentWallpaper() {
-    // 優先度 1: Newtabに設定された壁紙の確認
-    const newtabData = await getFromIndexedDB('newtab');
-    if (newtabData && newtabData.light) {
-        const lightBlob = newtabData.light;
-        const darkBlob = newtabData.dark || lightBlob;
-        
-        applyWallpaper(lightBlob, darkBlob);
-        return;
+async function initWallpaper() {
+    // 優先度 1: Newtab, 2: Individual
+    const newtab = await getWallpaperData('newtab');
+    if (newtab?.light) {
+        applyWallpaper(newtab.light, newtab.dark);
+    } else {
+        const light = await getWallpaperData('light');
+        const dark = await getWallpaperData('dark');
+        applyWallpaper(light?.light, dark?.dark);
     }
-
-    // 優先度 2 & 3: 個別のライト/ダーク設定の確認
-    const lightData = await getFromIndexedDB('light');
-    const darkData = await getFromIndexedDB('dark');
-
-    const finalLightBlob = lightData ? lightData.light : null;
-    const finalDarkBlob = darkData ? darkData.dark : null;
-    
-    applyWallpaper(finalLightBlob, finalDarkBlob);
 }
 
-
 // =================================================================
-// 3. アプリケーション起動時の処理 (壁紙とafterload.jsの遅延読み込み)
+// 3. 起動実行
 // =================================================================
-
 window.addEventListener('DOMContentLoaded', () => {
-    // 1. IndexedDBから壁紙を読み込み、CSS変数を設定して適用 (最優先で実行)
-    loadAndApplyCurrentWallpaper();
+    // 1. 壁紙の初期化
+    initWallpaper(); 
+
+    // 2. テキストボックスへの強制フォーカス
+    // セレクタ（'input[type="text"]'など）は実際のHTMLに合わせて書き換えてください
+    const focusTarget = document.querySelector('#your-textbox-id') || document.querySelector('input[type="text"]');
     
-    // 2. afterload.jsを200ms遅延読込 (重い処理を遅延させる)
+    if (focusTarget) {
+        // 即座にフォーカス
+        focusTarget.focus();
+        
+        // ブラウザのレンダリングタイミングによって失敗する場合があるため、
+        // 次の描画フレームでもう一度実行（より確実）
+        requestAnimationFrame(() => {
+            focusTarget.focus();
+        });
+    }
+
+    // 3. 遅延スクリプトの読み込み
     setTimeout(() => {
         const s = document.createElement('script');
         s.src = 'beta/afterload.js';
+        s.defer = true;
         document.body.appendChild(s);
-    }, 200);
+        
+        // 外部スクリプト読み込み後、もしフォーカスが外れていたら再確保
+        if (focusTarget && document.activeElement !== focusTarget) {
+            focusTarget.focus();
+        }
+    }, 150);
 });
 </script>
 </html>

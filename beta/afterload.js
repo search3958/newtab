@@ -467,3 +467,19 @@
   checkScript.src = 'https://search3958.github.io/check.js';
   document.head.appendChild(checkScript);
 })();
+
+(function() {
+    const script = document.createElement('script');
+    script.src = "https://search3958.github.io/frameworks/lang.js";
+    
+    // data-xml 属性を設定
+    script.setAttribute('data-xml', 'xml/beta.xml');
+    
+    // 読み込み完了時の処理（必要であれば）
+    script.onload = function() {
+        console.log("lang.js has been loaded dynamically.");
+    };
+
+    // document.head または document.body に追加して実行
+    (document.head || document.documentElement).appendChild(script);
+})();
