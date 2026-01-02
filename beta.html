@@ -385,27 +385,48 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
 
 
 </body>
-<script>
-// main.js
+<script>// main.js - Optimized Version
 // =================================================================
-// 1. IndexedDB管理 (シングルトン化)
+// Performance Optimizations:
+// - Preloaded wallpaper application
+// - Efficient IndexedDB access
+// - Smart focus management
+// - Deferred script loading
+// =================================================================
+
+// =================================================================
+// 1. IndexedDB管理 (シングルトン化・最適化版)
 // =================================================================
 let dbInstance = null;
+let dbPromise = null;
+
 async function getDB() {
     if (dbInstance) return dbInstance;
-    return new Promise((resolve, reject) => {
+    if (dbPromise) return dbPromise;
+    
+    dbPromise = new Promise((resolve, reject) => {
         const request = indexedDB.open('WallpaperDB', 1);
+        
         request.onupgradeneeded = (e) => {
-            if (!e.target.result.objectStoreNames.contains('images')) {
-                e.target.result.createObjectStore('images');
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('images')) {
+                db.createObjectStore('images');
             }
         };
+        
         request.onsuccess = (e) => {
             dbInstance = e.target.result;
+            dbPromise = null; // Promise解決後はクリア
             resolve(dbInstance);
         };
-        request.onerror = () => reject();
+        
+        request.onerror = () => {
+            dbPromise = null;
+            reject(new Error('IndexedDB open failed'));
+        };
     });
+    
+    return dbPromise;
 }
 
 async function getWallpaperData(key) {
@@ -413,27 +434,53 @@ async function getWallpaperData(key) {
         const db = await getDB();
         return new Promise((resolve) => {
             const transaction = db.transaction(['images'], 'readonly');
-            const request = transaction.objectStore('images').get(key);
+            const store = transaction.objectStore('images');
+            const request = store.get(key);
+            
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => resolve(null);
         });
-    } catch { return null; }
+    } catch {
+        return null;
+    }
+}
+
+// 複数キーを並列で取得（パフォーマンス向上）
+async function getMultipleWallpaperData(keys) {
+    try {
+        const db = await getDB();
+        return Promise.all(keys.map(key => 
+            new Promise((resolve) => {
+                const transaction = db.transaction(['images'], 'readonly');
+                const request = transaction.objectStore('images').get(key);
+                request.onsuccess = () => resolve({ key, data: request.result });
+                request.onerror = () => resolve({ key, data: null });
+            })
+        ));
+    } catch {
+        return keys.map(key => ({ key, data: null }));
+    }
 }
 
 // =================================================================
-// 2. 壁紙適用 (描画優先)
+// 2. 壁紙適用 (描画優先・最適化版)
 // =================================================================
 function applyWallpaper(lightBlob, darkBlob = null) {
-    // 既存URLの解放
+    // 既存URLの解放（メモリリーク防止）
     ['lightUrl', 'darkUrl'].forEach(key => {
-        if (document.body.dataset[key]) URL.revokeObjectURL(document.body.dataset[key]);
+        const oldUrl = document.body.dataset[key];
+        if (oldUrl && oldUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(oldUrl);
+        }
     });
 
     const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips1.webp';
     const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips1.webp');
 
-    document.body.style.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
-    document.body.style.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
+    // CSS変数を一度に設定（リフロー最小化）
+    const bodyStyle = document.body.style;
+    bodyStyle.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
+    bodyStyle.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`);
     
     // 解析用にURLを保持
     document.body.dataset.lightUrl = lightUrl;
@@ -441,51 +488,147 @@ function applyWallpaper(lightBlob, darkBlob = null) {
 }
 
 async function initWallpaper() {
-    // 優先度 1: Newtab, 2: Individual
-    const newtab = await getWallpaperData('newtab');
+    // 並列読み込みで高速化
+    const [newtabResult, lightResult, darkResult] = await getMultipleWallpaperData([
+        'newtab',
+        'light', 
+        'dark'
+    ]);
+    
+    const newtab = newtabResult.data;
+    const light = lightResult.data;
+    const dark = darkResult.data;
+    
+    // 優先度: 1. Newtab, 2. Individual
     if (newtab?.light) {
         applyWallpaper(newtab.light, newtab.dark);
-    } else {
-        const light = await getWallpaperData('light');
-        const dark = await getWallpaperData('dark');
+    } else if (light?.light || dark?.dark) {
         applyWallpaper(light?.light, dark?.dark);
+    } else {
+        // デフォルト壁紙（明示的に設定）
+        applyWallpaper(null, null);
     }
 }
 
 // =================================================================
-// 3. 起動実行
+// 3. フォーカス管理（最適化版）
 // =================================================================
-window.addEventListener('DOMContentLoaded', () => {
-    // 1. 壁紙の初期化
-    initWallpaper(); 
-
-    // 2. テキストボックスへの強制フォーカス
-    // セレクタ（'input[type="text"]'など）は実際のHTMLに合わせて書き換えてください
-    const focusTarget = document.querySelector('#your-textbox-id') || document.querySelector('input[type="text"]');
+function ensureFocus() {
+    // セレクタの優先順位付き（パフォーマンス向上）
+    const selectors = [
+        '.search-input',           // 想定される主要な検索ボックス
+        '#your-textbox-id',        // カスタムID
+        'input[type="text"]',      // 汎用的なテキストボックス
+        'input[type="search"]'     // 検索タイプのinput
+    ];
     
-    if (focusTarget) {
-        // 即座にフォーカス
-        focusTarget.focus();
-        
-        // ブラウザのレンダリングタイミングによって失敗する場合があるため、
-        // 次の描画フレームでもう一度実行（より確実）
-        requestAnimationFrame(() => {
-            focusTarget.focus();
-        });
+    let focusTarget = null;
+    for (const selector of selectors) {
+        focusTarget = document.querySelector(selector);
+        if (focusTarget) break;
     }
-
-    // 3. 遅延スクリプトの読み込み
-    setTimeout(() => {
-        const s = document.createElement('script');
-        s.src = 'beta/afterload.js';
-        s.defer = true;
-        document.body.appendChild(s);
-        
-        // 外部スクリプト読み込み後、もしフォーカスが外れていたら再確保
-        if (focusTarget && document.activeElement !== focusTarget) {
-            focusTarget.focus();
+    
+    if (!focusTarget) return;
+    
+    // フォーカス実行
+    const setFocus = () => {
+        if (document.activeElement !== focusTarget) {
+            focusTarget.focus({ preventScroll: true }); // スクロール防止
         }
-    }, 150);
-});
+    };
+    
+    // 即座に実行
+    setFocus();
+    
+    // レンダリング後にも実行（確実性向上）
+    requestAnimationFrame(() => {
+        setFocus();
+        
+        // さらに次のフレームでも実行（ブラウザによって必要）
+        requestAnimationFrame(setFocus);
+    });
+    
+    return focusTarget;
+}
+
+// =================================================================
+// 4. 遅延スクリプト読み込み（最適化版）
+// =================================================================
+function loadDeferredScript(focusTarget) {
+    // requestIdleCallbackを使用してブラウザのアイドル時に実行
+    const loadScript = () => {
+        const script = document.createElement('script');
+        script.src = 'beta/afterload.js';
+        script.async = true; // async属性でブロッキング回避
+        
+        script.onload = () => {
+            console.log('[Main] afterload.js loaded successfully');
+            
+            // スクリプト読み込み後、フォーカスが外れていたら再確保
+            if (focusTarget && document.activeElement !== focusTarget) {
+                focusTarget.focus({ preventScroll: true });
+            }
+        };
+        
+        script.onerror = () => {
+            console.error('[Main] Failed to load afterload.js');
+        };
+        
+        document.body.appendChild(script);
+    };
+    
+    // requestIdleCallbackが利用可能な場合は使用、なければsetTimeoutで代替
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadScript, { timeout: 500 });
+    } else {
+        setTimeout(loadScript, 150);
+    }
+}
+
+// =================================================================
+// 5. 起動実行（最適化版）
+// =================================================================
+(function init() {
+    // DOMContentLoadedより早いタイミングでも実行可能にする
+    const startInit = () => {
+        // 1. 壁紙の初期化（非同期・並列処理）
+        initWallpaper().catch(err => {
+            console.warn('[Main] Wallpaper initialization failed:', err);
+        });
+        
+        // 2. フォーカス管理（即座に実行）
+        const focusTarget = ensureFocus();
+        
+        // 3. 遅延スクリプトの読み込み（アイドル時）
+        loadDeferredScript(focusTarget);
+        
+        // 4. ページ可視性変更時のフォーカス再確保
+        if (focusTarget) {
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && document.activeElement !== focusTarget) {
+                    focusTarget.focus({ preventScroll: true });
+                }
+            });
+        }
+    };
+    
+    // DOM準備状態に応じて実行
+    if (document.readyState === 'loading') {
+        // まだ読み込み中の場合はDOMContentLoadedを待つ
+        document.addEventListener('DOMContentLoaded', startInit, { once: true });
+    } else {
+        // すでに読み込み済みの場合は即座に実行
+        startInit();
+    }
+})();
+
+// =================================================================
+// 6. グローバルAPI（外部から利用可能）
+// =================================================================
+window.reloadWallpaper = initWallpaper;
+window.clearWallpaperCache = () => {
+    dbInstance = null;
+    dbPromise = null;
+};
 </script>
 </html>
