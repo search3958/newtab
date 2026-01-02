@@ -470,10 +470,10 @@
 
 (function() {
     const script = document.createElement('script');
-    script.src = "/xml/lang.js";
+    script.src = "https://search3958.github.io/newtab/xml/lang.js";
     
     // data-xml 属性を設定
-    script.setAttribute('data-xml', '/xml/index.xml');
+    script.setAttribute('data-xml', 'https://search3958.github.io/newtab/xml/index.xml');
     
     // 読み込み完了時の処理（必要であれば）
     script.onload = function() {
