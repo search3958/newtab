@@ -1,4 +1,59 @@
 // beta/afterload.js
+// =================================================================
+// Ads script loader (singleton)
+// =================================================================
+function loadAdsenseScript() {
+  return new Promise((resolve, reject) => {
+    const EXISTING_ID = 'adsbygoogle-js';
+
+    if (document.getElementById(EXISTING_ID)) {
+      console.log('[Ads] adsbygoogle.js already loaded');
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = EXISTING_ID;
+    script.async = true;
+    script.src =
+      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874';
+    script.crossOrigin = 'anonymous';
+
+    script.onload = () => {
+      console.log('[Ads] adsbygoogle.js loaded successfully');
+      resolve();
+    };
+
+    script.onerror = (e) => {
+      console.error('[Ads] failed to load adsbygoogle.js', e);
+      reject(e);
+    };
+
+    (document.head || document.documentElement).appendChild(script);
+    console.log('[Ads] loading adsbygoogle.js...');
+  });
+}
+
+
+// =================================================================
+// Ads DOM builder
+// =================================================================
+function createAdsenseBlock() {
+  const adDiv = document.createElement('div');
+  adDiv.className = 'adsense-container';
+  adDiv.style.cssText = 'width:100%; margin-top:20px;';
+
+  adDiv.innerHTML = `
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-format="autorelaxed"
+         data-ad-client="ca-pub-6151036058675874"
+         data-ad-slot="9559715307"></ins>
+  `;
+
+  console.log('[Ads] adsense DOM created');
+  return adDiv;
+}
 
 (function() {
   // =================================================================
@@ -84,19 +139,34 @@
       return Promise.reject("No wallpaper set");
     }
   };
+// =================================================================
+// 1. ローカル(base64)フォントの注入
+// =================================================================
+(function injectLocalFont() {
+  try {
+    if (document.getElementById('local-google-sans-font')) {
+      console.log('[Font] local font already injected');
+      return;
+    }
 
-  // =================================================================
-  // 1. Google Fonts の動的読み込み
-  // =================================================================
-  function loadGoogleFont() {
-    if (document.getElementById('google-fonts-link')) return;
-    const link = document.createElement('link');
-    link.id = 'google-fonts-link';
-    link.href = 'https://fonts.googleapis.com/css2?family=Google+Sans:wght@400&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
+    const style = document.createElement('style');
+    style.id = 'local-google-sans-font';
+    style.type = 'text/css';
+
+    style.textContent = `
+@font-face { 
+  font-family: "Google_Sans_Xiao2";
+  src: url(data:application/octet-stream;base64,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);
+}
+    `;
+
+    document.head.appendChild(style);
+    console.log('[Font] Google_Sans_Xiao2 injected successfully');
+
+  } catch (e) {
+    console.error('[Font] failed to inject local font', e);
   }
-  loadGoogleFont();
+})();
 
   // =================================================================
   // 2. 検索・履歴・UI制御 & インテリジェンス
@@ -358,7 +428,7 @@
     const infoDiv = document.createElement('div');
     infoDiv.className = 'info';
     infoDiv.innerHTML = `
-      <div class="info-time" style="font-size:5em; margin:0px; font-family:'Google Sans', sans-serif;">--:--</div>
+      <div class="info-time" style="font-size:5em; margin:0px; font-family:'Google_Sans_Xiao2', sans-serif;">--:--</div>
       <div class="info-details">
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
         <span class="info-date">----年--月--日</span>
@@ -444,15 +514,26 @@
       });
       container.appendChild(fragment);
 
-      // Ads
-      const adDiv = document.createElement('div');
-      adDiv.style.cssText = 'width:100%; margin-top:20px;';
-      adDiv.innerHTML = `<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>`;
-      container.appendChild(adDiv);
-      const s = document.createElement('script');
-      s.async = true; s.src = "https://pagead2.googlesyndication.com/pagead2/js/adsbygoogle.js?client=ca-pub-6151036058675874";
-      document.head.appendChild(s);
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      // Ads initialization
+      // =================================================================
+      try {
+        const adContainer = createAdsenseBlock();
+        container.appendChild(adContainer);
+
+        loadAdsenseScript()
+          .then(() => {
+            window.adsbygoogle = window.adsbygoogle || [];
+            window.adsbygoogle.push({});
+            console.log('[Ads] adsbygoogle.push executed');
+          })
+          .catch(() => {
+            console.warn('[Ads] ads initialized failed');
+          });
+
+      } catch (e) {
+        console.error('[Ads] unexpected error while initializing ads', e);
+      }
+
 
     } catch (e) { console.error(e); }
   };
