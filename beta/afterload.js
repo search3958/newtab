@@ -262,10 +262,26 @@ function initAdsDeferred(container) {
     const q = searchInput.value.trim();
     if (!q) return;
     addHistory(q);
-    if (foundApp && searchMode === 'google') {
-      window.location.href = foundApp.url;
-      return;
+
+    if (searchMode === 'google') {
+      // 1. アプリ名のマッチング
+      if (foundApp) {
+        window.location.href = foundApp.url;
+        return;
+      }
+
+      // 2. URLの直接アクセス
+      if (urlPattern.test(q)) {
+        let directUrl = q;
+        if (!/^https?:\/\//i.test(q)) {
+          directUrl = 'https://' + q;
+        }
+        window.location.href = directUrl;
+        return;
+      }
     }
+
+    // 3. 通常の検索（Google / ChatGPT）
     let url = (searchMode === 'google')
       ? 'https://www.google.com/search?q=' + encodeURIComponent(q)
       : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
@@ -350,13 +366,26 @@ function initAdsDeferred(container) {
 
   function triggerIconRotation() {
     if (!intelligenceIcon) return;
+
+    // 1. 一旦クラスを強制削除
     intelligenceIcon.classList.remove('animate-icon');
-    void intelligenceIcon.offsetWidth;
+    
+    // 2. 魔法の一行：リフローを強制（ブラウザに「今クラスが消えた」ことを認識させる）
+    void intelligenceIcon.offsetWidth; 
+    
+    // 3. 再びクラスを付与（これでアニメーションが最初から再生される）
     intelligenceIcon.classList.add('animate-icon');
+
+    // 4. アニメーション完了後(500ms後)にクラスを掃除しておく
+    setTimeout(() => {
+      intelligenceIcon.classList.remove('animate-icon');
+    }, 500);
   }
 
   // デバウンス処理を追加してinputイベントの負荷を軽減
   let updateTimer = null;
+  const urlPattern = /^(https?:\/\/|(([a-z0-9-]+\.)+[a-z]{2,}))/i;
+
   function updateCalculationDisplay() {
     if (!searchInput || !intelligenceIcon || !answerElement) return;
 
@@ -364,14 +393,27 @@ function initAdsDeferred(container) {
     
     updateTimer = setTimeout(() => {
       const inputText = searchInput.value.trim();
-      const result = isMathExpression(inputText) ? calculateResult(inputText) : null;
-      const app = (!result) ? searchApp(inputText) : null;
-      const newValue = result !== null ? String(result) : (app ? app.name : null);
+      
+      const isUrl = urlPattern.test(inputText);
+      const result = !isUrl && isMathExpression(inputText) ? calculateResult(inputText) : null;
+      const app = (!isUrl && !result) ? searchApp(inputText) : null;
+
+      let newValue = null;
+      if (isUrl) {
+        newValue = "URLを開く";
+      } else if (result !== null) {
+        newValue = String(result);
+      } else if (app) {
+        newValue = app.name;
+      }
 
       if (searchMode === 'google' && newValue !== null) {
         if (newValue !== currentResult) {
-          answerElement.classList.add('hide');
+          // 1. 回答が変わった瞬間にアイコンを回転
           triggerIconRotation();
+
+          // 2. テキストのフェード切り替え
+          answerElement.classList.add('hide');
           setTimeout(() => {
             answerElement.textContent = newValue;
             currentResult = newValue;
@@ -385,7 +427,7 @@ function initAdsDeferred(container) {
         currentResult = null;
         foundApp = null;
       }
-    }, 100); // 100msのデバウンス
+    }, 100);
   }
 
   if (searchInput) searchInput.addEventListener('input', updateCalculationDisplay);
