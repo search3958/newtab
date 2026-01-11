@@ -531,41 +531,76 @@ function initAdsDeferred(container) {
   // 3. リアルタイム情報更新 (時計・日付・バッテリー)
   // =================================================================
   function setupInfoSection(container) {
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'info';
-    infoDiv.innerHTML = `
-      <div class="info-time" style="font-size:5em; margin:0px; font-family:'Google_Sans_Xiao2', sans-serif;">--:--</div>
-      <div class="info-details">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
-        <span class="info-date">----年--月--日</span>
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h540q50 0 85 35t35 85v240q0 50-35 85t-85 35H160Zm0-80h540q17 0 28.5-11.5T740-360v-240q0-17-11.5-28.5T700-640H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320Zm700-60v-200h20q17 0 28.5-11.5T920-540v120q0 17-11.5 28.5T880-380h-20Zm-700 20v-240h540v240H160Z"/></svg>
-        <span class="info-battery">バッテリー --%</span>
-      </div>
-    `;
-    container.prepend(infoDiv);
+  const infoDiv = document.createElement('div');
+  infoDiv.className = 'info';
+  // 初期状態では中身を空にするか、プレースホルダーを入れる
+  infoDiv.innerHTML = `
+    <div class="info-time" style="font-size:5em; margin:0px; font-family:'Google_Sans_Xiao2', sans-serif;">--:--</div>
+    <div class="info-details" style="display: flex; gap: 8px;">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
+      <span class="info-date">----年--月--日</span>
+      <span class="battery-icon-wrapper"></span>
+      <span class="info-battery">バッテリー --%</span>
+    </div>
+  `;
+  container.prepend(infoDiv);
 
-    const timeEl = infoDiv.querySelector('.info-time');
-    const dateEl = infoDiv.querySelector('.info-date');
-    const battEl = infoDiv.querySelector('.info-battery');
+  const timeEl = infoDiv.querySelector('.info-time');
+  const dateEl = infoDiv.querySelector('.info-date');
+  const battEl = infoDiv.querySelector('.info-battery');
+  const battIconWrapper = infoDiv.querySelector('.battery-icon-wrapper');
 
-    function update() {
-      const now = new Date();
-      if (timeEl) timeEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      if (dateEl) dateEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-    }
-
-    async function initBattery() {
-      if (!navigator.getBattery) return;
-      const b = await navigator.getBattery();
-      const ref = () => { if (battEl) battEl.textContent = `バッテリー ${Math.round(b.level * 100)}%`; };
-      ref();
-      b.addEventListener('levelchange', ref);
-    }
-
-    update();
-    setInterval(update, 1000);
-    initBattery();
+  function update() {
+    const now = new Date();
+    if (timeEl) timeEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (dateEl) dateEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
   }
+
+  // バッテリーアイコンを生成する関数
+  function getBatterySVG(level, isCharging) {
+    const color = "var(--text-color)";
+    
+    // 充電中のSVG
+    if (isCharging) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${color}"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h562l-64 80H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320h473l-15 80H160Zm547-40 28-160H600l192-240h21l-28 160h135L728-280h-21Zm-547-80v-240h466L434-360H160Z"/></svg>`;
+    }
+
+    // 10%以下の警告SVG
+    if (level <= 10) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${color}"><path d="M840-300q-17 0-28.5-11.5T800-340q0-17 11.5-28.5T840-380q17 0 28.5 11.5T880-340q0 17-11.5 28.5T840-300Zm-40-140v-240h80v240h-80Zm-49 200H160q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h560v80H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320h560q0 23 8.5 43.5T751-240Zm-631-80v-320 320Z"/></svg>`;
+    }
+
+    // 10%超〜100%：内部の幅を動的に計算 (最大540)
+    // 規則性: 100%で540, 70%で400, 50%で320, 30%で160... 
+    // ※提示された数値に基づき、160 + (level - 30) * ( (540-160)/(100-30) ) 形式で計算
+    const width = Math.max(0, Math.min(540, 160 + (level - 30) * 5.43)); 
+    
+    return `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${color}"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h540q50 0 85 35t35 85v240q0 50-35 85t-85 35H160Zm0-80h540q17 0 28.5-11.5T740-360v-240q0-17-11.5-28.5T700-640H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320Zm700-60v-200h20q17 0 28.5 11.5T920-540v120q0 17-11.5 28.5T880-380h-20Zm-700 20v-240h${Math.round(width)}v240H160Z"/></svg>`;
+  }
+
+  async function initBattery() {
+    if (!navigator.getBattery) {
+        // 非対応ブラウザ用
+        if (battEl) battEl.textContent = ""; 
+        return;
+    }
+    const b = await navigator.getBattery();
+    
+    const refresh = () => {
+      const level = Math.round(b.level * 100);
+      if (battEl) battEl.textContent = `バッテリー ${level}%`;
+      if (battIconWrapper) battIconWrapper.innerHTML = getBatterySVG(level, b.charging);
+    };
+
+    refresh();
+    b.addEventListener('levelchange', refresh);
+    b.addEventListener('chargingchange', refresh);
+  }
+
+  update();
+  setInterval(update, 1000);
+  initBattery();
+}
 
   // =================================================================
   // 4. アプリ一覧構築 & 初期化（最適化版）
@@ -607,7 +642,7 @@ function initAdsDeferred(container) {
 
       // DocumentFragmentを使用してリフロー最小化
       const fragment = document.createDocumentFragment();
-      (data.categories || []).forEach((category) => {
+      (data.categories || []).forEach((category, idx) => {
         const catDiv = document.createElement('div');
         catDiv.className = 'category';
         catDiv.innerHTML = `<h2 class="category-title">${category.title || '無題'}</h2>`;
@@ -623,6 +658,24 @@ function initAdsDeferred(container) {
           `;
           catDiv.appendChild(a);
         });
+        // 2カテゴリごとにカテゴリ内末尾に広告を挿入
+        if ((idx + 1) % 2 === 0) {
+          const adDiv = document.createElement('div');
+          adDiv.className = 'shortcut-adsense';
+          adDiv.innerHTML = `
+            <!-- ShortCut -->
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:205px;height:50px"
+                 data-ad-client="ca-pub-6151036058675874"
+                 data-ad-slot="2788469305"></ins>
+          `;
+          catDiv.appendChild(adDiv);
+          setTimeout(() => {
+            try {
+              (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {}
+          }, 0);
+        }
         fragment.appendChild(catDiv);
       });
       container.appendChild(fragment);
