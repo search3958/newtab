@@ -665,7 +665,7 @@ function initAdsDeferred(container) {
           adDiv.innerHTML = `
             <!-- ShortCut -->
             <ins class="adsbygoogle"
-                 style="display:inline-block;width:205px;height:50px"
+                 style="display:inline-block;width:500px;height:60px"
                  data-ad-client="ca-pub-6151036058675874"
                  data-ad-slot="2788469305"></ins>
           `;
