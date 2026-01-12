@@ -1,10 +1,10 @@
 const CACHE_NAME = 'newtab-v6-cache-v2'; // バージョンを更新
 const ASSETS = [
-  './',
-  './index.html',
-  './v6.1/afterload.js',
-  './lsr/icons-6.zip',
-  './links-v6.json',
+  '/',
+  '/index.html',
+  '/v6.1/afterload.js',
+  '/lsr/icons-6.zip',
+  '/links-v6.json',
   'https://search3958.github.io/project/logos/3958logo_main.svg',
   'https://search3958.github.io/check.js',
   'https://search3958.github.io/newtab/xml/lang.js',
