@@ -659,7 +659,7 @@ function initAdsDeferred(container) {
           catDiv.appendChild(a);
         });
         // 2カテゴリごとにカテゴリ内末尾に広告を挿入
-        if ((idx + 1) % 2 === 0) {
+        if ((idx + 1) % 3 === 0) {
           const adDiv = document.createElement('div');
           adDiv.className = 'shortcut-adsense';
           adDiv.innerHTML = `
