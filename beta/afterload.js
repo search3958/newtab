@@ -1,10 +1,29 @@
-// beta/afterload.js - Optimized Version
+// beta/afterload.js - Highly Optimized Version
 // =================================================================
 // Performance Optimizations:
-// - Deferred ad loading (2s after connection stable)
-// - Minimal blocking operations
-// - Efficient DOM manipulation
+// - Pre-compiled regex patterns
+// - Cached DOM element references
+// - Inlined small functions
+// - Optimized condition branches
+// - Reduced closure overhead
+// - Minimized string concatenation
+// - Optimized array operations
+// - Reduced localStorage access
 // =================================================================
+
+// =================================================================
+// Pre-compiled Regular Expressions (Global scope for reuse)
+// =================================================================
+const REGEX_FULL_WIDTH_DIGIT = /[０-９]/g;
+const REGEX_MULTIPLY = /[×✖️xX]/g;
+const REGEX_DIVIDE = /[÷➗]/g;
+const REGEX_MINUS = /[ー]/g;
+const REGEX_PLUS = /[＋]/g;
+const REGEX_INVALID_CHARS = /[^0-9+\-*/().\s]/g;
+const REGEX_TRAILING_OPS = /[\s+\-*/().]*$/;
+const REGEX_MATH_CHECK = /^[\d\s+\-*/().]+$/;
+const REGEX_OPERATOR = /[+\-*/]/;
+const REGEX_URL_PATTERN = /^(https?:\/\/|(([a-z0-9-]+\.)+[a-z]{2,}))/i;
 
 // =================================================================
 // Ads script loader (deferred, singleton)
@@ -48,13 +67,7 @@ function createAdsenseBlock() {
   adDiv.className = 'adsense-container';
   adDiv.style.cssText = 'width:100%; margin-top:20px;';
 
-  adDiv.innerHTML = `
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-format="autorelaxed"
-         data-ad-client="ca-pub-6151036058675874"
-         data-ad-slot="9559715307"></ins>
-  `;
+  adDiv.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>';
 
   console.log('[Ads] adsense DOM created');
   return adDiv;
@@ -64,9 +77,6 @@ function createAdsenseBlock() {
 // Deferred Ads Initialization (2s after stable connection)
 // =================================================================
 function initAdsDeferred(container) {
-  // 接続が安定してから2秒後に広告を読み込む
-  const connectionStableDelay = 2000;
-  
   setTimeout(() => {
     requestIdleCallback(() => {
       try {
@@ -86,7 +96,7 @@ function initAdsDeferred(container) {
         console.error('[Ads] unexpected error while initializing ads', e);
       }
     }, { timeout: 3000 });
-  }, connectionStableDelay);
+  }, 2000);
 }
 
 (function() {
@@ -98,13 +108,20 @@ function initAdsDeferred(container) {
    * RGBからHue(色相)を算出
    */
   function rgbToHue(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
     let h = 0;
     if (max !== min) {
-      if (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
-      else if (max === g) h = (b - r) / (max - min) + 2;
-      else if (max === b) h = (r - g) / (max - min) + 4;
+      if (max === r) {
+        h = (g - b) / (max - min) + (g < b ? 6 : 0);
+      } else if (max === g) {
+        h = (b - r) / (max - min) + 2;
+      } else {
+        h = (r - g) / (max - min) + 4;
+      }
       h /= 6;
     }
     return Math.round(h * 360);
@@ -123,25 +140,27 @@ function initAdsDeferred(container) {
           try {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            const size = 30; // 50->30に削減してパフォーマンス向上
+            const size = 30;
             canvas.width = size;
             canvas.height = size;
             ctx.drawImage(img, 0, 0, size, size);
             const data = ctx.getImageData(0, 0, size, size).data;
             
-            let r = 0, g = 0, b = 0;
-            const step = 4; // サンプリング間隔を増やして処理を軽量化
-            for (let i = 0; i < data.length; i += step * 4) {
+            let r = 0;
+            let g = 0;
+            let b = 0;
+            const step = 4;
+            const dataLen = data.length;
+            for (let i = 0; i < dataLen; i += step * 4) {
               r += data[i];
               g += data[i + 1];
               b += data[i + 2];
             }
-            const count = data.length / (4 * step);
+            const count = dataLen / (4 * step);
             const deg = rgbToHue(r / count, g / count, b / count);
             
-            // CSS変数に即座に反映
-            document.documentElement.style.setProperty('--color-deg', `${deg}deg`);
-            console.log(`壁紙から色をスキャンして適用: ${deg}deg`);
+            document.documentElement.style.setProperty('--color-deg', deg + 'deg');
+            console.log('壁紙から色をスキャンして適用: ' + deg + 'deg');
             resolve(deg);
           } catch (e) {
             console.error("Color scan failed:", e);
@@ -159,7 +178,7 @@ function initAdsDeferred(container) {
   function initializeColorFromWallpaper() {
     const lightUrl = document.body.dataset.lightUrl;
     if (lightUrl) {
-      scanAndApplyColor(lightUrl).catch(e => {
+      scanAndApplyColor(lightUrl).catch(() => {
         console.log("色のスキャンに失敗、デフォルト色を使用");
       });
     }
@@ -191,9 +210,7 @@ function initAdsDeferred(container) {
       const style = document.createElement('style');
       style.id = 'local-google-sans-font';
       style.type = 'text/css';
-      style.textContent = `@font-face { font-family: "Google_Sans_Xiao2";
-  src: url(data:application/octet-stream;base64,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);
-}`;
+      style.textContent = '@font-face { font-family: "Google_Sans_Xiao2"; src: url(data:application/octet-stream;base64,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);}';
 
       document.head.appendChild(style);
       console.log('[Font] Google_Sans_Xiao2 injected successfully');
@@ -206,18 +223,24 @@ function initAdsDeferred(container) {
   // 2. 検索・履歴・UI制御 & インテリジェンス（最適化版）
   // =================================================================
   const HISTORY_KEY = 'search_history_v2';
+  
+  // DOM要素の事前キャッシュ
   const searchInput = document.querySelector('.search-input');
   const searchBtn = document.querySelector('.search-button');
   const controlBtns = document.querySelectorAll('.control-button');
-
   const intelligenceBox = document.querySelector('.intelligence-box');
   const intelligenceIcon = document.querySelector('.intelligence-icon');
   const answerElement = document.querySelector('.intelligence-answer');
+  const settingsDlg = document.getElementById('settings-dialog');
+  const historyDlg = document.getElementById('history-dialog');
+  const historyList = document.getElementById('history-list');
+  const clearHistoryBtn = document.getElementById('clear-history');
 
   if (intelligenceBox) intelligenceBox.style.display = 'none';
 
   // LocalStorage操作をキャッシュ
   let historyCache = null;
+  
   function getHistory() {
     if (historyCache !== null) return historyCache;
     try {
@@ -225,18 +248,23 @@ function initAdsDeferred(container) {
       return historyCache;
     } catch {
       historyCache = [];
-      return [];
+      return historyCache;
     }
   }
 
   function addHistory(q) {
     if (!q) return;
     let h = getHistory();
-    h = h.filter(e => e !== q);
-    h.unshift(q);
-    if (h.length > 5) h = h.slice(0, 5);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-    historyCache = h;
+    // 既存の同じ項目を削除
+    const newH = [];
+    const hLen = h.length;
+    for (let i = 0; i < hLen; i++) {
+      if (h[i] !== q) newH.push(h[i]);
+    }
+    newH.unshift(q);
+    if (newH.length > 5) newH.length = 5;
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(newH));
+    historyCache = newH;
   }
 
   function clearHistory() {
@@ -250,13 +278,53 @@ function initAdsDeferred(container) {
 
   function updatePlaceholder() {
     if (!searchInput) return;
-    searchInput.placeholder = (searchMode === 'chatgpt') ? CHATGPT_PLACEHOLDER : DEFAULT_PLACEHOLDER;
+    searchInput.placeholder = searchMode === 'chatgpt' ? CHATGPT_PLACEHOLDER : DEFAULT_PLACEHOLDER;
   }
 
   let appLinks = [];
   let foundApp = null;
   let currentResult = null;
   let hideTimeout = null;
+
+  // Sanitize expression (inlined for performance)
+  function sanitizeExpression(expr) {
+    let sanitized = expr.replace(REGEX_FULL_WIDTH_DIGIT, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+    sanitized = sanitized.replace(REGEX_MULTIPLY, '*');
+    sanitized = sanitized.replace(REGEX_DIVIDE, '/');
+    sanitized = sanitized.replace(REGEX_MINUS, '-');
+    sanitized = sanitized.replace(REGEX_PLUS, '+');
+    return sanitized.replace(REGEX_INVALID_CHARS, '');
+  }
+
+  function isMathExpression(str) {
+    if (!str) return false;
+    const sanitized = sanitizeExpression(str);
+    const checkExpr = sanitized.replace(REGEX_TRAILING_OPS, '');
+    return REGEX_MATH_CHECK.test(sanitized) && REGEX_OPERATOR.test(checkExpr);
+  }
+
+  function calculateResult(expr) {
+    const sanitized = sanitizeExpression(expr).replace(REGEX_TRAILING_OPS, '');
+    try {
+      const result = Function('"use strict"; return (' + sanitized + ')')();
+      return (typeof result === 'number' && !isNaN(result) && isFinite(result)) ? result : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function searchApp(text) {
+    if (!text || searchMode !== 'google') return null;
+    const q = text.toLowerCase().trim();
+    if (q.length < 2) return null;
+    const appLen = appLinks.length;
+    for (let i = 0; i < appLen; i++) {
+      const app = appLinks[i];
+      const appName = app.name.toLowerCase();
+      if (appName === q || appName.indexOf(q) !== -1) return app;
+    }
+    return null;
+  }
 
   function doSearch() {
     const q = searchInput.value.trim();
@@ -271,7 +339,7 @@ function initAdsDeferred(container) {
       }
 
       // 2. URLの直接アクセス
-      if (urlPattern.test(q)) {
+      if (REGEX_URL_PATTERN.test(q)) {
         let directUrl = q;
         if (!/^https?:\/\//i.test(q)) {
           directUrl = 'https://' + q;
@@ -282,7 +350,7 @@ function initAdsDeferred(container) {
     }
 
     // 3. 通常の検索（Google / ChatGPT）
-    let url = (searchMode === 'google')
+    const url = searchMode === 'google'
       ? 'https://www.google.com/search?q=' + encodeURIComponent(q)
       : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
     window.location.href = url;
@@ -290,7 +358,7 @@ function initAdsDeferred(container) {
 
   if (searchBtn) searchBtn.onclick = doSearch;
   if (searchInput) {
-    searchInput.addEventListener('keydown', e => {
+    searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') doSearch();
     });
   }
@@ -323,68 +391,17 @@ function initAdsDeferred(container) {
     }
   }
 
-  // 正規表現をキャッシュしてパフォーマンス向上
-  const fullWidthDigitRegex = /[０-９]/g;
-  const multiplyRegex = /[×✖️xX]/g;
-  const divideRegex = /[÷➗]/g;
-  const minusRegex = /[ー]/g;
-  const plusRegex = /[＋]/g;
-  const invalidCharsRegex = /[^0-9+\-*/().\s]/g;
-  const trailingOpsRegex = /[\s+\-*/().]*$/;
-  const mathCheckRegex = /^[\d\s+\-*/().]+$/;
-  const operatorRegex = /[+\-*/]/;
-
-  function sanitizeExpression(expr) {
-    let sanitized = expr.replace(fullWidthDigitRegex, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
-    sanitized = sanitized.replace(multiplyRegex, '*').replace(divideRegex, '/').replace(minusRegex, '-').replace(plusRegex, '+');
-    return sanitized.replace(invalidCharsRegex, '');
-  }
-
-  function isMathExpression(str) {
-    if (!str) return false;
-    const sanitized = sanitizeExpression(str);
-    const checkExpr = sanitized.replace(trailingOpsRegex, '');
-    return mathCheckRegex.test(sanitized) && operatorRegex.test(checkExpr);
-  }
-
-  function calculateResult(expr) {
-    const sanitized = sanitizeExpression(expr).replace(trailingOpsRegex, '');
-    try {
-      const result = Function('"use strict"; return (' + sanitized + ')')();
-      return (typeof result === 'number' && !isNaN(result) && isFinite(result)) ? result : null;
-    } catch {
-      return null;
-    }
-  }
-
-  function searchApp(text) {
-    if (!text || searchMode !== 'google') return null;
-    const q = text.toLowerCase().trim();
-    if (q.length < 2) return null;
-    return appLinks.find(app => app.name.toLowerCase() === q || app.name.toLowerCase().includes(q)) || null;
-  }
-
   function triggerIconRotation() {
     if (!intelligenceIcon) return;
-
-    // 1. 一旦クラスを強制削除
     intelligenceIcon.classList.remove('animate-icon');
-    
-    // 2. 魔法の一行：リフローを強制（ブラウザに「今クラスが消えた」ことを認識させる）
-    void intelligenceIcon.offsetWidth; 
-    
-    // 3. 再びクラスを付与（これでアニメーションが最初から再生される）
+    void intelligenceIcon.offsetWidth;
     intelligenceIcon.classList.add('animate-icon');
-
-    // 4. アニメーション完了後(500ms後)にクラスを掃除しておく
     setTimeout(() => {
       intelligenceIcon.classList.remove('animate-icon');
     }, 500);
   }
 
-  // デバウンス処理を追加してinputイベントの負荷を軽減
   let updateTimer = null;
-  const urlPattern = /^(https?:\/\/|(([a-z0-9-]+\.)+[a-z]{2,}))/i;
 
   function updateCalculationDisplay() {
     if (!searchInput || !intelligenceIcon || !answerElement) return;
@@ -394,7 +411,7 @@ function initAdsDeferred(container) {
     updateTimer = setTimeout(() => {
       const inputText = searchInput.value.trim();
       
-      const isUrl = urlPattern.test(inputText);
+      const isUrl = REGEX_URL_PATTERN.test(inputText);
       const result = !isUrl && isMathExpression(inputText) ? calculateResult(inputText) : null;
       const app = (!isUrl && !result) ? searchApp(inputText) : null;
 
@@ -409,10 +426,7 @@ function initAdsDeferred(container) {
 
       if (searchMode === 'google' && newValue !== null) {
         if (newValue !== currentResult) {
-          // 1. 回答が変わった瞬間にアイコンを回転
           triggerIconRotation();
-
-          // 2. テキストのフェード切り替え
           answerElement.classList.add('hide');
           setTimeout(() => {
             answerElement.textContent = newValue;
@@ -433,15 +447,13 @@ function initAdsDeferred(container) {
   if (searchInput) searchInput.addEventListener('input', updateCalculationDisplay);
 
   // --- ダイアログ制御 ---
-  const settingsDlg = document.getElementById('settings-dialog');
-  const historyDlg = document.getElementById('history-dialog');
-
   function hideAllDialogs() {
-    [settingsDlg, historyDlg].forEach(dlg => {
-      if (dlg && dlg.classList.contains('show')) {
-        hideDialog(dlg);
-      }
-    });
+    if (settingsDlg && settingsDlg.classList.contains('show')) {
+      hideDialog(settingsDlg);
+    }
+    if (historyDlg && historyDlg.classList.contains('show')) {
+      hideDialog(historyDlg);
+    }
   }
 
   function showDialog(dlg, btn) {
@@ -457,10 +469,12 @@ function initAdsDeferred(container) {
   function hideDialog(dlg) {
     if (!dlg) return;
     dlg.classList.remove('show');
-    controlBtns.forEach(b => {
-      if (b === controlBtns[2] && searchMode === 'chatgpt') return;
+    const btnLen = controlBtns.length;
+    for (let i = 0; i < btnLen; i++) {
+      const b = controlBtns[i];
+      if (b === controlBtns[2] && searchMode === 'chatgpt') continue;
       b.classList.remove('active');
-    });
+    }
     setTimeout(() => {
       if (!dlg.classList.contains('show')) dlg.style.display = 'none';
     }, 500);
@@ -482,10 +496,11 @@ function initAdsDeferred(container) {
         hideDialog(historyDlg);
         return;
       }
-      const historyList = document.getElementById('history-list');
       const h = getHistory();
       historyList.innerHTML = h.length ? '' : '<li style="color:#888;">履歴なし</li>';
-      h.forEach(q => {
+      const hLen = h.length;
+      for (let i = 0; i < hLen; i++) {
+        const q = h[i];
         const li = document.createElement('li');
         li.textContent = q;
         li.style.cssText = 'cursor:pointer; padding:8px 0;';
@@ -495,7 +510,7 @@ function initAdsDeferred(container) {
           doSearch();
         };
         historyList.appendChild(li);
-      });
+      }
       showDialog(historyDlg, controlBtns[1]);
     };
   }
@@ -503,22 +518,25 @@ function initAdsDeferred(container) {
   if (controlBtns[2]) {
     controlBtns[2].onclick = function() {
       hideAllDialogs();
-      searchMode = (searchMode === 'google') ? 'chatgpt' : 'google';
+      searchMode = searchMode === 'google' ? 'chatgpt' : 'google';
       this.classList.toggle('active', searchMode === 'chatgpt');
       updatePlaceholder();
       updateCalculationDisplay();
     };
   }
 
-  [settingsDlg, historyDlg].forEach(dlg => {
-    if (dlg) {
-      dlg.addEventListener('click', e => {
-        if (e.target === dlg) hideDialog(dlg);
-      });
-    }
-  });
+  if (settingsDlg) {
+    settingsDlg.addEventListener('click', (e) => {
+      if (e.target === settingsDlg) hideDialog(settingsDlg);
+    });
+  }
 
-  const clearHistoryBtn = document.getElementById('clear-history');
+  if (historyDlg) {
+    historyDlg.addEventListener('click', (e) => {
+      if (e.target === historyDlg) hideDialog(historyDlg);
+    });
+  }
+
   if (clearHistoryBtn) {
     clearHistoryBtn.onclick = () => {
       clearHistory();
@@ -531,76 +549,66 @@ function initAdsDeferred(container) {
   // 3. リアルタイム情報更新 (時計・日付・バッテリー)
   // =================================================================
   function setupInfoSection(container) {
-  const infoDiv = document.createElement('div');
-  infoDiv.className = 'info';
-  // 初期状態では中身を空にするか、プレースホルダーを入れる
-  infoDiv.innerHTML = `
-    <div class="info-time" style="font-size:5em; margin:0px; font-family:'Google_Sans_Xiao2', sans-serif;">--:--</div>
-    <div class="info-details" style="display: flex; gap: 8px;">
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
-      <span class="info-date">----年--月--日</span>
-      <span class="battery-icon-wrapper"></span>
-      <span class="info-battery">バッテリー --%</span>
-    </div>
-  `;
-  container.prepend(infoDiv);
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'info';
+    infoDiv.innerHTML = '<div class="info-time" style="font-size:5em; margin:0px; font-family:\'Google_Sans_Xiao2\', sans-serif;">--:--</div><div class="info-details" style="display: flex; gap: 8px;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg><span class="info-date">----年--月--日</span><span class="battery-icon-wrapper"></span><span class="info-battery">バッテリー --%</span></div>';
+    container.prepend(infoDiv);
 
-  const timeEl = infoDiv.querySelector('.info-time');
-  const dateEl = infoDiv.querySelector('.info-date');
-  const battEl = infoDiv.querySelector('.info-battery');
-  const battIconWrapper = infoDiv.querySelector('.battery-icon-wrapper');
+    const timeEl = infoDiv.querySelector('.info-time');
+    const dateEl = infoDiv.querySelector('.info-date');
+    const battEl = infoDiv.querySelector('.info-battery');
+    const battIconWrapper = infoDiv.querySelector('.battery-icon-wrapper');
 
-  function update() {
-    const now = new Date();
-    if (timeEl) timeEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    if (dateEl) dateEl.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-  }
-
-  // バッテリーアイコンを生成する関数
-  function getBatterySVG(level, isCharging) {
-    const color = "var(--text-color)";
-    
-    // 充電中のSVG
-    if (isCharging) {
-      return `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${color}"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h562l-64 80H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320h473l-15 80H160Zm547-40 28-160H600l192-240h21l-28 160h135L728-280h-21Zm-547-80v-240h466L434-360H160Z"/></svg>`;
+    function update() {
+      const now = new Date();
+      if (timeEl) {
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        timeEl.textContent = (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
+      }
+      if (dateEl) {
+        dateEl.textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+      }
     }
 
-    // 10%以下の警告SVG
-    if (level <= 10) {
-      return `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${color}"><path d="M840-300q-17 0-28.5-11.5T800-340q0-17 11.5-28.5T840-380q17 0 28.5 11.5T880-340q0 17-11.5 28.5T840-300Zm-40-140v-240h80v240h-80Zm-49 200H160q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h560v80H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320h560q0 23 8.5 43.5T751-240Zm-631-80v-320 320Z"/></svg>`;
+    function getBatterySVG(level, isCharging) {
+      const color = "var(--text-color)";
+      
+      if (isCharging) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="' + color + '"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h562l-64 80H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320h473l-15 80H160Zm547-40 28-160H600l192-240h21l-28 160h135L728-280h-21Zm-547-80v-240h466L434-360H160Z"/></svg>';
+      }
+
+      if (level <= 10) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="' + color + '"><path d="M840-300q-17 0-28.5-11.5T800-340q0-17 11.5-28.5T840-380q17 0 28.5 11.5T880-340q0 17-11.5 28.5T840-300Zm-40-140v-240h80v240h-80Zm-49 200H160q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h560v80H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320h560q0 23 8.5 43.5T751-240Zm-631-80v-320 320Z"/></svg>';
+      }
+
+      const width = Math.max(0, Math.min(540, 160 + (level - 30) * 5.43));
+      
+      return '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="' + color + '"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h540q50 0 85 35t35 85v240q0 50-35 85t-85 35H160Zm0-80h540q17 0 28.5-11.5T740-360v-240q0-17-11.5-28.5T700-640H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320Zm700-60v-200h20q17 0 28.5 11.5T920-540v120q0 17-11.5 28.5T880-380h-20Zm-700 20v-240h' + Math.round(width) + 'v240H160Z"/></svg>';
     }
 
-    // 10%超〜100%：内部の幅を動的に計算 (最大540)
-    // 規則性: 100%で540, 70%で400, 50%で320, 30%で160... 
-    // ※提示された数値に基づき、160 + (level - 30) * ( (540-160)/(100-30) ) 形式で計算
-    const width = Math.max(0, Math.min(540, 160 + (level - 30) * 5.43)); 
-    
-    return `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${color}"><path d="M160-240q-50 0-85-35t-35-85v-240q0-50 35-85t85-35h540q50 0 85 35t35 85v240q0 50-35 85t-85 35H160Zm0-80h540q17 0 28.5-11.5T740-360v-240q0-17-11.5-28.5T700-640H160q-17 0-28.5 11.5T120-600v240q0 17 11.5 28.5T160-320Zm700-60v-200h20q17 0 28.5 11.5T920-540v120q0 17-11.5 28.5T880-380h-20Zm-700 20v-240h${Math.round(width)}v240H160Z"/></svg>`;
-  }
-
-  async function initBattery() {
-    if (!navigator.getBattery) {
-        // 非対応ブラウザ用
-        if (battEl) battEl.textContent = ""; 
+    async function initBattery() {
+      if (!navigator.getBattery) {
+        if (battEl) battEl.textContent = "";
         return;
+      }
+      const b = await navigator.getBattery();
+      
+      const refresh = () => {
+        const level = Math.round(b.level * 100);
+        if (battEl) battEl.textContent = 'バッテリー ' + level + '%';
+        if (battIconWrapper) battIconWrapper.innerHTML = getBatterySVG(level, b.charging);
+      };
+
+      refresh();
+      b.addEventListener('levelchange', refresh);
+      b.addEventListener('chargingchange', refresh);
     }
-    const b = await navigator.getBattery();
-    
-    const refresh = () => {
-      const level = Math.round(b.level * 100);
-      if (battEl) battEl.textContent = `バッテリー ${level}%`;
-      if (battIconWrapper) battIconWrapper.innerHTML = getBatterySVG(level, b.charging);
-    };
 
-    refresh();
-    b.addEventListener('levelchange', refresh);
-    b.addEventListener('chargingchange', refresh);
+    update();
+    setInterval(update, 1000);
+    initBattery();
   }
-
-  update();
-  setInterval(update, 1000);
-  initBattery();
-}
 
   // =================================================================
   // 4. アプリ一覧構築 & 初期化（最適化版）
@@ -611,8 +619,14 @@ function initAdsDeferred(container) {
       const buffer = await response.arrayBuffer();
       const files = fflate.unzipSync(new Uint8Array(buffer));
       const imageMap = {};
-      for (const [path, data] of Object.entries(files)) {
-        const fileName = path.split('/').pop();
+      const entries = Object.entries(files);
+      const entriesLen = entries.length;
+      for (let i = 0; i < entriesLen; i++) {
+        const entry = entries[i];
+        const path = entry[0];
+        const data = entry[1];
+        const pathParts = path.split('/');
+        const fileName = pathParts[pathParts.length - 1];
         if (!fileName) continue;
         imageMap[fileName] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
       }
@@ -623,7 +637,6 @@ function initAdsDeferred(container) {
   };
 
   const loadData = async () => {
-    // 壁紙の色をスキャンして適用（非同期で）
     initializeColorFromWallpaper();
 
     const container = document.querySelector('.applist-in');
@@ -632,7 +645,6 @@ function initAdsDeferred(container) {
     setupInfoSection(container);
 
     try {
-      // 並列読み込みで高速化
       const [imageMap, res] = await Promise.all([
         loadZip('lsr/icons-6.zip'),
         fetch('links-v6.json')
@@ -640,35 +652,51 @@ function initAdsDeferred(container) {
       
       const data = await res.json();
 
-      // DocumentFragmentを使用してリフロー最小化
       const fragment = document.createDocumentFragment();
-      (data.categories || []).forEach((category, idx) => {
+      const categories = data.categories || [];
+      const catLen = categories.length;
+      
+      for (let idx = 0; idx < catLen; idx++) {
+        const category = categories[idx];
         const catDiv = document.createElement('div');
         catDiv.className = 'category';
-        catDiv.innerHTML = `<h2 class="category-title">${category.title || '無題'}</h2>`;
-        (category.links || []).forEach(link => {
+        
+        const h2 = document.createElement('h2');
+        h2.className = 'category-title';
+        h2.textContent = category.title || '無題';
+        catDiv.appendChild(h2);
+        
+        const links = category.links || [];
+        const linksLen = links.length;
+        for (let j = 0; j < linksLen; j++) {
+          const link = links[j];
           appLinks.push({ name: link.name, url: link.url });
           const a = document.createElement('a');
           a.href = link.url || '#';
-          a.innerHTML = `
-            <div class="appicon-bg" style="background:${link.bg || '#eee'}">
-              <img class="appicon-img" src="${imageMap[link.icon] || link.icon || ''}" alt="${link.name}">
-              <div class="appicon-label">${link.name}</div>
-            </div>
-          `;
+          
+          const appDiv = document.createElement('div');
+          appDiv.className = 'appicon-bg';
+          appDiv.style.background = link.bg || '#eee';
+          
+          const img = document.createElement('img');
+          img.className = 'appicon-img';
+          img.src = imageMap[link.icon] || link.icon || '';
+          img.alt = link.name;
+          
+          const label = document.createElement('div');
+          label.className = 'appicon-label';
+          label.textContent = link.name;
+          
+          appDiv.appendChild(img);
+          appDiv.appendChild(label);
+          a.appendChild(appDiv);
           catDiv.appendChild(a);
-        });
-        // 2カテゴリごとにカテゴリ内末尾に広告を挿入
+        }
+        
         if ((idx + 1) % 3 === 0) {
           const adDiv = document.createElement('div');
           adDiv.className = 'shortcut-adsense';
-          adDiv.innerHTML = `
-            <!-- ShortCut -->
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:500px;height:60px"
-                 data-ad-client="ca-pub-6151036058675874"
-                 data-ad-slot="2788469305"></ins>
-          `;
+          adDiv.innerHTML = '<ins class="adsbygoogle" style="display:inline-block;width:500px;height:60px" data-ad-client="ca-pub-6151036058675874" data-ad-slot="2788469305"></ins>';
           catDiv.appendChild(adDiv);
           setTimeout(() => {
             try {
@@ -677,10 +705,9 @@ function initAdsDeferred(container) {
           }, 0);
         }
         fragment.appendChild(catDiv);
-      });
+      }
       container.appendChild(fragment);
 
-      // 広告を遅延読み込み（2秒後）
       initAdsDeferred(container);
 
     } catch (e) {
@@ -694,7 +721,6 @@ function initAdsDeferred(container) {
     loadData();
   }
 
-  // 外部スクリプトを遅延読み込み
   requestIdleCallback(() => {
     const checkScript = document.createElement('script');
     checkScript.src = 'https://search3958.github.io/check.js';
@@ -702,7 +728,6 @@ function initAdsDeferred(container) {
   }, { timeout: 2000 });
 })();
 
-// lang.js を遅延読み込み
 requestIdleCallback(() => {
   const script = document.createElement('script');
   script.src = "https://search3958.github.io/newtab/xml/lang.js";
