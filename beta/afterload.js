@@ -67,7 +67,7 @@ function createAdsenseBlock() {
   adDiv.className = 'adsense-container';
   adDiv.style.cssText = 'width:100%; margin-top:20px;';
 
-  adDiv.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>';
+  adDiv.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>';
 
   console.log('[Ads] adsense DOM created');
   return adDiv;

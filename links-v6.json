@@ -374,6 +374,102 @@
           "icon": "qitta.webp"
         }
       ]
+    },
+
+    {
+  "title": "まだアイコンが用意できていない",
+  "links": [
+    {
+      "name": "Perplexity",
+      "bg": "var(--iconbg)",
+      "url": "https://www.perplexity.ai/",
+      "icon": "-.png"
+    },
+    {
+      "name": "Gemini",
+      "bg": "var(--iconbg)",
+      "url": "https://gemini.google.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "X",
+      "bg": "var(--iconbg)",
+      "url": "https://x.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "AdMob",
+      "bg": "var(--iconbg)",
+      "url": "https://admob.google.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "闲鱼",
+      "bg": "var(--iconbg)",
+      "url": "https://2.taobao.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "WeChat",
+      "bg": "var(--iconbg)",
+      "url": "https://www.wechat.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "Weixin",
+      "bg": "var(--iconbg)",
+      "url": "https://weixin.qq.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "Search Console",
+      "bg": "var(--iconbg)",
+      "url": "https://search.google.com/search-console",
+      "icon": "-.png"
+    },
+    {
+      "name": "マイナポータル",
+      "bg": "var(--iconbg)",
+      "url": "https://myna.go.jp/",
+      "icon": "-.png"
+    },
+    {
+      "name": "NAVER",
+      "bg": "var(--iconbg)",
+      "url": "https://www.naver.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "Papago",
+      "bg": "var(--iconbg)",
+      "url": "https://papago.naver.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "豆包",
+      "bg": "var(--iconbg)",
+      "url": "https://www.doubao.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "DeepSeek",
+      "bg": "var(--iconbg)",
+      "url": "https://www.deepseek.com/",
+      "icon": "-.png"
+    },
+    {
+      "name": "Kimi",
+      "bg": "var(--iconbg)",
+      "url": "https://kimi.moonshot.cn/",
+      "icon": "-.png"
+    },
+    {
+      "name": "Baram Code",
+      "bg": "var(--iconbg)",
+      "url": "https://search3958.github.io/baram/welcome.html",
+      "icon": "-.png"
     }
+  ]
+}
   ]
 }
