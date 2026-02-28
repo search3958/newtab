@@ -21,7 +21,7 @@
   --text-color: #000;
   --bound: linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
   --ease: cubic-bezier(.34, .24, .18, 1);
-  --color-deg:15deg;
+  --color-deg:270deg;
 }
 
 /* Base Styles */
@@ -82,7 +82,7 @@ body {
 }
 
 .search-button {
-  background: hsl(var(--color-deg) 40% 40%);
+  background: hsl(var(--color-deg) 80% 50%);
   outline: none;
   border: none;
   color: #fff;
@@ -91,7 +91,9 @@ body {
   border-radius: 110px / 100px;
   box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
 }
-
+.search-button svg {
+    fill: hsl(var(--color-deg) 100% 90%);
+}
 .control-button {
   border: none;
   background: #0000;
@@ -113,38 +115,51 @@ body {
   fill: hsl(var(--color-deg) 60% 25%);
 }
 @keyframes fadeIn {
-      from { opacity: 0; border-radius:80px 80px 0px 0px; pointer-events:none;}
-      to { opacity: 1; border-radius:0px; pointer-events:unset;}
+      from { --opacity: 0; --border-radius:80px 80px 0px 0px; --pointer-events:none; --overflow: hidden;--gap:32px;--transform: translateY(20vh); --filter:blur(16px);}
+      to { --opacity: 1; --border-radius:0px; --pointer-events:unset; --overflow: scroll;--gap:0px;--transform: translateY(0px);--filter:blur(0px);}
+    }
+
+    .applist{
+    animation: fadeIn ease forwards;
+      animation-timeline: scroll();
+      animation-range: 0px 0.5px;
+
     }
 /* App List Area */
 .applist-in {
   width: calc(100vw - 48px);
   padding: 24px;
   padding-top:64px;
-  overflow: scroll;
+  filter:var(--filter);
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius:40px 40px 0px 0px;
-    margin-top:200px;
-    background:hsl(var(--color-deg) 54.4% 96% / 90%);
+  border-radius:var(--border-radius);
+  opacity: var(--opacity);
+    margin-top:0.5px;
+    pointer-events:var(--pointer-events);
+    background:hsl(var(--color-deg) 54.4% 96% / 80%);
     corner-shape: superellipse(1.6);
-
-    animation: fadeIn ease forwards;
-      animation-timeline: scroll();
-      animation-range: 0px 240px;
-      will-change:opacity;
+  overflow:var(--overflow);
       position: sticky; /* ここに注目! */
   top: 0;
+  gap:var(--gap);
+      height: calc(100vh - 88px);
+  transform:var(--transform);
+      transition:all 0.6s ease;
 }
 
 .category {
-  width: 100%;
-  margin-bottom: 32px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));grid-template-rows: 24px;
-  grid-auto-rows: 90px;
-  gap: 10px;
+    width: calc(100% - 32px);
+    /* margin-bottom: 32px; */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-template-rows: 0px;
+    grid-auto-rows: 90px;
+    gap: 10px;
+    background: hsl(var(--color-deg) 54.4% 96% / 90%);
+    padding: 24px 16px;
+    margin:3px;
 }
 
 .category-title {
@@ -153,7 +168,7 @@ body {
   margin: 0 0 3px 0;
   text-align:center;
   grid-column: 1 / -1;
-  opacity:0.3;
+  opacity:0;
   align-items: flex-end;
 }
 
@@ -173,8 +188,6 @@ a {width: 100%;
     width: 50px;
     height: 50px;
     border-radius: 100px;
-    corner-shape: superellipse(1.1);
-    /*backdrop-filter: blur(10px);*/
     flex-direction: column;
     align-items: center;
 }
@@ -197,7 +210,6 @@ a {width: 100%;
   padding: 16px;
   border-radius: 24px;
   corner-shape: superellipse(1.6);
-  backdrop-filter: blur(8px) brightness(1.15);
   box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
   display: flex;
   align-items: center;
@@ -283,7 +295,7 @@ a {width: 100%;
 }
 
 .dialog-box button {
-    background: hsl(var(--color-deg) 80% 40% / 15%);
+    background: hsl(var(--color-deg) 80% 40% / 5%);
     color: hsl(var(--color-deg) 60% 20%);
     border: none;
     padding: 13px 17px;
@@ -307,11 +319,6 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
   :root { --iconbg: #0009; }
   body { background-color: #000; background-image: var(--user-wallpaper-dark); }
   .search-button, svg, .search-input, .dialog-box, .intelligence-answer ,.category-title ,.appicon-label ,.info{ color: #fff; fill: #fff; }
-  .dialog-box { background: #0c0c0cd0; backdrop-filter: blur(8px) brightness(0.85);}
-  .dialog-box button{ background: #000; color: #fff; }
-  .search-in,.intelligence-box {background: #000a; backdrop-filter: blur(8px) brightness(0.85);}
-  .search-input{background: #00000082;}
-    .active svg{fill: hsl(var(--color-deg) 100% 80%);}
 }
 
 /* Animations */
@@ -391,9 +398,10 @@ svg { margin-bottom: -5px; transition: fill 0.3s var(--ease);}
         </button>
     </div>
 
-
+<div class="applist">
     <div class="applist-in">
       <md-ripple class="search-rp"></md-ripple>
+    </div>
     </div>
       <div class="intelligence-box">
         <div class="intelligence-icon">
@@ -498,8 +506,8 @@ function applyWallpaper(lightBlob, darkBlob = null) {
         }
     });
 
-    const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips1.webp';
-    const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips1.webp');
+    const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/chips2.webp';
+    const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/chips2.webp');
 
     // CSS変数を一度に設定（リフロー最小化）
     const bodyStyle = document.body.style;
