@@ -594,7 +594,7 @@ function loadDeferredScript(focusTarget) {
         script.async = true; // async属性でブロッキング回避
         
         script.onload = () => {
-            console.log('[Main] afterload.js loaded successfully');
+            console.log('[Main] check v2 loaded successfully');
             
             // スクリプト読み込み後、フォーカスが外れていたら再確保
             if (focusTarget && document.activeElement !== focusTarget) {
@@ -603,7 +603,7 @@ function loadDeferredScript(focusTarget) {
         };
         
         script.onerror = () => {
-            console.error('[Main] Failed to load afterload.js');
+            console.error('[Main] Failed to load check v2');
         };
         
         document.body.appendChild(script);
