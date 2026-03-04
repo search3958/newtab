@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>AES-GCM 暗号化ツール (パスワード表示版)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; line-height: 1.6; background-color: #f9f9f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 100px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; padding: 10px; box-sizing: border-box; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .pw-controls { margin-bottom: 15px; font-size: 0.9em; display: flex; align-items: center; }
+        .pw-controls input { width: auto; margin-right: 5px; }
+        .buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { flex: 1; padding: 12px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #218838; }
+        .output { background: #eee; padding: 15px; border-radius: 4px; word-break: break-all; white-space: pre-wrap; min-height: 50px; border-left: 5px solid #007bff; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>AES-GCM 暗号化/復号</h2>
+
+    <label>パスワード (共通鍵):</label>
+    <input type="text" id="password" placeholder="パスワードを入力">
+    <div class="pw-controls">
+        <input type="checkbox" id="toggleVisible" checked onchange="togglePassword()"> 
+        <label for="toggleVisible" style="display:inline; font-weight:normal;">パスワードを表示する</label>
+    </div>
+
+    <label>入力テキスト:</label>
+    <textarea id="inputText" placeholder="平文、または暗号化されたBase64文字列を入力"></textarea>
+
+    <div class="buttons">
+        <button onclick="process('encrypt')">暗号化実行</button>
+        <button onclick="process('decrypt')" style="background:#007bff;">復号実行</button>
+    </div>
+
+    <label>結果:</label>
+    <div id="result" class="output">ここに結果が表示されます</div>
+</div>
+
+<script>
+    const encode = (str) => new TextEncoder().encode(str);
+    const decode = (buf) => new TextDecoder().decode(buf);
+
+    async function process(mode) {
+        const password = document.getElementById('password').value;
+        const text = document.getElementById('inputText').value;
+        const resultDiv = document.getElementById('result');
+
+        if (!password || !text) {
+            alert("パスワードとテキストを入力してください");
+            return;
+        }
+
+        try {
+            // パスワードをSHA-256でハッシュ化して32バイトの鍵にする (CheckJS互換)
+            const pwHash = await crypto.subtle.digest('SHA-256', encode(password));
+            const key = await crypto.subtle.importKey('raw', pwHash, 'AES-GCM', false, ['encrypt', 'decrypt']);
+
+            if (mode === 'encrypt') {
+                // IV (12バイト) を生成
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                
+                const encrypted = await window.crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv },
+                    key,
+                    encode(text)
+                );
+
+                // CheckJSが待っている形式: [IV(12バイト)] + [暗号データ]
+                const combined = new Uint8Array(iv.length + encrypted.byteLength);
+                combined.set(iv);
+                combined.set(new Uint8Array(encrypted), iv.length);
+                
+                resultDiv.innerText = btoa(String.fromCharCode(...combined));
+            } else {
+                // 復号処理
+                const data = Uint8Array.from(atob(text.trim()), c => c.charCodeAt(0));
+                const iv = data.slice(0, 12); // 先頭12バイトがIV
+                const ciphertext = data.slice(12);
+                
+                const decrypted = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv },
+                    key,
+                    ciphertext
+                );
+
+                resultDiv.innerText = decode(decrypted);
+            }
+        } catch (e) {
+            console.error(e);
+            resultDiv.innerText = "エラー: 復号に失敗しました。";
+        }
+    }
+</script>
+</body>
+</html>

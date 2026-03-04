@@ -590,7 +590,7 @@ function loadDeferredScript(focusTarget) {
     // requestIdleCallbackを使用してブラウザのアイドル時に実行
     const loadScript = () => {
         const script = document.createElement('script');
-        script.src = 'beta/afterload.js';
+        script.src = 'check2.js';
         script.async = true; // async属性でブロッキング回避
         
         script.onload = () => {
