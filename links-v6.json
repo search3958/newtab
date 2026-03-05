@@ -132,7 +132,13 @@
           "bg": "var(--iconbg)",
           "url": "https://remotedesktop.google.com/",
           "icon": "remotedesktop.webp"
-        }
+        },
+    {
+      "name": "Gemini",
+      "bg": "var(--iconbg)",
+      "url": "https://gemini.google.com/",
+      "icon": "gemini.webp"
+    }
       ]
     },
     {
@@ -220,7 +226,13 @@
           "bg": "#27ffbfbb",
           "url": "https://weverse.io/",
           "icon": "weverse.webp"
-        }
+        },
+    {
+      "name": "WeChat",
+      "bg": "var(--iconbg)",
+      "url": "https://www.wechat.com/",
+      "icon": "wechat.webp"
+    }
       ]
     },
     {
@@ -267,7 +279,13 @@
           "bg": "var(--iconbg)",
           "url": "https://www.xiaohongshu.com/explore",
           "icon": "xiaohongshu.webp"
-        }
+        },
+    {
+      "name": "X",
+      "bg": "#fff",
+      "url": "https://x.com/",
+      "icon": "x.webp"
+    }
       ]
     },
     {
@@ -314,7 +332,32 @@
           "bg": "var(--iconbg)",
           "url": "https://fonts.google.com/",
           "icon": "fonts.webp"
-        }
+        },
+
+    {
+      "name": "Baram Code",
+      "bg": "var(--iconbg)",
+      "url": "https://search3958.github.io/baram/",
+      "icon": "garam.png"
+    },
+    {
+      "name": "Analytics",
+      "bg": "var(--iconbg)",
+      "url": "https://weixin.qq.com/",
+      "icon": "analytics.webp"
+    },
+    {
+      "name": "Search Console",
+      "bg": "var(--iconbg)",
+      "url": "https://search.google.com/search-console",
+      "icon": "searchconsole.webp"
+    },
+    {
+      "name": "AdMob",
+      "bg": "var(--iconbg)",
+      "url": "https://admob.google.com/",
+      "icon": "admob.webp"
+    }
       ]
     },
     {
@@ -343,7 +386,13 @@
           "bg": "var(--iconbg)",
           "url": "https://paypayfleamarket.yahoo.co.jp/",
           "icon": "pfm.webp"
-        }
+        },
+    {
+      "name": "闲鱼",
+      "bg": "#FBE74F",
+      "url": "https://2.taobao.com/",
+      "icon": "xianyu.webp"
+    }
       ]
     },
     {
@@ -372,104 +421,38 @@
           "bg": "var(--iconbg)",
           "url": "https://qiita.com/",
           "icon": "qitta.webp"
-        }
-      ]
-    },
-
-    {
-  "title": "まだアイコンが用意できていない",
-  "links": [
-    {
-      "name": "Perplexity",
-      "bg": "var(--iconbg)",
-      "url": "https://www.perplexity.ai/",
-      "icon": "-.png"
-    },
-    {
-      "name": "Gemini",
-      "bg": "var(--iconbg)",
-      "url": "https://gemini.google.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "X",
-      "bg": "var(--iconbg)",
-      "url": "https://x.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "AdMob",
-      "bg": "var(--iconbg)",
-      "url": "https://admob.google.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "闲鱼",
-      "bg": "var(--iconbg)",
-      "url": "https://2.taobao.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "WeChat",
-      "bg": "var(--iconbg)",
-      "url": "https://www.wechat.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "Weixin",
-      "bg": "var(--iconbg)",
-      "url": "https://weixin.qq.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "Search Console",
-      "bg": "var(--iconbg)",
-      "url": "https://search.google.com/search-console",
-      "icon": "-.png"
-    },
-    {
-      "name": "マイナポータル",
-      "bg": "var(--iconbg)",
-      "url": "https://myna.go.jp/",
-      "icon": "-.png"
-    },
+        },
     {
       "name": "NAVER",
-      "bg": "var(--iconbg)",
+      "bg": "#07cd85",
       "url": "https://www.naver.com/",
-      "icon": "-.png"
+      "icon": "naver.webp"
     },
     {
       "name": "Papago",
       "bg": "var(--iconbg)",
       "url": "https://papago.naver.com/",
-      "icon": "-.png"
+      "icon": "papago.webp"
     },
     {
       "name": "豆包",
       "bg": "var(--iconbg)",
       "url": "https://www.doubao.com/",
-      "icon": "-.png"
-    },
-    {
-      "name": "DeepSeek",
-      "bg": "var(--iconbg)",
-      "url": "https://www.deepseek.com/",
-      "icon": "-.png"
+      "icon": "doubao.webp"
     },
     {
       "name": "Kimi",
-      "bg": "var(--iconbg)",
+      "bg": "#000b",
       "url": "https://kimi.moonshot.cn/",
-      "icon": "-.png"
+      "icon": "kimi.webp"
     },
     {
-      "name": "Baram Code",
+      "name": "Perplexity",
       "bg": "var(--iconbg)",
-      "url": "https://search3958.github.io/baram/",
-      "icon": "-.png"
+      "url": "https://www.perplexity.ai/",
+      "icon": "perproxity.webp"
     }
-  ]
-}
+      ]
+    }
   ]
 }
