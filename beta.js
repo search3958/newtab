@@ -647,7 +647,7 @@ function showDialog(dlg, btn) {
     function setupInfoSection(container) {
         const infoDiv = document.createElement('div');
         infoDiv.className = 'info';
-        infoDiv.innerHTML = '<div class="info-time" style="font-size:5em;margin:0px;font-family:\'Google_Sans_Xiao2\',sans-serif;">--:--</div><div class="info-details" style="display:flex;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg><span class="info-date">----年--月--日</span><span class="battery-icon-wrapper"></span><span class="info-battery">バッテリー --%</span></div>';
+        infoDiv.innerHTML = '<div class="info-time" style="font-size:5em;margin:0px;font-family:\'Google_Sans_Xiao2\',sans-serif;">--:--</div><div class="info-details" style="display:flex;gap:8px;"><div class="info-datebg"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg><span class="info-date">----.--.--</span></div><div class="info-battery"><span class="battery-icon-wrapper"></span><span class="info-battery">--%</span></div></div>';
         container.prepend(infoDiv);
         const timeEl = infoDiv.querySelector('.info-time');
         const dateEl = infoDiv.querySelector('.info-date');
@@ -662,7 +662,7 @@ function showDialog(dlg, btn) {
                 timeEl.textContent = (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
             }
             if (dateEl) {
-                dateEl.textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+                dateEl.textContent = now.getFullYear() + '.' + (now.getMonth() + 1) + '.' + now.getDate();
             }
         }
 
@@ -685,7 +685,7 @@ function showDialog(dlg, btn) {
             const b = await navigator.getBattery();
             const refresh = () => {
                 const level = Math.round(b.level * 100);
-                if (battEl) battEl.textContent = 'バッテリー ' + level + '%';
+                if (battEl) battEl.textContent = '' + level + '%';
                 if (battIconWrapper) battIconWrapper.innerHTML = getBatterySVG(level, b.charging);
             };
             refresh();
