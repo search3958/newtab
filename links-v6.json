@@ -343,7 +343,7 @@
     {
       "name": "Analytics",
       "bg": "var(--iconbg)",
-      "url": "https://weixin.qq.com/",
+      "url": "https://analytics.google.com/analytics/web/",
       "icon": "analytics.webp"
     },
     {

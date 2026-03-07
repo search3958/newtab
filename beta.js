@@ -287,70 +287,7 @@ function initAdsDeferred(container) {
         if (document.getElementById('intelligence-multi-style')) return;
         const style = document.createElement('style');
         style.id = 'intelligence-multi-style';
-        style.textContent = `
-            .intelligence-box {
-                flex-direction: column !important;
-                gap: 2px !important;
-                padding: 6px 4px !important;
-                min-width: 220px;
-            }
-            .intelligence-box-header {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                padding: 2px 8px 4px;
-                opacity: .6;
-                font-size: 11px;
-            }
-            .intelligence-answer {
-                display: flex !important;
-                align-items: center;
-                gap: 8px;
-                padding: 6px 10px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 13px;
-                transition: background .12s;
-                text-decoration: none;
-                color: inherit;
-                white-space: nowrap;
-                overflow: hidden;
-            }
-            .intelligence-answer:hover,
-            .intelligence-answer.il-active {
-                background: rgba(128,128,128,.15);
-            }
-            .il-icon {
-                flex-shrink: 0;
-                font-size: 15px;
-                width: 22px;
-                text-align: center;
-            }
-            .il-app-icon {
-                width: 22px;
-                height: 22px;
-                border-radius: 5px;
-                object-fit: cover;
-                flex-shrink: 0;
-            }
-            .il-label {
-                flex: 1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .il-sub {
-                font-size: 11px;
-                opacity: .5;
-                flex-shrink: 0;
-                margin-left: 4px;
-            }
-            .il-divider {
-                height: 1px;
-                background: currentColor;
-                opacity: .1;
-                margin: 3px 8px;
-            }
-        `;
+        style.textContent = ``;
         document.head.appendChild(style);
     })();
 
@@ -595,6 +532,35 @@ function initAdsDeferred(container) {
         intelligenceIcon.classList.add('animate-icon');
         setTimeout(() => intelligenceIcon.classList.remove('animate-icon'), 500);
     }
+    /* --- 修正箇所: hideAllDialogs の定義を追加 --- */
+function hideAllDialogs() {
+    // 全てのダイアログ（設定、履歴など）を非表示にする
+    [settingsDlg, historyDlg].forEach(dlg => {
+        if (dlg) {
+            dlg.classList.remove('show');
+            setTimeout(() => {
+                if (!dlg.classList.contains('show')) dlg.style.display = 'none';
+            }, 500);
+        }
+    });
+    // 全てのボタンのアクティブ状態を解除（ChatGPTモードのボタン以外）
+    controlBtns.forEach((btn, idx) => {
+        // インデックス2がChatGPT切り替えボタンの場合、モードに応じて維持
+        if (idx === 2 && searchMode === 'chatgpt') return;
+        btn.classList.remove('active');
+    });
+}
+
+/* --- 既存の showDialog --- */
+function showDialog(dlg, btn) {
+    if (!dlg) return;
+    hideAllDialogs(); // これでエラーが消えます
+    dlg.style.display = 'flex';
+    requestAnimationFrame(() => {
+        dlg.classList.add('show');
+        if (btn) btn.classList.add('active');
+    });
+}
     function showDialog(dlg, btn) {
         if (!dlg) return;
         hideAllDialogs();

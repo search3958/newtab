@@ -280,7 +280,7 @@ a {
     color: #000;
     border: none;
     padding: 16px 24px;
-    border-radius: 16px;
+    border-radius: 24px;
     corner-shape: superellipse(1.8);
     margin-bottom: 8px;
     box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
@@ -311,6 +311,70 @@ svg {
   border-radius:40%;
 }
 
+
+            .intelligence-box {
+                gap: 2px !important;
+                padding: 8px !important;
+                min-width: 90vw;
+                    overflow: scroll;
+            }
+            .intelligence-box-header {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 2px 8px 4px;
+                opacity: .6;
+                font-size: 11px;
+            }
+            .intelligence-answer {
+                display: flex !important;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 10px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 13px;
+                transition: background .12s;
+                text-decoration: none;
+                color: inherit;
+                white-space: nowrap;
+            }
+            .intelligence-answer:hover,
+            .intelligence-answer.il-active {
+                background: rgba(128,128,128,.15);
+            }
+            .il-icon {
+                flex-shrink: 0;
+                font-size: 15px;
+                width: 22px;
+                text-align: center;
+            }
+            .il-app-icon {
+                width: 22px;
+                height: 22px;
+                border-radius: 5px;
+                object-fit: cover;
+                flex-shrink: 0;
+            }
+            .il-label {
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 17px;
+            }
+            .il-sub {
+                display:none;
+            }
+            .il-divider {
+                height: 1px;
+                background: currentColor;
+                opacity: .1;
+                margin: 3px 8px;
+            }
+
+            .appicon-label {
+    font-size: 15px;
+}
 @media (prefers-color-scheme:dark) {
     :root {
         --iconbg: #0009;
@@ -440,7 +504,7 @@ svg {
       <h4>検索履歴</h4>
       <button id="clear-history">検索履歴を削除</button>
 
-      <h4>Newtab v6.1</h4>
+      <h4>Newtab v6.2 Beta</h4>
       <p>ご利用いただく場合，利用規約と<br>プライバシーポリシーの方針に同意するものとみなします。</p>
       <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
