@@ -323,13 +323,13 @@ function initAdsDeferred(container) {
     function buildIconEl(item) {
         if (item.type === 'app' && appIconMap[item.appName]) {
             const img = document.createElement('img');
-            img.className = 'il-app-icon';
+            img.className = 'il-app-icon active';
             img.src = appIconMap[item.appName];
             img.alt = item.appName;
             return img;
         }
         const span = document.createElement('span');
-        span.className = 'il-icon';
+        span.className = 'il-icon active';
         const icons = { calc: '＝', url: '🔗', suggest: '🔍', app: '🚀' };
         span.textContent = icons[item.type] || '🔍';
         return span;
@@ -446,7 +446,7 @@ function initAdsDeferred(container) {
 
         updateTimer = setTimeout(async () => {
             const inputText = searchInput.value.trim();
-            if (!inputText) { renderIntelligenceItems([]); return; }
+            if (inputText.length < 2) { renderIntelligenceItems([]); return; }
 
             const isUrl = REGEX_URL_PATTERN.test(inputText);
             const mathResult = !isUrl && isMathExpression(inputText) ? calculateResult(inputText) : null;
@@ -465,12 +465,12 @@ function initAdsDeferred(container) {
             });
             if (!isUrl && mathResult === null && searchMode === 'google') {
                 const suggestions = await fetchGoogleSuggestions(inputText);
-                suggestions.slice(0, 8).forEach(s => {
+                suggestions.forEach(s => {
                     items.push({ type: 'suggest', label: s });
                 });
             }
 
-            renderIntelligenceItems(items);
+            renderIntelligenceItems(items.slice(0, 5));
             foundApp = matchedApps[0] || null;
             currentResult = items[0]?.label || null;
         }, 120);
@@ -480,7 +480,7 @@ function initAdsDeferred(container) {
 
     function doSearch() {
         const q = searchInput ? searchInput.value.trim() : '';
-        if (!q) return;
+        if (q.length < 2) return;
         addHistory(q);
         renderIntelligenceItems([]);
 
@@ -733,13 +733,14 @@ function showDialog(dlg, btn) {
             const catLen = categories.length;
             for (let idx = 0; idx < catLen; idx++) {
                 const category = categories[idx];
+                const links = category.links || [];
+                registerAppIcons(imageMap, links);
                 const catDiv = document.createElement('div');
                 catDiv.className = 'category';
                 const h2 = document.createElement('h2');
                 h2.className = 'category-title';
                 h2.textContent = category.title || '無題';
                 catDiv.appendChild(h2);
-                const links = category.links || [];
                 const linksLen = links.length;
                 for (let j = 0; j < linksLen; j++) {
                     const link = links[j];

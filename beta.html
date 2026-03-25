@@ -218,7 +218,10 @@ a {
     border-radius: 100px;
 }
 
-.intelligence-icon.animate-icon {
+.intelligence-icon.animate-icon,
+.intelligence-icon.active,
+.il-icon.active,
+.il-app-icon.active {
     animation: rotate-icon 0.5s var(--ease);
 }
 
@@ -323,7 +326,7 @@ svg {
             .intelligence-box {
                 gap: 2px !important;
                 padding: 8px !important;
-                min-width: 90vw;
+                    width: fit-content;
                     overflow: scroll;
             }
             .intelligence-box-header {
