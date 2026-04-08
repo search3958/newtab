@@ -217,7 +217,6 @@ function initAdsDeferred(container) {
     let foundApp = null;
     let currentResult = null;
     let hideTimeout = null;
-/* ── サニタイズ / 数式判定 / 計算 ── */
 
     function sanitizeExpression(expr) {
         let sanitized = expr.replace(REGEX_FULL_WIDTH_DIGIT, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
@@ -245,281 +244,69 @@ function initAdsDeferred(container) {
         }
     }
 
-    /* ── アプリ検索（全候補） ── */
-
-    function searchApps(text) {
-        if (!text || searchMode !== 'google') return [];
+    function searchApp(text) {
+        if (!text || searchMode !== 'google') return null;
         const q = text.toLowerCase().trim();
-        if (q.length < 1) return [];
-        return appLinks.filter(app => app.name.toLowerCase().includes(q));
-    }
-
-    /* ── Google Suggest（XML） ── */
-
-    let suggestController = null;
-    let suggestCache = {};
-
-    async function fetchGoogleSuggestions(query) {
-        if (!query || query.length < 1) return [];
-        if (suggestCache[query]) return suggestCache[query];
-        if (suggestController) suggestController.abort();
-        suggestController = new AbortController();
-        try {
-            const url = `https://suggestqueries.google.com/complete/search?output=toolbar&hl=ja&q=${encodeURIComponent(query)}`;
-            const res = await fetch(url, { signal: suggestController.signal });
-            if (!res.ok) return [];
-            const text = await res.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'application/xml');
-            const suggestions = Array.from(doc.querySelectorAll('suggestion'))
-                .map(n => n.getAttribute('data')).filter(Boolean);
-            suggestCache[query] = suggestions;
-            return suggestions;
-        } catch (e) {
-            if (e.name !== 'AbortError') console.warn('Suggest fetch error:', e);
-            return [];
+        if (q.length < 2) return null;
+        const appLen = appLinks.length;
+        for (let i = 0; i < appLen; i++) {
+            const app = appLinks[i];
+            const appName = app.name.toLowerCase();
+            if (appName === q || appName.indexOf(q) !== -1) return app;
         }
+        return null;
     }
-
-    /* ── intelligence-box 内スタイル注入 ── */
-
-    (function injectIntelligenceStyles() {
-        if (document.getElementById('intelligence-multi-style')) return;
-        const style = document.createElement('style');
-        style.id = 'intelligence-multi-style';
-        style.textContent = ``;
-        document.head.appendChild(style);
-    })();
-
-    /* ── intelligence-box 内へ複数 answer を描画 ── */
-
-    // appLinks のアイコンマップ（loadData で imageMap が確定後に埋める）
-    const appIconMap = {};   // { name: blobUrl }
-
-    // imageMap 取得後に呼ぶ（loadData 側で呼び出す）
-    function registerAppIcons(imageMap, links) {
-        links.forEach(link => {
-            if (link.icon && imageMap[link.icon]) {
-                appIconMap[link.name] = imageMap[link.icon];
-            } else if (link.icon) {
-                appIconMap[link.name] = link.icon;
-            }
-        });
-    }
-
-    let ilActiveIndex = -1;
-    let ilCurrentItems = [];
-
-    function clearIntelligenceItems() {
-        if (!intelligenceBox) return;
-        // intelligenceIcon 以外の子要素（answer・divider・header）を削除
-        Array.from(intelligenceBox.children).forEach(el => {
-            if (!el.classList.contains('intelligence-icon')) el.remove();
-        });
-        ilActiveIndex = -1;
-        ilCurrentItems = [];
-    }
-
-    function buildIconEl(item) {
-        if (item.type === 'app' && appIconMap[item.appName]) {
-            const img = document.createElement('img');
-            img.className = 'il-app-icon active';
-            img.src = appIconMap[item.appName];
-            img.alt = item.appName;
-            return img;
-        }
-        const span = document.createElement('span');
-        span.className = 'il-icon active';
-        const icons = { calc: '＝', url: '🔗', suggest: '🔍', app: '🚀' };
-        span.textContent = icons[item.type] || '🔍';
-        return span;
-    }
-
-    function renderIntelligenceItems(items) {
-        if (!intelligenceBox) return;
-        clearIntelligenceItems();
-        ilCurrentItems = items || [];
-
-        if (!ilCurrentItems.length) {
-            toggleIntelligenceActive(false);
-            return;
-        }
-
-        ilCurrentItems.forEach((item, idx) => {
-            // セクション区切り
-            if (idx > 0 && ilCurrentItems[idx - 1].type !== item.type) {
-                const div = document.createElement('div');
-                div.className = 'il-divider';
-                intelligenceBox.appendChild(div);
-            }
-
-            const el = document.createElement('div');
-            el.className = 'intelligence-answer';
-            el.dataset.ilIdx = String(idx);
-
-            el.appendChild(buildIconEl(item));
-
-            const labelEl = document.createElement('span');
-            labelEl.className = 'il-label';
-            labelEl.textContent = item.label;
-            el.appendChild(labelEl);
-
-            if (item.sub) {
-                const subEl = document.createElement('span');
-                subEl.className = 'il-sub';
-                subEl.textContent = item.sub;
-                el.appendChild(subEl);
-            }
-
-            el.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                selectIlItem(item);
-            });
-
-            intelligenceBox.appendChild(el);
-        });
-
-        toggleIntelligenceActive(true);
-        triggerIconRotation();
-    }
-
-    function selectIlItem(item) {
-        if (item.type === 'app') {
-            window.location.href = item.url;
-        } else if (item.type === 'url') {
-            window.location.href = /^https?:\/\//i.test(item.label) ? item.label : 'https://' + item.label;
-        } else if (item.type === 'calc') {
-            if (searchInput) searchInput.value = item.sub;
-            renderIntelligenceItems([]);
-        } else {
-            if (searchInput) searchInput.value = item.label;
-            renderIntelligenceItems([]);
-            doSearch();
-        }
-    }
-
-    /* ── キーボードナビゲーション ── */
-
-    function getIlItems() {
-        if (!intelligenceBox) return [];
-        return Array.from(intelligenceBox.querySelectorAll('.intelligence-answer'));
-    }
-
-    function highlightIlItem(els) {
-        els.forEach((el, i) => el.classList.toggle('il-active', i === ilActiveIndex));
-        if (ilActiveIndex >= 0 && searchInput) {
-            const lbl = els[ilActiveIndex].querySelector('.il-label');
-            if (lbl) searchInput.value = lbl.textContent;
-        }
-    }
-
-    function attachKeyboardNav() {
-        if (!searchInput) return;
-        searchInput.addEventListener('keydown', (e) => {
-            if (!ilCurrentItems.length) return;
-            const els = getIlItems();
-            if (!els.length) return;
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                ilActiveIndex = Math.min(ilActiveIndex + 1, els.length - 1);
-                highlightIlItem(els);
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                ilActiveIndex = Math.max(ilActiveIndex - 1, 0);
-                highlightIlItem(els);
-            } else if (e.key === 'Escape') {
-                renderIntelligenceItems([]);
-            }
-        });
-        searchInput.addEventListener('blur', () => {
-            setTimeout(() => renderIntelligenceItems([]), 200);
-        });
-    }
-
-    /* ── メイン更新処理 ── */
-
-    let updateTimer = null;
-
-    async function updateCalculationDisplay() {
-        if (!searchInput || !intelligenceBox) return;
-        if (updateTimer) clearTimeout(updateTimer);
-
-        updateTimer = setTimeout(async () => {
-            const inputText = searchInput.value.trim();
-            if (inputText.length < 2) { renderIntelligenceItems([]); return; }
-
-            const isUrl = REGEX_URL_PATTERN.test(inputText);
-            const mathResult = !isUrl && isMathExpression(inputText) ? calculateResult(inputText) : null;
-            const matchedApps = (!isUrl && searchMode === 'google') ? searchApps(inputText) : [];
-
-            const items = [];
-
-            if (isUrl) {
-                items.push({ type: 'url', label: inputText, sub: 'URLを開く' });
-            }
-            if (mathResult !== null) {
-                items.push({ type: 'calc', label: `${inputText} = ${mathResult}`, sub: String(mathResult) });
-            }
-            matchedApps.forEach(app => {
-                items.push({ type: 'app', label: app.name, sub: '開く', url: app.url, appName: app.name });
-            });
-            if (!isUrl && mathResult === null && searchMode === 'google') {
-                const suggestions = await fetchGoogleSuggestions(inputText);
-                suggestions.forEach(s => {
-                    items.push({ type: 'suggest', label: s });
-                });
-            }
-
-            renderIntelligenceItems(items.slice(0, 5));
-            foundApp = matchedApps[0] || null;
-            currentResult = items[0]?.label || null;
-        }, 120);
-    }
-
-    /* ── doSearch ── */
 
     function doSearch() {
-        const q = searchInput ? searchInput.value.trim() : '';
-        if (q.length < 2) return;
+        const q = searchInput.value.trim();
+        if (!q) return;
         addHistory(q);
-        renderIntelligenceItems([]);
-
         if (searchMode === 'google') {
-            if (foundApp) { window.location.href = foundApp.url; return; }
+            if (foundApp) {
+                window.location.href = foundApp.url;
+                return;
+            }
             if (REGEX_URL_PATTERN.test(q)) {
-                window.location.href = /^https?:\/\//i.test(q) ? q : 'https://' + q;
+                let directUrl = q;
+                if (!/^https?:\/\//i.test(q)) {
+                    directUrl = 'https://' + q;
+                }
+                window.location.href = directUrl;
                 return;
             }
         }
-        const url = searchMode === 'google'
-            ? 'https://www.google.com/search?q=' + encodeURIComponent(q)
-            : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
+        const url = searchMode === 'google' ? 'https://www.google.com/search?q=' + encodeURIComponent(q) : 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
         window.location.href = url;
     }
-
     if (searchBtn) searchBtn.onclick = doSearch;
     if (searchInput) {
-        searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
-        searchInput.addEventListener('input', updateCalculationDisplay);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') doSearch();
+        });
     }
-    attachKeyboardNav();
-
-    /* ── toggleIntelligenceActive / triggerIconRotation ── */
 
     function toggleIntelligenceActive(show) {
-        if (!intelligenceIcon || !intelligenceBox) return;
-        if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
+        if (!intelligenceIcon || !answerElement || !intelligenceBox) return;
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+        }
         if (show) {
             intelligenceBox.style.display = 'flex';
             requestAnimationFrame(() => {
                 intelligenceBox.classList.add('active');
                 intelligenceIcon.classList.add('active');
+                answerElement.classList.add('active');
             });
         } else {
             intelligenceBox.classList.remove('active');
             intelligenceIcon.classList.remove('active');
+            answerElement.classList.remove('active');
+            answerElement.classList.add('hide');
             hideTimeout = setTimeout(() => {
-                if (!intelligenceBox.classList.contains('active')) intelligenceBox.style.display = 'none';
+                if (!intelligenceBox.classList.contains('active')) {
+                    intelligenceBox.style.display = 'none';
+                }
                 hideTimeout = null;
             }, 500);
         }
@@ -530,37 +317,58 @@ function initAdsDeferred(container) {
         intelligenceIcon.classList.remove('animate-icon');
         void intelligenceIcon.offsetWidth;
         intelligenceIcon.classList.add('animate-icon');
-        setTimeout(() => intelligenceIcon.classList.remove('animate-icon'), 500);
+        setTimeout(() => {
+            intelligenceIcon.classList.remove('animate-icon');
+        }, 500);
     }
-    /* --- 修正箇所: hideAllDialogs の定義を追加 --- */
-function hideAllDialogs() {
-    // 全てのダイアログ（設定、履歴など）を非表示にする
-    [settingsDlg, historyDlg].forEach(dlg => {
-        if (dlg) {
-            dlg.classList.remove('show');
-            setTimeout(() => {
-                if (!dlg.classList.contains('show')) dlg.style.display = 'none';
-            }, 500);
-        }
-    });
-    // 全てのボタンのアクティブ状態を解除（ChatGPTモードのボタン以外）
-    controlBtns.forEach((btn, idx) => {
-        // インデックス2がChatGPT切り替えボタンの場合、モードに応じて維持
-        if (idx === 2 && searchMode === 'chatgpt') return;
-        btn.classList.remove('active');
-    });
-}
+    let updateTimer = null;
 
-/* --- 既存の showDialog --- */
-function showDialog(dlg, btn) {
-    if (!dlg) return;
-    hideAllDialogs(); // これでエラーが消えます
-    dlg.style.display = 'flex';
-    requestAnimationFrame(() => {
-        dlg.classList.add('show');
-        if (btn) btn.classList.add('active');
-    });
-}
+    function updateCalculationDisplay() {
+        if (!searchInput || !intelligenceIcon || !answerElement) return;
+        if (updateTimer) clearTimeout(updateTimer);
+        updateTimer = setTimeout(() => {
+            const inputText = searchInput.value.trim();
+            const isUrl = REGEX_URL_PATTERN.test(inputText);
+            const result = !isUrl && isMathExpression(inputText) ? calculateResult(inputText) : null;
+            const app = (!isUrl && !result) ? searchApp(inputText) : null;
+            let newValue = null;
+            if (isUrl) {
+                newValue = "URLを開く";
+            } else if (result !== null) {
+                newValue = String(result);
+            } else if (app) {
+                newValue = app.name;
+            }
+            if (searchMode === 'google' && newValue !== null) {
+                if (newValue !== currentResult) {
+                    triggerIconRotation();
+                    answerElement.classList.add('hide');
+                    setTimeout(() => {
+                        answerElement.textContent = newValue;
+                        currentResult = newValue;
+                        foundApp = app;
+                        answerElement.classList.remove('hide');
+                    }, 150);
+                }
+                toggleIntelligenceActive(true);
+            } else {
+                toggleIntelligenceActive(false);
+                currentResult = null;
+                foundApp = null;
+            }
+        }, 100);
+    }
+    if (searchInput) searchInput.addEventListener('input', updateCalculationDisplay);
+
+    function hideAllDialogs() {
+        if (settingsDlg && settingsDlg.classList.contains('show')) {
+            hideDialog(settingsDlg);
+        }
+        if (historyDlg && historyDlg.classList.contains('show')) {
+            hideDialog(historyDlg);
+        }
+    }
+
     function showDialog(dlg, btn) {
         if (!dlg) return;
         hideAllDialogs();
@@ -647,7 +455,7 @@ function showDialog(dlg, btn) {
     function setupInfoSection(container) {
         const infoDiv = document.createElement('div');
         infoDiv.className = 'info';
-        infoDiv.innerHTML = '<div class="info-time" style="font-size:5em;margin:0px;font-family:\'Google_Sans_Xiao2\',sans-serif;">--:--</div><div class="info-details" style="display:flex;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg><span class="info-date">----.--.--</span><span class="battery-icon-wrapper"></span><span class="info-battery">--%</span></div>';
+        infoDiv.innerHTML = '<div class="info-time" style="font-size:5em;margin:0px;font-family:\'Google_Sans_Xiao2\',sans-serif;">--:--</div><div class="info-details" style="display:flex;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg><span class="info-date">----年--月--日</span><span class="battery-icon-wrapper"></span><span class="info-battery">バッテリー --%</span></div>';
         container.prepend(infoDiv);
         const timeEl = infoDiv.querySelector('.info-time');
         const dateEl = infoDiv.querySelector('.info-date');
@@ -662,7 +470,7 @@ function showDialog(dlg, btn) {
                 timeEl.textContent = (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes);
             }
             if (dateEl) {
-                dateEl.textContent = now.getFullYear() + '.' + (now.getMonth() + 1) + '.' + now.getDate();
+                dateEl.textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
             }
         }
 
@@ -685,7 +493,7 @@ function showDialog(dlg, btn) {
             const b = await navigator.getBattery();
             const refresh = () => {
                 const level = Math.round(b.level * 100);
-                if (battEl) battEl.textContent = '' + level + '%';
+                if (battEl) battEl.textContent = 'バッテリー ' + level + '%';
                 if (battIconWrapper) battIconWrapper.innerHTML = getBatterySVG(level, b.charging);
             };
             refresh();
@@ -733,14 +541,15 @@ function showDialog(dlg, btn) {
             const catLen = categories.length;
             for (let idx = 0; idx < catLen; idx++) {
                 const category = categories[idx];
-                const links = category.links || [];
-                registerAppIcons(imageMap, links);
-                const catDiv = document.createElement('div');
-                catDiv.className = 'category';
+                const catBgDiv = document.createElement('div');
+                catBgDiv.className = 'category-bg';
                 const h2 = document.createElement('h2');
                 h2.className = 'category-title';
                 h2.textContent = category.title || '無題';
-                catDiv.appendChild(h2);
+                catBgDiv.appendChild(h2);
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category';
+                const links = category.links || [];
                 const linksLen = links.length;
                 for (let j = 0; j < linksLen; j++) {
                     const link = links[j];
@@ -765,18 +574,8 @@ function showDialog(dlg, btn) {
                     a.appendChild(appDiv);
                     catDiv.appendChild(a);
                 }
-                if ((idx + 1) % 3 === 0) {
-                    const adDiv = document.createElement('div');
-                    adDiv.className = 'shortcut-adsense';
-                    adDiv.innerHTML = '<ins class="adsbygoogle" style="display:inline-block;width:500px;height:60px" data-ad-client="ca-pub-6151036058675874" data-ad-slot="2788469305"></ins>';
-                    catDiv.appendChild(adDiv);
-                    setTimeout(() => {
-                        try {
-                            (window.adsbygoogle = window.adsbygoogle || []).push({});
-                        } catch (e) {}
-                    }, 0);
-                }
-                fragment.appendChild(catDiv);
+                catBgDiv.appendChild(catDiv);
+                fragment.appendChild(catBgDiv);
             }
             container.appendChild(fragment);
             initAdsDeferred(container);
