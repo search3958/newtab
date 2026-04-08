@@ -38,7 +38,9 @@ body {
     background-size: cover;
     background-attachment: fixed;
 }
-
+a{
+        text-decoration: none;
+}
 body:before {
     background: #fff2;
     content: " ";
@@ -155,7 +157,7 @@ body:before {
     width: 300px;
     grid-template-columns: repeat(3, 1fr);
     background: #fff5;
-    backdrop-filter: blur(25px) brightness(1.2);
+    backdrop-filter: blur(25px) brightness(1.05);
     padding: 16px;
     justify-items: center;
     gap: 16px;
@@ -372,6 +374,7 @@ svg {
             }
 
             .appicon-label {
+        color: #000a;
     font-size: 12px;
 }
 @media (prefers-color-scheme:dark) {
@@ -393,7 +396,7 @@ svg {
     .appicon-label,
     .info {
         color: #fff;
-        fill: #fff;
+        fill: #fffa;
     }
 
     .dialog-box {
@@ -423,6 +426,11 @@ svg {
 
     .active svg {
         fill: hsl(var(--color-deg) 100% 80%);
+    }
+
+    .category{
+        background:#0005;
+            backdrop-filter: blur(25px) brightness(0.95);
     }
 }
 
@@ -581,7 +589,7 @@ svg {
 
 
 </body>
-<script>let dbInstance = null; let dbPromise = null; async function getDB() { if (dbInstance) return dbInstance; if (dbPromise) return dbPromise; dbPromise = new Promise((resolve, reject) => { const request = indexedDB.open('WallpaperDB', 1); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains('images')) { db.createObjectStore('images'); } }; request.onsuccess = (e) => { dbInstance = e.target.result; dbPromise = null; resolve(dbInstance); }; request.onerror = () => { dbPromise = null; reject(new Error('IndexedDB open failed')); }; }); return dbPromise; } async function getWallpaperData(key) { try { const db = await getDB(); return new Promise((resolve) => { const transaction = db.transaction(['images'], 'readonly'); const store = transaction.objectStore('images'); const request = store.get(key); request.onsuccess = () => resolve(request.result); request.onerror = () => resolve(null); }); } catch { return null; } } async function getMultipleWallpaperData(keys) { try { const db = await getDB(); return Promise.all(keys.map(key => new Promise((resolve) => { const transaction = db.transaction(['images'], 'readonly'); const request = transaction.objectStore('images').get(key); request.onsuccess = () => resolve({ key, data: request.result }); request.onerror = () => resolve({ key, data: null }); }) )); } catch { return keys.map(key => ({ key, data: null })); } } function applyWallpaper(lightBlob, darkBlob = null) { ['lightUrl', 'darkUrl'].forEach(key => { const oldUrl = document.body.dataset[key]; if (oldUrl && oldUrl.startsWith('blob:')) { URL.revokeObjectURL(oldUrl); } }); const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/samag1.webp'; const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/samag1.webp'); const bodyStyle = document.body.style; bodyStyle.setProperty('--user-wallpaper-light', `url('${lightUrl}')`); bodyStyle.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`); document.body.dataset.lightUrl = lightUrl; document.body.dataset.darkUrl = darkUrl; } async function initWallpaper() { const [newtabResult, lightResult, darkResult] = await getMultipleWallpaperData([ 'newtab', 'light', 'dark' ]); const newtab = newtabResult.data; const light = lightResult.data; const dark = darkResult.data; if (newtab?.light) { applyWallpaper(newtab.light, newtab.dark); } else if (light?.light || dark?.dark) { applyWallpaper(light?.light, dark?.dark); } else { applyWallpaper(null, null); } } function ensureFocus() { const selectors = [ '.search-input', '#your-textbox-id', 'input[type="text"]', 'input[type="search"]' ]; let focusTarget = null; for (const selector of selectors) { focusTarget = document.querySelector(selector); if (focusTarget) break; } if (!focusTarget) return; const setFocus = () => { if (document.activeElement !== focusTarget) { focusTarget.focus({ preventScroll: true }); } }; setFocus(); requestAnimationFrame(() => { setFocus(); requestAnimationFrame(setFocus); }); return focusTarget; } function loadDeferredScript(focusTarget) { const loadScript = () => { const script = document.createElement('script'); script.src = 'beta.js'; script.async = true; script.onload = () => { console.log('[Main] check v2 loaded successfully'); if (focusTarget && document.activeElement !== focusTarget) { focusTarget.focus({ preventScroll: true }); } }; script.onerror = () => { console.error('[Main] Failed to load check v2'); }; document.body.appendChild(script); }; if ('requestIdleCallback' in window) { requestIdleCallback(loadScript, { timeout: 500 }); } else { setTimeout(loadScript, 150); } } (function init() { const startInit = () => { initWallpaper().catch(err => { console.warn('[Main] Wallpaper initialization failed:', err); }); const focusTarget = ensureFocus(); loadDeferredScript(focusTarget); if (focusTarget) { document.addEventListener('visibilitychange', () => { if (!document.hidden && document.activeElement !== focusTarget) { focusTarget.focus({ preventScroll: true }); } }); } }; if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', startInit, { once: true }); } else { startInit(); } })(); window.reloadWallpaper = initWallpaper; window.clearWallpaperCache = () => { dbInstance = null; dbPromise = null; }; if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js') .then(reg => console.log('Service Worker registered')) .catch(err => console.error('Service Worker registration failed', err)); }); }
+<script>let dbInstance = null; let dbPromise = null; async function getDB() { if (dbInstance) return dbInstance; if (dbPromise) return dbPromise; dbPromise = new Promise((resolve, reject) => { const request = indexedDB.open('WallpaperDB', 1); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains('images')) { db.createObjectStore('images'); } }; request.onsuccess = (e) => { dbInstance = e.target.result; dbPromise = null; resolve(dbInstance); }; request.onerror = () => { dbPromise = null; reject(new Error('IndexedDB open failed')); }; }); return dbPromise; } async function getWallpaperData(key) { try { const db = await getDB(); return new Promise((resolve) => { const transaction = db.transaction(['images'], 'readonly'); const store = transaction.objectStore('images'); const request = store.get(key); request.onsuccess = () => resolve(request.result); request.onerror = () => resolve(null); }); } catch { return null; } } async function getMultipleWallpaperData(keys) { try { const db = await getDB(); return Promise.all(keys.map(key => new Promise((resolve) => { const transaction = db.transaction(['images'], 'readonly'); const request = transaction.objectStore('images').get(key); request.onsuccess = () => resolve({ key, data: request.result }); request.onerror = () => resolve({ key, data: null }); }) )); } catch { return keys.map(key => ({ key, data: null })); } } function applyWallpaper(lightBlob, darkBlob = null) { ['lightUrl', 'darkUrl'].forEach(key => { const oldUrl = document.body.dataset[key]; if (oldUrl && oldUrl.startsWith('blob:')) { URL.revokeObjectURL(oldUrl); } }); const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/samag1.webp'; const darkUrl = darkBlob ? URL.createObjectURL(darkBlob) : (lightBlob ? lightUrl : 'bgimg/samag1_dark.webp'); const bodyStyle = document.body.style; bodyStyle.setProperty('--user-wallpaper-light', `url('${lightUrl}')`); bodyStyle.setProperty('--user-wallpaper-dark', `url('${darkUrl}')`); document.body.dataset.lightUrl = lightUrl; document.body.dataset.darkUrl = darkUrl; } async function initWallpaper() { const [newtabResult, lightResult, darkResult] = await getMultipleWallpaperData([ 'newtab', 'light', 'dark' ]); const newtab = newtabResult.data; const light = lightResult.data; const dark = darkResult.data; if (newtab?.light) { applyWallpaper(newtab.light, newtab.dark); } else if (light?.light || dark?.dark) { applyWallpaper(light?.light, dark?.dark); } else { applyWallpaper(null, null); } } function ensureFocus() { const selectors = [ '.search-input', '#your-textbox-id', 'input[type="text"]', 'input[type="search"]' ]; let focusTarget = null; for (const selector of selectors) { focusTarget = document.querySelector(selector); if (focusTarget) break; } if (!focusTarget) return; const setFocus = () => { if (document.activeElement !== focusTarget) { focusTarget.focus({ preventScroll: true }); } }; setFocus(); requestAnimationFrame(() => { setFocus(); requestAnimationFrame(setFocus); }); return focusTarget; } function loadDeferredScript(focusTarget) { const loadScript = () => { const script = document.createElement('script'); script.src = 'beta.js'; script.async = true; script.onload = () => { console.log('[Main] check v2 loaded successfully'); if (focusTarget && document.activeElement !== focusTarget) { focusTarget.focus({ preventScroll: true }); } }; script.onerror = () => { console.error('[Main] Failed to load check v2'); }; document.body.appendChild(script); }; if ('requestIdleCallback' in window) { requestIdleCallback(loadScript, { timeout: 500 }); } else { setTimeout(loadScript, 150); } } (function init() { const startInit = () => { initWallpaper().catch(err => { console.warn('[Main] Wallpaper initialization failed:', err); }); const focusTarget = ensureFocus(); loadDeferredScript(focusTarget); if (focusTarget) { document.addEventListener('visibilitychange', () => { if (!document.hidden && document.activeElement !== focusTarget) { focusTarget.focus({ preventScroll: true }); } }); } }; if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', startInit, { once: true }); } else { startInit(); } })(); window.reloadWallpaper = initWallpaper; window.clearWallpaperCache = () => { dbInstance = null; dbPromise = null; }; if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js') .then(reg => console.log('Service Worker registered')) .catch(err => console.error('Service Worker registration failed', err)); }); }
 </script>
 
 </html>
