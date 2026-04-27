@@ -434,6 +434,15 @@ function initAdsDeferred(container) {
             updateCalculationDisplay();
         };
     }
+    const standbyToggleBtn = document.getElementById('standby-toggle');
+    if (standbyToggleBtn) {
+        standbyToggleBtn.onclick = function() {
+            document.body.classList.toggle('standby');
+            const applistIn = document.querySelector('.applist-in');
+            if (applistIn) applistIn.classList.toggle('standby');
+            this.classList.toggle('active', document.body.classList.contains('standby'));
+        };
+    }
     if (settingsDlg) {
         settingsDlg.addEventListener('click', (e) => {
             if (e.target === settingsDlg) hideDialog(settingsDlg);
