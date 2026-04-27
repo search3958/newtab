@@ -79,6 +79,18 @@
           "bg": "var(--iconbg)",
           "url": "https://scratch.mit.edu/",
           "icon": "scratch.webp"
+        },
+        {
+          "name": "ロイロノート",
+          "bg": "var(--iconbg)",
+          "url": "https://loilonote.app/",
+          "icon": "-.png"
+        },
+        {
+          "name": "Lit講座",
+          "bg": "var(--iconbg)",
+          "url": "https://member.lifeistech-lesson.jp/home",
+          "icon": "-.png"
         }
       ]
     },
@@ -195,7 +207,7 @@
         {
           "name": "Microsoft 365",
           "bg": "var(--iconbg)",
-          "url": "https://www.microsoft.com/microsoft-365",
+          "url": "https://www.microsoft365.com",
           "icon": "microsodt.webp"
         },
         {
