@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" href="https://search3958.github.io/project/logos/3958logo_main.svg">
+  <link rel="icon" href="https://search3958.github.io/project/logos/newtab_main.webp">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>新しいタブ v6</title>
   <!-- Google tag (gtag.js) -->
@@ -43,7 +43,7 @@ a{
         text-decoration: none;
 }
 body.standby:before {
-    backdrop-filter: brightness(0.9) blur(0px);
+    backdrop-filter: brightness(0.97) blur(0px);
 }
 body:before {
     background: #fff2;
@@ -162,6 +162,43 @@ transition:
     filter:blur(24px);
     pointer-events:none;
 
+}
+
+.standby-info {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%) scale(0.98);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    filter: blur(12px);
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(.36, 0, 0, 1), transform 0.5s cubic-bezier(.36, 0, 0, 1), filter 0.5s cubic-bezier(.36, 0, 0, 1);
+    z-index: 1;
+    color: #fff;
+    text-shadow: 0 2px 64px rgba(0, 0, 0, 0.7), 0 1px 130px rgba(0, 0, 0, 0.85);
+}
+
+.standby-clock {
+    font-size: clamp(80px, 14vw, 180px);
+    line-height: 1 !important;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.standby-date {
+    font-size: clamp(20px, 2.8vw, 34px);
+    opacity: 0.85;
+}
+
+body.standby .standby-info {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(-50%, -50%) scale(1);
 }
 .appicon-bg {
     display: flex;
@@ -565,14 +602,14 @@ h2.category-title {
       <button id="clear-history">検索履歴を削除</button>
 
       <h4>Newtab v6.3 Beta</h4>
-      <p>ご利用いただく場合，利用規約と<br>プライバシーポリシーの方針に同意するものとみなします。</p>
+      <p>ご利用いただく場合，利用規約と<br>個人情報政策に同意するものとみなします。</p>
       <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
       <button onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'">簡易版</button>
       <button onclick="window.location.href='https://search3958.github.io/newtab/beta'">Beta</button>
 
       <h4>重要情報</h4>
-      <button onclick="window.location.href='https://search3958.github.io/policies/'">利用規約とプライバシーポリシー</button>
+      <button onclick="window.location.href='https://search3958.github.io/policies/'">利用規約と個人情報政策</button>
       <button onclick="window.location.href='https://search3958.github.io/usercheck/entry'">同意を撤回</button>
       <button onclick="window.location.href='https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/'">Language</button>
 
@@ -604,6 +641,10 @@ h2.category-title {
 
 
   <div class="applist-in">
+  </div>
+  <div class="standby-info" aria-hidden="true">
+    <div class="standby-clock" id="standby-clock">--:--</div>
+    <div class="standby-date" id="standby-date">----</div>
   </div>
   <div class="intelligence-box">
     <div class="intelligence-icon">Enterキーでアクセス</div>
