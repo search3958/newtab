@@ -201,6 +201,10 @@ body.standby .standby-info {
     transform: translate(-50%, -50%) scale(1);
 }
 .appicon-bg {
+    --rotateX: 0deg;
+    --rotateY: 0deg;
+    --moveX: 0px;
+    --moveY: 0px;
     display: flex;
     align-items: center;
     width: 85px;
@@ -209,6 +213,10 @@ body.standby .standby-info {
     corner-shape: superellipse(1.6);
     flex-direction: column;
     box-shadow: 0px 8px 24px #0001;
+    transform-style: preserve-3d;
+    transform: perspective(900px) rotateX(var(--rotateX)) rotateY(var(--rotateY)) translate3d(var(--moveX), var(--moveY), 0);
+    transition: transform 0.6s cubic-bezier(0,.05,0,1), box-shadow 0.6s cubic-bezier(0,.05,0,1);
+    will-change: transform;
 }
 
 
@@ -230,10 +238,13 @@ body.standby .standby-info {
 
 
 .appicon-img {
+    --moveX: 0px;
+    --moveY: 0px;
     height: 85px;
     width: 85px;
     object-fit: cover;
-    scale:0.8;
+    transform: translate3d(var(--moveX), var(--moveY), 26px) scale(0.8);
+    transition: transform 0.6s cubic-bezier(0,.05,0,1);
     filter: if(
         style(--icon-mode: 1): saturate(0) brightness(0.8) invert(30%);
         else: none;
@@ -244,6 +255,12 @@ body.standby .standby-info {
     );
 
     
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .appicon-bg:hover {
+        box-shadow: 0px 14px 30px #0002;
+    }
 }
 
 .intelligence-box {
@@ -601,7 +618,7 @@ h2.category-title {
       <h4>検索履歴</h4>
       <button id="clear-history">検索履歴を削除</button>
 
-      <h4>Newtab v6.3 Beta</h4>
+      <h4>Newtab v6.4 Beta</h4>
       <p>ご利用いただく場合，利用規約と<br>個人情報政策に同意するものとみなします。</p>
       <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>

@@ -404,6 +404,70 @@ function loadZip(url) {
     .catch(() => ({}));
 }
 
+const ENABLE_ICON_3D =
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+function attachIcon3DEffect(iconWrapper, img) {
+  if (!iconWrapper || !img || !ENABLE_ICON_3D) return;
+
+  // マウスイベントを最適化（throttling）
+  let mouseTimeout = null;
+  let latestEvent = null;
+
+  function reset3DState() {
+    iconWrapper.style.setProperty('--rotateX', '0deg');
+    iconWrapper.style.setProperty('--rotateY', '0deg');
+    iconWrapper.style.setProperty('--moveX', '0px');
+    iconWrapper.style.setProperty('--moveY', '0px');
+    img.style.setProperty('--moveX', '0px');
+    img.style.setProperty('--moveY', '0px');
+  }
+
+  iconWrapper.addEventListener('mousemove', e => {
+    latestEvent = e;
+    if (mouseTimeout) return;
+
+    mouseTimeout = requestAnimationFrame(() => {
+      if (!latestEvent) {
+        mouseTimeout = null;
+        return;
+      }
+
+      const box = iconWrapper.getBoundingClientRect();
+      if (!box.width || !box.height) {
+        reset3DState();
+        mouseTimeout = null;
+        return;
+      }
+
+      const mouseX = latestEvent.clientX - box.left;
+      const mouseY = latestEvent.clientY - box.top;
+      const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 15;
+      const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -15;
+      const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 10;
+      const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 10;
+
+      iconWrapper.style.setProperty('--rotateX', `${rotateX}deg`);
+      iconWrapper.style.setProperty('--rotateY', `${rotateY}deg`);
+      iconWrapper.style.setProperty('--moveX', `${moveX}px`);
+      iconWrapper.style.setProperty('--moveY', `${moveY}px`);
+      img.style.setProperty('--moveX', `${moveX * 1.2}px`);
+      img.style.setProperty('--moveY', `${moveY * 1.2}px`);
+      mouseTimeout = null;
+    });
+  });
+
+  iconWrapper.addEventListener('mouseleave', () => {
+    latestEvent = null;
+    if (mouseTimeout) {
+      cancelAnimationFrame(mouseTimeout);
+      mouseTimeout = null;
+    }
+    reset3DState();
+  });
+}
+
 function renderIcons(container, imageMap, data) {
   const iconMode = parseInt(localStorage.getItem(ICON_MODE_KEY)) || 0;
   const fragment = document.createDocumentFragment();
@@ -443,6 +507,7 @@ function renderIcons(container, imageMap, data) {
       label.className = 'appicon-label';
       label.textContent = link.name;
 
+      attachIcon3DEffect(appDiv, img);
       appDiv.appendChild(img);
       appDiv.appendChild(label);
       a.appendChild(appDiv);
