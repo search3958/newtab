@@ -8,6 +8,14 @@
   document.head.appendChild(style);
 })();
 
+const requestIdle =
+  typeof window.requestIdleCallback === 'function'
+    ? window.requestIdleCallback.bind(window)
+    : (cb, options = {}) => setTimeout(
+      () => cb({ didTimeout: true, timeRemaining: () => 0 }),
+      options.timeout || 1
+    );
+
 // ============================================================
 // § 2. 壁紙から色を計算して CSS 変数に適用
 // ============================================================
@@ -31,7 +39,7 @@
       img.crossOrigin = 'Anonymous';
       img.src = imageUrl;
       img.onload = () => {
-        requestIdleCallback(() => {
+        requestIdle(() => {
           try {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -165,7 +173,7 @@ function searchApp(text) {
   const q = text.toLowerCase().trim();
   if (q.length < 2) return null;
   for (const app of appLinks) {
-    const n = app.name.toLowerCase();
+    const n = app.nameLower || app.name.toLowerCase();
     if (n === q || n.includes(q)) return app;
   }
   return null;
@@ -370,23 +378,39 @@ clearHistBtn?.addEventListener('click', () => { clearHistory(); alert('検索履
 // § 11. zip.js をロードしてからアイコンを描画
 //        (完全に安定してから実行するため requestIdleCallback)
 // ============================================================
-async function loadIcons(container) {
+function ensureFflateLoaded() {
   return new Promise((resolve, reject) => {
     // zip.js (fflate 互換 API) を動的ロード
     if (window.fflate) { resolve(); return; }
+
+    const existing = document.getElementById('zip-js-loader');
+    if (existing) {
+      existing.addEventListener('load', resolve, { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+
     const s = document.createElement('script');
+    s.id = 'zip-js-loader';
     s.src = 'zip.js'; // 同じフォルダ
-    s.onload  = resolve;
+    s.onload = resolve;
     s.onerror = reject;
     document.head.appendChild(s);
-  }).then(async () => {
-    const [imgMap, res] = await Promise.all([
-      loadZip('lsr/icons-6-2.zip'),
-      fetch('links-v6.json')
-    ]);
-    const data = await res.json();
-    renderIcons(container, imgMap, data);
   });
+}
+
+async function loadIcons(container) {
+  // JSON は zip.js 読み込みと並列で先行取得する
+  const dataPromise = fetch('links-v6.json').then(res => res.json());
+
+  await ensureFflateLoaded();
+
+  const [imgMap, data] = await Promise.all([
+    loadZip('lsr/icons-6-2.zip'),
+    dataPromise
+  ]);
+
+  renderIcons(container, imgMap, data);
 }
 
 function loadZip(url) {
@@ -485,7 +509,11 @@ function renderIcons(container, imageMap, data) {
     catDiv.className = 'category';
 
     for (const link of (category.links || [])) {
-      appLinks.push({ name: link.name, url: link.url });
+      appLinks.push({
+        name: link.name,
+        url: link.url,
+        nameLower: (link.name || '').toLowerCase()
+      });
 
       const a = document.createElement('a');
       a.href = link.url || '#';
@@ -502,12 +530,13 @@ function renderIcons(container, imageMap, data) {
       img.alt = link.name;
       // 遅延読み込み
       img.loading = 'lazy';
+      img.decoding = 'async';
 
       const label = document.createElement('div');
       label.className = 'appicon-label';
       label.textContent = link.name;
 
-      attachIcon3DEffect(appDiv, img);
+      if (ENABLE_ICON_3D) attachIcon3DEffect(appDiv, img);
       appDiv.appendChild(img);
       appDiv.appendChild(label);
       a.appendChild(appDiv);
@@ -541,7 +570,7 @@ function loadAdsenseScript() {
 function initAds(container) {
   // アイコン描画から 2 秒後、さらに idle 時に挿入
   setTimeout(() => {
-    requestIdleCallback(() => {
+    requestIdle(() => {
       try {
         const wrap = document.createElement('div');
         wrap.className = 'adsense-container';
@@ -564,7 +593,7 @@ async function loadData() {
   if (!container) return;
 
   // zip.js が安定してロードされてからアイコンを描画
-  requestIdleCallback(() => {
+  requestIdle(() => {
     loadIcons(container)
       .then(() => initAds(container))
       .catch(e => console.error('[beta] icon load failed', e));
@@ -572,7 +601,7 @@ async function loadData() {
 }
 
 if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', loadData);
+  window.addEventListener('DOMContentLoaded', loadData, { once: true });
 } else {
   loadData();
 }
@@ -580,14 +609,14 @@ if (document.readyState === 'loading') {
 // ============================================================
 // § 15. lang.js / check.js — 完全安定後にロード
 // ============================================================
-requestIdleCallback(() => {
+requestIdle(() => {
   // check.js
   const checkScript = document.createElement('script');
   checkScript.src = 'https://search3958.github.io/check.js';
   document.head.appendChild(checkScript);
 }, { timeout: 2000 });
 
-requestIdleCallback(() => {
+requestIdle(() => {
   // lang.js (xml 属性付き)
   const langScript = document.createElement('script');
   langScript.src = 'https://search3958.github.io/newtab/xml/lang.js';

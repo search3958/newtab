@@ -6,6 +6,8 @@
   <link rel="icon" href="https://search3958.github.io/project/logos/newtab_main.webp">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>新しいタブ v6</title>
+  <link rel="preload" href="beta.js" as="script">
+  <link rel="preload" href="zip.js" as="script">
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
 <script>
@@ -810,8 +812,11 @@ function ensureFocus() {
 
 // ---------- beta.js 遅延ロード ----------
 function loadDeferredScript(focusTarget) {
+  const SCRIPT_ID = 'beta-js-deferred';
   const load = () => {
+    if (document.getElementById(SCRIPT_ID)) return;
     const script = document.createElement('script');
+    script.id = SCRIPT_ID;
     script.src = 'beta.js';
     script.async = true;
     script.onload = () => {
@@ -821,9 +826,11 @@ function loadDeferredScript(focusTarget) {
     script.onerror = () => console.error('[Main] Failed to load beta.js');
     document.body.appendChild(script);
   };
-  'requestIdleCallback' in window
-    ? requestIdleCallback(load, { timeout: 500 })
-    : setTimeout(load, 150);
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(load, { timeout: 350 });
+  } else {
+    setTimeout(load, 80);
+  }
 }
 
 // ---------- Service Worker ----------
