@@ -50,7 +50,13 @@
       "bg": "var(--iconbg)",
       "url": "https://search3958.github.io/baram/",
       "icon": "garam.webp"
-    }
+    },
+        {
+          "name": "MALU辞書",
+          "bg": "var(--iconbg)",
+          "url": "https://sy9-k.github.io/dictionary/",
+          "icon": "malu.png"
+        }
       ]
     },
     {
