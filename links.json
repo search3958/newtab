@@ -40,6 +40,12 @@
           "bg": "var(--iconbg)",
           "url": "https://search3958.github.io/3dspace/",
           "icon": "3dspace.webp"
+        },
+        {
+          "name": "MALU辞書",
+          "bg": "var(--iconbg)",
+          "url": "https://sy9-k.github.io/dictionary/",
+          "icon": "malu.png"
         }
       ]
     },
