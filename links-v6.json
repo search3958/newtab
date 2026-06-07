@@ -63,12 +63,6 @@
       "title": "学習と教育",
       "links": [
         {
-          "name": "Classroom",
-          "bg": "var(--iconbg)",
-          "url": "https://classroom.google.com/",
-          "icon": "classroom.webp"
-        },
-        {
           "name": "Monoxer",
           "bg": "#0073ffbb",
           "url": "https://app.monoxer.com/",
@@ -144,6 +138,12 @@
           "bg": "var(--iconbg)",
           "url": "https://photos.google.com/",
           "icon": "photos.webp"
+        },
+        {
+          "name": "Classroom",
+          "bg": "var(--iconbg)",
+          "url": "https://classroom.google.com/",
+          "icon": "classroom.webp"
         },
         {
           "name": "Forms",
