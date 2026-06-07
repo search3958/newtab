@@ -156,13 +156,7 @@
           "bg": "var(--iconbg)",
           "url": "https://remotedesktop.google.com/",
           "icon": "remotedesktop.webp"
-        },
-    {
-      "name": "Gemini",
-      "bg": "var(--iconbg)",
-      "url": "https://gemini.google.com/",
-      "icon": "gemini.webp"
-    }
+           }
       ]
     },
     {
