@@ -207,6 +207,21 @@ transition:
     text-wrap-mode: wrap;
     user-select: text;
 }
+.standby-chat-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.standby-chat-title .emoji {
+    font-size: 32px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.standby-chat-body {
+    padding-top: 4px;
+}
 
 .standby-chat-messages p { margin: 0 0 8px 0;    line-height: 1.9 !important; }
 .standby-chat-messages p:last-child { margin-bottom: 0; }
@@ -257,6 +272,56 @@ body.standby .standby-info {
     opacity: 1;
     filter: blur(0);
     pointer-events: auto;
+}
+
+.standby-placeholder {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    transition: opacity 0.6s cubic-bezier(.36, 0, 0, 1), filter 0.6s cubic-bezier(.36, 0, 0, 1);
+    opacity: 0;
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: 2;
+}
+
+body.standby .standby-placeholder {
+    opacity: 1;
+    filter: blur(0);
+}
+
+body.standby .standby-placeholder.hidden {
+    opacity: 0;
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+body:not(.standby) .standby-placeholder {
+    opacity: 0;
+    filter: blur(8px);
+}
+
+.standby-placeholder-text {
+    font-size: clamp(18px, 3vw, 26px);
+    color: var(--text-color);
+    text-shadow: 0 2px 32px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.standby-chat-box {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+    transition: opacity 0.7s cubic-bezier(.36, 0, 0, 1), transform 0.7s cubic-bezier(.36, 0, 0, 1), filter 0.7s cubic-bezier(.36, 0, 0, 1);
+}
+
+.standby-chat-box.visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
 }
 .appicon-bg {
     --rotateX: 0deg;
@@ -715,6 +780,9 @@ h2.category-title {
   <div class="applist-in">
   </div>
   <div class="standby-info" aria-hidden="true">
+    <div class="standby-placeholder" id="standby-placeholder">
+      <div class="standby-placeholder-text">気になることはありますか？</div>
+    </div>
     <div class="standby-chat-box">
       <div class="standby-chat-messages" id="chat-result"></div>
     </div>

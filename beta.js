@@ -189,13 +189,29 @@ const _md = (() => {
   const FUNCTION_URL = 'https://bhwxeffktrxzfdmpfhpd.supabase.co/functions/v1/search';
   const chatBox = document.querySelector('.standby-chat-box');
   const chatMessages = document.getElementById('chat-result');
+  const placeholder = document.getElementById('standby-placeholder');
+  const placeholderText = placeholder?.querySelector('.standby-placeholder-text');
   let chatPending = false;
+  let hasResponded = false;
+
+  function showPlaceholder(msg) {
+    if (placeholderText) placeholderText.textContent = msg;
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (chatBox) chatBox.classList.remove('visible');
+  }
+
+  function hidePlaceholder() {
+    if (placeholder) placeholder.classList.add('hidden');
+  }
 
   function doChat(text) {
     if (chatPending || !chatMessages) return;
     chatPending = true;
+    hasResponded = true;
+    hidePlaceholder();
     chatBox.classList.add('has-content');
-    chatMessages.innerHTML = '<p style="opacity:0.6">送信中...</p>';
+    chatMessages.innerHTML = '<p style="opacity:0.6">生成中...</p>';
+    chatBox.classList.remove('visible');
 
     fetch(FUNCTION_URL, {
       method: 'POST',
@@ -208,19 +224,43 @@ const _md = (() => {
       })
       .then(data => {
         if (data.error) throw new Error(data.error);
-        const content = data.choices?.[0]?.message?.content || JSON.stringify(data, null, 2);
-        chatMessages.innerHTML = _md.render(content);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        const raw = data.choices?.[0]?.message?.content || JSON.stringify(data, null, 2);
+        const lines = raw.split('\n');
+        const firstLine = lines[0];
+        const titleMatch = firstLine.match(/^\/\/([\p{Emoji_Presentation}\p{Emoji}\u200d\ufe0f]+)\s*(.*)/u);
+        let titleHtml = '';
+        let body = raw;
+        if (titleMatch) {
+          const emoji = titleMatch[1];
+          const title = titleMatch[2].trim();
+          titleHtml = '<div class="standby-chat-title"><span class="emoji">' + emoji + '</span>' + esc(title) + '</div>';
+          body = lines.slice(1).join('\n');
+        }
+        chatMessages.innerHTML = titleHtml + '<div class="standby-chat-body">' + _md.render(body) + '</div>';
+        requestAnimationFrame(() => {
+          chatBox.classList.add('visible');
+          chatBox.scrollTop = chatBox.scrollHeight;
+        });
       })
       .catch(err => {
         chatMessages.innerHTML = '<p style="color:#f88">エラー: ' + esc(err.message) + '</p>';
+        chatBox.classList.add('visible');
       })
       .finally(() => { chatPending = false; });
   }
 
   function esc(s) { return s.replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+  showPlaceholder('気になることはありますか？');
+
   window._doChat = doChat;
+  window._resetChat = function () {
+    hasResponded = false;
+    chatPending = false;
+    chatBox.classList.remove('has-content', 'visible');
+    chatMessages.innerHTML = '';
+    showPlaceholder('気になることはありますか？');
+  };
 })();
 
 // ============================================================
