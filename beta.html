@@ -147,16 +147,14 @@ body:before {
     padding: 24px 0 100px 0;
     overflow: scroll;
     display: flex;
-    /* flex-direction: column; */
     align-items: flex-start;
     flex-wrap: wrap;
     justify-content: center;
     gap: 24px;
     opacity:1;
-    filter:blur(0px);
     transform:scale(1);
 transition: 
-  transform 0.7s cubic-bezier(.36, 0, 0, 1), filter 0.7s cubic-bezier(.36, 0, 0, 1),  opacity 0.4s cubic-bezier(.36, 0, 0, 1);
+  transform 0.7s cubic-bezier(.36, 0, 0, 1), filter 0.7s cubic-bezier(.36, 0, 0, 1),  opacity 0.35s cubic-bezier(.36, 0, 0, 1);
 }
 
 .applist-in.standby{
@@ -174,16 +172,18 @@ transition:
     flex-direction: column;
     align-items: center;
     width: 100vw;
-    max-height: 70vh;
+    height: 100vh;
     opacity: 0;
+    transform:scale(0.95);
+  filter:blur(10px);
     pointer-events: none;
-    transition: opacity 0.5s cubic-bezier(.36, 0, 0, 1), transform 0.5s cubic-bezier(.36, 0, 0, 1), filter 0.5s cubic-bezier(.36, 0, 0, 1);
+    transition: opacity 0.3s cubic-bezier(.36, 0, 0, 1), transform 0.5s cubic-bezier(.36, 0, 0, 1), filter 0.5s cubic-bezier(.36, 0, 0, 1);
     z-index: 1;
     color: var(--text-color);}
 
 .standby-chat-box {
     width: 100%;
-    max-height: 70vh;
+    max-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 24px 7vw;
@@ -202,10 +202,12 @@ transition:
     overflow-wrap: break-word;
     text-wrap-mode: wrap;
     user-select: text;
+    color: var(--text-color);
 }
 .standby-chat-messages * {
     text-wrap-mode: wrap;
     user-select: text;
+    color: var(--text-color);
 }
 .standby-chat-title {
     font-size: 22px;
@@ -218,9 +220,11 @@ transition:
     font-size: 32px;
     margin-right: 4px;
     vertical-align: middle;
+    display:block;
 }
 .standby-chat-body {
     padding-top: 4px;
+        margin-bottom: 200px;
 }
 
 .standby-chat-messages p { margin: 0 0 8px 0;    line-height: 1.9 !important; }
@@ -276,7 +280,7 @@ body.standby .standby-info {
 
 .standby-placeholder {
     position: fixed;
-    top: 50%;
+    top: 50vh;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
@@ -313,14 +317,14 @@ body:not(.standby) .standby-placeholder {
 
 .standby-chat-box {
     opacity: 0;
-    transform: translateY(16px);
-    filter: blur(6px);
+    transform: scale(0.92) translateY(90px);
+    filter: blur(17px);
     transition: opacity 0.7s cubic-bezier(.36, 0, 0, 1), transform 0.7s cubic-bezier(.36, 0, 0, 1), filter 0.7s cubic-bezier(.36, 0, 0, 1);
 }
 
 .standby-chat-box.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
     filter: blur(0);
 }
 .appicon-bg {
@@ -349,7 +353,7 @@ body:not(.standby) .standby-placeholder {
     width: 300px;
     grid-template-columns: repeat(3, 1fr);
     background: #fff5;
-    backdrop-filter: brightness(1.05);
+    backdrop-filter: blur(16px);
     padding: 16px;
     justify-items: center;
     gap: 16px;
@@ -580,6 +584,7 @@ svg {
 @media (prefers-color-scheme:dark) {
     :root {
         --iconbg: #0006;
+        --text-color: #fff;
     }
 
     body {
@@ -620,10 +625,10 @@ svg {
 
     body:before {
         background: #0003;
-    backdrop-filter: brightness(0.9) blur(0px);
+    backdrop-filter: brightness(1) blur(0px);
     }
 body.standby:before {
-    backdrop-filter: brightness(0.8) blur(24px);
+    backdrop-filter: brightness(0.5) blur(24px);
 }
 
     .active svg {
