@@ -45,7 +45,7 @@ a{
         text-decoration: none;
 }
 body.standby:before {
-    backdrop-filter: brightness(0.97) blur(0px);
+    backdrop-filter: brightness(1.4) blur(24px);
 }
 body:before {
     background: #fff2;
@@ -53,7 +53,7 @@ body:before {
     height: 100vh;
     width: 100vw;
     display: block;
-    backdrop-filter: brightness(1.2) blur(24px);
+    backdrop-filter: brightness(1) blur(0px);
 
     transition: backdrop-filter 0.8s cubic-bezier(.36, 0, 0, 1);
 }
@@ -61,7 +61,7 @@ body:before {
 * {
     scrollbar-width: none;
     line-height: 1.5 !important;
-    font-family: "Google_Sans_Xiao2", "Yu Gothic UI", "Yu Gothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
+    font-family: "Google_Sans_Xiao2", "Meiryo UI", "Yu Gothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
     text-wrap-mode: nowrap;
     user-select: none;
 }
@@ -154,53 +154,109 @@ body:before {
     gap: 24px;
     opacity:1;
     filter:blur(0px);
+    transform:scale(1);
 transition: 
-  top 0.5s cubic-bezier(.36, 0, 0, 1), filter 0.5s cubic-bezier(.36, 0, 0, 1),  opacity 0.4s cubic-bezier(.36, 0, 0, 1);
+  transform 0.7s cubic-bezier(.36, 0, 0, 1), filter 0.7s cubic-bezier(.36, 0, 0, 1),  opacity 0.4s cubic-bezier(.36, 0, 0, 1);
 }
 
 .applist-in.standby{
-  top:140px;
+    transform:scale(0.95);
     opacity:0;
-    filter:blur(24px);
     pointer-events:none;
 
 }
 
 .standby-info {
     position: fixed;
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%) scale(0.98);
+    top: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    width: 100vw;
+    max-height: 70vh;
     opacity: 0;
-    filter: blur(12px);
     pointer-events: none;
     transition: opacity 0.5s cubic-bezier(.36, 0, 0, 1), transform 0.5s cubic-bezier(.36, 0, 0, 1), filter 0.5s cubic-bezier(.36, 0, 0, 1);
     z-index: 1;
-    color: #fff;
-    text-shadow: 0 2px 64px rgba(0, 0, 0, 0.7), 0 1px 130px rgba(0, 0, 0, 0.85);
+    color: var(--text-color);}
+
+.standby-chat-box {
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 7vw;
+    display: none;
+    box-sizing: border-box;
 }
 
-.standby-clock {
-    font-size: clamp(80px, 14vw, 180px);
-    line-height: 1 !important;
-    font-weight: 500;
-    letter-spacing: 0;
+.standby-chat-box.has-content {
+    display: block;
 }
 
-.standby-date {
-    font-size: clamp(20px, 2.8vw, 34px);
+.standby-chat-messages {
+    font-size: 18px;
+    line-height: 1.7;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-wrap-mode: wrap;
+    user-select: text;
+}
+.standby-chat-messages * {
+    text-wrap-mode: wrap;
+    user-select: text;
+}
+
+.standby-chat-messages p { margin: 0 0 8px 0;    line-height: 1.9 !important; }
+.standby-chat-messages p:last-child { margin-bottom: 0; }
+.standby-chat-messages h1,
+.standby-chat-messages h2,
+.standby-chat-messages h3,
+.standby-chat-messages h4 { margin: 12px 0 6px 0; font-weight: 600; }
+.standby-chat-messages h1 { font-size: 1.4em; }
+.standby-chat-messages h2 { font-size: 1.2em; }
+.standby-chat-messages h3 { font-size: 1.1em; }
+.standby-chat-messages ul,
+.standby-chat-messages ol { padding-left: 20px; margin: 6px 0; }
+.standby-chat-messages li { margin: 2px 0; }
+.standby-chat-messages code {
+    background: rgba(255,255,255,0.12);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+.standby-chat-messages pre {
+    background: rgba(0,0,0,0.35);
+    padding: 12px 16px;
+    border-radius: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin: 8px 0;
+}
+.standby-chat-messages pre code {
+    background: none;
+    padding: 0;
+}
+.standby-chat-messages blockquote {
+    border-left: 3px solid rgba(255,255,255,0.3);
+    padding-left: 12px;
+    margin: 8px 0;
     opacity: 0.85;
 }
+.standby-chat-messages strong { font-weight: 600; }
+.standby-chat-messages em { font-style: italic; }
+.standby-chat-messages a { color: #8cf; text-decoration: underline; }
+.standby-chat-messages hr { border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 10px 0; }
+.standby-chat-messages table { border-collapse: collapse; margin: 8px 0; width: 100%; display: block; overflow-x: auto; }
+.standby-chat-messages th,
+.standby-chat-messages td { border: 1px solid rgba(255,255,255,0.15); padding: 6px 10px; text-align: left; }
+.standby-chat-messages th { background: rgba(255,255,255,0.08); }
 
 body.standby .standby-info {
     opacity: 1;
     filter: blur(0);
-    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
 }
 .appicon-bg {
     --rotateX: 0deg;
@@ -499,10 +555,10 @@ svg {
 
     body:before {
         background: #0003;
-    backdrop-filter: brightness(0.9) blur(24px);
+    backdrop-filter: brightness(0.9) blur(0px);
     }
 body.standby:before {
-    backdrop-filter: brightness(0.8) blur(0px);
+    backdrop-filter: brightness(0.8) blur(24px);
 }
 
     .active svg {
@@ -592,6 +648,7 @@ body.standby:before {
 
 h2.category-title {
     margin: 0px;
+    font-weight:normal;
 }
 
 
@@ -658,8 +715,9 @@ h2.category-title {
   <div class="applist-in">
   </div>
   <div class="standby-info" aria-hidden="true">
-    <div class="standby-clock" id="standby-clock">--:--</div>
-    <div class="standby-date" id="standby-date">----</div>
+    <div class="standby-chat-box">
+      <div class="standby-chat-messages" id="chat-result"></div>
+    </div>
   </div>
   <div class="intelligence-box">
     <div class="intelligence-icon">Enterキーでアクセス</div>

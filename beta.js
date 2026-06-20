@@ -95,8 +95,6 @@ const settingsDlg  = document.getElementById('settings-dialog');
 const historyDlg   = document.getElementById('history-dialog');
 const historyList  = document.getElementById('history-list');
 const clearHistBtn = document.getElementById('clear-history');
-const standbyClockEl   = document.getElementById('standby-clock');
-const standbyDateEl    = document.getElementById('standby-date');
 
 // インライン側で公開したユーティリティを受け取る
 const { sanitizeExpr, isMath, calcResult, RE_URL } = window._inlineUtils || {};
@@ -104,26 +102,126 @@ const { sanitizeExpr, isMath, calcResult, RE_URL } = window._inlineUtils || {};
 if (intelBox) intelBox.style.display = 'none';
 
 // ============================================================
-// § 3.5 Standby 表示 (時計 / 日付)
+// § 3.5 Markdown レンダラー (簡易)
 // ============================================================
-let standbyTimer = null;
+const _md = (() => {
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function inline(s) {
+    s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    s = s.replace(/~~(.+?)~~/g, '<del>$1</del>');
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    return s;
+  }
+  function render(text) {
+    const lines = text.split('\n');
+    let html = '', inList = null, inCode = false, codeBuf = [], inTable = false, tableBuf = [];
+    for (const raw of lines) {
+      const line = esc(raw);
+      if (line.startsWith('```')) {
+        if (inCode) { html += '<pre><code>' + codeBuf.join('\n') + '</code></pre>'; codeBuf = []; inCode = false; }
+        else { inCode = true; }
+        continue;
+      }
+      if (inCode) { codeBuf.push(line); continue; }
+      if (line.match(/^\|(.+)\|$/)) {
+        if (!inTable) { inTable = true; tableBuf = []; }
+        const cells = line.split('|').filter((_, i, a) => i > 0 && i < a.length - 1);
+        if (cells.every(c => /^[\s:-]+$/.test(c))) continue;
+        tableBuf.push(cells.map(c => c.trim()));
+        continue;
+      } else if (inTable) {
+        html += '<table><thead><tr>' + tableBuf[0].map(c => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
+        for (let i = 1; i < tableBuf.length; i++)
+          html += '<tr>' + tableBuf[i].map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>';
+        html += '</tbody></table>';
+        inTable = false; tableBuf = [];
+      }
+      if (line.match(/^#{1,4}\s/)) {
+        const level = line.match(/^(#+)/)[1].length;
+        html += '<h' + level + '>' + inline(line.replace(/^#+\s*/, '')) + '</h' + level + '>';
+        inList = null; continue;
+      }
+      if (line.match(/^[-*]\s/)) {
+        if (inList !== 'ul') { if (inList) html += '</' + inList + '>'; html += '<ul>'; inList = 'ul'; }
+        html += '<li>' + inline(line.replace(/^[-*]\s*/, '')) + '</li>';
+        continue;
+      }
+      if (line.match(/^\d+\.\s/)) {
+        if (inList !== 'ol') { if (inList) html += '</' + inList + '>'; html += '<ol>'; inList = 'ol'; }
+        html += '<li>' + inline(line.replace(/^\d+\.\s*/, '')) + '</li>';
+        continue;
+      }
+      if (line.match(/^>\s/)) {
+        if (inList) { html += '</' + inList + '>'; inList = null; }
+        html += '<blockquote>' + inline(line.replace(/^>\s*/, '')) + '</blockquote>';
+        continue;
+      }
+      if (line.match(/^(-{3,}|_{3,}|\*{3,})$/)) {
+        if (inList) { html += '</' + inList + '>'; inList = null; }
+        html += '<hr>';
+        continue;
+      }
+      if (inList) { html += '</' + inList + '>'; inList = null; }
+      if (line === '') { html += '<br>'; continue; }
+      html += '<p>' + inline(line) + '</p>';
+    }
+    if (inCode && codeBuf.length) html += '<pre><code>' + codeBuf.join('\n') + '</code></pre>';
+    if (inList) html += '</' + inList + '>';
+    if (inTable && tableBuf.length) {
+      html += '<table><thead><tr>' + tableBuf[0].map(c => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
+      for (let i = 1; i < tableBuf.length; i++)
+        html += '<tr>' + tableBuf[i].map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>';
+      html += '</tbody></table>';
+    }
+    return html;
+  }
+  return { render };
+})();
 
-function updateStandbyDateTime() {
-  if (!standbyClockEl || !standbyDateEl) return;
-  const now = new Date();
-  const clock = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false });
-  const date = now.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
-  standbyClockEl.textContent = clock;
-  standbyDateEl.textContent = date;
-}
+// ============================================================
+// § 3.6 チャット (Standby 時に検索ボックスから API 送信)
+// ============================================================
+(function setupChat() {
+  const FUNCTION_URL = 'https://bhwxeffktrxzfdmpfhpd.supabase.co/functions/v1/search';
+  const chatBox = document.querySelector('.standby-chat-box');
+  const chatMessages = document.getElementById('chat-result');
+  let chatPending = false;
 
-function initStandbyInfo() {
-  updateStandbyDateTime();
-  if (standbyTimer) clearInterval(standbyTimer);
-  standbyTimer = setInterval(updateStandbyDateTime, 1000);
-}
+  function doChat(text) {
+    if (chatPending || !chatMessages) return;
+    chatPending = true;
+    chatBox.classList.add('has-content');
+    chatMessages.innerHTML = '<p style="opacity:0.6">送信中...</p>';
 
-initStandbyInfo();
+    fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+        const content = data.choices?.[0]?.message?.content || JSON.stringify(data, null, 2);
+        chatMessages.innerHTML = _md.render(content);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      })
+      .catch(err => {
+        chatMessages.innerHTML = '<p style="color:#f88">エラー: ' + esc(err.message) + '</p>';
+      })
+      .finally(() => { chatPending = false; });
+  }
+
+  function esc(s) { return s.replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  window._doChat = doChat;
+})();
 
 // ============================================================
 // § 4. 履歴
@@ -186,6 +284,10 @@ function doSearch() {
   const q = searchInput ? searchInput.value.trim() : '';
   if (!q) return;
   addHistory(q);
+  if (document.body.classList.contains('standby')) {
+    if (window._doChat) window._doChat(q);
+    return;
+  }
   if (searchMode === 'google') {
     if (foundApp)          { window.location.href = foundApp.url; return; }
     if (RE_URL && RE_URL.test(q)) {
@@ -342,7 +444,6 @@ if (standbyBtn) {
     const isStandby = document.body.classList.toggle('standby');
     document.querySelector('.applist-in')?.classList.toggle('standby');
     this.classList.toggle('active', isStandby);
-    if (isStandby) updateStandbyDateTime();
   };
 }
 
