@@ -239,7 +239,7 @@ const _md = (() => {
         chatMessages.innerHTML = titleHtml + '<div class="standby-chat-body">' + _md.render(body) + '</div>';
         requestAnimationFrame(() => {
           chatBox.classList.add('visible');
-          chatBox.scrollTop = chatBox.scrollHeight;
+          chatBox.scrollTop = 0;
         });
       })
       .catch(err => {
