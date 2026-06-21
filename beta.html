@@ -227,6 +227,13 @@ transition:
         margin-bottom: 200px;
 }
 
+.chat-content-fade {
+  animation: fadeIn 0.5s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; filter: blur(4px); }
+  to   { opacity: 1; filter: blur(0); }
+}
 .standby-chat-messages p { margin: 0 0 8px 0;    line-height: 1.9 !important; }
 .standby-chat-messages p:last-child { margin-bottom: 0; }
 .standby-chat-messages h1,
@@ -310,7 +317,6 @@ body:not(.standby) .standby-placeholder {
 .standby-placeholder-text {
     font-size: clamp(18px, 3vw, 26px);
     color: var(--text-color);
-    text-shadow: 0 2px 32px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
     transition: opacity 0.5s ease, filter 0.5s ease;
 }

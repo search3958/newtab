@@ -211,7 +211,7 @@ const _md = (() => {
     hidePlaceholder();
     chatBox.classList.add('has-content');
     chatMessages.innerHTML = '<p style="opacity:0.6">生成中...</p>';
-    chatBox.classList.remove('visible');
+    chatBox.classList.add('visible');
 
     fetch(FUNCTION_URL, {
       method: 'POST',
@@ -236,15 +236,21 @@ const _md = (() => {
           titleHtml = '<div class="standby-chat-title"><span class="emoji">' + emoji + '</span>' + esc(title) + '</div>';
           body = lines.slice(1).join('\n');
         }
-        chatMessages.innerHTML = titleHtml + '<div class="standby-chat-body">' + _md.render(body) + '</div>';
-        requestAnimationFrame(() => {
-          chatBox.classList.add('visible');
-          chatBox.scrollTop = 0;
-        });
+        chatBox.classList.remove('visible');
+        setTimeout(() => {
+          chatMessages.innerHTML = titleHtml + '<div class="standby-chat-body">' + _md.render(body) + '</div>';
+          requestAnimationFrame(() => {
+            chatBox.classList.add('visible');
+            chatBox.scrollTop = 0;
+          });
+        }, 700);
       })
       .catch(err => {
-        chatMessages.innerHTML = '<p style="color:#f88">エラー: ' + esc(err.message) + '</p>';
-        chatBox.classList.add('visible');
+        chatBox.classList.remove('visible');
+        setTimeout(() => {
+          chatMessages.innerHTML = '<p style="color:#f88">エラー: ' + esc(err.message) + '</p>';
+          chatBox.classList.add('visible');
+        }, 700);
       })
       .finally(() => { chatPending = false; });
   }

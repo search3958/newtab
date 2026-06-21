@@ -11,7 +11,7 @@
         },
         {
           "name": "文字カウンター",
-          "bg": "#fffc",
+          "bg": "var(--iconbg)",
           "url": "https://search3958.github.io/tools/counter.html",
           "icon": "counter.webp"
         },
@@ -52,10 +52,10 @@
       "icon": "garam.webp"
     },
         {
-          "name": "MALU辞書",
+          "name": "千里辞書",
           "bg": "var(--iconbg)",
-          "url": "https://sy9-k.github.io/dictionary/",
-          "icon": "malu.png"
+          "url": "https://search3958.github.io/tools/sajon/",
+          "icon": "cheonri.webp"
         }
       ]
     },
