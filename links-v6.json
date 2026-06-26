@@ -1,7 +1,7 @@
 {
   "categories": [
     {
-      "title": "おすすめ",
+      "title": "Sentaro",
       "links": [
         {
           "name": "私について",
@@ -40,6 +40,12 @@
           "icon": "aclock.webp"
         },
         {
+          "name": "記録ノート",
+          "bg": "var(--iconbg)",
+          "url": "https://search3958.github.io/tools/girog/",
+          "icon": "girog.png"
+        },
+        {
           "name": "ToolBoard",
           "bg": "var(--iconbg)",
           "url": "https://search3958.github.io/toolboard",
@@ -63,16 +69,22 @@
       "title": "学習と教育",
       "links": [
         {
+          "name": "Classroom",
+          "bg": "var(--iconbg)",
+          "url": "https://classroom.google.com/",
+          "icon": "classroom.webp"
+        },
+        {
           "name": "Monoxer",
           "bg": "#0073ffbb",
           "url": "https://app.monoxer.com/",
           "icon": "monoxer.webp"
         },
         {
-          "name": "Kahoot",
-          "bg": "#1b00a8bb",
-          "url": "https://kahoot.it/",
-          "icon": "kahoot.webp"
+          "name": "MALU辞書",
+          "bg": "var(--iconbg)",
+          "url": "https://sy9-k.github.io/dictionary/",
+          "icon": "malu.png"
         },
         {
           "name": "Scratch",
@@ -138,12 +150,6 @@
           "bg": "var(--iconbg)",
           "url": "https://photos.google.com/",
           "icon": "photos.webp"
-        },
-        {
-          "name": "Classroom",
-          "bg": "var(--iconbg)",
-          "url": "https://classroom.google.com/",
-          "icon": "classroom.webp"
         },
         {
           "name": "Forms",
@@ -267,6 +273,12 @@
           "bg": "var(--iconbg)",
           "url": "https://www.youtube.com/",
           "icon": "youtube.webp"
+        },
+        {
+          "name": "Kahoot",
+          "bg": "#1b00a8bb",
+          "url": "https://kahoot.it/",
+          "icon": "kahoot.webp"
         },
         {
           "name": "Netflix",
