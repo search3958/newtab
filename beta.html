@@ -37,7 +37,7 @@ body.standby:before {
     backdrop-filter: brightness(1.4) blur(24px);
 }
 body:before {
-    background: #fff2;
+    background: #0001;
     content: " ";
     height: 100vh;
     width: 100vw;
@@ -229,7 +229,7 @@ transition:
 .standby-chat-messages h3,
 .standby-chat-messages h4 { margin: 12px 0 6px 0; font-weight: 600; }
 .standby-chat-messages h1 { font-size: 1.4em; }
-.standby-chat-messages h2 { font-size: 1.2em; }
+.standby-chat-messages h2 { font-size: 1.2em;}
 .standby-chat-messages h3 { font-size: 1.1em; }
 .standby-chat-messages ul,
 .standby-chat-messages ol { padding-left: 20px; margin: 6px 0; }
@@ -338,6 +338,7 @@ body:not(.standby) .standby-placeholder {
     transform: perspective(900px) rotateX(var(--rotateX)) rotateY(var(--rotateY)) translate3d(var(--moveX), var(--moveY), 0);
     transition: transform 0.6s cubic-bezier(0,.05,0,1), box-shadow 0.6s cubic-bezier(0,.05,0,1);
     will-change: transform;
+    outline:2px solid #fffa
 }
 
 
@@ -346,8 +347,8 @@ body:not(.standby) .standby-placeholder {
     display: grid;
     width: 300px;
     grid-template-columns: repeat(3, 1fr);
-    background: #fff5;
-    backdrop-filter: blur(8px);
+    background: #fff9;
+    backdrop-filter: blur(16px);
     padding: 16px;
     justify-items: center;
     gap: 16px;
@@ -581,6 +582,11 @@ svg {
         --text-color: #fff;
     }
 
+    .appicon-bg{
+
+    outline:solid 2px #ffffff24;
+    }
+
     body {
         background-color: #000;
         background-image: var(--user-wallpaper-dark);
@@ -630,7 +636,7 @@ body.standby:before {
     }
 
     .category{
-        background:#0005;
+        background:#0009;
     backdrop-filter: blur(16px);
     }
 
@@ -713,6 +719,9 @@ body.standby:before {
 h2.category-title {
     margin: 0px;
     font-weight:normal;
+    color:#fff;
+    filter:drop-shadow(0 4px 16px #000);
+
 }
 
 
@@ -852,9 +861,9 @@ function applyWallpaper(lightBlob, darkBlob = null) {
     const old = document.body.dataset[key];
     if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
   });
-  const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/samag2.webp';
+  const lightUrl = lightBlob ? URL.createObjectURL(lightBlob) : 'bgimg/baram1.webp';
   const darkUrl  = darkBlob  ? URL.createObjectURL(darkBlob)  :
-                   lightBlob ? lightUrl : 'bgimg/samag2_dark.webp';
+                   lightBlob ? lightUrl : 'bgimg/baram1_dark.webp';
   const s = document.body.style;
   s.setProperty('--user-wallpaper-light', `url('${lightUrl}')`);
   s.setProperty('--user-wallpaper-dark',  `url('${darkUrl}')`);
