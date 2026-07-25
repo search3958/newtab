@@ -7,6 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>新しいタブ v6</title>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="dns-prefetch" href="https://search3958.github.io">
+  <link rel="preload" as="image" href="bgimg/baram1.webp" fetchpriority="high">
+  <link rel="preload" as="image" href="bgimg/baram1_dark.webp" fetchpriority="low">
 
   <style>
   :root {
@@ -37,13 +41,13 @@ body.standby:before {
     backdrop-filter: brightness(1.4) blur(24px);
 }
 body:before {
-    background: #0001;
+    background: #fff2;
     content: " ";
     height: 100vh;
     width: 100vw;
     display: block;
     backdrop-filter: brightness(1) blur(0px);
-
+    contain: layout style paint;
     transition: backdrop-filter 0.8s cubic-bezier(.36, 0, 0, 1);
 }
 
@@ -76,7 +80,7 @@ body:before {
     gap: 8px;
         width: 420px;
     height: 50px;
-
+    contain: layout style;
     box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
 }
 
@@ -167,7 +171,9 @@ transition:
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(.36, 0, 0, 1), transform 0.5s cubic-bezier(.36, 0, 0, 1), filter 0.5s cubic-bezier(.36, 0, 0, 1);
     z-index: 1;
-    color: var(--text-color);}
+    color: var(--text-color);
+    content-visibility: auto;
+    contain-intrinsic-size: 100vw 100vh;}
 
 .standby-chat-box {
     width: 100%;
@@ -338,7 +344,6 @@ body:not(.standby) .standby-placeholder {
     transform: perspective(900px) rotateX(var(--rotateX)) rotateY(var(--rotateY)) translate3d(var(--moveX), var(--moveY), 0);
     transition: transform 0.6s cubic-bezier(0,.05,0,1), box-shadow 0.6s cubic-bezier(0,.05,0,1);
     will-change: transform;
-    outline:2px solid #fffa
 }
 
 
@@ -347,7 +352,7 @@ body:not(.standby) .standby-placeholder {
     display: grid;
     width: 300px;
     grid-template-columns: repeat(3, 1fr);
-    background: #fff9;
+    background: #fff5;
     backdrop-filter: blur(16px);
     padding: 16px;
     justify-items: center;
@@ -355,7 +360,7 @@ body:not(.standby) .standby-placeholder {
     border-radius: 66px;
     corner-shape: superellipse(1.8);
     box-shadow: 0px 8px 32px #0001;
-
+    contain: layout style paint;
 }
 
 
@@ -404,6 +409,8 @@ body:not(.standby) .standby-placeholder {
     transition: bottom 0.5s cubic-bezier(.34, .24, 0, 1);
     flex-direction: column-reverse;
     justify-content: center;
+    content-visibility: auto;
+    contain-intrinsic-size: 200px 100px;
 }
 
 .intelligence-box.active {
@@ -450,6 +457,8 @@ body:not(.standby) .standby-placeholder {
     background: #0000;
     z-index: 5;
     transition: background 0.3s ease;
+    content-visibility: auto;
+    contain-intrinsic-size: 100vw 100vh;
 }
 
 #history-dialog.show,
@@ -472,6 +481,7 @@ body:not(.standby) .standby-placeholder {
     corner-shape: superellipse(1.6);
     box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
     transition: all 0.3s cubic-bezier(.26, 0, .91, .54);
+    contain: layout style paint;
 }
 
 .show .dialog-box {
@@ -698,12 +708,12 @@ body.standby:before {
 
 
 @media (min-width: 1448px) and (max-width: 1803.9px) {
-    .applist-in .category-bg:nth-of-type(5) {
-  transform: translateY(-100px);
-    }
 
     .applist-in .category-bg:nth-of-type(6) {
   transform: translateY(-210px);
+    }
+    .applist-in .category-bg:nth-of-type(7) {
+  transform: translateY(-100px);
     }
 
 
@@ -797,11 +807,11 @@ h2.category-title {
     <div class="intelligence-answer hide">-</div>
   </div>
 
-
-
-</body>
-
 <script>
+document.body.style.setProperty('--user-wallpaper-light',"url('bgimg/baram1.webp')");
+document.body.style.setProperty('--user-wallpaper-dark',"url('bgimg/baram1_dark.webp')");
+</script>
+<script defer>
 
   // ============================================================
 // inline.js — ページ内 <script> に埋め込む最小限のコード
@@ -905,15 +915,37 @@ function ensureFflateLoaded() {
 function loadZip(url) {
   return fetch(url)
     .then(r => r.arrayBuffer())
-    .then(buf => {
-      const files = fflate.unzipSync(new Uint8Array(buf));
-      const map = {};
-      for (const [path, data] of Object.entries(files)) {
-        const name = path.split('/').pop();
-        if (name) map[name] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
+    .then(buf => new Promise((resolve) => {
+      const u8 = new Uint8Array(buf);
+      const done = (err, files) => {
+        if (err || !files) return resolve({});
+        const map = {};
+        const entries = Object.entries(files);
+        const CHUNK = 20;
+        function processChunk(i) {
+          const end = Math.min(i + CHUNK, entries.length);
+          for (let j = i; j < end; j++) {
+            const [path, data] = entries[j];
+            const name = path.split('/').pop();
+            if (name) map[name] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
+          }
+          if (end < entries.length) {
+            requestIdleCallback(() => processChunk(end), { timeout: 50 });
+          } else {
+            resolve(map);
+          }
+        }
+        processChunk(0);
+      };
+      if (typeof fflate.unzip === 'function') {
+        fflate.unzip(u8, done);
+      } else {
+        try {
+          const files = fflate.unzipSync(u8);
+          done(null, files);
+        } catch { resolve({}); }
       }
-      return map;
-    })
+    }))
     .catch(() => ({}));
 }
 
@@ -1101,7 +1133,7 @@ function registerSW() {
         loadIcons(container).catch(e => console.error('[Main] Shortcut load failed:', e));
       }, { timeout: 1500 });
     }
-    initWallpaper().catch(e => console.warn('[Main] Wallpaper init failed:', e));
+    initWallpaper();
     const focusTarget = ensureFocus();
     loadDeferredScripts(focusTarget);
     if (focusTarget) {
@@ -1124,4 +1156,5 @@ window.clearWallpaperCache = () => { dbInstance = null; dbPromise = null; };
 window.appLinks = appLinks;
 </script>
 
+</body>
 </html>
