@@ -545,22 +545,3 @@ if (document.readyState === 'loading') {
 } else {
   initBetaFeatures();
 }
-
-// ============================================================
-// § 15. lang.js / check.js — 完全安定後にロード
-// ============================================================
-requestIdle(() => {
-  // check.js
-  const checkScript = document.createElement('script');
-  checkScript.src = 'https://search3958.github.io/check.js';
-  document.head.appendChild(checkScript);
-}, { timeout: 2000 });
-
-requestIdle(() => {
-  // lang.js (xml 属性付き)
-  const langScript = document.createElement('script');
-  langScript.src = 'https://search3958.github.io/newtab/xml/lang.js';
-  langScript.setAttribute('data-xml', 'https://search3958.github.io/newtab/xml/beta.xml');
-  langScript.onload = () => console.log('[beta] lang.js loaded');
-  (document.head || document.documentElement).appendChild(langScript);
-}, { timeout: 2500 });
