@@ -9,6 +9,9 @@
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="dns-prefetch" href="https://search3958.github.io">
+  <link rel="preload" as="script" href="zip.js" fetchpriority="high">
+  <link rel="preload" as="fetch" href="lsr/icons-6-2.zip" fetchpriority="high">
+  <link rel="preload" as="script" href="beta.js" fetchpriority="low">
   <link rel="preload" as="image" href="bgimg/baram1.webp" fetchpriority="high">
   <link rel="preload" as="image" href="bgimg/baram1_dark.webp" fetchpriority="low">
 
@@ -344,6 +347,23 @@ body:not(.standby) .standby-placeholder {
     transform: perspective(900px) rotateX(var(--rotateX)) rotateY(var(--rotateY)) translate3d(var(--moveX), var(--moveY), 0);
     transition: transform 0.6s cubic-bezier(0,.05,0,1), box-shadow 0.6s cubic-bezier(0,.05,0,1);
     will-change: transform;
+}
+
+.appicon-bg.is-placeholder::before {
+    content: attr(data-shortcut-initial);
+    display: grid;
+    place-items: center;
+    width: 85px;
+    height: 85px;
+    color: var(--text-color);
+    font-size: 28px;
+    font-weight: 600;
+    opacity: .35;
+    transform: translateZ(26px) scale(.8);
+}
+
+.appicon-bg.is-placeholder .appicon-img {
+    display: none;
 }
 
 
@@ -921,21 +941,11 @@ function loadZip(url) {
         if (err || !files) return resolve({});
         const map = {};
         const entries = Object.entries(files);
-        const CHUNK = 20;
-        function processChunk(i) {
-          const end = Math.min(i + CHUNK, entries.length);
-          for (let j = i; j < end; j++) {
-            const [path, data] = entries[j];
-            const name = path.split('/').pop();
-            if (name) map[name] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
-          }
-          if (end < entries.length) {
-            requestIdleCallback(() => processChunk(end), { timeout: 50 });
-          } else {
-            resolve(map);
-          }
+        for (const [path, data] of entries) {
+          const name = path.split('/').pop();
+          if (name) map[name] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
         }
-        processChunk(0);
+        resolve(map);
       };
       if (typeof fflate.unzip === 'function') {
         fflate.unzip(u8, done);
@@ -961,8 +971,17 @@ function _renderOneIcon(imageMap, link) {
   appDiv.style.background = link.bg || '#eee';
   const img = document.createElement('img');
   img.className = 'appicon-img';
-  img.src = imageMap[link.icon] || link.icon || '';
-  img.alt = link.name;
+  const iconSrc = imageMap[link.icon];
+  if (iconSrc) {
+    img.src = iconSrc;
+    img.alt = link.name;
+  } else {
+    appDiv.classList.add('is-placeholder');
+    appDiv.dataset.shortcutInitial = (link.name || '?').slice(0, 1);
+    img.dataset.icon = link.icon || '';
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+  }
   img.loading = 'lazy';
   img.decoding = 'async';
   const label = document.createElement('div');
@@ -972,6 +991,21 @@ function _renderOneIcon(imageMap, link) {
   appDiv.appendChild(label);
   a.appendChild(appDiv);
   return a;
+}
+
+function hydrateIcons(container, imageMap) {
+  const pending = container.querySelectorAll('img[data-icon]');
+  for (const img of pending) {
+    const iconSrc = imageMap[img.dataset.icon];
+    if (!iconSrc) continue;
+    img.src = iconSrc;
+    img.alt = img.closest('a')?.querySelector('.appicon-label')?.textContent || '';
+    img.removeAttribute('aria-hidden');
+    img.removeAttribute('data-icon');
+    const appDiv = img.parentElement;
+    appDiv.classList.remove('is-placeholder');
+    delete appDiv.dataset.shortcutInitial;
+  }
 }
 
 function renderIcons(container, imageMap, data) {
@@ -993,24 +1027,15 @@ function renderIcons(container, imageMap, data) {
     catBg.appendChild(catDiv);
     fragment.appendChild(catBg);
   }
-  const BATCH = 7;
-  let idx = 0;
-  function renderBatch() {
-    const end = Math.min(idx + BATCH, flatLinks.length);
-    for (let i = idx; i < end; i++) {
-      flatLinks[i].catDiv.appendChild(_renderOneIcon(imageMap, flatLinks[i].link));
-    }
-    idx = end;
-    if (idx < flatLinks.length) requestAnimationFrame(renderBatch);
+  for (const { link, catDiv } of flatLinks) {
+    catDiv.appendChild(_renderOneIcon(imageMap, link));
   }
   container.appendChild(fragment);
-  requestAnimationFrame(renderBatch);
 }
 
-async function loadIcons(container) {
+function loadIcons(container) {
   const zipReady = ensureFflateLoaded().then(() => loadZip('lsr/icons-6-2.zip'));
-  const imgMap = await zipReady;
-  renderIcons(container, imgMap, SHORTCUT_DATA);
+  return zipReady.then((imgMap) => hydrateIcons(container, imgMap));
 }
 
 // ---------- フォーカス管理 ----------
@@ -1066,10 +1091,15 @@ function ensureFocus() {
   window._inlineUtils = { sanitizeExpr: sanitizeExpr, isMath: isMath, calcResult: calcResult, RE_URL: RE_URL };
 })();
 
-// ---------- 遅延スクリプト (ページ読み込み完了+3秒) ----------
+// ---------- 非クリティカルスクリプト（初回操作まで実行しない） ----------
 function loadDeferredScripts(focusTarget) {
-  window.addEventListener('load', () => {
-    setTimeout(() => {
+  let started = false;
+  const start = () => {
+    if (started) return;
+    started = true;
+    for (const eventName of ['pointerdown', 'keydown', 'touchstart', 'input']) {
+      window.removeEventListener(eventName, start, true);
+    }
       // beta.js
       if (!document.getElementById('beta-js-deferred')) {
         const s = document.createElement('script');
@@ -1112,8 +1142,11 @@ function loadDeferredScripts(focusTarget) {
         l.setAttribute('data-xml', 'https://search3958.github.io/newtab/xml/beta.xml');
         document.head.appendChild(l);
       }
-    }, 700);
-  });
+  };
+
+  for (const eventName of ['pointerdown', 'keydown', 'touchstart', 'input']) {
+    window.addEventListener(eventName, start, { capture: true, passive: true });
+  }
 }
 
 // ---------- Service Worker ----------
@@ -1128,12 +1161,11 @@ function registerSW() {
 // ---------- 初期化 ----------
 (function init() {
   const start = () => {
-    ensureFflateLoaded();
     const container = document.querySelector('.applist-in');
     if (container) {
-      requestIdleCallback(() => {
-        loadIcons(container).catch(e => console.error('[Main] Shortcut load failed:', e));
-      }, { timeout: 1500 });
+      // リンクと枠は同期描画し、重いアイコンZIPは並行して後から適用する。
+      renderIcons(container, {}, SHORTCUT_DATA);
+      loadIcons(container).catch(e => console.error('[Main] Shortcut icon load failed:', e));
     }
     initWallpaper();
     const focusTarget = ensureFocus();
