@@ -6,17 +6,7 @@
   <link rel="icon" href="https://search3958.github.io/project/logos/newtab_main.webp">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>新しいタブ v6</title>
-  <link rel="preload" href="beta.js" as="script">
-  <link rel="preload" href="zip.js" as="script">
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-7N56NHPY3C');
-</script>
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
   <style>
   :root {
@@ -26,7 +16,6 @@
     --bound: linear(0, 0.007 0.7%, 0.031 1.5%, 0.131 3.3%, 0.691 9.9%, 0.904 13%, 1.042 16.1%, 1.087 17.8%, 1.113 19.5%, 1.123 21.5%, 1.117 23.7%, 1.015 34.3%, 0.996 37.6%, 0.986 41.1%, 1.002 62.1%, 1);
     --ease: cubic-bezier(.34, .24, .18, 1);
     --color-deg: 197deg;
-    --icon-mode: 0;
 }
 
 body {
@@ -112,9 +101,8 @@ body:before {
     padding: 12px 13px;
     border-radius: 24px;
     corner-shape: superellipse(1.8);
-
-  background-image: conic-gradient(from 270deg at 56% 50%, hsl(var(--color-deg) 50% 8%) 0deg, hsl(var(--color-deg) 80% 20%) 190deg,  hsl(var(--color-deg) 80% 40%) 320deg, hsl(var(--color-deg) 200% 90%) 360deg);
-
+    background:hsl(var(--color-deg) 100% 25%);
+    
 }
 
 .control-button {
@@ -359,7 +347,7 @@ body:not(.standby) .standby-placeholder {
     width: 300px;
     grid-template-columns: repeat(3, 1fr);
     background: #fff5;
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(8px);
     padding: 16px;
     justify-items: center;
     gap: 16px;
@@ -747,13 +735,10 @@ h2.category-title {
 
       <h4>カスタマイズ</h4>
       <button onclick="window.location.href='https://search3958.github.io/project/images/2/'">壁紙を選択</button>
-
-      <button id="toggle-icon-mode">アイコンを切り替え</button>
-
       <h4>検索履歴</h4>
       <button id="clear-history">検索履歴を削除</button>
 
-      <h4>Newtab v6.4 Beta</h4>
+      <h4>Newtab v6.5 Beta</h4>
       <p>ご利用いただく場合，利用規約と<br>個人情報政策に同意するものとみなします。</p>
       <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
@@ -808,11 +793,10 @@ h2.category-title {
 </body>
 
 <script>
-  
 
   // ============================================================
 // inline.js — ページ内 <script> に埋め込む最小限のコード
-// 責務: 壁紙表示 / フォーカス管理 / 検索実行と計算 / beta.js の遅延ロード
+// 責務: 壁紙表示 / ショートカット描画 / フォーカス管理 / 検索計算ユーティリティ / beta.js の遅延ロード
 // ============================================================
 
 // ---------- IndexedDB ヘルパー ----------
@@ -888,6 +872,106 @@ async function initWallpaper() {
   } else {
     applyWallpaper(null, null);
   }
+}
+
+// ---------- zip.js 動的ロード ----------
+function ensureFflateLoaded() {
+  return new Promise((resolve, reject) => {
+    if (window.fflate) { resolve(); return; }
+    const existing = document.getElementById('zip-js-loader');
+    if (existing) {
+      existing.addEventListener('load', resolve, { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+    const s = document.createElement('script');
+    s.id = 'zip-js-loader';
+    s.src = 'zip.js';
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function loadZip(url) {
+  return fetch(url)
+    .then(r => r.arrayBuffer())
+    .then(buf => {
+      const files = fflate.unzipSync(new Uint8Array(buf));
+      const map = {};
+      for (const [path, data] of Object.entries(files)) {
+        const name = path.split('/').pop();
+        if (name) map[name] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
+      }
+      return map;
+    })
+    .catch(() => ({}));
+}
+
+// ---------- ショートカット描画 ----------
+const appLinks = [];
+
+function renderIcons(container, imageMap, data) {
+  const fragment = document.createDocumentFragment();
+
+  for (const category of (data.categories || [])) {
+    const catBg = document.createElement('div');
+    catBg.className = 'category-bg';
+
+    const h2 = document.createElement('h2');
+    h2.className = 'category-title';
+    h2.textContent = category.title || '無題';
+    catBg.appendChild(h2);
+
+    const catDiv = document.createElement('div');
+    catDiv.className = 'category';
+
+    for (const link of (category.links || [])) {
+      appLinks.push({
+        name: link.name,
+        url: link.url,
+        nameLower: (link.name || '').toLowerCase()
+      });
+
+      const a = document.createElement('a');
+      a.href = link.url || '#';
+
+      const appDiv = document.createElement('div');
+      appDiv.className = 'appicon-bg';
+      appDiv.style.background = link.bg || '#eee';
+
+      const img = document.createElement('img');
+      img.className = 'appicon-img';
+      img.src = imageMap[link.icon] || link.icon || '';
+      img.alt = link.name;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+
+      const label = document.createElement('div');
+      label.className = 'appicon-label';
+      label.textContent = link.name;
+
+      appDiv.appendChild(img);
+      appDiv.appendChild(label);
+      a.appendChild(appDiv);
+      catDiv.appendChild(a);
+    }
+
+    catBg.appendChild(catDiv);
+    fragment.appendChild(catBg);
+  }
+
+  container.appendChild(fragment);
+}
+
+async function loadIcons(container) {
+  const dataPromise = fetch('links-v6.json').then(res => res.json());
+  await ensureFflateLoaded();
+  const [imgMap, data] = await Promise.all([
+    loadZip('lsr/icons-6-2.zip'),
+    dataPromise
+  ]);
+  renderIcons(container, imgMap, data);
 }
 
 // ---------- フォーカス管理 ----------
@@ -966,6 +1050,26 @@ function loadDeferredScript(focusTarget) {
   }
 }
 
+// ---------- 広告スクリプト (ページ読み込み完了+3秒) ----------
+function loadAdScript() {
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (document.getElementById('gtag-script')) return;
+      const s1 = document.createElement('script');
+      s1.id = 'gtag-script';
+      s1.async = true;
+      s1.src = 'https://www.googletagmanager.com/gtag/js?id=G-7N56NHPY3C';
+      s1.onload = () => {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-7N56NHPY3C');
+      };
+      document.head.appendChild(s1);
+    }, 3000);
+  });
+}
+
 // ---------- Service Worker ----------
 function registerSW() {
   if ('serviceWorker' in navigator) {
@@ -978,9 +1082,16 @@ function registerSW() {
 // ---------- 初期化 ----------
 (function init() {
   const start = () => {
+    const container = document.querySelector('.applist-in');
+    if (container) {
+      requestIdleCallback(() => {
+        loadIcons(container).catch(e => console.error('[Main] Shortcut load failed:', e));
+      }, { timeout: 1500 });
+    }
     initWallpaper().catch(e => console.warn('[Main] Wallpaper init failed:', e));
     const focusTarget = ensureFocus();
     loadDeferredScript(focusTarget);
+    loadAdScript();
     if (focusTarget) {
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden && document.activeElement !== focusTarget)
@@ -998,6 +1109,7 @@ window.addEventListener('load', registerSW);
 // ---------- グローバル公開 (beta.js / 外部から参照) ----------
 window.reloadWallpaper = initWallpaper;
 window.clearWallpaperCache = () => { dbInstance = null; dbPromise = null; };
+window.appLinks = appLinks;
 </script>
 
 </html>

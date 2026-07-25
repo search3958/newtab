@@ -81,7 +81,6 @@ const requestIdle =
 // § 3. DOM 参照・定数
 // ============================================================
 const HISTORY_KEY = 'search_history_v2';
-const ICON_MODE_KEY = 'icon_mode';
 const DEFAULT_PLACEHOLDER = '検索や計算・アプリ';
 const CHATGPT_PLACEHOLDER = 'ChatGPTに質問';
 
@@ -306,9 +305,8 @@ function updatePlaceholder() {
 }
 
 // ============================================================
-// § 6. アプリショートカット検索
+// § 6. アプリショートカット検索 (appLinks は inline 側で構築済み)
 // ============================================================
-let appLinks  = [];
 let foundApp  = null;
 let curResult = null;
 
@@ -499,205 +497,6 @@ historyDlg?.addEventListener('click',  e => { if (e.target === historyDlg)  hide
 clearHistBtn?.addEventListener('click', () => { clearHistory(); alert('検索履歴を削除しました'); hideDialog(settingsDlg); });
 
 // ============================================================
-// § 10. アイコンモード切替 (旧インライン script から移動)
-// ============================================================
-(function setupIconMode() {
-  const toggleBtn = document.getElementById('toggle-icon-mode');
-  let iconMode = parseInt(localStorage.getItem(ICON_MODE_KEY)) || 0;
-
-  function applyIconMode(mode) {
-    document.documentElement.style.setProperty('--icon-mode', mode);
-    document.querySelectorAll('.appicon-bg').forEach(el => {
-      el.style.background = mode === 1 ? 'var(--iconbg)' : (el.dataset.originalBg || '#eee');
-    });
-  }
-
-  applyIconMode(iconMode);
-
-  toggleBtn?.addEventListener('click', () => {
-    iconMode = iconMode === 0 ? 1 : 0;
-    localStorage.setItem(ICON_MODE_KEY, iconMode);
-    applyIconMode(iconMode);
-  });
-})();
-
-// ============================================================
-// § 11. zip.js をロードしてからアイコンを描画
-//        (完全に安定してから実行するため requestIdleCallback)
-// ============================================================
-function ensureFflateLoaded() {
-  return new Promise((resolve, reject) => {
-    // zip.js (fflate 互換 API) を動的ロード
-    if (window.fflate) { resolve(); return; }
-
-    const existing = document.getElementById('zip-js-loader');
-    if (existing) {
-      existing.addEventListener('load', resolve, { once: true });
-      existing.addEventListener('error', reject, { once: true });
-      return;
-    }
-
-    const s = document.createElement('script');
-    s.id = 'zip-js-loader';
-    s.src = 'zip.js'; // 同じフォルダ
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
-async function loadIcons(container) {
-  // JSON は zip.js 読み込みと並列で先行取得する
-  const dataPromise = fetch('links-v6.json').then(res => res.json());
-
-  await ensureFflateLoaded();
-
-  const [imgMap, data] = await Promise.all([
-    loadZip('lsr/icons-6-2.zip'),
-    dataPromise
-  ]);
-
-  renderIcons(container, imgMap, data);
-}
-
-function loadZip(url) {
-  return fetch(url)
-    .then(r => r.arrayBuffer())
-    .then(buf => {
-      const files = fflate.unzipSync(new Uint8Array(buf));
-      const map = {};
-      for (const [path, data] of Object.entries(files)) {
-        const name = path.split('/').pop();
-        if (name) map[name] = URL.createObjectURL(new Blob([data.buffer], { type: 'image/webp' }));
-      }
-      return map;
-    })
-    .catch(() => ({}));
-}
-
-const ENABLE_ICON_3D =
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-function attachIcon3DEffect(iconWrapper, img) {
-  if (!iconWrapper || !img || !ENABLE_ICON_3D) return;
-
-  // マウスイベントを最適化（throttling）
-  let mouseTimeout = null;
-  let latestEvent = null;
-
-  function reset3DState() {
-    iconWrapper.style.setProperty('--rotateX', '0deg');
-    iconWrapper.style.setProperty('--rotateY', '0deg');
-    iconWrapper.style.setProperty('--moveX', '0px');
-    iconWrapper.style.setProperty('--moveY', '0px');
-    img.style.setProperty('--moveX', '0px');
-    img.style.setProperty('--moveY', '0px');
-  }
-
-  iconWrapper.addEventListener('mousemove', e => {
-    latestEvent = e;
-    if (mouseTimeout) return;
-
-    mouseTimeout = requestAnimationFrame(() => {
-      if (!latestEvent) {
-        mouseTimeout = null;
-        return;
-      }
-
-      const box = iconWrapper.getBoundingClientRect();
-      if (!box.width || !box.height) {
-        reset3DState();
-        mouseTimeout = null;
-        return;
-      }
-
-      const mouseX = latestEvent.clientX - box.left;
-      const mouseY = latestEvent.clientY - box.top;
-      const rotateY = ((mouseX - box.width / 2) / (box.width / 2)) * 15;
-      const rotateX = ((mouseY - box.height / 2) / (box.height / 2)) * -15;
-      const moveX = ((mouseX - box.width / 2) / (box.width / 2)) * 10;
-      const moveY = ((mouseY - box.height / 2) / (box.height / 2)) * 10;
-
-      iconWrapper.style.setProperty('--rotateX', `${rotateX}deg`);
-      iconWrapper.style.setProperty('--rotateY', `${rotateY}deg`);
-      iconWrapper.style.setProperty('--moveX', `${moveX}px`);
-      iconWrapper.style.setProperty('--moveY', `${moveY}px`);
-      img.style.setProperty('--moveX', `${moveX * 1.2}px`);
-      img.style.setProperty('--moveY', `${moveY * 1.2}px`);
-      mouseTimeout = null;
-    });
-  });
-
-  iconWrapper.addEventListener('mouseleave', () => {
-    latestEvent = null;
-    if (mouseTimeout) {
-      cancelAnimationFrame(mouseTimeout);
-      mouseTimeout = null;
-    }
-    reset3DState();
-  });
-}
-
-function renderIcons(container, imageMap, data) {
-  const iconMode = parseInt(localStorage.getItem(ICON_MODE_KEY)) || 0;
-  const fragment = document.createDocumentFragment();
-
-  for (const category of (data.categories || [])) {
-    const catBg = document.createElement('div');
-    catBg.className = 'category-bg';
-
-    const h2 = document.createElement('h2');
-    h2.className = 'category-title';
-    h2.textContent = category.title || '無題';
-    catBg.appendChild(h2);
-
-    const catDiv = document.createElement('div');
-    catDiv.className = 'category';
-
-    for (const link of (category.links || [])) {
-      appLinks.push({
-        name: link.name,
-        url: link.url,
-        nameLower: (link.name || '').toLowerCase()
-      });
-
-      const a = document.createElement('a');
-      a.href = link.url || '#';
-
-      const appDiv = document.createElement('div');
-      appDiv.className = 'appicon-bg';
-      const origBg = link.bg || '#eee';
-      appDiv.dataset.originalBg = origBg;
-      appDiv.style.background = iconMode === 1 ? 'var(--iconbg)' : origBg;
-
-      const img = document.createElement('img');
-      img.className = 'appicon-img';
-      img.src = imageMap[link.icon] || link.icon || '';
-      img.alt = link.name;
-      // 遅延読み込み
-      img.loading = 'lazy';
-      img.decoding = 'async';
-
-      const label = document.createElement('div');
-      label.className = 'appicon-label';
-      label.textContent = link.name;
-
-      if (ENABLE_ICON_3D) attachIcon3DEffect(appDiv, img);
-      appDiv.appendChild(img);
-      appDiv.appendChild(label);
-      a.appendChild(appDiv);
-      catDiv.appendChild(a);
-    }
-
-    catBg.appendChild(catDiv);
-    fragment.appendChild(catBg);
-  }
-
-  container.appendChild(fragment);
-}
-
-// ============================================================
 // § 13. AdSense (アイコン描画後に遅延挿入)
 // ============================================================
 function loadAdsenseScript() {
@@ -733,24 +532,18 @@ function initAds(container) {
 }
 
 // ============================================================
-// § 14. メインデータ読み込みフロー
+// § 13.5 メインデータ読み込みフロー (ショートカットは inline 側で描画済み)
 // ============================================================
-async function loadData() {
+function initBetaFeatures() {
   const container = document.querySelector('.applist-in');
   if (!container) return;
-
-  // zip.js が安定してロードされてからアイコンを描画
-  requestIdle(() => {
-    loadIcons(container)
-      .then(() => initAds(container))
-      .catch(e => console.error('[beta] icon load failed', e));
-  }, { timeout: 1500 });
+  requestIdle(() => initAds(container), { timeout: 3000 });
 }
 
 if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', loadData, { once: true });
+  window.addEventListener('DOMContentLoaded', initBetaFeatures, { once: true });
 } else {
-  loadData();
+  initBetaFeatures();
 }
 
 // ============================================================
