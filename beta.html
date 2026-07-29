@@ -11,7 +11,7 @@
   <link rel="dns-prefetch" href="https://search3958.github.io">
   <link rel="preload" as="script" href="zip.js" fetchpriority="high">
   <link rel="preload" as="fetch" href="lsr/icons-6-2.zip" fetchpriority="high">
-  <link rel="preload" as="script" href="beta.js" fetchpriority="low">
+  <script id="beta-js" defer src="beta.js"></script>
   <link rel="preload" as="image" href="bgimg/baram1.webp" fetchpriority="high">
   <link rel="preload" as="image" href="bgimg/baram1_dark.webp" fetchpriority="low">
 
@@ -835,7 +835,7 @@ document.body.style.setProperty('--user-wallpaper-dark',"url('bgimg/baram1_dark.
 
   // ============================================================
 // inline.js — ページ内 <script> に埋め込む最小限のコード
-// 責務: 壁紙表示 / ショートカット描画 / フォーカス管理 / 検索計算ユーティリティ / beta.js の遅延ロード
+// 責務: 壁紙表示 / ショートカット描画 / フォーカス管理 / 検索計算ユーティリティ / 非クリティカルスクリプトの遅延ロード
 // ============================================================
 
 // ---------- IndexedDB ヘルパー ----------
@@ -1092,7 +1092,7 @@ function ensureFocus() {
 })();
 
 // ---------- 非クリティカルスクリプト（初回操作まで実行しない） ----------
-function loadDeferredScripts(focusTarget) {
+function loadDeferredScripts() {
   let started = false;
   const start = () => {
     if (started) return;
@@ -1100,19 +1100,6 @@ function loadDeferredScripts(focusTarget) {
     for (const eventName of ['pointerdown', 'keydown', 'touchstart', 'input']) {
       window.removeEventListener(eventName, start, true);
     }
-      // beta.js
-      if (!document.getElementById('beta-js-deferred')) {
-        const s = document.createElement('script');
-        s.id = 'beta-js-deferred';
-        s.src = 'beta.js';
-        s.async = true;
-        s.onload = () => {
-          if (focusTarget && document.activeElement !== focusTarget)
-            focusTarget.focus({ preventScroll: true });
-        };
-        s.onerror = () => console.error('[Main] Failed to load beta.js');
-        document.body.appendChild(s);
-      }
       // gtag
       if (!document.getElementById('gtag-script')) {
         const g = document.createElement('script');
@@ -1169,7 +1156,7 @@ function registerSW() {
     }
     initWallpaper();
     const focusTarget = ensureFocus();
-    loadDeferredScripts(focusTarget);
+    loadDeferredScripts();
     if (focusTarget) {
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden && document.activeElement !== focusTarget)
