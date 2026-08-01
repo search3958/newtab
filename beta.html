@@ -537,25 +537,69 @@ body:not(.standby) .standby-placeholder {
 }
 
 .version-select {
+    display: none;
+}
+
+.version-menu[hidden] {
+    display: none;
+}
+
+.version-menu {
+    position: fixed;
+    z-index: 2000;
+    width: 240px;
+    padding: 8px;
+    overflow-y: auto;
+    background: #fffef2;
+    color: #111;
+    border: 1px solid #0001;
+    border-radius: 24px;
+    corner-shape: superellipse(1.5);
+    box-shadow: 0 12px 40px #0003;
+    box-sizing: border-box;
+}
+
+.version-menu-group {
+    padding: 8px 12px 4px;
+    color: #0008;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.version-menu button {
     display: block;
     width: 100%;
-    min-height: 48px;
-    margin: 2px 0 12px;
-    padding: 0 42px 0 18px;
+    margin: 0;
+    padding: 10px 12px;
     border: 0;
-    border-radius: 24px;
-    background: #ffffff82;
-    color: var(--text-color);
-    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+    border-radius: 14px;
+    background: transparent;
+    color: inherit;
     font-size: 14px;
+    text-align: left;
     cursor: pointer;
 }
 
+.version-menu button:hover,
+.version-menu button:focus-visible {
+    background: #0001;
+    outline: none;
+}
+
 @media (prefers-color-scheme: dark) {
-    .version-select {
-        background: #000;
+    .version-menu {
+        background: #171713;
         color: #fff;
-        color-scheme: dark;
+        border-color: #fff2;
+    }
+
+    .version-menu-group {
+        color: #fff9;
+    }
+
+    .version-menu button:hover,
+    .version-menu button:focus-visible {
+        background: #fff2;
     }
 }
 
@@ -839,8 +883,11 @@ h2.category-title {
       <p>ご利用いただく場合，利用規約と<br>個人情報政策に同意するものとみなします。</p>
       <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
-      <h4>バージョンを選ぶ</h4>
-      <select class="version-select" aria-label="Newtabのバージョンを選択"
+      <button onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'">簡易版</button>
+      <button onclick="window.location.href='https://search3958.github.io/newtab/beta'">Beta</button>
+      <button id="version-menu-button" type="button" aria-haspopup="menu" aria-expanded="false"
+        onclick="openVersionPicker()">バージョン</button>
+      <select id="version-select" class="version-select" aria-label="Newtabのバージョンを選択"
         onchange="if (this.value) window.location.href=this.value">
         <option value="" selected>選択するとすぐに移動します</option>
         <optgroup label="v6 系列">
@@ -886,6 +933,8 @@ h2.category-title {
 
     </div>
   </div>
+
+  <div id="version-menu" class="version-menu" role="menu" aria-label="Newtabのバージョン" hidden></div>
 
 
   <div class="search-in corner-box">
@@ -981,6 +1030,72 @@ async function getMultipleWallpaperData(keys) {
 }
 
 // ---------- 壁紙適用 ----------
+function openVersionPicker() {
+  const select = document.getElementById('version-select');
+  const menu = document.getElementById('version-menu');
+  const trigger = document.getElementById('version-menu-button');
+  if (!select || !menu || !trigger) return;
+
+  if (!menu.children.length) {
+    for (const group of select.querySelectorAll('optgroup')) {
+      const heading = document.createElement('div');
+      heading.className = 'version-menu-group';
+      heading.textContent = group.label;
+      menu.appendChild(heading);
+
+      for (const option of group.querySelectorAll('option')) {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.role = 'menuitem';
+        item.textContent = option.textContent;
+        item.addEventListener('click', () => {
+          window.location.href = option.value;
+        });
+        menu.appendChild(item);
+      }
+    }
+  }
+
+  if (!menu.hidden) {
+    closeVersionPicker();
+    return;
+  }
+
+  menu.hidden = false;
+  const rect = trigger.getBoundingClientRect();
+  const width = Math.min(240, window.innerWidth - 24);
+  const maxHeight = Math.min(360, window.innerHeight - 24);
+  const left = Math.max(12, Math.min(rect.right - width, window.innerWidth - width - 12));
+  const top = window.innerHeight - rect.bottom >= maxHeight + 8
+    ? rect.bottom + 8
+    : Math.max(12, rect.top - maxHeight - 8);
+
+  menu.style.width = `${width}px`;
+  menu.style.maxHeight = `${maxHeight}px`;
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  trigger.setAttribute('aria-expanded', 'true');
+  menu.querySelector('button')?.focus();
+}
+
+function closeVersionPicker() {
+  const menu = document.getElementById('version-menu');
+  const trigger = document.getElementById('version-menu-button');
+  if (menu) menu.hidden = true;
+  trigger?.setAttribute('aria-expanded', 'false');
+}
+
+document.addEventListener('pointerdown', (event) => {
+  if (!event.target.closest('#version-menu, #version-menu-button')) closeVersionPicker();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeVersionPicker();
+    document.getElementById('version-menu-button')?.focus();
+  }
+});
+
 function applyWallpaper(lightBlob, darkBlob = null) {
   ['lightUrl', 'darkUrl'].forEach(key => {
     const old = document.body.dataset[key];
