@@ -902,9 +902,14 @@ function applyWallpaper(lightBlob, darkBlob = null) {
 }
 
 async function initWallpaper() {
-  const results = await getMultipleWallpaperData(['newtab', 'light', 'dark']);
+  const results = await getMultipleWallpaperData(['newtabRandom', 'newtab', 'light', 'dark']);
   const map = Object.fromEntries(results.map(r => [r.key, r.data]));
-  if (map.newtab?.light) {
+  const randomWallpapers = map.newtabRandom?.wallpapers;
+  if (Array.isArray(randomWallpapers) && randomWallpapers.length) {
+    const randomIndex = Math.floor(Math.random() * randomWallpapers.length);
+    const wallpaper = randomWallpapers[randomIndex];
+    applyWallpaper(wallpaper.light || wallpaper.dark, wallpaper.dark);
+  } else if (map.newtab?.light) {
     applyWallpaper(map.newtab.light, map.newtab.dark);
   } else if (map.light?.light || map.dark?.dark) {
     applyWallpaper(map.light?.light, map.dark?.dark);
