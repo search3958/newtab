@@ -57,7 +57,8 @@ body:before {
 * {
     scrollbar-width: none;
     line-height: 1.5 !important;
-    font-family: "Google_Sans_Xiao2", "Meiryo UI", "Yu Gothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Meiryo UI", Meiryo, sans-serif;
+    font-kerning: normal;
     text-wrap-mode: nowrap;
     user-select: none;
 }
@@ -376,7 +377,9 @@ body:not(.standby) .standby-placeholder {
     backdrop-filter: blur(16px);
     padding: 16px;
     justify-items: center;
-    gap: 16px;
+    column-gap: 16px;
+    row-gap: 9px;
+    align-items: start;
     border-radius: 66px;
     corner-shape: superellipse(1.8);
     box-shadow: 0px 8px 32px #0001;
@@ -490,7 +493,7 @@ body:not(.standby) .standby-placeholder {
 .dialog-box {
     position: fixed;
     left: 50vw;
-    bottom: -600px;
+    bottom: calc(-100vh - 40px);
     transform: translateX(-50%);
     min-width: 300px;
     padding: 24px;
@@ -502,6 +505,9 @@ body:not(.standby) .standby-placeholder {
     box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001, 0px 4px 32px 0px #0002;
     transition: all 0.3s cubic-bezier(.26, 0, .91, .54);
     contain: layout style paint;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .show .dialog-box {
@@ -518,6 +524,39 @@ body:not(.standby) .standby-placeholder {
     corner-shape: superellipse(1.8);
     margin-bottom: 8px;
     box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+}
+
+.settings-note {
+    max-width: 310px;
+    margin: -2px 0 12px;
+    color: color-mix(in srgb, var(--text-color) 68%, transparent);
+    font-size: 12px;
+    line-height: 1.55 !important;
+    white-space: normal;
+    text-wrap: wrap;
+}
+
+.version-select {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin: 2px 0 12px;
+    padding: 0 42px 0 18px;
+    border: 0;
+    border-radius: 24px;
+    background: #ffffff82;
+    color: var(--text-color);
+    box-shadow: 0px 2px 4px 0px #0001, 0px 4px 16px 0px #0001;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    .version-select {
+        background: #000;
+        color: #fff;
+        color-scheme: dark;
+    }
 }
 
 #clear-history {
@@ -603,9 +642,27 @@ svg {
             }
 
             .appicon-label {
-        color: #000a;
-    font-size: 12px;
-}
+                width: 85px;
+                min-width: 0;
+                margin-top: 3px;
+                color: #000a;
+                font-size: 11px;
+                font-weight: 500;
+                line-height: 1.3 !important;
+                text-align: center;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            .category > a {
+                display: flex;
+                width: 85px;
+                min-width: 0;
+                flex-direction: column;
+                align-items: center;
+                color: inherit;
+            }
 @media (prefers-color-scheme:dark) {
     :root {
         --iconbg: #0006;
@@ -773,7 +830,8 @@ h2.category-title {
       <h3>設定</h3>
 
       <h4>カスタマイズ</h4>
-      <button onclick="window.location.href='https://search3958.github.io/project/images/2/'">壁紙を選択</button>
+      <button onclick="window.location.href='https://search3958.github.io/project/images/2/'">壁紙・ランダム表示を設定</button>
+      <p class="settings-note">テーマ、または複数の画像からランダム表示を選べます。</p>
       <h4>検索履歴</h4>
       <button id="clear-history">検索履歴を削除</button>
 
@@ -781,8 +839,45 @@ h2.category-title {
       <p>ご利用いただく場合，利用規約と<br>個人情報政策に同意するものとみなします。</p>
       <button onclick="window.location.href='https://search3958.github.io/'">私について</button>
       <button onclick="window.location.href='https://search3958.github.io/i/newtab/'">設定方法</button>
-      <button onclick="window.location.href='https://search3958.github.io/newtab/newtab-simple.html'">簡易版</button>
-      <button onclick="window.location.href='https://search3958.github.io/newtab/beta'">Beta</button>
+      <h4>バージョンを選ぶ</h4>
+      <select class="version-select" aria-label="Newtabのバージョンを選択"
+        onchange="if (this.value) window.location.href=this.value">
+        <option value="" selected>選択するとすぐに移動します</option>
+        <optgroup label="v6 系列">
+          <option value="https://search3958.github.io/newtab/">v6.4</option>
+          <option value="https://search3958.github.io/newtab/v6.3">v6.3</option>
+          <option value="https://search3958.github.io/newtab/v6.2">v6.2</option>
+          <option value="https://search3958.github.io/newtab/v6.1">v6.1</option>
+          <option value="https://search3958.github.io/newtab/v6">v6</option>
+        </optgroup>
+        <optgroup label="v5 系列">
+          <option value="https://search3958.github.io/newtab/v5.3">v5.3</option>
+          <option value="https://search3958.github.io/newtab/v5.2">v5.2</option>
+          <option value="https://search3958.github.io/newtab/v5.1">v5.1</option>
+          <option value="https://search3958.github.io/newtab/v5">v5</option>
+        </optgroup>
+        <optgroup label="v4 系列">
+          <option value="https://search3958.github.io/newtab/v4.1">v4.1</option>
+          <option value="https://search3958.github.io/newtab/v4">v4</option>
+        </optgroup>
+        <optgroup label="v3 系列">
+          <option value="https://search3958.github.io/newtab/v3.6">v3.6</option>
+          <option value="https://search3958.github.io/newtab/v3.5">v3.5</option>
+          <option value="https://search3958.github.io/newtab/v3">v3</option>
+        </optgroup>
+        <optgroup label="v2・特別版">
+          <option value="https://search3958.github.io/newtab/v2.1/index2">Lite</option>
+          <option value="https://search3958.github.io/newtab/v2.1/index2">Elemental</option>
+          <option value="https://search3958.github.io/newtab/v2.1/index2">v2.1</option>
+          <option value="https://search3958.github.io/newtab/v2">v2</option>
+        </optgroup>
+        <optgroup label="クラシック">
+          <option value="https://search3958.github.io/newtab/old/">v1</option>
+          <option value="https://search3958.github.io/newtab/old/first">First</option>
+          <option value="https://codepen.io/sentaroTakenaka/pen/MWdRQgY">Portal</option>
+          <option value="https://sites.google.com/view/c-portal-takesen/%E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF?authuser=0">C Portal</option>
+        </optgroup>
+      </select>
 
       <h4>重要情報</h4>
       <button onclick="window.location.href='https://search3958.github.io/policies/'">利用規約と個人情報政策</button>
@@ -971,6 +1066,8 @@ const SHORTCUT_DATA = {"categories":[{"title":"Sentaro","links":[{"name":"私に
 function _renderOneIcon(imageMap, link) {
   const a = document.createElement('a');
   a.href = link.url || '#';
+  a.title = link.name || '';
+  a.setAttribute('aria-label', link.name || 'ショートカット');
   const appDiv = document.createElement('div');
   appDiv.className = 'appicon-bg';
   appDiv.style.background = link.bg || '#eee';
@@ -993,8 +1090,8 @@ function _renderOneIcon(imageMap, link) {
   label.className = 'appicon-label';
   label.textContent = link.name;
   appDiv.appendChild(img);
-  appDiv.appendChild(label);
   a.appendChild(appDiv);
+  a.appendChild(label);
   return a;
 }
 
