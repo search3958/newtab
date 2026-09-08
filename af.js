@@ -337,8 +337,12 @@
         const val = searchBox.value;
         const atIndex = val.lastIndexOf("@");
         if (atIndex >= 0 && searchBox.selectionStart === val.length) {
-            const query = val.substring(atIndex + 1);
-            showAppSearchDropdown(query);
+            const afterAt = val.substring(atIndex + 1);
+            if (afterAt.includes(" ")) {
+                hideAppSearchDropdown();
+            } else {
+                showAppSearchDropdown(afterAt);
+            }
         } else {
             hideAppSearchDropdown();
         }
@@ -363,8 +367,26 @@
             } else {
                 searchUrl = app.url + encodeURIComponent(query || "");
             }
+            updateHistory(`@${appName} ${query}`.trim());
             window.location.href = searchUrl;
         }
+    };
+
+    const selectFirstDropdownItem = () => {
+        const dropdown = document.getElementById("appSearchDropdown");
+        if (!dropdown || !dropdown.classList.contains("visible")) return false;
+        const firstItem = dropdown.querySelector(".app-search-item");
+        if (firstItem) {
+            const name = firstItem.dataset.name;
+            const searchBox = document.getElementById("searchBox");
+            if (searchBox) {
+                searchBox.value = `@${name} `;
+                hideAppSearchDropdown();
+                searchBox.focus();
+            }
+            return true;
+        }
+        return false;
     };
 
 /* =========================================================
@@ -480,6 +502,16 @@
         }
 
         if (searchBox) {
+            searchBox.addEventListener("keydown", (e) => {
+                const dropdown = document.getElementById("appSearchDropdown");
+                if (dropdown && dropdown.classList.contains("visible")) {
+                    if (e.key === "Enter" || e.key === "Tab") {
+                        e.preventDefault();
+                        selectFirstDropdownItem();
+                    }
+                }
+            });
+
             searchBox.addEventListener("keypress", (e) => {
                 if (e.key === "Enter") {
                     const val = searchBox.value.trim();
@@ -499,8 +531,10 @@
                 const val = searchBox.value;
                 const atIndex = val.lastIndexOf("@");
                 if (atIndex >= 0 && searchBox.selectionStart === val.length) {
-                    const query = val.substring(atIndex + 1);
-                    showAppSearchDropdown(query);
+                    const afterAt = val.substring(atIndex + 1);
+                    if (!afterAt.includes(" ")) {
+                        showAppSearchDropdown(afterAt);
+                    }
                 }
             });
 
@@ -548,12 +582,4 @@
 
     window.renderShortcuts = renderShortcuts;
     window.setupSearchAndHistory = setupSearchAndHistory;
-    window.updateClock = () => {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        const seconds = String(now.getSeconds()).padStart(2, "0");
-        const clockEl = document.getElementById("clock");
-        if (clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
-    };
 })();

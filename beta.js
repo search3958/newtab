@@ -198,21 +198,8 @@
         return null;
     };
 
-    /* =========================================================
-       Clock
-    ========================================================= */
-
-    const updateClock = () => {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        const seconds = String(now.getSeconds()).padStart(2, "0");
-        const clockEl = document.getElementById("clock");
-        if (clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
-    };
-
-    /* =========================================================
-       Initialize
+/* =========================================================
+        Initialize
     ========================================================= */
 
     const init = async () => {
@@ -249,8 +236,6 @@
                 if (window.setupSearchAndHistory) {
                     window.setupSearchAndHistory();
                 }
-                window.updateClock();
-                setInterval(window.updateClock, 1000);
             };
             script.onerror = () => {
                 console.error("[Beta] Failed to load af.js");

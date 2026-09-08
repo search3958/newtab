@@ -165,7 +165,7 @@ body {
     z-index: 100;
 }
 
-.clear-history-btn {
+.search-btn {
     margin: 4px;
     padding: 8px 16px;
     background: rgba(255, 255, 255, 0.5);
@@ -179,36 +179,38 @@ body {
     font-size: 14px;
 }
 
+.search-btn--app {
+    background: rgba(24, 90, 242, 0.5);
+    color: #fff;
+}
+
 @media (prefers-color-scheme: dark) {
-    .clear-history-btn {
+    .search-btn {
         background: rgba(28, 28, 28, 0.5);
         color: #fff;
     }
-}
-
-.app-search-btn {
-    margin: 4px;
-    padding: 8px 16px;
-    background: rgba(24, 90, 242, 0.5);
-    color: #fff;
-    border-radius: 16px;
-    backdrop-filter: blur(16px);
-    height: 40px;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .app-search-btn {
+    .search-btn--app {
         background: rgba(24, 90, 242, 0.7);
         color: #fff;
     }
 }
 
-.app-search-btn:hover {
+.search-btn:hover {
     background: rgba(24, 90, 242, 0.8);
+}
+
+.search-btn--history:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+    .search-btn--history:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+.search-btn--app:hover {
+    background: rgba(24, 90, 242, 0.9);
 }
 
 /* ================================
@@ -545,6 +547,21 @@ body {
 </div>
 
 <script src="beta.js"></script>
+<script>
+    const updateClock = () => {
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const dayName = days[now.getDay()];
+        const clockEl = document.getElementById("clock");
+        if (clockEl) clockEl.textContent = `${month}.${day} ${dayName} ${hours}:${minutes}`;
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
 
 </body>
 </html>
