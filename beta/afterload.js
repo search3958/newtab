@@ -316,7 +316,7 @@ function initAdsDeferred(container) {
   function searchApp(text) {
     if (!text || searchMode !== 'google') return null;
     const q = text.toLowerCase().trim();
-    if (q.length < 2) return null;
+    if (q.length < 1) return null;
     const appLen = appLinks.length;
     for (let i = 0; i < appLen; i++) {
       const app = appLinks[i];

@@ -254,7 +254,29 @@
         { name: "AliExpress", icon: "aliexpress.webp", url: "https://ja.aliexpress.com/w/wholesale-.html?spm=a2g0o.home.search.0", placeholder: null, pattern: "wholesale-*.html" },
         { name: "Amazon", icon: "amazon.webp", url: "https://www.amazon.co.jp/s?k=", placeholder: "k" },
         { name: "Qiita", icon: "qitta.webp", url: "https://qiita.com/search?q=", placeholder: "q" },
-        { name: "PayPayフリマ", icon: "pfm.webp", url: "https://paypayfleamarket.yahoo.co.jp/search/?page=1", placeholder: null }
+        { name: "PayPayフリマ", icon: "pfm.webp", url: "https://paypayfleamarket.yahoo.co.jp/search/?page=1", placeholder: null },
+        { name: "Gmail", icon: "gmail.webp", url: "https://mail.google.com/mail/q=" },
+        { name: "Keep", icon: "keep.webp", url: "https://keep.google.com/" },
+{ name: "ドキュメント", icon: "document.webp", url: "https://docs.google.com/" },
+        { name: "スライド", icon: "slide.webp", url: "https://slides.google.com/" },
+        { name: "スプレッドシート", icon: "spreadsheet.webp", url: "https://sheets.google.com/" },
+        { name: "リモート", icon: "remotedesktop.webp", url: "https://remotely.app/" },
+        { name: "Classroom", icon: "classroom.webp", url: "https://classroom.google.com/" },
+        { name: "Monoxer", icon: "monoxer.webp", url: "https://monoxer.jp/" },
+        { name: "Baram Code", icon: "toolboard.webp", url: "https://baramcode.app/" },
+        { name: "ToolBoard", icon: "toolboard.webp", url: "https://toolboard.app/" },
+        { name: "記録ノート", icon: "notebooklm.webp", url: "https://record.app/" },
+        { name: "デジタル時計", icon: "dclock.webp", url: "https://clock.app/" },
+        { name: "アナログ時計", icon: "aclock.webp", url: "https://clock.app/" },
+        { name: "ストップウォッチ", icon: "stopwatch.webp", url: "https://stopwatch.app/" },
+        { name: "タイマー", icon: "timer.webp", url: "https://timer.app/" },
+        { name: "文字カウンター", icon: "counter.webp", url: "https://counter.app/" },
+        { name: "Qwen", icon: "qwen.webp", url: "https://chatgpt.com?q=" },
+        { name: "TurboWarp", icon: "turbowarp.webp", url: "https://turbowarp.org/" },
+        { name: "Copilot", icon: "copilot.webp", url: "https://copilot.microsoft.com/" },
+        { name: "Claude", icon: "claude.webp", url: "https://claude.ai/" },
+        { name: "Photos", icon: "photos.webp", url: "https://photos.google.com/" },
+        { name: "Forms", icon: "forms.webp", url: "https://forms.gle/" }
     ];
 
     const resolveAppIconUrl = (iconName, iconMap) => {
@@ -266,11 +288,106 @@
         return null;
     };
 
-    let appSearchIconMap = null;
+let appSearchIconMap = null;
+    let lastDropdownQuery = null;
+    const iconCache = new Map();
+
+    const cacheDropdownQuery = (query) => { lastDropdownQuery = query; };
+
+    const fullWidthToHalf = (str) => {
+        const map = {
+            '０': '0', '１': '1', '２': '2', '３': '3', '４': '4',
+            '５': '5', '６': '6', '７': '7', '８': '8', '９': '9',
+            '＋': '+', '－': '-', '×': '*', '÷': '/', '＝': '=',
+            '＋': '+', '−': '-', '＊': '*', '／': '/', '＝': '='
+        };
+        return str.split('').map(c => map[c] || c).join('');
+    };
+
+    const evaluateMath = (str) => {
+        const cleaned = fullWidthToHalf(str).trim();
+        if (!cleaned) return null;
+        const mathRegex = /^[\d\+\-\*\/\.\(\) ]+$/;
+        if (!mathRegex.test(cleaned)) return null;
+        if (!cleaned.includes('+') && !cleaned.includes('-') && !cleaned.includes('*') && !cleaned.includes('/')) return null;
+        try {
+            const result = Function('"use strict"; return (' + cleaned + ')')();
+            if (typeof result === 'number' && isFinite(result)) {
+                return `${cleaned}=${result}`;
+            }
+        } catch (e) {}
+        return null;
+    };
+
+    const resolveAppIconUrlCached = (iconName, iconMap) => {
+        if (!iconName) return null;
+        const cacheKey = `${iconName}_${iconMap.size}`;
+        if (iconCache.has(cacheKey)) return iconCache.get(cacheKey);
+        const url = resolveAppIconUrl(iconName, iconMap);
+        if (url) iconCache.set(cacheKey, url);
+        return url;
+    };
+
+    const showIntelBox = (text, url) => {
+        const intelBox = document.getElementById("intelBox");
+        const intelAnswer = document.getElementById("intelAnswer");
+        if (!intelBox || !intelAnswer) return;
+        intelAnswer.textContent = text;
+        intelAnswer.onclick = null;
+        intelAnswer.classList.remove("hide");
+        if (url) {
+            intelAnswer.style.cursor = "pointer";
+            intelAnswer.onclick = () => window.location.href = url;
+        } else {
+            intelAnswer.style.cursor = "default";
+        }
+        intelBox.classList.add("visible");
+    };
+
+    const hideIntelBox = () => {
+        const intelBox = document.getElementById("intelBox");
+        const intelAnswer = document.getElementById("intelAnswer");
+        if (intelBox) intelBox.classList.remove("visible");
+        if (intelAnswer) {
+            intelAnswer.classList.add("hide");
+            intelAnswer.onclick = null;
+        }
+    };
+
+    const searchApp = (text) => {
+        if (!text) return null;
+        const q = text.replace(/^@/, '').toLowerCase().trim();
+        if (q.length < 1) return null;
+        return APP_SEARCH_DATA.find(app => {
+            const n = app.name.toLowerCase();
+            return n === q || n.includes(q);
+        }) || null;
+    };
+
+    const updateIntelFromDropdown = (query) => {
+        if (!query) { hideIntelBox(); return; }
+        const match = APP_SEARCH_DATA.find(app => app.name.toLowerCase().includes(query.toLowerCase()));
+        if (match) {
+            const iconUrl = resolveAppIconUrlCached(match.icon, appSearchIconMap);
+            const iconHtml = iconUrl
+                ? `<img src="${iconUrl}" alt="${match.name}" style="width:20px;height:20px;object-fit:contain">`
+                : '';
+            showIntelBox(`${iconHtml} ${match.name}`, match.url);
+        } else {
+            hideIntelBox();
+        }
+    };
 
     const showAppSearchDropdown = (query) => {
         const dropdown = document.getElementById("appSearchDropdown");
         if (!dropdown) return;
+        if (query === lastDropdownQuery) {
+            updateIntelFromDropdown(query);
+            return;
+        }
+        lastDropdownQuery = query;
+        // Update intel box immediately, before generating dropdown HTML
+        updateIntelFromDropdown(query);
         const filtered = query
             ? APP_SEARCH_DATA.filter(app => app.name.toLowerCase().includes(query.toLowerCase()))
             : APP_SEARCH_DATA;
@@ -278,7 +395,7 @@
             dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:14px">該当するアプリが見つかりません</div>';
         } else {
             dropdown.innerHTML = filtered.map(app => {
-                const iconUrl = resolveAppIconUrl(app.icon, appSearchIconMap);
+                const iconUrl = resolveAppIconUrlCached(app.icon, appSearchIconMap);
                 const iconHtml = iconUrl
                     ? `<div class="app-search-item-icon"><img src="${iconUrl}" alt="${app.name}"></div>`
                     : `<div class="app-search-item-icon" style="background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">${app.name[0]}</div>`;
@@ -290,11 +407,21 @@
             item.addEventListener("mousedown", (e) => {
                 e.preventDefault();
                 const name = item.dataset.name;
-                const searchBox = document.getElementById("searchBox");
-                if (searchBox) {
-                    searchBox.value = `@${name} `;
-                    hideAppSearchDropdown();
-                    searchBox.focus();
+                const url = item.dataset.url;
+                hideAppSearchDropdown();
+                hideIntelBox();
+                const app = APP_SEARCH_DATA.find(a => a.name === name);
+                if (app) {
+                    let searchUrl;
+                    if (app.name === "AliExpress") {
+                        searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
+                    } else if (app.placeholder) {
+                        searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
+                    } else {
+                        searchUrl = app.url + encodeURIComponent("");
+                    }
+                    updateHistory(`@${name}`);
+                    window.location.href = searchUrl;
                 }
             });
         });
@@ -316,6 +443,7 @@
         } else if (val === "@") {
             searchBox.value = "";
             hideAppSearchDropdown();
+            hideIntelBox();
         } else if (val.startsWith("@")) {
             const spaceIdx = val.indexOf(" ");
             if (spaceIdx > 0) {
@@ -324,6 +452,7 @@
                 searchBox.value = "";
             }
             hideAppSearchDropdown();
+            hideIntelBox();
         } else {
             searchBox.value = val + "@";
             searchBox.focus();
@@ -331,12 +460,41 @@
         }
     };
 
-    const filterAppDropdown = () => {
+    const selectFirstDropdownItem = () => {
+        const dropdown = document.getElementById("appSearchDropdown");
+        if (!dropdown || !dropdown.classList.contains("visible")) return false;
+        const firstItem = dropdown.querySelector(".app-search-item");
+        if (firstItem) {
+            const name = firstItem.dataset.name;
+            const url = firstItem.dataset.url;
+            hideAppSearchDropdown();
+            const app = APP_SEARCH_DATA.find(a => a.name === name);
+            if (app) {
+                showIntelBox(app.name, app.url);
+                const searchBox = document.getElementById("searchBox");
+                if (searchBox) searchBox.focus();
+                let searchUrl;
+                if (app.name === "AliExpress") {
+                    searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
+                } else if (app.placeholder) {
+                    searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
+                } else {
+                    searchUrl = app.url + encodeURIComponent("");
+                }
+                updateHistory(`@${name}`);
+                window.location.href = searchUrl;
+            }
+            return true;
+        }
+        return false;
+    };
+
+const filterAppDropdown = () => {
         const searchBox = document.getElementById("searchBox");
         if (!searchBox) return;
         const val = searchBox.value;
         const atIndex = val.lastIndexOf("@");
-        if (atIndex >= 0 && searchBox.selectionStart === val.length) {
+        if (atIndex >= 0) {
             const afterAt = val.substring(atIndex + 1);
             if (afterAt.includes(" ")) {
                 hideAppSearchDropdown();
@@ -353,43 +511,24 @@
         if (!searchBox) return;
         const val = searchBox.value.trim();
         if (!val.startsWith("@")) return;
-        const parts = val.substring(1).split(/\s+/);
-        const appName = parts[0];
-        const query = parts.slice(1).join(" ");
-        const app = APP_SEARCH_DATA.find(a => a.name === appName);
+        const app = searchApp(val);
         if (app) {
             hideAppSearchDropdown();
+            hideIntelBox();
             let searchUrl;
             if (app.name === "AliExpress") {
-                searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(query || ""));
+                searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
             } else if (app.placeholder) {
-                searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(query || ""));
+                searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
             } else {
-                searchUrl = app.url + encodeURIComponent(query || "");
+                searchUrl = app.url + encodeURIComponent("");
             }
-            updateHistory(`@${appName} ${query}`.trim());
+            updateHistory(`@${app.name}`);
             window.location.href = searchUrl;
         }
     };
 
-    const selectFirstDropdownItem = () => {
-        const dropdown = document.getElementById("appSearchDropdown");
-        if (!dropdown || !dropdown.classList.contains("visible")) return false;
-        const firstItem = dropdown.querySelector(".app-search-item");
-        if (firstItem) {
-            const name = firstItem.dataset.name;
-            const searchBox = document.getElementById("searchBox");
-            if (searchBox) {
-                searchBox.value = `@${name} `;
-                hideAppSearchDropdown();
-                searchBox.focus();
-            }
-            return true;
-        }
-        return false;
-    };
-
-/* =========================================================
+    /* =========================================================
         Search & History
     ========================================================= */
 
@@ -501,14 +640,44 @@
             appSearchBtn.addEventListener("click", handleAppSearchClick);
         }
 
-        if (searchBox) {
+if (searchBox) {
+            let inputTimer = null;
             searchBox.addEventListener("keydown", (e) => {
                 const dropdown = document.getElementById("appSearchDropdown");
+                const intelBox = document.getElementById("intelBox");
+                const intelVisible = intelBox && intelBox.classList.contains("visible");
                 if (dropdown && dropdown.classList.contains("visible")) {
-                    if (e.key === "Enter" || e.key === "Tab") {
+                    if (e.key === "Enter") {
                         e.preventDefault();
                         selectFirstDropdownItem();
+                    } else if (e.key === "Tab") {
+                        e.preventDefault();
+                        hideAppSearchDropdown();
+                    } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        const val = searchBox.value;
+                        const atIndex = val.lastIndexOf("@");
+                        if (atIndex >= 0) {
+                            cacheDropdownQuery(val.substring(atIndex + 1));
+                        }
+                        hideAppSearchDropdown();
+                        hideIntelBox();
                     }
+                } else if (intelVisible) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        const intelAnswer = document.getElementById("intelAnswer");
+                        if (intelAnswer && intelAnswer.onclick) intelAnswer.onclick();
+                    } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        hideIntelBox();
+                    } else if (e.key === "Tab") {
+                        e.preventDefault();
+                        hideIntelBox();
+                    }
+                } else if (e.key === "Escape") {
+                    hideAppSearchDropdown();
+                    hideIntelBox();
                 }
             });
 
@@ -516,7 +685,14 @@
                 if (e.key === "Enter") {
                     const val = searchBox.value.trim();
                     if (val.startsWith("@")) {
-                        performAppSearch();
+                        const app = searchApp(val);
+                        if (app) {
+                            performAppSearch();
+                        } else {
+                            performSearch(val);
+                        }
+                    } else if (/^[\d\+\-\*\/\.\(\) ]+=\d+$/.test(val)) {
+                        // Math result, don't search
                     } else {
                         performSearch(val);
                     }
@@ -524,13 +700,32 @@
             });
 
             searchBox.addEventListener("input", () => {
-                filterAppDropdown();
+                clearTimeout(inputTimer);
+                inputTimer = setTimeout(() => {
+                    const val = searchBox.value.trim();
+                    if (val.startsWith("@")) {
+                        filterAppDropdown();
+                    } else {
+                        hideAppSearchDropdown();
+                        const isMathExpr = evaluateMath(val);
+                        if (isMathExpr) {
+                            showIntelBox(isMathExpr, null);
+                        } else {
+                            const app = searchApp(val);
+                            if (app) {
+                                showIntelBox(app.name, app.url);
+                            } else {
+                                hideIntelBox();
+                            }
+                        }
+                    }
+                }, 50);
             });
 
             searchBox.addEventListener("focus", () => {
                 const val = searchBox.value;
                 const atIndex = val.lastIndexOf("@");
-                if (atIndex >= 0 && searchBox.selectionStart === val.length) {
+                if (atIndex >= 0) {
                     const afterAt = val.substring(atIndex + 1);
                     if (!afterAt.includes(" ")) {
                         showAppSearchDropdown(afterAt);
@@ -540,15 +735,17 @@
 
             searchBox.addEventListener("blur", () => {
                 setTimeout(() => {
-                    if (!document.getElementById("appSearchDropdown")?.matches(":hover")) {
+                    if (!document.getElementById("appSearchDropdown")?.matches(":hover") &&
+                        !document.getElementById("intelBox")?.matches(":hover")) {
                         hideAppSearchDropdown();
+                        hideIntelBox();
                     }
                 }, 200);
             });
 
-            const dropdown = document.getElementById("appSearchDropdown");
-            if (dropdown) {
-                dropdown.addEventListener("mousedown", (e) => e.preventDefault());
+const dropdownEl = document.getElementById("appSearchDropdown");
+            if (dropdownEl) {
+                dropdownEl.addEventListener("mousedown", (e) => e.preventDefault());
             }
         }
 

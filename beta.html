@@ -300,6 +300,63 @@ body {
 }
 
 /* ================================
+    Intelligence Box
+    ================================ */
+
+.intelligence-box {
+    position: fixed;
+    top: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 413px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    backdrop-filter: blur(24px);
+    z-index: 150;
+    padding: 8px 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+    pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    .intelligence-box {
+        background: rgba(28, 28, 28, 0.95);
+    }
+}
+
+.intelligence-box.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.intelligence-answer {
+    font-size: 16px;
+    color: #000;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    .intelligence-answer {
+        color: #fff;
+    }
+}
+
+.intelligence-answer.hide {
+    color: #0059ff;
+    filter: blur(4px);
+    opacity: 0;
+}
+
+/* ================================
    Shortcut Section (scrolls into view)
    ================================ */
 
@@ -340,11 +397,13 @@ body {
 
 .main-shortcut-title {
     margin: 0;
-    font-size: 24px;
-    font-weight: 500;
+    font-size: 20px;
     text-align: center;
+    font-weight:400;
     color: rgba(0, 0, 0, 0.88);
     text-shadow: 0 1px 5px rgba(255, 255, 255, 0.55);
+    margin-top:16px;
+    opacity:0.5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -533,6 +592,10 @@ body {
     <button class="searchbtn" id="searchButton">
         <span>search</span>
     </button>
+</div>
+
+<div class="intelligence-box" id="intelBox">
+    <div class="intelligence-answer hide" id="intelAnswer"></div>
 </div>
 
 <div class="history-list" id="historyList"></div>
