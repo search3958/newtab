@@ -46,6 +46,32 @@
 
     /* =========================================================
        Wallpaper
+    ========================================================= */
+
+    const setWallpaper = (light, dark) => {
+        if (!document.body) return;
+        const lightUrl = light ? URL.createObjectURL(light) : FALLBACK_LIGHT;
+        const darkUrl = dark ? URL.createObjectURL(dark) : lightUrl;
+        document.body.style.setProperty("--wallpaper-light", `url("${lightUrl}")`);
+        document.body.style.setProperty("--wallpaper-dark", `url("${darkUrl}")`);
+    };
+
+    const idbGet = (db, key) => new Promise(resolve => {
+        try {
+            const req = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        } catch { resolve(null); }
+    });
+
+    const initWallpaper = () => {
+        let request;
+        try { request = indexedDB.open(DB_NAME, 1); } catch { return; }
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+        };
+        request.onsuccess = async () => {
             const db = request.result;
             try {
                 const random = await idbGet(db, "newtabRandom");
