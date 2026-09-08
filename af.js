@@ -242,6 +242,132 @@
     };
 
 /* =========================================================
+        App Search Data
+    ========================================================= */
+
+    const APP_SEARCH_DATA = [
+        { name: "Scratch", icon: "scratch.webp", url: "https://scratch.mit.edu/search/projects?q=", placeholder: "q" },
+        { name: "YouTube", icon: "youtube.webp", url: "https://www.youtube.com/results?search_query=", placeholder: "search_query" },
+        { name: "X", icon: "x.webp", url: "https://x.com/search?q=", placeholder: "q" },
+        { name: "ChatGPT", icon: "chatgpt.webp", url: "https://chatgpt.com?q=", placeholder: "q" },
+        { name: "Mercari", icon: "mercari.webp", url: "https://jp.mercari.com/search?keyword=", placeholder: "keyword" },
+        { name: "AliExpress", icon: "aliexpress.webp", url: "https://ja.aliexpress.com/w/wholesale-.html?spm=a2g0o.home.search.0", placeholder: null, pattern: "wholesale-*.html" },
+        { name: "Amazon", icon: "amazon.webp", url: "https://www.amazon.co.jp/s?k=", placeholder: "k" },
+        { name: "Qiita", icon: "qitta.webp", url: "https://qiita.com/search?q=", placeholder: "q" },
+        { name: "PayPayフリマ", icon: "pfm.webp", url: "https://paypayfleamarket.yahoo.co.jp/search/?page=1", placeholder: null }
+    ];
+
+    const resolveAppIconUrl = (iconName, iconMap) => {
+        if (!iconName) return null;
+        if (iconMap.has(iconName)) return iconMap.get(iconName);
+        for (const [filename, url] of iconMap) {
+            if (filename.endsWith("/" + iconName) || filename.endsWith("\\" + iconName)) return url;
+        }
+        return null;
+    };
+
+    let appSearchIconMap = null;
+
+    const showAppSearchDropdown = (query) => {
+        const dropdown = document.getElementById("appSearchDropdown");
+        if (!dropdown) return;
+        const filtered = query
+            ? APP_SEARCH_DATA.filter(app => app.name.toLowerCase().includes(query.toLowerCase()))
+            : APP_SEARCH_DATA;
+        if (filtered.length === 0) {
+            dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:14px">該当するアプリが見つかりません</div>';
+        } else {
+            dropdown.innerHTML = filtered.map(app => {
+                const iconUrl = resolveAppIconUrl(app.icon, appSearchIconMap);
+                const iconHtml = iconUrl
+                    ? `<div class="app-search-item-icon"><img src="${iconUrl}" alt="${app.name}"></div>`
+                    : `<div class="app-search-item-icon" style="background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">${app.name[0]}</div>`;
+                return `<div class="app-search-item" data-url="${app.url}" data-name="${app.name}" data-placeholder="${app.placeholder || ''}">${iconHtml}<span class="app-search-item-name">${app.name}</span><span class="app-search-item-url">${app.url.replace(/=$/, "")}…</span></div>`;
+            }).join("");
+        }
+        dropdown.classList.add("visible");
+        dropdown.querySelectorAll(".app-search-item").forEach(item => {
+            item.addEventListener("mousedown", (e) => {
+                e.preventDefault();
+                const name = item.dataset.name;
+                const searchBox = document.getElementById("searchBox");
+                if (searchBox) {
+                    searchBox.value = `@${name} `;
+                    hideAppSearchDropdown();
+                    searchBox.focus();
+                }
+            });
+        });
+    };
+
+    const hideAppSearchDropdown = () => {
+        const dropdown = document.getElementById("appSearchDropdown");
+        if (dropdown) dropdown.classList.remove("visible");
+    };
+
+    const handleAppSearchClick = () => {
+        const searchBox = document.getElementById("searchBox");
+        if (!searchBox) return;
+        const val = searchBox.value;
+        if (val === "") {
+            searchBox.value = "@";
+            searchBox.focus();
+            showAppSearchDropdown("");
+        } else if (val === "@") {
+            searchBox.value = "";
+            hideAppSearchDropdown();
+        } else if (val.startsWith("@")) {
+            const spaceIdx = val.indexOf(" ");
+            if (spaceIdx > 0) {
+                searchBox.value = val.substring(0, spaceIdx);
+            } else {
+                searchBox.value = "";
+            }
+            hideAppSearchDropdown();
+        } else {
+            searchBox.value = val + "@";
+            searchBox.focus();
+            showAppSearchDropdown("");
+        }
+    };
+
+    const filterAppDropdown = () => {
+        const searchBox = document.getElementById("searchBox");
+        if (!searchBox) return;
+        const val = searchBox.value;
+        const atIndex = val.lastIndexOf("@");
+        if (atIndex >= 0 && searchBox.selectionStart === val.length) {
+            const query = val.substring(atIndex + 1);
+            showAppSearchDropdown(query);
+        } else {
+            hideAppSearchDropdown();
+        }
+    };
+
+    const performAppSearch = () => {
+        const searchBox = document.getElementById("searchBox");
+        if (!searchBox) return;
+        const val = searchBox.value.trim();
+        if (!val.startsWith("@")) return;
+        const parts = val.substring(1).split(/\s+/);
+        const appName = parts[0];
+        const query = parts.slice(1).join(" ");
+        const app = APP_SEARCH_DATA.find(a => a.name === appName);
+        if (app) {
+            hideAppSearchDropdown();
+            let searchUrl;
+            if (app.name === "AliExpress") {
+                searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(query || ""));
+            } else if (app.placeholder) {
+                searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(query || ""));
+            } else {
+                searchUrl = app.url + encodeURIComponent(query || "");
+            }
+            window.location.href = searchUrl;
+        }
+    };
+
+/* =========================================================
         Search & History
     ========================================================= */
 
@@ -345,18 +471,75 @@
         const searchBox = document.getElementById("searchBox");
         const searchButton = document.getElementById("searchButton");
         const clearHistoryBtn = document.getElementById("clearHistory");
+        const appSearchBtn = document.getElementById("appSearchBtn");
+
+        appSearchIconMap = window._iconMap || new Map();
+
+        if (appSearchBtn) {
+            appSearchBtn.addEventListener("click", handleAppSearchClick);
+        }
 
         if (searchBox) {
             searchBox.addEventListener("keypress", (e) => {
-                if (e.key === "Enter") performSearch(searchBox.value);
+                if (e.key === "Enter") {
+                    const val = searchBox.value.trim();
+                    if (val.startsWith("@")) {
+                        performAppSearch();
+                    } else {
+                        performSearch(val);
+                    }
+                }
+            });
+
+            searchBox.addEventListener("input", () => {
+                filterAppDropdown();
+            });
+
+            searchBox.addEventListener("focus", () => {
+                const val = searchBox.value;
+                const atIndex = val.lastIndexOf("@");
+                if (atIndex >= 0 && searchBox.selectionStart === val.length) {
+                    const query = val.substring(atIndex + 1);
+                    showAppSearchDropdown(query);
+                }
+            });
+
+            searchBox.addEventListener("blur", () => {
+                setTimeout(() => {
+                    if (!document.getElementById("appSearchDropdown")?.matches(":hover")) {
+                        hideAppSearchDropdown();
+                    }
+                }, 200);
+            });
+
+            const dropdown = document.getElementById("appSearchDropdown");
+            if (dropdown) {
+                dropdown.addEventListener("mousedown", (e) => e.preventDefault());
+            }
+        }
+
+        if (searchButton) {
+            searchButton.addEventListener("click", () => {
+                const val = searchBox?.value || "";
+                if (val.trim().startsWith("@")) {
+                    performAppSearch();
+                } else {
+                    performSearch(val);
+                }
             });
         }
-        if (searchButton) {
-            searchButton.addEventListener("click", () => performSearch(searchBox?.value || ""));
-        }
+
         if (clearHistoryBtn) {
             clearHistoryBtn.addEventListener("click", showHistoryDialog);
         }
+
+        document.addEventListener("click", (e) => {
+            const dropdown = document.getElementById("appSearchDropdown");
+            const appBtn = document.getElementById("appSearchBtn");
+            if (dropdown && !dropdown.contains(e.target) && appBtn && !appBtn.contains(e.target) && e.target !== searchBox && !e.target.closest(".app-search-item")) {
+                hideAppSearchDropdown();
+            }
+        });
     };
 
     /* =========================================================
