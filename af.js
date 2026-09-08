@@ -241,40 +241,27 @@
         console.log(`[Shortcut] Rendered ${categories.length} categories.`);
     };
 
-    /* =========================================================
-       Search & History
+/* =========================================================
+        Search & History
     ========================================================= */
 
     let searchEngine = "google";
 
     const setSearchEngine = (engine) => { searchEngine = engine; };
 
-    const updateHistory = (query) => {
-        const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
-        history.unshift(query);
-        if (history.length > 5) history.pop();
-        localStorage.setItem("searchHistory", JSON.stringify(history));
-        renderHistory();
+    const formatDateTime = (date) => {
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        const h = String(date.getHours()).padStart(2, "0");
+        const min = String(date.getMinutes()).padStart(2, "0");
+        return `${m}.${d} ${h}:${min}`;
     };
 
-    const renderHistory = () => {
+    const updateHistory = (query) => {
         const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
-        const container = document.getElementById("historyList");
-        if (!container) return;
-        container.innerHTML = "";
-        history.forEach((item, index) => {
-            const el = document.createElement("span");
-            el.className = "history";
-            el.textContent = item;
-            el.addEventListener("click", () => {
-                if (item.startsWith("http://") || item.startsWith("https://")) {
-                    window.location.href = item;
-                } else {
-                    performSearch(item);
-                }
-            });
-            container.appendChild(el);
-        });
+        history.unshift({ query, time: Date.now() });
+        if (history.length > 40) history.length = 40;
+        localStorage.setItem("searchHistory", JSON.stringify(history));
     };
 
     const performSearch = (query) => {
@@ -294,9 +281,64 @@
         window.location.href = url;
     };
 
-    const clearHistory = () => {
-        localStorage.removeItem("searchHistory");
-        renderHistory();
+    const showHistoryDialog = () => {
+        const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+        const existing = document.getElementById("historyDialog");
+        if (existing) existing.remove();
+
+        const dialog = document.createElement("div");
+        dialog.id = "historyDialog";
+
+        const header = document.createElement("div");
+        header.className = "dialog-header";
+
+        const title = document.createElement("h3");
+        title.textContent = "検索履歴";
+        header.appendChild(title);
+
+        const closeBtn = document.createElement("button");
+        closeBtn.textContent = "×";
+        closeBtn.addEventListener("click", () => dialog.remove());
+
+        const content = document.createElement("div");
+        content.className = "dialog-content";
+
+        if (history.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "dialog-empty";
+            empty.textContent = "履歴はありません";
+            content.appendChild(empty);
+        } else {
+            const displayHistory = history.slice(-40).reverse();
+            const list = document.createElement("ul");
+            displayHistory.forEach((item) => {
+                const li = document.createElement("li");
+                const query = typeof item === "string" ? item : item.query;
+                const time = typeof item === "string" ? null : item.time;
+                const dateStr = time ? formatDateTime(new Date(time)) : "";
+                li.innerHTML = `<span>${query}</span><span style="color:#999;font-size:12px;white-space:nowrap">${dateStr}</span>`;
+                li.addEventListener("click", () => {
+                    dialog.remove();
+                    if (query.startsWith("http://") || query.startsWith("https://")) {
+                        window.location.href = query;
+                    } else {
+                        performSearch(query);
+                    }
+                });
+                list.appendChild(li);
+            });
+            content.appendChild(list);
+        }
+
+        content.insertBefore(header, content.firstChild);
+        content.appendChild(closeBtn);
+        dialog.appendChild(content);
+
+        dialog.addEventListener("click", (e) => {
+            if (e.target === dialog) dialog.remove();
+        });
+
+        document.body.appendChild(dialog);
     };
 
     const setupSearchAndHistory = () => {
@@ -313,10 +355,8 @@
             searchButton.addEventListener("click", () => performSearch(searchBox?.value || ""));
         }
         if (clearHistoryBtn) {
-            clearHistoryBtn.addEventListener("click", clearHistory);
+            clearHistoryBtn.addEventListener("click", showHistoryDialog);
         }
-
-        renderHistory();
     };
 
     /* =========================================================
