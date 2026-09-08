@@ -1,547 +1,269 @@
-(function injectLocalFont() {
-  if (document.getElementById('local-google-sans-font')) return;
-  const style = document.createElement('style');
-  style.id = 'local-google-sans-font';
-  style.textContent =
-    '@font-face{font-family:"Google_Sans_Xiao2";' +
-    'src:url(data:application/octet-stream;base64,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);}';
-  document.head.appendChild(style);
-})();
+(() => {
+    "use strict";
 
-const requestIdle =
-  typeof window.requestIdleCallback === 'function'
-    ? window.requestIdleCallback.bind(window)
-    : (cb, options = {}) => setTimeout(
-      () => cb({ didTimeout: true, timeRemaining: () => 0 }),
-      options.timeout || 1
-    );
+    /* =========================================================
+       Constants
+    ========================================================= */
 
-// ============================================================
-// § 2. 壁紙から色を計算して CSS 変数に適用
-// ============================================================
-(function setupColorScan() {
-  function rgbToHue(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0;
-    if (max !== min) {
-      if      (max === r) h = (g - b) / (max - min) + (g < b ? 6 : 0);
-      else if (max === g) h = (b - r) / (max - min) + 2;
-      else                h = (r - g) / (max - min) + 4;
-      h /= 6;
-    }
-    return Math.round(h * 360);
-  }
+    const DB_NAME = "WallpaperDB";
+    const STORE = "images";
+    const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-6-2.zip";
+    const FALLBACK_LIGHT = "bgimg/baram1.webp";
+    const FALLBACK_DARK = "bgimg/baram1_dark.webp";
 
-  function scanAndApplyColor(imageUrl) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.src = imageUrl;
-      img.onload = () => {
-        requestIdle(() => {
-          try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            const size = 30;
-            canvas.width = canvas.height = size;
-            ctx.drawImage(img, 0, 0, size, size);
-            const data = ctx.getImageData(0, 0, size, size).data;
-            let r = 0, g = 0, b = 0;
-            const step = 4, len = data.length;
-            for (let i = 0; i < len; i += step * 4) {
-              r += data[i]; g += data[i + 1]; b += data[i + 2];
-            }
-            const count = len / (4 * step);
-            const deg = rgbToHue(r / count, g / count, b / count);
-            document.documentElement.style.setProperty('--color-deg', deg + 'deg');
-            resolve(deg);
-          } catch (e) { reject(e); }
-        }, { timeout: 1000 });
-      };
-      img.onerror = reject;
-    });
-  }
+    /* =========================================================
+       DOM
+    ========================================================= */
 
-  function initColorFromWallpaper() {
-    const url = document.body.dataset.lightUrl;
-    if (url) scanAndApplyColor(url).catch(() => {});
-  }
-
-  window.rescanWallpaperColor = () => {
-    const url = document.body.dataset.lightUrl;
-    return url ? scanAndApplyColor(url) : Promise.reject('No wallpaper set');
-  };
-
-  // 壁紙が既に適用済みなら即スキャン、なければ適用後にスキャン
-  initColorFromWallpaper();
-})();
-
-// ============================================================
-// § 3. DOM 参照・定数
-// ============================================================
-const HISTORY_KEY = 'search_history_v2';
-const DEFAULT_PLACEHOLDER = '検索や計算・アプリ';
-const CHATGPT_PLACEHOLDER = 'ChatGPTに質問';
-
-const searchInput  = document.querySelector('.search-input');
-const searchBtn    = document.querySelector('.search-button');
-const controlBtns  = document.querySelectorAll('.control-button');
-const intelBox     = document.querySelector('.intelligence-box');
-const intelIcon    = document.querySelector('.intelligence-icon');
-const answerEl     = document.querySelector('.intelligence-answer');
-const settingsDlg  = document.getElementById('settings-dialog');
-const historyDlg   = document.getElementById('history-dialog');
-const historyList  = document.getElementById('history-list');
-const clearHistBtn = document.getElementById('clear-history');
-
-// インライン側で公開したユーティリティを受け取る
-const { sanitizeExpr, isMath, calcResult, RE_URL } = window._inlineUtils || {};
-
-if (intelBox) intelBox.style.display = 'none';
-
-// ============================================================
-// § 3.5 Markdown レンダラー (簡易)
-// ============================================================
-const _md = (() => {
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-  function inline(s) {
-    s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    s = s.replace(/~~(.+?)~~/g, '<del>$1</del>');
-    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-    return s;
-  }
-  function render(text) {
-    const lines = text.split('\n');
-    let html = '', inList = null, inCode = false, codeBuf = [], inTable = false, tableBuf = [];
-    for (const raw of lines) {
-      const line = esc(raw);
-      if (line.startsWith('```')) {
-        if (inCode) { html += '<pre><code>' + codeBuf.join('\n') + '</code></pre>'; codeBuf = []; inCode = false; }
-        else { inCode = true; }
-        continue;
-      }
-      if (inCode) { codeBuf.push(line); continue; }
-      if (line.match(/^\|(.+)\|$/)) {
-        if (!inTable) { inTable = true; tableBuf = []; }
-        const cells = line.split('|').filter((_, i, a) => i > 0 && i < a.length - 1);
-        if (cells.every(c => /^[\s:-]+$/.test(c))) continue;
-        tableBuf.push(cells.map(c => c.trim()));
-        continue;
-      } else if (inTable) {
-        html += '<table><thead><tr>' + tableBuf[0].map(c => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
-        for (let i = 1; i < tableBuf.length; i++)
-          html += '<tr>' + tableBuf[i].map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>';
-        html += '</tbody></table>';
-        inTable = false; tableBuf = [];
-      }
-      if (line.match(/^#{1,4}\s/)) {
-        const level = line.match(/^(#+)/)[1].length;
-        html += '<h' + level + '>' + inline(line.replace(/^#+\s*/, '')) + '</h' + level + '>';
-        inList = null; continue;
-      }
-      if (line.match(/^[-*]\s/)) {
-        if (inList !== 'ul') { if (inList) html += '</' + inList + '>'; html += '<ul>'; inList = 'ul'; }
-        html += '<li>' + inline(line.replace(/^[-*]\s*/, '')) + '</li>';
-        continue;
-      }
-      if (line.match(/^\d+\.\s/)) {
-        if (inList !== 'ol') { if (inList) html += '</' + inList + '>'; html += '<ol>'; inList = 'ol'; }
-        html += '<li>' + inline(line.replace(/^\d+\.\s*/, '')) + '</li>';
-        continue;
-      }
-      if (line.match(/^>\s/)) {
-        if (inList) { html += '</' + inList + '>'; inList = null; }
-        html += '<blockquote>' + inline(line.replace(/^>\s*/, '')) + '</blockquote>';
-        continue;
-      }
-      if (line.match(/^(-{3,}|_{3,}|\*{3,})$/)) {
-        if (inList) { html += '</' + inList + '>'; inList = null; }
-        html += '<hr>';
-        continue;
-      }
-      if (inList) { html += '</' + inList + '>'; inList = null; }
-      if (line === '') { html += '<br>'; continue; }
-      html += '<p>' + inline(line) + '</p>';
-    }
-    if (inCode && codeBuf.length) html += '<pre><code>' + codeBuf.join('\n') + '</code></pre>';
-    if (inList) html += '</' + inList + '>';
-    if (inTable && tableBuf.length) {
-      html += '<table><thead><tr>' + tableBuf[0].map(c => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
-      for (let i = 1; i < tableBuf.length; i++)
-        html += '<tr>' + tableBuf[i].map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>';
-      html += '</tbody></table>';
-    }
-    return html;
-  }
-  return { render };
-})();
-
-// ============================================================
-// § 3.6 チャット (Standby 時に検索ボックスから API 送信)
-// ============================================================
-(function setupChat() {
-  const FUNCTION_URL = 'https://bhwxeffktrxzfdmpfhpd.supabase.co/functions/v1/search';
-  const chatBox = document.querySelector('.standby-chat-box');
-  const chatMessages = document.getElementById('chat-result');
-  const placeholder = document.getElementById('standby-placeholder');
-  const placeholderText = placeholder?.querySelector('.standby-placeholder-text');
-  let chatPending = false;
-  let hasResponded = false;
-
-  function showPlaceholder(msg) {
-    if (placeholderText) placeholderText.textContent = msg;
-    if (placeholder) placeholder.classList.remove('hidden');
-    if (chatBox) chatBox.classList.remove('visible');
-  }
-
-  function hidePlaceholder() {
-    if (placeholder) placeholder.classList.add('hidden');
-  }
-
-  function doChat(text) {
-    if (chatPending || !chatMessages) return;
-    chatPending = true;
-    hasResponded = true;
-    hidePlaceholder();
-    chatBox.classList.add('has-content');
-    chatMessages.innerHTML = '<p style="opacity:0.6">生成中...</p>';
-    chatBox.classList.add('visible');
-
-    fetch(FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(data => {
-        if (data.error) throw new Error(data.error);
-        const raw = data.choices?.[0]?.message?.content || JSON.stringify(data, null, 2);
-        const lines = raw.split('\n');
-        const firstLine = lines[0];
-        const titleMatch = firstLine.match(/^\/\/([\p{Emoji_Presentation}\p{Emoji}\u200d\ufe0f]+)\s*(.*)/u);
-        let titleHtml = '';
-        let body = raw;
-        if (titleMatch) {
-          const emoji = titleMatch[1];
-          const title = titleMatch[2].trim();
-          titleHtml = '<div class="standby-chat-title"><span class="emoji">' + emoji + '</span>' + esc(title) + '</div>';
-          body = lines.slice(1).join('\n');
+    const getRequiredElement = (selector) => {
+        const element = document.querySelector(selector);
+        if (!element) {
+            console.error(`[Wallpaper] Required element not found: ${selector}`);
+            return null;
         }
-        chatBox.classList.remove('visible');
-        setTimeout(() => {
-          chatMessages.innerHTML = titleHtml + '<div class="standby-chat-body">' + _md.render(body) + '</div>';
-          requestAnimationFrame(() => {
-            chatBox.classList.add('visible');
-            chatBox.scrollTop = 0;
-          });
-        }, 700);
-      })
-      .catch(err => {
-        chatBox.classList.remove('visible');
-        setTimeout(() => {
-          chatMessages.innerHTML = '<p style="color:#f88">エラー: ' + esc(err.message) + '</p>';
-          chatBox.classList.add('visible');
-        }, 700);
-      })
-      .finally(() => { chatPending = false; });
-  }
+        return element;
+    };
 
-  function esc(s) { return s.replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    /* =========================================================
+       Wallpaper
+    ========================================================= */
 
-  showPlaceholder('気になることはありますか？');
+    const setWallpaper = (light, dark) => {
+        if (!document.body) return;
+        const lightUrl = light ? URL.createObjectURL(light) : FALLBACK_LIGHT;
+        const darkUrl = dark ? URL.createObjectURL(dark) : lightUrl;
+        document.body.style.setProperty("--wallpaper-light", `url("${lightUrl}")`);
+        document.body.style.setProperty("--wallpaper-dark", `url("${darkUrl}")`);
+    };
 
-  window._doChat = doChat;
-  window._resetChat = function () {
-    hasResponded = false;
-    chatPending = false;
-    chatBox.classList.remove('has-content', 'visible');
-    chatMessages.innerHTML = '';
-    showPlaceholder('気になることはありますか？');
-  };
-})();
-
-// ============================================================
-// § 4. 履歴
-// ============================================================
-let historyCache = null;
-
-function getHistory() {
-  if (historyCache !== null) return historyCache;
-  try { historyCache = JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
-  catch { historyCache = []; }
-  return historyCache;
-}
-
-function addHistory(q) {
-  if (!q) return;
-  const h = getHistory().filter(s => s !== q);
-  h.unshift(q);
-  if (h.length > 5) h.length = 5;
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-  historyCache = h;
-}
-
-function clearHistory() {
-  localStorage.removeItem(HISTORY_KEY);
-  historyCache = [];
-}
-
-// ============================================================
-// § 5. 検索モード・プレースホルダー
-// ============================================================
-let searchMode = 'google';
-
-function updatePlaceholder() {
-  if (searchInput)
-    searchInput.placeholder = searchMode === 'chatgpt' ? CHATGPT_PLACEHOLDER : DEFAULT_PLACEHOLDER;
-}
-
-// ============================================================
-// § 6. アプリショートカット検索 (appLinks は inline 側で構築済み)
-// ============================================================
-let foundApp  = null;
-let curResult = null;
-
-function searchApp(text) {
-  if (!text || searchMode !== 'google') return null;
-  const q = text.toLowerCase().trim();
-  if (q.length < 2) return null;
-  for (const app of appLinks) {
-    const n = app.nameLower || app.name.toLowerCase();
-    if (n === q || n.includes(q)) return app;
-  }
-  return null;
-}
-
-// ============================================================
-// § 7. 検索実行
-// ============================================================
-function doSearch() {
-  const q = searchInput ? searchInput.value.trim() : '';
-  if (!q) return;
-  addHistory(q);
-  if (document.body.classList.contains('standby')) {
-    if (window._doChat) window._doChat(q);
-    return;
-  }
-  if (searchMode === 'google') {
-    if (foundApp)          { window.location.href = foundApp.url; return; }
-    if (RE_URL && RE_URL.test(q)) {
-      window.location.href = /^https?:\/\//i.test(q) ? q : 'https://' + q;
-      return;
-    }
-    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
-  } else {
-    window.location.href = 'https://chatgpt.com/?hints=search&openaicom_referred=true&prompt=' + encodeURIComponent(q);
-  }
-}
-
-if (searchBtn) searchBtn.onclick = doSearch;
-if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-
-// ============================================================
-// § 8. Intelligence ボックス (計算 / URL / アプリ)
-// ============================================================
-let hideTimeout  = null;
-let updateTimer  = null;
-
-function toggleIntel(show) {
-  if (!intelIcon || !answerEl || !intelBox) return;
-  if (hideTimeout) { clearTimeout(hideTimeout); hideTimeout = null; }
-  if (show) {
-    intelBox.style.display = 'flex';
-    requestAnimationFrame(() => {
-      intelBox.classList.add('active');
-      intelIcon.classList.add('active');
-      answerEl.classList.add('active');
+    const get = (db, key) => new Promise(resolve => {
+        let request;
+        try {
+            request = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
+        } catch (error) {
+            console.error(`[Wallpaper] Failed to create request for "${key}".`, error);
+            resolve(null);
+            return;
+        }
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => {
+            console.error(`[Wallpaper] Failed to read "${key}".`, request.error);
+            resolve(null);
+        };
     });
-  } else {
-    intelBox.classList.remove('active');
-    intelIcon.classList.remove('active');
-    answerEl.classList.remove('active');
-    answerEl.classList.add('hide');
-    hideTimeout = setTimeout(() => {
-      if (!intelBox.classList.contains('active')) intelBox.style.display = 'none';
-      hideTimeout = null;
-    }, 500);
-  }
-}
 
-function triggerIconRotation() {
-  if (!intelIcon) return;
-  intelIcon.classList.remove('animate-icon');
-  void intelIcon.offsetWidth;
-  intelIcon.classList.add('animate-icon');
-  setTimeout(() => intelIcon.classList.remove('animate-icon'), 500);
-}
+    const initWallpaper = () => {
+        let request;
+        try {
+            request = indexedDB.open(DB_NAME, 1);
+        } catch (error) {
+            console.error("[Wallpaper] IndexedDB open failed.", error);
+            return;
+        }
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE)) {
+                db.createObjectStore(STORE);
+            }
+        };
+        request.onsuccess = async () => {
+            const db = request.result;
+            try {
+                const random = await get(db, "newtabRandom");
+                if (Array.isArray(random?.wallpapers) && random.wallpapers.length) {
+                    const list = random.wallpapers.filter(item => item?.light || item?.dark);
+                    if (list.length) {
+                        const wallpaper = list[Math.floor(Math.random() * list.length)];
+                        setWallpaper(wallpaper.light || wallpaper.dark, wallpaper.dark || wallpaper.light);
+                        return;
+                    }
+                }
+                const normal = await get(db, "newtab");
+                if (normal?.light || normal?.dark) {
+                    setWallpaper(normal.light || normal.dark, normal.dark || normal.light);
+                    return;
+                }
+                const light = await get(db, "light");
+                const dark = await get(db, "dark");
+                if (light?.light || dark?.dark) {
+                    setWallpaper(light?.light || dark?.dark, dark?.dark || light?.light);
+                }
+            } catch (error) {
+                console.error("[Wallpaper] Load failed.", error);
+            } finally {
+                db.close();
+            }
+        };
+        request.onerror = () => console.error("[Wallpaper] IndexedDB open failed:", request.error);
+    };
 
-function updateCalcDisplay() {
-  if (!searchInput || !intelIcon || !answerEl) return;
-  if (updateTimer) clearTimeout(updateTimer);
-  updateTimer = setTimeout(() => {
-    const text  = searchInput.value.trim();
-    const isUrl = RE_URL && RE_URL.test(text);
-    const result = (!isUrl && isMath && isMath(text)) ? (calcResult && calcResult(text)) : null;
-    const app  = (!isUrl && result === null) ? searchApp(text) : null;
+    /* =========================================================
+       ZIP Reader
+    ========================================================= */
 
-    let newValue = null;
-    if (isUrl)          newValue = 'URLを開く';
-    else if (result !== null) newValue = String(result);
-    else if (app)       newValue = app.name;
+    const findEndOfCentralDirectory = (bytes) => {
+        const minimumSize = 22;
+        const maximumComment = 0xffff;
+        const start = Math.max(0, bytes.length - minimumSize - maximumComment);
+        for (let offset = bytes.length - minimumSize; offset >= start; offset--) {
+            if (bytes[offset] === 0x50 && bytes[offset + 1] === 0x4b && bytes[offset + 2] === 0x05 && bytes[offset + 3] === 0x06) {
+                return offset;
+            }
+        }
+        return -1;
+    };
 
-    if (searchMode === 'google' && newValue !== null) {
-      if (newValue !== curResult) {
-        triggerIconRotation();
-        answerEl.classList.add('hide');
+    const createZipReader = async (arrayBuffer) => {
+        const bytes = new Uint8Array(arrayBuffer);
+        const view = new DataView(arrayBuffer);
+        const eocdOffset = findEndOfCentralDirectory(bytes);
+        if (eocdOffset < 0) throw new Error("ZIP end-of-central-directory record was not found.");
+        const centralDirectorySize = view.getUint32(eocdOffset + 12, true);
+        const centralDirectoryOffset = view.getUint32(eocdOffset + 16, true);
+        const entries = new Map();
+        let cursor = centralDirectoryOffset;
+        const centralEnd = centralDirectoryOffset + centralDirectorySize;
+        const decoder = new TextDecoder();
+        while (cursor < centralEnd) {
+            if (view.getUint32(cursor, true) !== 0x02014b50) throw new Error("Invalid ZIP central directory entry.");
+            const compressionMethod = view.getUint16(cursor + 10, true);
+            const compressedSize = view.getUint32(cursor + 20, true);
+            const uncompressedSize = view.getUint32(cursor + 24, true);
+            const filenameLength = view.getUint16(cursor + 28, true);
+            const extraLength = view.getUint16(cursor + 30, true);
+            const commentLength = view.getUint16(cursor + 32, true);
+            const localHeaderOffset = view.getUint32(cursor + 42, true);
+            const filenameBytes = bytes.subarray(cursor + 46, cursor + 46 + filenameLength);
+            const filename = decoder.decode(filenameBytes);
+            entries.set(filename, { compressionMethod, compressedSize, uncompressedSize, localHeaderOffset });
+            cursor += 46 + filenameLength + extraLength + commentLength;
+        }
+        const read = async (filename) => {
+            const entry = entries.get(filename);
+            if (!entry) return null;
+            const localOffset = entry.localHeaderOffset;
+            if (view.getUint32(localOffset, true) !== 0x04034b50) throw new Error(`Invalid local header: ${filename}`);
+            const localFilenameLength = view.getUint16(localOffset + 26, true);
+            const localExtraLength = view.getUint16(localOffset + 28, true);
+            const dataOffset = localOffset + 30 + localFilenameLength + localExtraLength;
+            const compressedData = bytes.slice(dataOffset, dataOffset + entry.compressedSize);
+            if (entry.compressionMethod === 0) return compressedData;
+            if (entry.compressionMethod !== 8) throw new Error(`Unsupported ZIP compression method for ${filename}: ${entry.compressionMethod}`);
+            if (typeof DecompressionStream === "undefined") throw new Error("DecompressionStream is not supported by this browser.");
+            const stream = new Blob([compressedData]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+            return new Uint8Array(await new Response(stream).arrayBuffer());
+        };
+        return { entries, read };
+    };
+
+    /* =========================================================
+       Icon Loader
+    ========================================================= */
+
+    const loadIconsFromZip = async () => {
+        console.log("[Shortcut] Loading icon ZIP...");
+        const response = await fetch(ICON_ZIP_URL, { cache: "force-cache" });
+        if (!response.ok) throw new Error(`Icon ZIP request failed: ${response.status}`);
+        const buffer = await response.arrayBuffer();
+        const zip = await createZipReader(buffer);
+        const objectUrls = new Map();
+        for (const [filename] of zip.entries) {
+            if (filename.endsWith("/") || filename.includes("../")) continue;
+            try {
+                const data = await zip.read(filename);
+                if (!data) continue;
+                const extension = filename.split(".").pop()?.toLowerCase();
+                const mimeMap = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", svg: "image/svg+xml", avif: "image/avif" };
+                const mime = mimeMap[extension] || "application/octet-stream";
+                const blob = new Blob([data], { type: mime });
+                objectUrls.set(filename, URL.createObjectURL(blob));
+            } catch (error) {
+                console.error(`[Shortcut] Failed to extract icon: ${filename}`, error);
+            }
+        }
+        console.log(`[Shortcut] Loaded ${objectUrls.size} icons from ZIP.`);
+        return objectUrls;
+    };
+
+    const resolveIconUrl = (iconName, iconMap) => {
+        if (!iconName) {
+            console.error("[Shortcut] Icon name is missing.");
+            return null;
+        }
+        if (iconMap.has(iconName)) return iconMap.get(iconName);
+        for (const [filename, url] of iconMap) {
+            if (filename.endsWith("/" + iconName) || filename.endsWith("\\" + iconName)) return url;
+        }
+        console.error(`[Shortcut] Icon not found in ZIP: ${iconName}`);
+        return null;
+    };
+
+    /* =========================================================
+       Clock
+    ========================================================= */
+
+    const updateClock = () => {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+        const clockEl = document.getElementById("clock");
+        if (clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+    };
+
+    /* =========================================================
+       Initialize
+    ========================================================= */
+
+    const init = async () => {
+        console.log("[Wallpaper] Initializing...");
+
+        const wallpaperTask = Promise.resolve().then(initWallpaper);
+        const iconTask = loadIconsFromZip();
+
+        try {
+            const iconMap = await iconTask;
+            window._iconMap = iconMap;
+        } catch (error) {
+            console.error("[Shortcut] Icon initialization failed.", error);
+            window._iconMap = new Map();
+        }
+
+        await wallpaperTask;
+
+        /* Load af.js after 2 seconds */
         setTimeout(() => {
-          answerEl.textContent = newValue;
-          curResult = newValue;
-          foundApp  = app;
-          answerEl.classList.remove('hide');
-        }, 150);
-      }
-      toggleIntel(true);
+            console.log("[Beta] Loading af.js...");
+            const script = document.createElement("script");
+            script.src = "af.js";
+            script.onload = () => {
+                console.log("[Beta] af.js loaded.");
+                if (window.renderShortcuts && window._iconMap) {
+                    try {
+                        window.renderShortcuts(window._iconMap);
+                    } catch (e) {
+                        console.error("[Beta] renderShortcuts failed:", e);
+                        if (window.renderShortcuts) window.renderShortcuts(new Map());
+                    }
+                }
+                if (window.setupSearchAndHistory) {
+                    window.setupSearchAndHistory();
+                }
+                window.updateClock();
+                setInterval(window.updateClock, 1000);
+            };
+            script.onerror = () => {
+                console.error("[Beta] Failed to load af.js");
+            };
+            document.head.appendChild(script);
+        }, 2000);
+
+        console.log("[Wallpaper] Initialization completed.");
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init, { once: true });
     } else {
-      toggleIntel(false);
-      curResult = null;
-      foundApp  = null;
+        init();
     }
-  }, 100);
-}
-
-if (searchInput) searchInput.addEventListener('input', updateCalcDisplay);
-
-// ============================================================
-// § 9. ダイアログ制御
-// ============================================================
-function hideAllDialogs() {
-  if (settingsDlg && settingsDlg.classList.contains('show')) hideDialog(settingsDlg);
-  if (historyDlg  && historyDlg.classList.contains('show'))  hideDialog(historyDlg);
-}
-
-function showDialog(dlg, btn) {
-  if (!dlg) return;
-  hideAllDialogs();
-  dlg.style.display = 'flex';
-  requestAnimationFrame(() => {
-    dlg.classList.add('show');
-    if (btn) btn.classList.add('active');
-  });
-}
-
-function hideDialog(dlg) {
-  if (!dlg) return;
-  dlg.classList.remove('show');
-  controlBtns.forEach((b, i) => {
-    if (i === 2 && searchMode === 'chatgpt') return;
-    b.classList.remove('active');
-  });
-  setTimeout(() => {
-    if (!dlg.classList.contains('show')) dlg.style.display = 'none';
-  }, 500);
-}
-
-// コントロールボタン
-if (controlBtns[0]) {
-  controlBtns[0].onclick = () =>
-    settingsDlg.classList.contains('show') ? hideDialog(settingsDlg) : showDialog(settingsDlg, controlBtns[0]);
-}
-
-if (controlBtns[1]) {
-  controlBtns[1].onclick = () => {
-    if (historyDlg.classList.contains('show')) { hideDialog(historyDlg); return; }
-    const h = getHistory();
-    historyList.innerHTML = h.length ? '' : '<li style="color:#888;">履歴なし</li>';
-    h.forEach(q => {
-      const li = document.createElement('li');
-      li.textContent = q;
-      li.style.cssText = 'cursor:pointer;padding:8px 0;';
-      li.onclick = () => { searchInput.value = q; hideDialog(historyDlg); doSearch(); };
-      historyList.appendChild(li);
-    });
-    showDialog(historyDlg, controlBtns[1]);
-  };
-}
-
-if (controlBtns[2]) {
-  controlBtns[2].onclick = function () {
-    hideAllDialogs();
-    searchMode = searchMode === 'google' ? 'chatgpt' : 'google';
-    this.classList.toggle('active', searchMode === 'chatgpt');
-    updatePlaceholder();
-    updateCalcDisplay();
-  };
-}
-
-// スタンバイトグル
-const standbyBtn = document.getElementById('standby-toggle');
-if (standbyBtn) {
-  standbyBtn.onclick = function () {
-    const isStandby = document.body.classList.toggle('standby');
-    document.querySelector('.applist-in')?.classList.toggle('standby');
-    this.classList.toggle('active', isStandby);
-  };
-}
-
-// ダイアログ外クリックで閉じる
-settingsDlg?.addEventListener('click', e => { if (e.target === settingsDlg) hideDialog(settingsDlg); });
-historyDlg?.addEventListener('click',  e => { if (e.target === historyDlg)  hideDialog(historyDlg); });
-clearHistBtn?.addEventListener('click', () => { clearHistory(); alert('検索履歴を削除しました'); hideDialog(settingsDlg); });
-
-// ============================================================
-// § 13. AdSense (アイコン描画後に遅延挿入)
-// ============================================================
-function loadAdsenseScript() {
-  return new Promise((resolve, reject) => {
-    const ID = 'adsbygoogle-js';
-    if (document.getElementById(ID)) { resolve(); return; }
-    const s = document.createElement('script');
-    s.id = ID; s.async = true;
-    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874';
-    s.crossOrigin = 'anonymous';
-    s.onload  = resolve;
-    s.onerror = reject;
-    (document.head || document.documentElement).appendChild(s);
-  });
-}
-
-function initAds(container) {
-  // アイコン描画から 2 秒後、さらに idle 時に挿入
-  setTimeout(() => {
-    requestIdle(() => {
-      try {
-        const wrap = document.createElement('div');
-        wrap.className = 'adsense-container';
-        wrap.style.cssText = 'width:100%;margin-top:20px;';
-        wrap.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-6151036058675874" data-ad-slot="9559715307"></ins>';
-        container.appendChild(wrap);
-        loadAdsenseScript().then(() => {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        }).catch(() => {});
-      } catch (e) { console.error('[Ads]', e); }
-    }, { timeout: 3000 });
-  }, 2000);
-}
-
-// ============================================================
-// § 13.5 メインデータ読み込みフロー (ショートカットは inline 側で描画済み)
-// ============================================================
-function initBetaFeatures() {
-  const container = document.querySelector('.applist-in');
-  if (!container) return;
-  requestIdle(() => initAds(container), { timeout: 3000 });
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', initBetaFeatures, { once: true });
-} else {
-  initBetaFeatures();
-}
+})();

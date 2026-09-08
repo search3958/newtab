@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wallpaper</title>
-
+<title>Apkil 7</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 html,
 body {
@@ -16,6 +16,19 @@ body {
 body {
     background: #fff var(--wallpaper-light, url("bgimg/baram1.webp"))
         center / cover no-repeat fixed;
+    font-family:
+        "IBM Plex Sans JP",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+    padding: 0;
+    margin: 0;
+    transition: background-image 0.3s ease;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    overflow-x: hidden;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,128 +37,369 @@ body {
         background-image: var(--wallpaper-dark, url("bgimg/baram1_dark.webp"));
     }
 }
+
+/* ================================
+    Layout
+    ================================ */
+
+/* ================================
+    Clock
+    ================================ */
+
+#clock {
+    position: fixed;
+    top: 35px;
+    right: 40px;
+    color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    font-size: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+    #clock {
+        color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* ================================
+   Search Bar (v2.1 style)
+   ================================ */
+
+.search {
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 413px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 27px;
+    padding: 3px;
+    backdrop-filter: blur(24px);
+    z-index: 100;
+    position: fixed;
+}
+
+@media (prefers-color-scheme: dark) {
+    .search {
+        background: rgba(28, 28, 28, 0.5);
+    }
+}
+
+#searchBox {
+    margin: 0;
+    width: 344px;
+    height: 48px;
+    font-size: 32px;
+    padding-left: 16px;
+    border: none;
+    background: none;
+    outline: none;
+    border-radius: 100px;
+    font-family: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+    #searchBox {
+        color: #fff;
+    }
+}
+
+.searchbtn {
+    margin: 0;
+    width: 39px;
+    height: 50px;
+    border: none;
+    background: none;
+    text-align: right;
+    transform: scale(1.2);
+    color: #185af2;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* ================================
+   History (v2.1 style)
+   ================================ */
+
+.history-list {
+    position: fixed;
+    top: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    z-index: 100;
+    max-width: 500px;
+}
+
+.history {
+    position: relative;
+    margin: 4px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.5);
+    color: #000;
+    border-radius: 16px;
+    backdrop-filter: blur(16px);
+    height: 24px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    .history {
+        background: rgba(28, 28, 28, 0.5);
+        color: #fff;
+    }
+}
+
+.clear-history-btn {
+    position: fixed;
+    top: 170px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 4px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.5);
+    color: #000;
+    border-radius: 16px;
+    backdrop-filter: blur(16px);
+    height: 40px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    z-index: 100;
+}
+
+@media (prefers-color-scheme: dark) {
+    .clear-history-btn {
+        background: rgba(28, 28, 28, 0.5);
+        color: #fff;
+    }
+}
+
+/* ================================
+   Shortcut Section (scrolls into view)
+   ================================ */
+
+.shortcut {
+    position: relative;
+    top: 100vh;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(32px);
+    padding-top: 8px;
+    min-height: 100vh;
+    width: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+    .shortcut {
+        background: rgba(0, 0, 0, 0.3);
+    }
+}
+
+.main-shortcuts {
+    box-sizing: border-box;
+    padding: 32px;
+}
+
+.main-shortcuts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.main-shortcut-category {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.main-shortcut-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.88);
+    text-shadow: 0 1px 5px rgba(255, 255, 255, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+    .main-shortcut-title {
+        color: rgba(255, 255, 255, 0.92);
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    }
+}
+
+.main-shortcut-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+}
+
+/* ================================
+    Shortcut Items (v2.1 style)
+   ================================ */
+
+.main-shortcut-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    perspective: 800px;
+}
+
+.main-shortcut-box {
+    width: 120px;
+    height: 120px;
+    border-radius: 40px;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-out;
+    transform: rotateX(0deg) rotateY(0deg);
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+}
+
+@media (prefers-color-scheme: dark) {
+    .main-shortcut-box {
+        background-color: rgba(17, 17, 17, 0.7);
+    }
+}
+
+.main-shortcut-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.main-shortcut-icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.main-shortcut-name {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.3;
+    color: rgba(0, 0, 0, 0.88);
+    text-shadow: 0 1px 5px rgba(255, 255, 255, 0.65);
+}
+
+@media (prefers-color-scheme: dark) {
+    .main-shortcut-name {
+        color: rgba(255, 255, 255, 0.92);
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+    }
+}
+
+.main-shortcut-box {
+    transition: transform 0.2s ease-out;
+}
+
+.main-shortcut-item:hover .main-shortcut-box {
+    transform: rotateX(0deg) rotateY(0deg);
+}
+
+/* ================================
+    Responsive
+   ================================ */
+
+@media (max-width: 650px) {
+    #clock {
+        display: none;
+    }
+
+    .search {
+        width: 90%;
+        top: 70px;
+    }
+
+    #searchBox {
+        width: 200px;
+        font-size: 24px;
+    }
+
+    .history-list {
+        top: 130px;
+    }
+
+    .clear-history-btn {
+        top: 160px;
+    }
+
+    .main-shortcut-box {
+        width: 96px;
+        height: 96px;
+    }
+
+    .main-shortcut-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+    .main-shortcut-name {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 600px) {
+    .main-shortcuts {
+        padding: 20px 14px;
+    }
+
+    .main-shortcuts-list {
+        gap: 22px;
+    }
+
+    .main-shortcut-links {
+        gap: 8px;
+    }
+}
 </style>
 </head>
 
 <body>
 
-<script>
-(() => {
-    const DB_NAME = "WallpaperDB";
-    const STORE = "images";
+<div id="clock"></div>
 
-    const setWallpaper = (light, dark) => {
-        if (!document.body) return;
+<div class="search">
+    <input type="text" id="searchBox" placeholder="" autocomplete="off" />
+    <button class="searchbtn" id="searchButton">
+        <span>search</span>
+    </button>
+</div>
 
-        const lightUrl = light
-            ? URL.createObjectURL(light)
-            : "bgimg/baram1.webp";
+<div class="history-list" id="historyList"></div>
+<button class="clear-history-btn" id="clearHistory">履歴クリア</button>
 
-        const darkUrl = dark
-            ? URL.createObjectURL(dark)
-            : lightUrl;
+<div class="shortcut">
+    <div class="main-shortcuts" id="mainShortcuts"></div>
+</div>
 
-        document.body.style.setProperty(
-            "--wallpaper-light",
-            `url("${lightUrl}")`
-        );
-
-        document.body.style.setProperty(
-            "--wallpaper-dark",
-            `url("${darkUrl}")`
-        );
-    };
-
-    const get = (db, key) => new Promise(resolve => {
-        const request = db
-            .transaction(STORE, "readonly")
-            .objectStore(STORE)
-            .get(key);
-
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => resolve(null);
-    });
-
-    const init = () => {
-        const request = indexedDB.open(DB_NAME, 1);
-
-        request.onupgradeneeded = e => {
-            const db = e.target.result;
-
-            if (!db.objectStoreNames.contains(STORE)) {
-                db.createObjectStore(STORE);
-            }
-        };
-
-        request.onsuccess = async () => {
-            const db = request.result;
-
-            try {
-                // ランダム壁紙
-                const random = await get(db, "newtabRandom");
-
-                if (
-                    Array.isArray(random?.wallpapers) &&
-                    random.wallpapers.length
-                ) {
-                    const list = random.wallpapers.filter(
-                        x => x?.light || x?.dark
-                    );
-
-                    if (list.length) {
-                        const wallpaper =
-                            list[Math.floor(Math.random() * list.length)];
-
-                        setWallpaper(
-                            wallpaper.light || wallpaper.dark,
-                            wallpaper.dark || wallpaper.light
-                        );
-
-                        return;
-                    }
-                }
-
-                // 通常壁紙
-                const normal = await get(db, "newtab");
-
-                if (normal?.light || normal?.dark) {
-                    setWallpaper(
-                        normal.light || normal.dark,
-                        normal.dark || normal.light
-                    );
-
-                    return;
-                }
-
-                // Light / Dark 個別壁紙
-                const light = await get(db, "light");
-                const dark = await get(db, "dark");
-
-                if (light?.light || dark?.dark) {
-                    setWallpaper(
-                        light?.light || dark?.dark,
-                        dark?.dark || light?.light
-                    );
-                }
-            } catch (error) {
-                console.error("[Wallpaper] Load failed:", error);
-            }
-
-            db.close();
-        };
-
-        request.onerror = () => {
-            console.error("[Wallpaper] IndexedDB open failed:", request.error);
-        };
-    };
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init, { once: true });
-    } else {
-        init();
-    }
-})();
-</script>
+<script src="beta.js"></script>
 
 </body>
 </html>

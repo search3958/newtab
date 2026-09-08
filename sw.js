@@ -1,8 +1,8 @@
-const CACHE_NAME = 'newtab-cache-10'; // バージョンを更新
+const CACHE_NAME = 'newtab-cache-11'; // バージョンを更新
 const ASSETS = [
   '/',
   '/index.html',
-  '/v6.4/af.js',
+  '/v6.5/a.js',
   '/lsr/icons-6-2.zip',
   '/links-v6.json',
   'https://search3958.github.io/check.js',
