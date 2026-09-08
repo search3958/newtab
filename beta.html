@@ -241,7 +241,7 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 14px;
+    gap: 1px;
 }
 
 /* ================================
@@ -260,8 +260,6 @@ body {
 }
 
 .main-shortcut-box {
-    width: 120px;
-    height: 120px;
     border-radius: 40px;
     background-color: rgba(255, 255, 255, 0.7);
     display: flex;
@@ -270,7 +268,6 @@ body {
     transition: transform 0.2s ease-out;
     transform: rotateX(0deg) rotateY(0deg);
     overflow: hidden;
-    backdrop-filter: blur(16px);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -294,10 +291,11 @@ body {
     height: 100%;
     display: block;
     object-fit: contain;
+    scale:0.9;
 }
 
 .main-shortcut-name {
-    width: 100%;
+    width: 70px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
