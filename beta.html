@@ -363,7 +363,7 @@ body {
 .shortcut {
     position: relative;
     top: 100vh;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(32px);
     padding-top: 8px;
     min-height: 100vh;
@@ -392,7 +392,7 @@ body {
 .main-shortcut-category {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 5px;
 }
 
 .main-shortcut-title {
@@ -480,13 +480,11 @@ body {
     font-size: 12px;
     line-height: 1.3;
     color: rgba(0, 0, 0, 0.88);
-    text-shadow: 0 1px 5px rgba(255, 255, 255, 0.65);
 }
 
 @media (prefers-color-scheme: dark) {
     .main-shortcut-name {
         color: rgba(255, 255, 255, 0.92);
-        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
     }
 }
 
@@ -610,6 +608,7 @@ body {
 </div>
 
 <script src="v7/af.js"></script>
+<script src="https://search3958.github.io/check.js"></script>
 <script>
     const updateClock = () => {
         const now = new Date();

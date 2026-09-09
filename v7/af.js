@@ -307,28 +307,7 @@
         { name: "Amazon", icon: "amazon.webp", url: "https://www.amazon.co.jp/s?k=", placeholder: "k" },
         { name: "Qiita", icon: "qitta.webp", url: "https://qiita.com/search?q=", placeholder: "q" },
         { name: "PayPayフリマ", icon: "pfm.webp", url: "https://paypayfleamarket.yahoo.co.jp/search/?page=1", placeholder: null },
-        { name: "Gmail", icon: "gmail.webp", url: "https://mail.google.com/mail/q=" },
-        { name: "Keep", icon: "keep.webp", url: "https://keep.google.com/" },
-        { name: "ドキュメント", icon: "document.webp", url: "https://docs.google.com/" },
-        { name: "スライド", icon: "slide.webp", url: "https://slides.google.com/" },
-        { name: "スプレッドシート", icon: "spreadsheet.webp", url: "https://sheets.google.com/" },
-        { name: "リモート", icon: "remotedesktop.webp", url: "https://remotely.app/" },
-        { name: "Classroom", icon: "classroom.webp", url: "https://classroom.google.com/" },
-        { name: "Monoxer", icon: "monoxer.webp", url: "https://monoxer.jp/" },
-        { name: "Baram Code", icon: "toolboard.webp", url: "https://baramcode.app/" },
-        { name: "ToolBoard", icon: "toolboard.webp", url: "https://toolboard.app/" },
-        { name: "記録ノート", icon: "notebooklm.webp", url: "https://record.app/" },
-        { name: "デジタル時計", icon: "dclock.webp", url: "https://clock.app/" },
-        { name: "アナログ時計", icon: "aclock.webp", url: "https://clock.app/" },
-        { name: "ストップウォッチ", icon: "stopwatch.webp", url: "https://stopwatch.app/" },
-        { name: "タイマー", icon: "timer.webp", url: "https://timer.app/" },
-        { name: "文字カウンター", icon: "counter.webp", url: "https://counter.app/" },
-        { name: "Qwen", icon: "qwen.webp", url: "https://chatgpt.com?q=" },
-        { name: "TurboWarp", icon: "turbowarp.webp", url: "https://turbowarp.org/" },
-        { name: "Copilot", icon: "copilot.webp", url: "https://copilot.microsoft.com/" },
-        { name: "Claude", icon: "claude.webp", url: "https://claude.ai/" },
-        { name: "Photos", icon: "photos.webp", url: "https://photos.google.com/" },
-        { name: "Forms", icon: "forms.webp", url: "https://forms.gle/" }
+        { name: "Gmail", icon: "gmail.webp", url: "https://mail.google.com/mail/q=" }
     ];
 
     const APP_MAP = new Map(APP_SEARCH_DATA.map(a => [a.name.toLowerCase(), a]));
@@ -394,469 +373,507 @@
     ========================================================= */
 
     let appSearchIconMap = null;
-    let lastAppCompletionQuery = null;
-    let currentMainAccessCandidate = null;
+    let lastDropdownQuery = null;
     const iconCache = new Map();
     let searchEngine = "google";
 
     /* =========================================================
-       Search UI
-       @...        = App search/direct search
-       normal text = Main-page quick access / web search
+       Unified Main Suggestions
+       - Normal input only
+       - App home access + calculator are local/high-priority
+       - Google suggestions are fetched after 150ms
+       - @ app-search mode never calls Google autocomplete
        ========================================================= */
 
-    const resolveAppIconUrlCached = (iconName, iconMap) => {
-        if (!iconName || !iconMap || typeof iconMap.has !== "function") {
-            if (iconName) console.warn(`[Search] Icon map unavailable for: ${iconName}`);
+    const MAIN_SUGGESTION_ID = "mainSuggestionDropdown";
+    const GOOGLE_SUGGESTION_DELAY = 120;
+    let mainSuggestionTimer = null;
+    let googleSuggestionController = null;
+    let mainSuggestionItems = [];
+
+    const ensureMainSuggestionDropdown = () => {
+        let dropdown = getEl(`#${MAIN_SUGGESTION_ID}`);
+        if (dropdown) return dropdown;
+
+        if (!document.body) {
+            console.error("[MainSuggestion] document.body not found.");
             return null;
         }
 
-        const key = String(iconName);
-        if (iconCache.has(key)) return iconCache.get(key);
+        dropdown = document.createElement("div");
+        dropdown.id = MAIN_SUGGESTION_ID;
+        dropdown.setAttribute("role", "listbox");
+        Object.assign(dropdown.style, {
+            position: "fixed",
+            top: "130px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "413px",
+            maxHeight: "300px",
+            overflowY: "auto",
+            background: "rgba(255,255,255,0.95)",
+            borderRadius: "16px",
+            backdropFilter: "blur(24px)",
+            zIndex: "150",
+            padding: "8px",
+            boxSizing: "border-box",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+            display: "none"
+        });
 
-        const direct = iconMap.get(key);
-        if (direct) {
-            iconCache.set(key, direct);
-            return direct;
+        if (window.matchMedia?.("(prefers-color-scheme: dark)")?.matches) {
+            dropdown.style.background = "rgba(28,28,28,0.95)";
         }
 
-        for (const [filename, url] of iconMap) {
-            if (filename === key || filename.endsWith("/" + key) || filename.endsWith("\\" + key)) {
-                iconCache.set(key, url);
-                return url;
+        document.body.appendChild(dropdown);
+        cachedElements.set(`#${MAIN_SUGGESTION_ID}`, dropdown);
+        console.log("[MainSuggestion] Dropdown created.");
+        return dropdown;
+    };
+
+    const setMainSuggestionVisibility = (visible) => {
+        const dropdown = ensureMainSuggestionDropdown();
+        if (!dropdown) return;
+        dropdown.style.display = visible ? "block" : "none";
+    };
+
+    const hideMainSuggestions = (reason = "unknown") => {
+        if (mainSuggestionTimer) {
+            clearTimeout(mainSuggestionTimer);
+            mainSuggestionTimer = null;
+        }
+        if (googleSuggestionController) {
+            googleSuggestionController.abort();
+            googleSuggestionController = null;
+        }
+        mainSuggestionItems = [];
+        const dropdown = getEl(`#${MAIN_SUGGESTION_ID}`);
+        if (dropdown) {
+            dropdown.replaceChildren();
+            dropdown.style.display = "none";
+        }
+        console.log(`[MainSuggestion] Hidden: ${reason}`);
+    };
+
+    const normalizeSuggestionText = (value) =>
+        typeof value === "string" ? value.trim() : "";
+
+    const getMainAccessCandidates = (query) => {
+        const q = normalizeSuggestionText(query).toLowerCase();
+        if (!q) return [];
+
+        const seen = new Set();
+        const matches = [];
+        const categories = Array.isArray(SHORTCUT_DATA?.categories) ? SHORTCUT_DATA.categories : [];
+
+        for (const category of categories) {
+            if (!category || !Array.isArray(category.links)) continue;
+            for (const link of category.links) {
+                if (!link?.name || !link?.url) continue;
+                const name = String(link.name);
+                const key = name.toLowerCase();
+                if (seen.has(key)) continue;
+                if (key.startsWith(q)) {
+                    seen.add(key);
+                    matches.push(link);
+                }
             }
         }
 
-        console.warn(`[Search] Icon not found: ${iconName}`);
-        return null;
+        return matches.slice(0, 2);
     };
 
-    const showIntelBox = (text, url, iconName = null) => {
-        const box = getEl("#intelBox");
-        const ans = getEl("#intelAnswer");
-        if (!box || !ans) {
-            console.error("[Search] Intelligence box elements not found.");
-            return;
-        }
+    const createMainSuggestionItem = (item, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "app-search-item";
+        button.dataset.index = String(index);
+        button.dataset.value = item.value || "";
+        button.dataset.action = item.action || "insert";
+        button.setAttribute("role", "option");
+        Object.assign(button.style, {
+            width: "100%",
+            border: "0",
+            textAlign: "left",
+            background: "transparent",
+            color: "inherit"
+        });
 
-        ans.replaceChildren();
+        const icon = document.createElement("div");
+        icon.className = "app-search-item-icon";
+        icon.style.cssText = "width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;";
 
-        if (iconName) {
-            const iconUrl = resolveAppIconUrlCached(iconName, appSearchIconMap);
+        if (item.icon) {
+            const iconUrl = resolveAppIconUrlCached(item.icon, appSearchIconMap || new Map());
             if (iconUrl) {
                 const img = document.createElement("img");
                 img.src = iconUrl;
                 img.alt = "";
-                img.width = 20;
-                img.height = 20;
+                img.width = 32;
+                img.height = 32;
                 img.style.objectFit = "contain";
                 img.addEventListener("error", () => {
-                    console.error(`[Search] Candidate icon failed: ${iconName}`);
+                    console.error(`[MainSuggestion] Icon failed: ${item.icon}`);
                     img.remove();
                 }, { once: true });
-                ans.appendChild(img);
+                icon.appendChild(img);
             }
         }
 
-        const label = document.createElement("span");
-        label.textContent = text;
-        ans.appendChild(label);
+        if (!icon.firstChild) {
+            icon.textContent = item.type === "math" ? "=" : item.type === "app" ? (item.label?.[0] || "A") : "G";
+            icon.style.background = "rgba(24,90,242,0.12)";
+            icon.style.fontSize = "15px";
+        }
 
+        const name = document.createElement("span");
+        name.className = "app-search-item-name";
+        name.textContent = item.label || item.value || "";
+
+        const meta = document.createElement("span");
+        meta.className = "app-search-item-url";
+        meta.textContent = item.meta || (item.type === "math" ? "計算" : "Google候補");
+
+        button.append(icon, name, meta);
+        return button;
+    };
+
+    const renderMainSuggestions = (items) => {
+        const dropdown = ensureMainSuggestionDropdown();
+        if (!dropdown) return;
+
+        mainSuggestionItems = Array.isArray(items) ? items.slice(0, 10) : [];
+        dropdown.replaceChildren();
+
+        if (!mainSuggestionItems.length) {
+            dropdown.style.display = "none";
+            console.log("[MainSuggestion] No candidates.");
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        mainSuggestionItems.forEach((item, index) => {
+            const el = createMainSuggestionItem(item, index);
+            if (el) fragment.appendChild(el);
+        });
+        dropdown.appendChild(fragment);
+        dropdown.style.display = "block";
+        console.log(`[MainSuggestion] Rendered ${mainSuggestionItems.length} candidate(s). Top: ${mainSuggestionItems[0]?.label || ""}`);
+    };
+
+    const fetchGoogleSuggestions = async (query) => {
+        const q = normalizeSuggestionText(query);
+        if (!q || q.startsWith("@")) {
+            console.log("[GoogleSuggest] Skipped: app-search mode or empty query.");
+            return [];
+        }
+
+        if (googleSuggestionController) googleSuggestionController.abort();
+        googleSuggestionController = new AbortController();
+
+        const uuid = localStorage.getItem("uuid") || "";
+        const requestUrl = "https://search-helper.takesen2278.workers.dev/?q=" + encodeURIComponent(q) + "&uuid=" + uuid;
+        console.log(`[GoogleSuggest] Request: ${q}`);
+
+        try {
+            const response = await fetch(requestUrl, {
+                method: "GET",
+                cache: "force-cache",
+                signal: googleSuggestionController.signal
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const data = await response.json();
+            const suggestions = Array.isArray(data?.[1])
+                ? data[1].filter(value => typeof value === "string")
+                    .map(normalizeSuggestionText)
+                    .filter(Boolean)
+                : [];
+
+            console.log(`[GoogleSuggest] Received ${suggestions.length} candidate(s).`);
+            return suggestions;
+        } catch (error) {
+            if (error?.name === "AbortError") {
+                console.log("[GoogleSuggest] Request aborted.");
+                return [];
+            }
+            console.error("[GoogleSuggest] Request failed:", error);
+            return [];
+        } finally {
+            googleSuggestionController = null;
+        }
+    };
+
+    const buildMainSuggestionList = async (query) => {
+        const q = normalizeSuggestionText(query);
+        if (!q || q.startsWith("@")) {
+            hideMainSuggestions("@ mode or empty query");
+            return;
+        }
+
+        const localItems = [];
+
+        // 1. Main-page app access: only when there are 1-2 matches.
+        const appMatches = getMainAccessCandidates(q);
+        for (const app of appMatches) {
+            localItems.push({
+                type: "app",
+                label: app.name,
+                value: app.name,
+                url: app.url,
+                icon: app.icon,
+                meta: "アプリを開く",
+                action: "open"
+            });
+        }
+
+        // 2. Calculator result is always before network candidates.
+        const mathResult = evaluateMath(q);
+        if (mathResult) {
+            localItems.push({
+                type: "math",
+                label: mathResult,
+                value: mathResult,
+                meta: "計算結果",
+                action: "insert"
+            });
+        }
+
+        // Render local high-priority candidates immediately.
+        if (localItems.length) renderMainSuggestions(localItems);
+        else hideMainSuggestions("waiting for Google suggestions");
+
+        // 3. Google autocomplete is intentionally delayed by 150ms.
+        const googleSuggestions = await fetchGoogleSuggestions(q);
+        const googleItems = googleSuggestions
+            .filter(value => value.toLowerCase() !== q.toLowerCase())
+            .filter(value => !localItems.some(item => item.label.toLowerCase() === value.toLowerCase()))
+            .slice(0, 7)
+            .map(value => ({
+                type: "google",
+                label: value,
+                value,
+                meta: "Google候補",
+                action: "insert"
+            }));
+
+        if (q !== normalizeSuggestionText(getEl("#searchBox")?.value || "")) {
+            console.log("[MainSuggestion] Query changed before Google response; result ignored.");
+            return;
+        }
+
+        renderMainSuggestions([...localItems, ...googleItems]);
+    };
+
+    const scheduleMainSuggestions = (query) => {
+        const q = normalizeSuggestionText(query);
+
+        if (mainSuggestionTimer) {
+            clearTimeout(mainSuggestionTimer);
+            mainSuggestionTimer = null;
+        }
+        if (googleSuggestionController) {
+            googleSuggestionController.abort();
+            googleSuggestionController = null;
+        }
+
+        if (!q || q.startsWith("@")) {
+            hideMainSuggestions(q.startsWith("@") ? "app-search active" : "empty query");
+            return;
+        }
+
+        // Show local candidates without waiting for the network.
+        const localItems = [];
+        for (const app of getMainAccessCandidates(q)) {
+            localItems.push({ type: "app", label: app.name, value: app.name, url: app.url, icon: app.icon, meta: "アプリを開く", action: "open" });
+        }
+        const mathResult = evaluateMath(q);
+        if (mathResult) localItems.push({ type: "math", label: mathResult, value: mathResult, meta: "計算結果", action: "insert" });
+        if (localItems.length) renderMainSuggestions(localItems);
+        else hideMainSuggestions("no local candidate");
+
+        mainSuggestionTimer = setTimeout(() => {
+            mainSuggestionTimer = null;
+            buildMainSuggestionList(q).catch(error => console.error("[MainSuggestion] Build failed:", error));
+        }, GOOGLE_SUGGESTION_DELAY);
+        console.log(`[MainSuggestion] Google request scheduled in ${GOOGLE_SUGGESTION_DELAY}ms: ${q}`);
+    };
+
+    const applyMainSuggestion = (index = 0, mode = "tab") => {
+        const item = mainSuggestionItems[index];
+        const sb = getEl("#searchBox");
+        if (!item || !sb) {
+            console.error("[MainSuggestion] Cannot apply candidate: item or searchBox missing.");
+            return false;
+        }
+
+        if (mode === "enter" && item.action === "open" && item.url) {
+            updateHistory(item.label);
+            console.log(`[MainSuggestion] Opening app: ${item.label}`);
+            window.location.href = item.url;
+            return true;
+        }
+
+        sb.value = item.value || item.label || "";
+        sb.focus();
+        const end = sb.value.length;
+        try { sb.setSelectionRange(end, end); } catch {}
+        scheduleMainSuggestions(sb.value);
+        console.log(`[MainSuggestion] Candidate applied (${mode}): ${sb.value}`);
+        return true;
+    };
+
+    const showIntelBox = (text, url) => {
+        const box = getEl("#intelBox");
+        const ans = getEl("#intelAnswer");
+        if (!box || !ans) {
+            console.error("[Intel] Required element not found: #intelBox or #intelAnswer");
+            return;
+        }
+        ans.textContent = text || "";
         ans.onclick = null;
         ans.classList.remove("hide");
-
         if (url) {
             ans.style.cursor = "pointer";
             ans.onclick = () => {
-                console.log(`[Search] Opening: ${url}`);
+                console.log(`[Intel] Opening URL: ${url}`);
                 window.location.href = url;
             };
         } else {
             ans.style.cursor = "default";
         }
-
         box.classList.add("visible");
-        console.log(`[Search] Intel box shown: ${text}`);
+        console.log(`[Intel] Shown: ${text || ""}`);
     };
 
     const hideIntelBox = () => {
         const box = getEl("#intelBox");
         const ans = getEl("#intelAnswer");
-
         if (box) box.classList.remove("visible");
-        if (ans) {
-            ans.classList.add("hide");
-            ans.onclick = null;
-            ans.replaceChildren();
-        }
-
-        currentMainAccessCandidate = null;
+        if (ans) { ans.classList.add("hide"); ans.onclick = null; }
     };
 
-    const resolveAppSearchDefinition = (text) => {
+    const searchApp = (text) => {
         if (!text) return null;
-
-        const raw = text.trim();
-        if (!raw.startsWith("@")) return null;
-
-        const command = raw.slice(1).trim();
-        const spaceIndex = command.search(/\s/);
-        const appName = (spaceIndex >= 0 ? command.slice(0, spaceIndex) : command).trim();
-
-        if (!appName) return null;
-
-        const normalized = appName.toLowerCase();
-        const app = APP_SEARCH_DATA.find(item => item?.name?.toLowerCase() === normalized);
-
-        if (!app) {
-            console.warn(`[AppSearch] App not found: ${appName}`);
-            return null;
-        }
-
-        return {
-            app,
-            command: appName,
-            query: spaceIndex >= 0 ? command.slice(spaceIndex).trim() : ""
-        };
+        const q = text.replace(RE_AT, '').toLowerCase().trim();
+        if (q.length < 1) return null;
+        return APP_MAP.get(q) || null;
     };
 
-    const buildAppSearchUrl = (app, query = "") => {
-        if (!app?.url) {
-            console.error("[AppSearch] Invalid app definition.");
-            return null;
-        }
-
-        const encodedQuery = encodeURIComponent(query);
-
-        if (app.name === "AliExpress") {
-            return app.url.replace("wholesale-", `wholesale-${encodedQuery}`);
-        }
-
-        if (app.placeholder) {
-            const token = `${app.placeholder}=`;
-            if (app.url.includes(token)) {
-                return app.url.replace(token, `${token}${encodedQuery}`);
-            }
-            console.warn(`[AppSearch] Placeholder not found in URL: ${app.name}`);
-        }
-
-        return app.url + encodedQuery;
+    const resolveAppIconUrlCached = (iconName, iconMap) => {
+        if (!iconName) return null;
+        const key = `${iconName}_${iconMap.size}`;
+        if (iconCache.has(key)) return iconCache.get(key);
+        const url = resolveIconUrl(iconName, iconMap);
+        if (url) iconCache.set(key, url);
+        return url;
     };
 
-    const getAppCompletionCandidates = (query) => {
-        const normalized = query.trim().toLowerCase();
-        if (!normalized) return APP_SEARCH_DATA;
-
-        return APP_SEARCH_DATA.filter(app =>
-            app?.name &&
-            app.name.toLowerCase().startsWith(normalized)
-        );
+    const updateIntelFromDropdown = (query) => {
+        if (!query) { hideIntelBox(); return; }
+        const match = APP_SEARCH_DATA.find(a => a.name.toLowerCase().includes(query.toLowerCase()));
+        if (match) {
+            const iconUrl = resolveAppIconUrlCached(match.icon, appSearchIconMap);
+            const iconHtml = iconUrl ? `<img src="${iconUrl}" alt="${match.name}" style="width:20px;height:20px;object-fit:contain">` : '';
+            showIntelBox(`${iconHtml} ${match.name}`, match.url);
+        } else { hideIntelBox(); }
     };
 
     const showAppSearchDropdown = (query) => {
         const dropdown = getEl("#appSearchDropdown");
-        if (!dropdown) {
-            console.error("[AppSearch] Dropdown element not found.");
-            return;
-        }
-
-        const normalizedQuery = query.trim().toLowerCase();
-
-        if (
-            lastAppCompletionQuery === normalizedQuery &&
-            dropdown.classList.contains("visible")
-        ) {
-            return;
-        }
-
-        lastAppCompletionQuery = normalizedQuery;
-
-        const filtered = getAppCompletionCandidates(query);
-        dropdown.replaceChildren();
-
+        if (!dropdown) return;
+        if (query === lastDropdownQuery) { updateIntelFromDropdown(query); return; }
+        lastDropdownQuery = query;
+        updateIntelFromDropdown(query);
+        const filtered = query ? APP_SEARCH_DATA.filter(a => a.name.toLowerCase().includes(query.toLowerCase())) : APP_SEARCH_DATA;
         if (filtered.length === 0) {
-            const empty = document.createElement("div");
-            empty.textContent = "該当するアプリが見つかりません";
-            empty.style.cssText = "padding:12px;text-align:center;color:#999;font-size:14px";
-            dropdown.appendChild(empty);
+            dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:14px">該当するアプリが見つかりません</div>';
         } else {
-            const fragment = document.createDocumentFragment();
-
-            for (const app of filtered) {
-                if (!app?.name) continue;
-
-                const item = document.createElement("div");
-                item.className = "app-search-item";
-                item.dataset.name = app.name;
-
-                const iconContainer = document.createElement("div");
-                iconContainer.className = "app-search-item-icon";
-
+            dropdown.innerHTML = filtered.map(app => {
                 const iconUrl = resolveAppIconUrlCached(app.icon, appSearchIconMap);
-                if (iconUrl) {
-                    const img = document.createElement("img");
-                    img.src = iconUrl;
-                    img.alt = "";
-                    img.addEventListener("error", () => {
-                        console.error(`[AppSearch] Icon failed: ${app.icon}`);
-                        img.remove();
-                    }, { once: true });
-                    iconContainer.appendChild(img);
-                } else {
-                    iconContainer.textContent = app.name.charAt(0);
-                }
-
-                const name = document.createElement("span");
-                name.className = "app-search-item-name";
-                name.textContent = app.name;
-
-                const url = document.createElement("span");
-                url.className = "app-search-item-url";
-                url.textContent = `${app.url.replace(/=$/, "")}…`;
-
-                item.append(iconContainer, name, url);
-                fragment.appendChild(item);
-            }
-
-            dropdown.appendChild(fragment);
+                const iconHtml = iconUrl
+                    ? `<div class="app-search-item-icon"><img src="${iconUrl}" alt="${app.name}"></div>`
+                    : `<div class="app-search-item-icon" style="background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">${app.name[0]}</div>`;
+                return `<div class="app-search-item" data-url="${app.url}" data-name="${app.name}" data-placeholder="${app.placeholder || ''}">${iconHtml}<span class="app-search-item-name">${app.name}</span><span class="app-search-item-url">${app.url.replace(/=$/, "")}…</span></div>`;
+            }).join("");
         }
-
         dropdown.classList.add("visible");
-        console.log(`[AppSearch] Completion candidates: ${filtered.length}`);
     };
 
     const hideAppSearchDropdown = () => {
-        const dropdown = getEl("#appSearchDropdown");
-        if (dropdown) dropdown.classList.remove("visible");
-        lastAppCompletionQuery = null;
-    };
-
-    const completeAppSearch = () => {
-        const searchBox = getEl("#searchBox");
-        const dropdown = getEl("#appSearchDropdown");
-
-        if (!searchBox || !dropdown || !dropdown.classList.contains("visible")) {
-            return false;
-        }
-
-        const val = searchBox.value;
-        if (!val.trim().startsWith("@")) return false;
-
-        const command = val.trim().slice(1);
-        if (/\s/.test(command)) return false;
-
-        const candidates = getAppCompletionCandidates(command);
-        if (candidates.length !== 1) {
-            console.log(`[AppSearch] Tab completion skipped: ${candidates.length} candidates.`);
-            return false;
-        }
-
-        const app = candidates[0];
-        const prefix = val.slice(0, val.indexOf("@") + 1);
-        searchBox.value = `${prefix}${app.name} `;
-        searchBox.focus();
-        hideAppSearchDropdown();
-
-        console.log(`[AppSearch] Tab completed: @${app.name}`);
-        return true;
+        const d = getEl("#appSearchDropdown");
+        if (d) d.classList.remove("visible");
     };
 
     const performAppSearch = () => {
-        const searchBox = getEl("#searchBox");
-        if (!searchBox) {
-            console.error("[AppSearch] Search box not found.");
-            return false;
+        const sb = getEl("#searchBox");
+        if (!sb) return;
+        const val = sb.value.trim();
+        if (!val.startsWith("@")) return;
+        const app = searchApp(val);
+        if (app) {
+            hideAppSearchDropdown(); hideIntelBox();
+            let searchUrl;
+            if (app.name === "AliExpress") searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
+            else if (app.placeholder) searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
+            else searchUrl = app.url + encodeURIComponent("");
+            updateHistory(`@${app.name}`);
+            window.location.href = searchUrl;
         }
-
-        const parsed = resolveAppSearchDefinition(searchBox.value);
-        if (!parsed) return false;
-
-        const { app, query } = parsed;
-        const searchUrl = buildAppSearchUrl(app, query);
-
-        if (!searchUrl) return false;
-
-        hideAppSearchDropdown();
-        hideIntelBox();
-        updateHistory(`@${app.name}${query ? ` ${query}` : ""}`);
-
-        console.log(`[AppSearch] Direct search: @${app.name} ${query}`.trim());
-        window.location.href = searchUrl;
-        return true;
     };
 
     const handleAppSearchClick = () => {
-        const searchBox = getEl("#searchBox");
-        if (!searchBox) {
-            console.error("[AppSearch] Search box not found.");
-            return;
-        }
-
-        const val = searchBox.value;
-
-        if (val === "") {
-            searchBox.value = "@";
-            searchBox.focus();
-            showAppSearchDropdown("");
-            hideIntelBox();
-            console.log("[AppSearch] Mode entered.");
-            return;
-        }
-
-        if (val.trim() === "@") {
-            searchBox.value = "";
-            hideAppSearchDropdown();
-            hideIntelBox();
-            console.log("[AppSearch] Mode exited.");
-            return;
-        }
-
-        if (val.startsWith("@")) {
-            const parsed = resolveAppSearchDefinition(val);
-            if (parsed) {
-                const prefixEnd = val.search(/\s/);
-                searchBox.value = prefixEnd >= 0 ? val.slice(0, prefixEnd + 1) : val;
-                searchBox.focus();
-                hideAppSearchDropdown();
-                hideIntelBox();
-                console.log(`[AppSearch] App selected: @${parsed.app.name}`);
-            } else {
-                showAppSearchDropdown(val.slice(1));
-                searchBox.focus();
-            }
-            return;
-        }
-
-        searchBox.value = `${val}@`;
-        searchBox.focus();
-        showAppSearchDropdown("");
-        hideIntelBox();
-        console.log("[AppSearch] Mode appended.");
+        const sb = getEl("#searchBox");
+        if (!sb) return;
+        const val = sb.value;
+        if (val === "") { sb.value = "@"; sb.focus(); showAppSearchDropdown(""); }
+        else if (val === "@") { sb.value = ""; hideAppSearchDropdown(); hideIntelBox(); }
+        else if (val.startsWith("@")) {
+            const si = val.indexOf(" ");
+            if (si > 0) sb.value = val.substring(0, si);
+            else sb.value = "";
+            hideAppSearchDropdown(); hideIntelBox();
+        } else { sb.value = val + "@"; sb.focus(); showAppSearchDropdown(""); }
     };
 
-    const getMainAccessData = () => {
-        const result = [];
-        const seen = new Set();
-
-        const categories = SHORTCUT_DATA?.categories;
-        if (!Array.isArray(categories)) {
-            console.error("[MainAccess] Shortcut categories are unavailable.");
-            return result;
+    const selectFirstDropdownItem = () => {
+        const dropdown = getEl("#appSearchDropdown");
+        if (!dropdown || !dropdown.classList.contains("visible")) return false;
+        const first = dropdown.querySelector(".app-search-item");
+        if (!first) return false;
+        const name = first.dataset.name;
+        hideAppSearchDropdown(); hideIntelBox();
+        const app = APP_SEARCH_DATA.find(a => a.name === name);
+        if (app) {
+            showIntelBox(app.name, app.url);
+            const sb = getEl("#searchBox");
+            if (sb) sb.focus();
+            let searchUrl;
+            if (app.name === "AliExpress") searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
+            else if (app.placeholder) searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
+            else searchUrl = app.url + encodeURIComponent("");
+            updateHistory(`@${name}`);
+            window.location.href = searchUrl;
         }
-
-        for (const category of categories) {
-            if (!Array.isArray(category?.links)) continue;
-
-            for (const link of category.links) {
-                if (!link?.name || !link?.url) continue;
-
-                const key = `${link.name.toLowerCase()}|${link.url}`;
-                if (seen.has(key)) continue;
-
-                seen.add(key);
-                result.push({
-                    name: link.name,
-                    url: link.url,
-                    icon: link.icon || null
-                });
-            }
-        }
-
-        return result;
-    };
-
-    const MAIN_ACCESS_DATA = getMainAccessData();
-
-    const findMainAccessCandidates = (query) => {
-        const normalized = query.trim().toLowerCase();
-        if (!normalized) return [];
-
-        return MAIN_ACCESS_DATA.filter(item =>
-            item?.name &&
-            item.name.toLowerCase().startsWith(normalized)
-        );
-    };
-
-    const updateMainAccessCandidate = (value) => {
-        if (!value || value.startsWith("@")) {
-            hideIntelBox();
-            return;
-        }
-
-        const candidates = findMainAccessCandidates(value);
-
-        if (candidates.length !== 1) {
-            currentMainAccessCandidate = null;
-            if (candidates.length > 1) {
-                console.log(`[MainAccess] ${candidates.length} candidates for "${value}".`);
-            }
-            hideIntelBox();
-            return;
-        }
-
-        const candidate = candidates[0];
-        currentMainAccessCandidate = candidate;
-
-        showIntelBox(candidate.name, candidate.url, candidate.icon);
-        console.log(`[MainAccess] Single candidate: ${candidate.name} -> ${candidate.url}`);
-    };
-
-    const performMainAccess = () => {
-        const searchBox = getEl("#searchBox");
-        if (!searchBox) {
-            console.error("[MainAccess] Search box not found.");
-            return false;
-        }
-
-        const value = searchBox.value.trim();
-        if (!value || value.startsWith("@")) return false;
-
-        const candidates = findMainAccessCandidates(value);
-        const candidate = candidates.length === 1
-            ? candidates[0]
-            : currentMainAccessCandidate;
-
-        if (!candidate) {
-            return false;
-        }
-
-        hideAppSearchDropdown();
-        hideIntelBox();
-        updateHistory(value);
-
-        console.log(`[MainAccess] Opening main page: ${candidate.name} -> ${candidate.url}`);
-        window.location.href = candidate.url;
         return true;
     };
 
     const filterAppDropdown = () => {
-        const searchBox = getEl("#searchBox");
-        if (!searchBox) {
-            console.error("[AppSearch] Search box not found.");
-            return;
-        }
-
-        const value = searchBox.value;
-        if (!value.startsWith("@")) {
-            hideAppSearchDropdown();
-            return;
-        }
-
-        const command = value.slice(1);
-        if (command.includes(" ")) {
-            hideAppSearchDropdown();
-            return;
-        }
-
-        showAppSearchDropdown(command);
+        const sb = getEl("#searchBox");
+        if (!sb) return;
+        const val = sb.value;
+        const ai = val.lastIndexOf("@");
+        if (ai >= 0) {
+            const after = val.substring(ai + 1);
+            if (!after.includes(" ")) showAppSearchDropdown(after);
+            else hideAppSearchDropdown();
+        } else { hideAppSearchDropdown(); }
     };
 
     const performSearch = (query) => {
         const q = query.trim();
         if (!q) return;
-
         updateHistory(q);
-
         let url = "";
         switch (searchEngine) {
             case "google": url = `https://www.google.com/search?q=${encodeURIComponent(q)}`; break;
@@ -867,12 +884,10 @@
             case "neighb": url = `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`; break;
             default: url = `https://www.google.com/search?q=${encodeURIComponent(q)}`; break;
         }
-
-        console.log(`[Search] Web search: ${q}`);
         window.location.href = url;
     };
 
-        const showHistoryDialog = () => {
+    const showHistoryDialog = () => {
         const history = getHistory();
         const existing = document.getElementById("historyDialog");
         if (existing) existing.remove();
@@ -1014,216 +1029,214 @@
         const searchButton = getEl("#searchButton");
         const clearHistoryBtn = getEl("#clearHistory");
         const appSearchBtn = getEl("#appSearchBtn");
-        const dropdown = getEl("#appSearchDropdown");
 
-        if (!searchBox) {
-            console.error("[Search] Required element not found: #searchBox");
-            return;
-        }
-        if (!dropdown) {
-            console.error("[AppSearch] Required element not found: #appSearchDropdown");
-        }
+        if (!searchBox) console.error("[Search] Required element not found: #searchBox");
+        if (!searchButton) console.error("[Search] Required element not found: #searchButton");
+        if (!clearHistoryBtn) console.error("[Search] Required element not found: #clearHistory");
+        if (!appSearchBtn) console.error("[Search] Required element not found: #appSearchBtn");
 
         appSearchIconMap = window._iconMap || new Map();
+        console.log(`[Search] Icon map ready: ${appSearchIconMap.size} item(s).`);
 
-        let inputTimer = null;
+        if (!searchBox) return;
 
-        /* ---------------------------------------------------------
-           Render state
-           --------------------------------------------------------- */
-        const refreshSearchUI = () => {
-            const value = searchBox.value.trim();
-
-            if (!value) {
-                hideAppSearchDropdown();
-                hideIntelBox();
-                console.log("[Search] UI cleared.");
-                return;
-            }
-
-            // @... はアプリ内検索専用。通常候補は絶対に混ぜない。
-            if (value.startsWith("@")) {
-                hideIntelBox();
-                filterAppDropdown();
-                console.log(`[AppSearch] UI refreshed: ${value}`);
-                return;
-            }
-
-            // 通常入力では @ 候補を一切表示しない。
-            hideAppSearchDropdown();
-
-            const isMath = evaluateMath(value);
-            if (isMath) {
-                currentMainAccessCandidate = null;
-                showIntelBox(isMath, null);
-                console.log(`[Search] Math result shown: ${isMath}`);
-                return;
-            }
-
-            updateMainAccessCandidate(value);
-            console.log(`[MainAccess] UI refreshed: ${value}`);
-        };
-
-        /* ---------------------------------------------------------
-           Keyboard
-           --------------------------------------------------------- */
         searchBox.addEventListener("keydown", (e) => {
-            const value = searchBox.value.trim();
-            const isAppMode = value.startsWith("@");
-            const isAppDropdownVisible = Boolean(
-                dropdown && dropdown.classList.contains("visible")
-            );
-            const isIntelVisible = Boolean(
-                getEl("#intelBox")?.classList.contains("visible")
-            );
+            const dropdown = getEl("#appSearchDropdown");
+            const mainDropdown = getEl(`#${MAIN_SUGGESTION_ID}`);
+            const isAtMode = searchBox.value.trimStart().startsWith("@");
 
-            if (e.key === "Escape") {
-                e.preventDefault();
-
-                if (isAppMode && isAppDropdownVisible) {
-                    hideAppSearchDropdown();
-                    console.log("[AppSearch] Dropdown closed by Escape.");
+            // @ app-search mode is completely independent.
+            if (isAtMode) {
+                if (e.key === "Tab") {
+                    e.preventDefault();
+                    const atValue = searchBox.value.trim();
+                    const appQuery = atValue.slice(1).trim();
+                    const matches = APP_SEARCH_DATA.filter(app => app.name.toLowerCase().startsWith(appQuery.toLowerCase()));
+                    if (matches.length > 0) {
+                        searchBox.value = `@${matches[0].name} `;
+                        searchBox.focus();
+                        hideAppSearchDropdown();
+                        hideMainSuggestions("@ Tab completed");
+                        console.log(`[AppSearch] Tab completed: ${searchBox.value}`);
+                    } else {
+                        console.log("[AppSearch] Tab: no matching app.");
+                    }
+                    return;
                 }
 
-                if (isIntelVisible) {
-                    hideIntelBox();
-                    console.log("[Search] Candidate closed by Escape.");
-                }
-
-                return;
-            }
-
-            if (e.key === "Tab") {
-                // @系: Tab は補完専用。補完できない場合もUIを勝手に消さない。
-                if (isAppMode && isAppDropdownVisible) {
-                    if (completeAppSearch()) {
-                        e.preventDefault();
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    hideMainSuggestions("@ Enter");
+                    const value = searchBox.value.trim();
+                    const si = value.indexOf(" ");
+                    if (si > 0) {
+                        const app = searchApp(value.slice(0, si));
+                        if (app) {
+                            performAppSearch();
+                            return;
+                        }
+                    }
+                    const app = searchApp(value);
+                    if (app) {
+                        performAppSearch();
                         return;
                     }
-                    console.log("[AppSearch] Tab: no unique completion; normal Tab preserved.");
+                    performSearch(value);
+                    return;
+                }
+
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    hideAppSearchDropdown();
+                    hideMainSuggestions("Escape in @ mode");
+                    hideIntelBox();
+                    console.log("[AppSearch] Escape closed suggestions.");
+                    return;
+                }
+
+                return;
+            }
+
+            // Normal mode: @ candidates are disabled.
+            hideAppSearchDropdown();
+
+            if (e.key === "Tab") {
+                if (mainSuggestionItems.length > 0) {
+                    e.preventDefault();
+                    applyMainSuggestion(0, "tab");
+                } else {
+                    console.log("[MainSuggestion] Tab: no visible candidate.");
                 }
                 return;
             }
 
             if (e.key === "Enter") {
+                const top = mainSuggestionItems[0];
+                if (top?.action === "open" && top.url) {
+                    e.preventDefault();
+                    applyMainSuggestion(0, "enter");
+                    return;
+                }
+
                 e.preventDefault();
-
-                if (isAppMode) {
-                    // @youtube 検索内容 -> YouTube検索へ直接アクセス
-                    if (performAppSearch()) return;
-
-                    console.log(`[AppSearch] Enter ignored: invalid command "${value}".`);
+                const value = searchBox.value.trim();
+                if (!value) {
+                    console.log("[Search] Enter ignored: empty query.");
                     return;
                 }
+                performSearch(value);
+                return;
+            }
 
-                // 通常入力 -> 単一候補だけメインページへ直接アクセス
-                if (performMainAccess()) return;
-
-                // 候補が複数/存在しない場合は通常検索
-                if (value) {
-                    performSearch(value);
-                    return;
+            if (e.key === "Escape") {
+                if ((mainDropdown && mainDropdown.style.display !== "none") || (getEl("#intelBox")?.classList.contains("visible"))) {
+                    e.preventDefault();
+                    hideMainSuggestions("Escape");
+                    hideIntelBox();
+                    console.log("[MainSuggestion] Escape closed suggestions.");
                 }
-
-                console.log("[Search] Enter ignored: empty query.");
+                return;
             }
         });
 
-        /* ---------------------------------------------------------
-           Input
-           --------------------------------------------------------- */
         searchBox.addEventListener("input", () => {
-            clearTimeout(inputTimer);
+            const value = searchBox.value;
+            const trimmed = value.trim();
 
-            inputTimer = setTimeout(() => {
-                refreshSearchUI();
-            }, 30);
+            if (trimmed.startsWith("@")) {
+                hideMainSuggestions("@ mode active");
+                filterAppDropdown();
+                console.log(`[Search] @ mode: ${value}`);
+                return;
+            }
+
+            hideAppSearchDropdown();
+            scheduleMainSuggestions(trimmed);
+            hideIntelBox();
+            console.log(`[Search] Normal input: ${trimmed}`);
         });
 
-        /* ---------------------------------------------------------
-           Focus
-           --------------------------------------------------------- */
         searchBox.addEventListener("focus", () => {
-            refreshSearchUI();
-            console.log("[Search] Search box focused.");
+            const trimmed = searchBox.value.trim();
+            if (trimmed.startsWith("@")) {
+                filterAppDropdown();
+                hideMainSuggestions("@ focus");
+            } else if (trimmed) {
+                scheduleMainSuggestions(trimmed);
+            }
+            console.log(`[Search] Focus: ${trimmed}`);
         });
 
-        /* ---------------------------------------------------------
-           App-search dropdown mouse interaction
-           --------------------------------------------------------- */
-        if (dropdown) {
-            dropdown.addEventListener("mousedown", (e) => {
-                e.preventDefault();
+        searchBox.addEventListener("blur", () => {
+            // Do not auto-close. Escape is the explicit close action.
+            console.log("[Search] Blur: suggestions remain available.");
+        });
 
-                const item = e.target.closest(".app-search-item");
-                if (!item) {
-                    console.warn("[AppSearch] Clicked area is not an app item.");
+        const dropdownEl = getEl("#appSearchDropdown");
+        if (dropdownEl) {
+            dropdownEl.addEventListener("mousedown", (e) => e.preventDefault());
+        } else {
+            console.error("[Search] Required element not found: #appSearchDropdown");
+        }
+
+        const mainDropdown = ensureMainSuggestionDropdown();
+        if (mainDropdown) {
+            mainDropdown.addEventListener("mousedown", (e) => e.preventDefault());
+            mainDropdown.addEventListener("click", (e) => {
+                const button = e.target.closest(".app-search-item");
+                if (!button || !mainDropdown.contains(button)) return;
+                const index = Number(button.dataset.index);
+                if (!Number.isInteger(index)) {
+                    console.error("[MainSuggestion] Invalid candidate index.");
                     return;
                 }
-
-                const name = item.dataset.name;
-                if (!name) {
-                    console.error("[AppSearch] App item is missing data-name.");
-                    return;
-                }
-
-                const app = APP_SEARCH_DATA.find(
-                    candidate => candidate?.name?.toLowerCase() === name.toLowerCase()
-                );
-                if (!app) {
-                    console.error(`[AppSearch] App definition not found: ${name}`);
-                    return;
-                }
-
-                searchBox.value = `@${app.name} `;
-                searchBox.focus();
-                hideAppSearchDropdown();
-                hideIntelBox();
-
-                console.log(`[AppSearch] Mouse completion: @${app.name}`);
+                applyMainSuggestion(index, "click");
             });
         }
 
-        /* ---------------------------------------------------------
-           Buttons
-           --------------------------------------------------------- */
         if (searchButton) {
             searchButton.addEventListener("click", () => {
-                const value = searchBox.value.trim();
-
-                if (!value) {
-                    console.log("[Search] Search button ignored: empty query.");
+                const val = searchBox.value.trim();
+                if (!val) {
+                    console.log("[Search] Button ignored: empty query.");
                     return;
                 }
-
-                if (value.startsWith("@")) {
-                    if (!performAppSearch()) {
-                        console.log(`[AppSearch] Search button ignored: invalid command "${value}".`);
-                    }
-                    return;
-                }
-
-                if (!performMainAccess()) {
-                    performSearch(value);
+                if (val.startsWith("@")) performAppSearch();
+                else {
+                    const top = mainSuggestionItems[0];
+                    if (top?.action === "open" && top.url) applyMainSuggestion(0, "enter");
+                    else performSearch(val);
                 }
             });
-        } else {
-            console.error("[Search] Required element not found: #searchButton");
         }
 
-        if (clearHistoryBtn) {
-            clearHistoryBtn.addEventListener("click", showHistoryDialog);
-        } else {
-            console.error("[Search] Required element not found: #clearHistory");
-        }
+        if (clearHistoryBtn) clearHistoryBtn.addEventListener("click", showHistoryDialog);
 
         if (appSearchBtn) {
-            appSearchBtn.addEventListener("click", handleAppSearchClick);
-        } else {
-            console.error("[AppSearch] Required element not found: #appSearchBtn");
+            appSearchBtn.addEventListener("click", () => {
+                hideMainSuggestions("manual app-search activation");
+                handleAppSearchClick();
+                console.log("[AppSearch] App-search button clicked.");
+            });
         }
 
-        console.log("[Search] Search and history handlers initialized.");
+        document.addEventListener("click", (e) => {
+            const dropdown = getEl("#appSearchDropdown");
+            const appBtn = getEl("#appSearchBtn");
+            const mainDropdown = getEl(`#${MAIN_SUGGESTION_ID}`);
+
+            if (dropdown && !dropdown.contains(e.target) && appBtn && !appBtn.contains(e.target) && e.target !== searchBox && !e.target.closest(".app-search-item")) {
+                // Intentionally do not close on outside click. Escape closes it.
+                console.log("[AppSearch] Outside click ignored; suggestions remain visible.");
+            }
+
+            if (mainDropdown && !mainDropdown.contains(e.target) && e.target !== searchBox) {
+                // Intentionally do not close on outside click. Escape closes it.
+                console.log("[MainSuggestion] Outside click ignored; suggestions remain visible.");
+            }
+        });
+
+        console.log("[Search] Search handlers initialized.");
     };
 
     /* =========================================================
