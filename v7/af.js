@@ -394,150 +394,469 @@
     ========================================================= */
 
     let appSearchIconMap = null;
-    let lastDropdownQuery = null;
+    let lastAppCompletionQuery = null;
+    let currentMainAccessCandidate = null;
     const iconCache = new Map();
     let searchEngine = "google";
 
-    const showIntelBox = (text, url) => {
+    /* =========================================================
+       Search UI
+       @...        = App search/direct search
+       normal text = Main-page quick access / web search
+       ========================================================= */
+
+    const resolveAppIconUrlCached = (iconName, iconMap) => {
+        if (!iconName || !iconMap || typeof iconMap.has !== "function") {
+            if (iconName) console.warn(`[Search] Icon map unavailable for: ${iconName}`);
+            return null;
+        }
+
+        const key = String(iconName);
+        if (iconCache.has(key)) return iconCache.get(key);
+
+        const direct = iconMap.get(key);
+        if (direct) {
+            iconCache.set(key, direct);
+            return direct;
+        }
+
+        for (const [filename, url] of iconMap) {
+            if (filename === key || filename.endsWith("/" + key) || filename.endsWith("\\" + key)) {
+                iconCache.set(key, url);
+                return url;
+            }
+        }
+
+        console.warn(`[Search] Icon not found: ${iconName}`);
+        return null;
+    };
+
+    const showIntelBox = (text, url, iconName = null) => {
         const box = getEl("#intelBox");
         const ans = getEl("#intelAnswer");
-        if (!box || !ans) return;
-        ans.textContent = text;
+        if (!box || !ans) {
+            console.error("[Search] Intelligence box elements not found.");
+            return;
+        }
+
+        ans.replaceChildren();
+
+        if (iconName) {
+            const iconUrl = resolveAppIconUrlCached(iconName, appSearchIconMap);
+            if (iconUrl) {
+                const img = document.createElement("img");
+                img.src = iconUrl;
+                img.alt = "";
+                img.width = 20;
+                img.height = 20;
+                img.style.objectFit = "contain";
+                img.addEventListener("error", () => {
+                    console.error(`[Search] Candidate icon failed: ${iconName}`);
+                    img.remove();
+                }, { once: true });
+                ans.appendChild(img);
+            }
+        }
+
+        const label = document.createElement("span");
+        label.textContent = text;
+        ans.appendChild(label);
+
         ans.onclick = null;
         ans.classList.remove("hide");
-        if (url) { ans.style.cursor = "pointer"; ans.onclick = () => window.location.href = url; }
-        else { ans.style.cursor = "default"; }
+
+        if (url) {
+            ans.style.cursor = "pointer";
+            ans.onclick = () => {
+                console.log(`[Search] Opening: ${url}`);
+                window.location.href = url;
+            };
+        } else {
+            ans.style.cursor = "default";
+        }
+
         box.classList.add("visible");
+        console.log(`[Search] Intel box shown: ${text}`);
     };
 
     const hideIntelBox = () => {
         const box = getEl("#intelBox");
         const ans = getEl("#intelAnswer");
+
         if (box) box.classList.remove("visible");
-        if (ans) { ans.classList.add("hide"); ans.onclick = null; }
+        if (ans) {
+            ans.classList.add("hide");
+            ans.onclick = null;
+            ans.replaceChildren();
+        }
+
+        currentMainAccessCandidate = null;
     };
 
-    const searchApp = (text) => {
+    const resolveAppSearchDefinition = (text) => {
         if (!text) return null;
-        const q = text.replace(RE_AT, '').toLowerCase().trim();
-        if (q.length < 1) return null;
-        return APP_MAP.get(q) || null;
+
+        const raw = text.trim();
+        if (!raw.startsWith("@")) return null;
+
+        const command = raw.slice(1).trim();
+        const spaceIndex = command.search(/\s/);
+        const appName = (spaceIndex >= 0 ? command.slice(0, spaceIndex) : command).trim();
+
+        if (!appName) return null;
+
+        const normalized = appName.toLowerCase();
+        const app = APP_SEARCH_DATA.find(item => item?.name?.toLowerCase() === normalized);
+
+        if (!app) {
+            console.warn(`[AppSearch] App not found: ${appName}`);
+            return null;
+        }
+
+        return {
+            app,
+            command: appName,
+            query: spaceIndex >= 0 ? command.slice(spaceIndex).trim() : ""
+        };
     };
 
-    const resolveAppIconUrlCached = (iconName, iconMap) => {
-        if (!iconName) return null;
-        const key = `${iconName}_${iconMap.size}`;
-        if (iconCache.has(key)) return iconCache.get(key);
-        const url = resolveIconUrl(iconName, iconMap);
-        if (url) iconCache.set(key, url);
-        return url;
+    const buildAppSearchUrl = (app, query = "") => {
+        if (!app?.url) {
+            console.error("[AppSearch] Invalid app definition.");
+            return null;
+        }
+
+        const encodedQuery = encodeURIComponent(query);
+
+        if (app.name === "AliExpress") {
+            return app.url.replace("wholesale-", `wholesale-${encodedQuery}`);
+        }
+
+        if (app.placeholder) {
+            const token = `${app.placeholder}=`;
+            if (app.url.includes(token)) {
+                return app.url.replace(token, `${token}${encodedQuery}`);
+            }
+            console.warn(`[AppSearch] Placeholder not found in URL: ${app.name}`);
+        }
+
+        return app.url + encodedQuery;
     };
 
-    const updateIntelFromDropdown = (query) => {
-        if (!query) { hideIntelBox(); return; }
-        const match = APP_SEARCH_DATA.find(a => a.name.toLowerCase().includes(query.toLowerCase()));
-        if (match) {
-            const iconUrl = resolveAppIconUrlCached(match.icon, appSearchIconMap);
-            const iconHtml = iconUrl ? `<img src="${iconUrl}" alt="${match.name}" style="width:20px;height:20px;object-fit:contain">` : '';
-            showIntelBox(`${iconHtml} ${match.name}`, match.url);
-        } else { hideIntelBox(); }
+    const getAppCompletionCandidates = (query) => {
+        const normalized = query.trim().toLowerCase();
+        if (!normalized) return APP_SEARCH_DATA;
+
+        return APP_SEARCH_DATA.filter(app =>
+            app?.name &&
+            app.name.toLowerCase().startsWith(normalized)
+        );
     };
 
     const showAppSearchDropdown = (query) => {
         const dropdown = getEl("#appSearchDropdown");
-        if (!dropdown) return;
-        if (query === lastDropdownQuery) { updateIntelFromDropdown(query); return; }
-        lastDropdownQuery = query;
-        updateIntelFromDropdown(query);
-        const filtered = query ? APP_SEARCH_DATA.filter(a => a.name.toLowerCase().includes(query.toLowerCase())) : APP_SEARCH_DATA;
-        if (filtered.length === 0) {
-            dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:14px">該当するアプリが見つかりません</div>';
-        } else {
-            dropdown.innerHTML = filtered.map(app => {
-                const iconUrl = resolveAppIconUrlCached(app.icon, appSearchIconMap);
-                const iconHtml = iconUrl
-                    ? `<div class="app-search-item-icon"><img src="${iconUrl}" alt="${app.name}"></div>`
-                    : `<div class="app-search-item-icon" style="background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">${app.name[0]}</div>`;
-                return `<div class="app-search-item" data-url="${app.url}" data-name="${app.name}" data-placeholder="${app.placeholder || ''}">${iconHtml}<span class="app-search-item-name">${app.name}</span><span class="app-search-item-url">${app.url.replace(/=$/, "")}…</span></div>`;
-            }).join("");
+        if (!dropdown) {
+            console.error("[AppSearch] Dropdown element not found.");
+            return;
         }
+
+        const normalizedQuery = query.trim().toLowerCase();
+
+        if (
+            lastAppCompletionQuery === normalizedQuery &&
+            dropdown.classList.contains("visible")
+        ) {
+            return;
+        }
+
+        lastAppCompletionQuery = normalizedQuery;
+
+        const filtered = getAppCompletionCandidates(query);
+        dropdown.replaceChildren();
+
+        if (filtered.length === 0) {
+            const empty = document.createElement("div");
+            empty.textContent = "該当するアプリが見つかりません";
+            empty.style.cssText = "padding:12px;text-align:center;color:#999;font-size:14px";
+            dropdown.appendChild(empty);
+        } else {
+            const fragment = document.createDocumentFragment();
+
+            for (const app of filtered) {
+                if (!app?.name) continue;
+
+                const item = document.createElement("div");
+                item.className = "app-search-item";
+                item.dataset.name = app.name;
+
+                const iconContainer = document.createElement("div");
+                iconContainer.className = "app-search-item-icon";
+
+                const iconUrl = resolveAppIconUrlCached(app.icon, appSearchIconMap);
+                if (iconUrl) {
+                    const img = document.createElement("img");
+                    img.src = iconUrl;
+                    img.alt = "";
+                    img.addEventListener("error", () => {
+                        console.error(`[AppSearch] Icon failed: ${app.icon}`);
+                        img.remove();
+                    }, { once: true });
+                    iconContainer.appendChild(img);
+                } else {
+                    iconContainer.textContent = app.name.charAt(0);
+                }
+
+                const name = document.createElement("span");
+                name.className = "app-search-item-name";
+                name.textContent = app.name;
+
+                const url = document.createElement("span");
+                url.className = "app-search-item-url";
+                url.textContent = `${app.url.replace(/=$/, "")}…`;
+
+                item.append(iconContainer, name, url);
+                fragment.appendChild(item);
+            }
+
+            dropdown.appendChild(fragment);
+        }
+
         dropdown.classList.add("visible");
+        console.log(`[AppSearch] Completion candidates: ${filtered.length}`);
     };
 
     const hideAppSearchDropdown = () => {
-        const d = getEl("#appSearchDropdown");
-        if (d) d.classList.remove("visible");
+        const dropdown = getEl("#appSearchDropdown");
+        if (dropdown) dropdown.classList.remove("visible");
+        lastAppCompletionQuery = null;
+    };
+
+    const completeAppSearch = () => {
+        const searchBox = getEl("#searchBox");
+        const dropdown = getEl("#appSearchDropdown");
+
+        if (!searchBox || !dropdown || !dropdown.classList.contains("visible")) {
+            return false;
+        }
+
+        const val = searchBox.value;
+        if (!val.trim().startsWith("@")) return false;
+
+        const command = val.trim().slice(1);
+        if (/\s/.test(command)) return false;
+
+        const candidates = getAppCompletionCandidates(command);
+        if (candidates.length !== 1) {
+            console.log(`[AppSearch] Tab completion skipped: ${candidates.length} candidates.`);
+            return false;
+        }
+
+        const app = candidates[0];
+        const prefix = val.slice(0, val.indexOf("@") + 1);
+        searchBox.value = `${prefix}${app.name} `;
+        searchBox.focus();
+        hideAppSearchDropdown();
+
+        console.log(`[AppSearch] Tab completed: @${app.name}`);
+        return true;
     };
 
     const performAppSearch = () => {
-        const sb = getEl("#searchBox");
-        if (!sb) return;
-        const val = sb.value.trim();
-        if (!val.startsWith("@")) return;
-        const app = searchApp(val);
-        if (app) {
-            hideAppSearchDropdown(); hideIntelBox();
-            let searchUrl;
-            if (app.name === "AliExpress") searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
-            else if (app.placeholder) searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
-            else searchUrl = app.url + encodeURIComponent("");
-            updateHistory(`@${app.name}`);
-            window.location.href = searchUrl;
+        const searchBox = getEl("#searchBox");
+        if (!searchBox) {
+            console.error("[AppSearch] Search box not found.");
+            return false;
         }
+
+        const parsed = resolveAppSearchDefinition(searchBox.value);
+        if (!parsed) return false;
+
+        const { app, query } = parsed;
+        const searchUrl = buildAppSearchUrl(app, query);
+
+        if (!searchUrl) return false;
+
+        hideAppSearchDropdown();
+        hideIntelBox();
+        updateHistory(`@${app.name}${query ? ` ${query}` : ""}`);
+
+        console.log(`[AppSearch] Direct search: @${app.name} ${query}`.trim());
+        window.location.href = searchUrl;
+        return true;
     };
 
     const handleAppSearchClick = () => {
-        const sb = getEl("#searchBox");
-        if (!sb) return;
-        const val = sb.value;
-        if (val === "") { sb.value = "@"; sb.focus(); showAppSearchDropdown(""); }
-        else if (val === "@") { sb.value = ""; hideAppSearchDropdown(); hideIntelBox(); }
-        else if (val.startsWith("@")) {
-            const si = val.indexOf(" ");
-            if (si > 0) sb.value = val.substring(0, si);
-            else sb.value = "";
-            hideAppSearchDropdown(); hideIntelBox();
-        } else { sb.value = val + "@"; sb.focus(); showAppSearchDropdown(""); }
+        const searchBox = getEl("#searchBox");
+        if (!searchBox) {
+            console.error("[AppSearch] Search box not found.");
+            return;
+        }
+
+        const val = searchBox.value;
+
+        if (val === "") {
+            searchBox.value = "@";
+            searchBox.focus();
+            showAppSearchDropdown("");
+            hideIntelBox();
+            console.log("[AppSearch] Mode entered.");
+            return;
+        }
+
+        if (val.trim() === "@") {
+            searchBox.value = "";
+            hideAppSearchDropdown();
+            hideIntelBox();
+            console.log("[AppSearch] Mode exited.");
+            return;
+        }
+
+        if (val.startsWith("@")) {
+            const parsed = resolveAppSearchDefinition(val);
+            if (parsed) {
+                const prefixEnd = val.search(/\s/);
+                searchBox.value = prefixEnd >= 0 ? val.slice(0, prefixEnd + 1) : val;
+                searchBox.focus();
+                hideAppSearchDropdown();
+                hideIntelBox();
+                console.log(`[AppSearch] App selected: @${parsed.app.name}`);
+            } else {
+                showAppSearchDropdown(val.slice(1));
+                searchBox.focus();
+            }
+            return;
+        }
+
+        searchBox.value = `${val}@`;
+        searchBox.focus();
+        showAppSearchDropdown("");
+        hideIntelBox();
+        console.log("[AppSearch] Mode appended.");
     };
 
-    const selectFirstDropdownItem = () => {
-        const dropdown = getEl("#appSearchDropdown");
-        if (!dropdown || !dropdown.classList.contains("visible")) return false;
-        const first = dropdown.querySelector(".app-search-item");
-        if (!first) return false;
-        const name = first.dataset.name;
-        hideAppSearchDropdown(); hideIntelBox();
-        const app = APP_SEARCH_DATA.find(a => a.name === name);
-        if (app) {
-            showIntelBox(app.name, app.url);
-            const sb = getEl("#searchBox");
-            if (sb) sb.focus();
-            let searchUrl;
-            if (app.name === "AliExpress") searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent(""));
-            else if (app.placeholder) searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent(""));
-            else searchUrl = app.url + encodeURIComponent("");
-            updateHistory(`@${name}`);
-            window.location.href = searchUrl;
+    const getMainAccessData = () => {
+        const result = [];
+        const seen = new Set();
+
+        const categories = SHORTCUT_DATA?.categories;
+        if (!Array.isArray(categories)) {
+            console.error("[MainAccess] Shortcut categories are unavailable.");
+            return result;
         }
+
+        for (const category of categories) {
+            if (!Array.isArray(category?.links)) continue;
+
+            for (const link of category.links) {
+                if (!link?.name || !link?.url) continue;
+
+                const key = `${link.name.toLowerCase()}|${link.url}`;
+                if (seen.has(key)) continue;
+
+                seen.add(key);
+                result.push({
+                    name: link.name,
+                    url: link.url,
+                    icon: link.icon || null
+                });
+            }
+        }
+
+        return result;
+    };
+
+    const MAIN_ACCESS_DATA = getMainAccessData();
+
+    const findMainAccessCandidates = (query) => {
+        const normalized = query.trim().toLowerCase();
+        if (!normalized) return [];
+
+        return MAIN_ACCESS_DATA.filter(item =>
+            item?.name &&
+            item.name.toLowerCase().startsWith(normalized)
+        );
+    };
+
+    const updateMainAccessCandidate = (value) => {
+        if (!value || value.startsWith("@")) {
+            hideIntelBox();
+            return;
+        }
+
+        const candidates = findMainAccessCandidates(value);
+
+        if (candidates.length !== 1) {
+            currentMainAccessCandidate = null;
+            if (candidates.length > 1) {
+                console.log(`[MainAccess] ${candidates.length} candidates for "${value}".`);
+            }
+            hideIntelBox();
+            return;
+        }
+
+        const candidate = candidates[0];
+        currentMainAccessCandidate = candidate;
+
+        showIntelBox(candidate.name, candidate.url, candidate.icon);
+        console.log(`[MainAccess] Single candidate: ${candidate.name} -> ${candidate.url}`);
+    };
+
+    const performMainAccess = () => {
+        const searchBox = getEl("#searchBox");
+        if (!searchBox) {
+            console.error("[MainAccess] Search box not found.");
+            return false;
+        }
+
+        const value = searchBox.value.trim();
+        if (!value || value.startsWith("@")) return false;
+
+        const candidates = findMainAccessCandidates(value);
+        const candidate = candidates.length === 1
+            ? candidates[0]
+            : currentMainAccessCandidate;
+
+        if (!candidate) {
+            return false;
+        }
+
+        hideAppSearchDropdown();
+        hideIntelBox();
+        updateHistory(value);
+
+        console.log(`[MainAccess] Opening main page: ${candidate.name} -> ${candidate.url}`);
+        window.location.href = candidate.url;
         return true;
     };
 
     const filterAppDropdown = () => {
-        const sb = getEl("#searchBox");
-        if (!sb) return;
-        const val = sb.value;
-        const ai = val.lastIndexOf("@");
-        if (ai >= 0) {
-            const after = val.substring(ai + 1);
-            if (!after.includes(" ")) showAppSearchDropdown(after);
-            else hideAppSearchDropdown();
-        } else { hideAppSearchDropdown(); }
+        const searchBox = getEl("#searchBox");
+        if (!searchBox) {
+            console.error("[AppSearch] Search box not found.");
+            return;
+        }
+
+        const value = searchBox.value;
+        if (!value.startsWith("@")) {
+            hideAppSearchDropdown();
+            return;
+        }
+
+        const command = value.slice(1);
+        if (command.includes(" ")) {
+            hideAppSearchDropdown();
+            return;
+        }
+
+        showAppSearchDropdown(command);
     };
 
     const performSearch = (query) => {
         const q = query.trim();
         if (!q) return;
+
         updateHistory(q);
+
         let url = "";
         switch (searchEngine) {
             case "google": url = `https://www.google.com/search?q=${encodeURIComponent(q)}`; break;
@@ -548,10 +867,12 @@
             case "neighb": url = `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`; break;
             default: url = `https://www.google.com/search?q=${encodeURIComponent(q)}`; break;
         }
+
+        console.log(`[Search] Web search: ${q}`);
         window.location.href = url;
     };
 
-    const showHistoryDialog = () => {
+        const showHistoryDialog = () => {
         const history = getHistory();
         const existing = document.getElementById("historyDialog");
         if (existing) existing.remove();
@@ -693,90 +1014,216 @@
         const searchButton = getEl("#searchButton");
         const clearHistoryBtn = getEl("#clearHistory");
         const appSearchBtn = getEl("#appSearchBtn");
+        const dropdown = getEl("#appSearchDropdown");
+
+        if (!searchBox) {
+            console.error("[Search] Required element not found: #searchBox");
+            return;
+        }
+        if (!dropdown) {
+            console.error("[AppSearch] Required element not found: #appSearchDropdown");
+        }
 
         appSearchIconMap = window._iconMap || new Map();
 
         let inputTimer = null;
 
-        if (searchBox) {
-            searchBox.addEventListener("keydown", (e) => {
-                const dropdown = getEl("#appSearchDropdown");
-                const intelBox = getEl("#intelBox");
-                const intelVisible = intelBox && intelBox.classList.contains("visible");
-                if (dropdown && dropdown.classList.contains("visible")) {
-                    if (e.key === "Enter") { e.preventDefault(); selectFirstDropdownItem(); }
-                    else if (e.key === "Tab") { e.preventDefault(); hideAppSearchDropdown(); }
-                    else if (e.key === "Escape") {
-                        e.preventDefault();
-                        const val = searchBox.value;
-                        const ai = val.lastIndexOf("@");
-                        if (ai >= 0) lastDropdownQuery = val.substring(ai + 1);
-                        hideAppSearchDropdown(); hideIntelBox();
-                    }
-                } else if (intelVisible) {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        const ans = getEl("#intelAnswer");
-                        if (ans && ans.onclick) ans.onclick();
-                    } else if (e.key === "Escape") { e.preventDefault(); hideIntelBox(); }
-                    else if (e.key === "Tab") { e.preventDefault(); hideIntelBox(); }
-                } else if (e.key === "Escape") { hideAppSearchDropdown(); hideIntelBox(); }
-            });
+        /* ---------------------------------------------------------
+           Render state
+           --------------------------------------------------------- */
+        const refreshSearchUI = () => {
+            const value = searchBox.value.trim();
 
-            searchBox.addEventListener("keypress", (e) => {
-                if (e.key === "Enter") {
-                    const val = searchBox.value.trim();
-                    if (val.startsWith("@")) { const app = searchApp(val); if (app) performAppSearch(); else performSearch(val); }
-                    else if (!/^[\d+\-*/(). ]+=\d+$/.test(val)) performSearch(val);
-                }
-            });
-
-            searchBox.addEventListener("input", () => {
-                clearTimeout(inputTimer);
-                inputTimer = setTimeout(() => {
-                    const val = searchBox.value.trim();
-                    if (val.startsWith("@")) filterAppDropdown();
-                    else {
-                        hideAppSearchDropdown();
-                        const isMath = evaluateMath(val);
-                        if (isMath) showIntelBox(isMath, null);
-                        else { const app = searchApp(val); if (app) showIntelBox(app.name, app.url); else hideIntelBox(); }
-                    }
-                }, 50);
-            });
-
-            searchBox.addEventListener("focus", () => {
-                const val = searchBox.value;
-                const ai = val.lastIndexOf("@");
-                if (ai >= 0) { const after = val.substring(ai + 1); if (!after.includes(" ")) showAppSearchDropdown(after); }
-            });
-
-            searchBox.addEventListener("blur", () => {
-                setTimeout(() => {
-                    const dd = getEl("#appSearchDropdown");
-                    const ib = getEl("#intelBox");
-                    if (!dd?.matches(":hover") && !ib?.matches(":hover")) { hideAppSearchDropdown(); hideIntelBox(); }
-                }, 200);
-            });
-
-            const dropdownEl = getEl("#appSearchDropdown");
-            if (dropdownEl) dropdownEl.addEventListener("mousedown", (e) => e.preventDefault());
-        }
-
-        if (searchButton) searchButton.addEventListener("click", () => {
-            const val = searchBox?.value || "";
-            if (val.trim().startsWith("@")) performAppSearch(); else performSearch(val);
-        });
-
-        if (clearHistoryBtn) clearHistoryBtn.addEventListener("click", showHistoryDialog);
-
-        document.addEventListener("click", (e) => {
-            const dropdown = getEl("#appSearchDropdown");
-            const appBtn = getEl("#appSearchBtn");
-            if (dropdown && !dropdown.contains(e.target) && appBtn && !appBtn.contains(e.target) && e.target !== searchBox && !e.target.closest(".app-search-item")) {
+            if (!value) {
                 hideAppSearchDropdown();
+                hideIntelBox();
+                console.log("[Search] UI cleared.");
+                return;
+            }
+
+            // @... はアプリ内検索専用。通常候補は絶対に混ぜない。
+            if (value.startsWith("@")) {
+                hideIntelBox();
+                filterAppDropdown();
+                console.log(`[AppSearch] UI refreshed: ${value}`);
+                return;
+            }
+
+            // 通常入力では @ 候補を一切表示しない。
+            hideAppSearchDropdown();
+
+            const isMath = evaluateMath(value);
+            if (isMath) {
+                currentMainAccessCandidate = null;
+                showIntelBox(isMath, null);
+                console.log(`[Search] Math result shown: ${isMath}`);
+                return;
+            }
+
+            updateMainAccessCandidate(value);
+            console.log(`[MainAccess] UI refreshed: ${value}`);
+        };
+
+        /* ---------------------------------------------------------
+           Keyboard
+           --------------------------------------------------------- */
+        searchBox.addEventListener("keydown", (e) => {
+            const value = searchBox.value.trim();
+            const isAppMode = value.startsWith("@");
+            const isAppDropdownVisible = Boolean(
+                dropdown && dropdown.classList.contains("visible")
+            );
+            const isIntelVisible = Boolean(
+                getEl("#intelBox")?.classList.contains("visible")
+            );
+
+            if (e.key === "Escape") {
+                e.preventDefault();
+
+                if (isAppMode && isAppDropdownVisible) {
+                    hideAppSearchDropdown();
+                    console.log("[AppSearch] Dropdown closed by Escape.");
+                }
+
+                if (isIntelVisible) {
+                    hideIntelBox();
+                    console.log("[Search] Candidate closed by Escape.");
+                }
+
+                return;
+            }
+
+            if (e.key === "Tab") {
+                // @系: Tab は補完専用。補完できない場合もUIを勝手に消さない。
+                if (isAppMode && isAppDropdownVisible) {
+                    if (completeAppSearch()) {
+                        e.preventDefault();
+                        return;
+                    }
+                    console.log("[AppSearch] Tab: no unique completion; normal Tab preserved.");
+                }
+                return;
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                if (isAppMode) {
+                    // @youtube 検索内容 -> YouTube検索へ直接アクセス
+                    if (performAppSearch()) return;
+
+                    console.log(`[AppSearch] Enter ignored: invalid command "${value}".`);
+                    return;
+                }
+
+                // 通常入力 -> 単一候補だけメインページへ直接アクセス
+                if (performMainAccess()) return;
+
+                // 候補が複数/存在しない場合は通常検索
+                if (value) {
+                    performSearch(value);
+                    return;
+                }
+
+                console.log("[Search] Enter ignored: empty query.");
             }
         });
+
+        /* ---------------------------------------------------------
+           Input
+           --------------------------------------------------------- */
+        searchBox.addEventListener("input", () => {
+            clearTimeout(inputTimer);
+
+            inputTimer = setTimeout(() => {
+                refreshSearchUI();
+            }, 30);
+        });
+
+        /* ---------------------------------------------------------
+           Focus
+           --------------------------------------------------------- */
+        searchBox.addEventListener("focus", () => {
+            refreshSearchUI();
+            console.log("[Search] Search box focused.");
+        });
+
+        /* ---------------------------------------------------------
+           App-search dropdown mouse interaction
+           --------------------------------------------------------- */
+        if (dropdown) {
+            dropdown.addEventListener("mousedown", (e) => {
+                e.preventDefault();
+
+                const item = e.target.closest(".app-search-item");
+                if (!item) {
+                    console.warn("[AppSearch] Clicked area is not an app item.");
+                    return;
+                }
+
+                const name = item.dataset.name;
+                if (!name) {
+                    console.error("[AppSearch] App item is missing data-name.");
+                    return;
+                }
+
+                const app = APP_SEARCH_DATA.find(
+                    candidate => candidate?.name?.toLowerCase() === name.toLowerCase()
+                );
+                if (!app) {
+                    console.error(`[AppSearch] App definition not found: ${name}`);
+                    return;
+                }
+
+                searchBox.value = `@${app.name} `;
+                searchBox.focus();
+                hideAppSearchDropdown();
+                hideIntelBox();
+
+                console.log(`[AppSearch] Mouse completion: @${app.name}`);
+            });
+        }
+
+        /* ---------------------------------------------------------
+           Buttons
+           --------------------------------------------------------- */
+        if (searchButton) {
+            searchButton.addEventListener("click", () => {
+                const value = searchBox.value.trim();
+
+                if (!value) {
+                    console.log("[Search] Search button ignored: empty query.");
+                    return;
+                }
+
+                if (value.startsWith("@")) {
+                    if (!performAppSearch()) {
+                        console.log(`[AppSearch] Search button ignored: invalid command "${value}".`);
+                    }
+                    return;
+                }
+
+                if (!performMainAccess()) {
+                    performSearch(value);
+                }
+            });
+        } else {
+            console.error("[Search] Required element not found: #searchButton");
+        }
+
+        if (clearHistoryBtn) {
+            clearHistoryBtn.addEventListener("click", showHistoryDialog);
+        } else {
+            console.error("[Search] Required element not found: #clearHistory");
+        }
+
+        if (appSearchBtn) {
+            appSearchBtn.addEventListener("click", handleAppSearchClick);
+        } else {
+            console.error("[AppSearch] Required element not found: #appSearchBtn");
+        }
+
+        console.log("[Search] Search and history handlers initialized.");
     };
 
     /* =========================================================
