@@ -13,6 +13,16 @@
     const HISTORY_KEY = "searchHistory";
     const MAX_HISTORY = 40;
 
+    const SETTINGS_DB_NAME = "NewtabSettingsDB";
+    const SETTINGS_STORE = "data";
+    const CUSTOM_SHORTCUTS_KEY = "customShortcuts";
+    const CUSTOM_SHORTCUT_ICON_PREFIX = "customShortcutIcon:";
+    const LABEL_VISIBLE_KEY = "newtab.labelVisible";
+    const ICON_SIZE_KEY = "newtab.iconSize";
+    const DEFAULT_LABEL_VISIBLE = true;
+    const DEFAULT_ICON_SIZE = "standard";
+    const FAVICON_API_URL = "https://www.google.com/s2/favicons";
+
     /* =========================================================
        Pre-compiled Regex
     ========================================================= */
@@ -42,6 +52,427 @@
         const el = document.querySelector(selector);
         if (el) cachedElements.set(selector, el);
         return el;
+    };
+
+    /* =========================================================
+       Newtab Settings / Custom Shortcuts
+    ========================================================= */
+
+    let settingsDbPromise = null;
+    let customShortcutsCache = [];
+    const customShortcutIconUrls = new Map();
+
+    const openSettingsDb = () => {
+        if (settingsDbPromise) return settingsDbPromise;
+
+        settingsDbPromise = new Promise((resolve, reject) => {
+            let request;
+            try {
+                request = indexedDB.open(SETTINGS_DB_NAME, 1);
+            } catch (error) {
+                console.error("[Settings] IndexedDB open failed:", error);
+                reject(error);
+                return;
+            }
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(SETTINGS_STORE)) {
+                    db.createObjectStore(SETTINGS_STORE, { keyPath: "key" });
+                    console.log("[Settings] IndexedDB store created.");
+                }
+            };
+
+            request.onsuccess = () => {
+                const db = request.result;
+                db.onversionchange = () => db.close();
+                console.log("[Settings] IndexedDB ready.");
+                resolve(db);
+            };
+
+            request.onerror = () => {
+                const error = request.error || new Error("IndexedDB request failed");
+                console.error("[Settings] IndexedDB unavailable:", error);
+                reject(error);
+            };
+
+            request.onblocked = () => {
+                console.error("[Settings] IndexedDB open blocked.");
+            };
+        });
+
+        return settingsDbPromise;
+    };
+
+    const settingsGet = async (key) => {
+        if (!key) {
+            console.error("[Settings] Get failed: key is empty.");
+            return null;
+        }
+
+        try {
+            const db = await openSettingsDb();
+            return await new Promise((resolve, reject) => {
+                let request;
+                try {
+                    request = db.transaction(SETTINGS_STORE, "readonly")
+                        .objectStore(SETTINGS_STORE)
+                        .get(key);
+                } catch (error) {
+                    reject(error);
+                    return;
+                }
+
+                request.onsuccess = () => resolve(request.result?.value ?? null);
+                request.onerror = () => reject(request.error || new Error(`IndexedDB get failed: ${key}`));
+            });
+        } catch (error) {
+            console.error(`[Settings] Get failed: ${key}`, error);
+            return null;
+        }
+    };
+
+    const settingsPut = async (key, value) => {
+        if (!key) {
+            console.error("[Settings] Put failed: key is empty.");
+            return false;
+        }
+
+        try {
+            const db = await openSettingsDb();
+            await new Promise((resolve, reject) => {
+                let request;
+                try {
+                    request = db.transaction(SETTINGS_STORE, "readwrite")
+                        .objectStore(SETTINGS_STORE)
+                        .put({ key, value });
+                } catch (error) {
+                    reject(error);
+                    return;
+                }
+
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error || new Error(`IndexedDB put failed: ${key}`));
+            });
+            console.log(`[Settings] Saved: ${key}`);
+            return true;
+        } catch (error) {
+            console.error(`[Settings] Save failed: ${key}`, error);
+            return false;
+        }
+    };
+
+    const settingsDelete = async (key) => {
+        if (!key) {
+            console.error("[Settings] Delete failed: key is empty.");
+            return false;
+        }
+
+        try {
+            const db = await openSettingsDb();
+            await new Promise((resolve, reject) => {
+                let request;
+                try {
+                    request = db.transaction(SETTINGS_STORE, "readwrite")
+                        .objectStore(SETTINGS_STORE)
+                        .delete(key);
+                } catch (error) {
+                    reject(error);
+                    return;
+                }
+
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error || new Error(`IndexedDB delete failed: ${key}`));
+            });
+            console.log(`[Settings] Deleted: ${key}`);
+            return true;
+        } catch (error) {
+            console.error(`[Settings] Delete failed: ${key}`, error);
+            return false;
+        }
+    };
+
+    const isValidCustomShortcut = (shortcut) =>
+        Boolean(
+            shortcut &&
+            typeof shortcut === "object" &&
+            typeof shortcut.id === "string" &&
+            shortcut.id &&
+            typeof shortcut.name === "string" &&
+            shortcut.name.trim() &&
+            typeof shortcut.url === "string" &&
+            /^https?:\/\//i.test(shortcut.url)
+        );
+
+    const releaseCustomShortcutIconUrls = () => {
+        for (const url of customShortcutIconUrls.values()) {
+            try { URL.revokeObjectURL(url); } catch (error) { console.error("[Settings] Icon URL revoke failed:", error); }
+        }
+        customShortcutIconUrls.clear();
+    };
+
+    const loadCustomShortcutData = async () => {
+        releaseCustomShortcutIconUrls();
+
+        const stored = await settingsGet(CUSTOM_SHORTCUTS_KEY);
+        customShortcutsCache = Array.isArray(stored)
+            ? stored.filter(isValidCustomShortcut).map(item => ({
+                id: item.id,
+                name: item.name.trim(),
+                url: item.url,
+                iconKey: typeof item.iconKey === "string" ? item.iconKey : null
+            }))
+            : [];
+
+        await Promise.all(customShortcutsCache.map(async (shortcut) => {
+            if (!shortcut.iconKey) return;
+
+            const blob = await settingsGet(`${CUSTOM_SHORTCUT_ICON_PREFIX}${shortcut.iconKey}`);
+            if (!(blob instanceof Blob) || blob.size === 0) {
+                console.error(`[Settings] Custom icon missing: ${shortcut.name}`);
+                return;
+            }
+
+            try {
+                customShortcutIconUrls.set(shortcut.id, URL.createObjectURL(blob));
+            } catch (error) {
+                console.error(`[Settings] Custom icon URL creation failed: ${shortcut.name}`, error);
+            }
+        }));
+
+        console.log(`[Settings] Loaded ${customShortcutsCache.length} custom shortcut(s).`);
+    };
+
+    const saveCustomShortcuts = async () => {
+        return settingsPut(CUSTOM_SHORTCUTS_KEY, customShortcutsCache);
+    };
+
+    const normalizeShortcutUrl = (input) => {
+        const raw = String(input || "").trim();
+        if (!raw) return null;
+
+        const candidate = /^[a-z][a-z\d+\-.]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+        try {
+            const url = new URL(candidate);
+            if (url.protocol !== "http:" && url.protocol !== "https:") {
+                console.error(`[Settings] Unsupported shortcut protocol: ${url.protocol}`);
+                return null;
+            }
+            return url.href;
+        } catch (error) {
+            console.error(`[Settings] Invalid shortcut URL: ${raw}`);
+            return null;
+        }
+    };
+
+    const buildFaviconApiUrl = (url) => {
+        try {
+            const parsed = new URL(url);
+            return `${FAVICON_API_URL}?domain=${encodeURIComponent(parsed.hostname)}&sz=128`;
+        } catch (error) {
+            console.error("[Settings] Favicon URL build failed:", error);
+            return null;
+        }
+    };
+
+    const fetchAndStoreFavicon = async (shortcutId, shortcutUrl) => {
+        const apiUrl = buildFaviconApiUrl(shortcutUrl);
+        if (!apiUrl) return false;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: "GET",
+                cache: "force-cache"
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            if (!blob.size) {
+                throw new Error("Favicon response was empty.");
+            }
+
+            const iconKey = shortcutId;
+            const saved = await settingsPut(`${CUSTOM_SHORTCUT_ICON_PREFIX}${iconKey}`, blob);
+            if (!saved) return false;
+
+            try {
+                const existing = customShortcutIconUrls.get(shortcutId);
+                if (existing) URL.revokeObjectURL(existing);
+                customShortcutIconUrls.set(shortcutId, URL.createObjectURL(blob));
+            } catch (error) {
+                console.error("[Settings] Favicon object URL creation failed:", error);
+            }
+
+            console.log(`[Settings] Favicon stored: ${shortcutUrl}`);
+            return true;
+        } catch (error) {
+            console.error(`[Settings] Favicon fetch failed: ${shortcutUrl}`, error);
+            return false;
+        }
+    };
+
+    const getShortcutCategories = () => {
+        const customLinks = customShortcutsCache.map(shortcut => ({
+            name: shortcut.name,
+            url: shortcut.url,
+            bg: "var(--iconbg)",
+            icon: null,
+            iconUrl: customShortcutIconUrls.get(shortcut.id) || null,
+            customId: shortcut.id
+        }));
+
+        return [
+            { title: "自分のショートカット", links: customLinks },
+            ...(Array.isArray(SHORTCUT_DATA?.categories) ? SHORTCUT_DATA.categories : [])
+        ];
+    };
+
+    const getLabelVisibleSetting = () => {
+        try {
+            const stored = localStorage.getItem(LABEL_VISIBLE_KEY);
+            return stored === null ? DEFAULT_LABEL_VISIBLE : stored !== "false";
+        } catch (error) {
+            console.error("[Settings] Label visibility read failed:", error);
+            return DEFAULT_LABEL_VISIBLE;
+        }
+    };
+
+    const getIconSizeSetting = () => {
+        try {
+            const stored = localStorage.getItem(ICON_SIZE_KEY);
+            return ["standard", "large", "extra-large"].includes(stored)
+                ? stored
+                : DEFAULT_ICON_SIZE;
+        } catch (error) {
+            console.error("[Settings] Icon size read failed:", error);
+            return DEFAULT_ICON_SIZE;
+        }
+    };
+
+    const applyAppearanceSettings = () => {
+        const root = getEl("#mainShortcuts");
+        if (!root) {
+            console.error("[Settings] Required element not found: #mainShortcuts");
+            return;
+        }
+
+        const labelVisible = getLabelVisibleSetting();
+        const iconSize = getIconSizeSetting();
+
+        root.dataset.labelVisible = String(labelVisible);
+        root.dataset.iconSize = iconSize;
+
+        console.log(`[Settings] Appearance applied: labels=${labelVisible}, iconSize=${iconSize}`);
+    };
+
+    const saveAppearanceSetting = (key, value) => {
+        try {
+            localStorage.setItem(key, value);
+            console.log(`[Settings] localStorage saved: ${key}=${value}`);
+            return true;
+        } catch (error) {
+            console.error(`[Settings] localStorage save failed: ${key}`, error);
+            return false;
+        }
+    };
+
+    const deleteOnlyWallpaperSettings = async () => {
+        try {
+            const request = indexedDB.open(DB_NAME);
+            await new Promise((resolve, reject) => {
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error("WallpaperDB open failed"));
+                request.onblocked = () => reject(new Error("WallpaperDB open blocked"));
+            });
+
+            const db = request.result;
+            const deleteKeys = ["newtabRandom", "newtab", "light", "dark"];
+
+            if (!db.objectStoreNames.contains(STORE)) {
+                db.close();
+                console.log("[Settings] Wallpaper store not found; nothing to reset.");
+                return true;
+            }
+
+            await new Promise((resolve, reject) => {
+                let transaction;
+                try {
+                    transaction = db.transaction(STORE, "readwrite");
+                    const store = transaction.objectStore(STORE);
+                    for (const key of deleteKeys) store.delete(key);
+                } catch (error) {
+                    reject(error);
+                    return;
+                }
+
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error || new Error("Wallpaper reset transaction failed"));
+                transaction.onabort = () => reject(transaction.error || new Error("Wallpaper reset transaction aborted"));
+            });
+
+            db.close();
+
+            if (document.body) {
+                document.body.style.removeProperty("--wallpaper-light");
+                document.body.style.removeProperty("--wallpaper-dark");
+            }
+
+            console.log("[Settings] Wallpaper reset: only Newtab wallpaper records were deleted.");
+            return true;
+        } catch (error) {
+            console.error("[Settings] Wallpaper reset failed:", error);
+            return false;
+        }
+    };
+
+    const resetNewtabSettings = async () => {
+        const confirmed = window.confirm(
+            "Newtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？"
+        );
+
+        if (!confirmed) {
+            console.log("[Settings] Newtab settings reset cancelled.");
+            return;
+        }
+
+        let localStorageReset = false;
+        try {
+            localStorage.removeItem(LABEL_VISIBLE_KEY);
+            localStorage.removeItem(ICON_SIZE_KEY);
+            localStorageReset = true;
+            console.log("[Settings] Appearance settings reset.");
+        } catch (error) {
+            console.error("[Settings] Appearance reset failed:", error);
+        }
+
+        const wallpaperReset = await deleteOnlyWallpaperSettings();
+        applyAppearanceSettings();
+
+        console.log(
+            `[Settings] Newtab reset completed: appearance=${localStorageReset}, wallpaper=${wallpaperReset}.`
+        );
+    };
+
+    const deleteSearchHistory = () => {
+        const confirmed = window.confirm("検索履歴をすべて削除します。実行しますか？");
+        if (!confirmed) {
+            console.log("[Settings] Search history deletion cancelled.");
+            return;
+        }
+
+        try {
+            localStorage.removeItem(HISTORY_KEY);
+            historyCache = [];
+            const historyList = getEl("#historyList");
+            if (historyList) historyList.replaceChildren();
+            console.log("[Settings] Search history deleted.");
+        } catch (error) {
+            console.error("[Settings] Search history deletion failed:", error);
+        }
     };
 
     /* =========================================================
@@ -464,7 +895,7 @@
 
         const seen = new Set();
         const matches = [];
-        const categories = Array.isArray(SHORTCUT_DATA?.categories) ? SHORTCUT_DATA.categories : [];
+        const categories = getShortcutCategories();
 
         for (const category of categories) {
             if (!category || !Array.isArray(category.links)) continue;
@@ -939,6 +1370,472 @@
     };
 
     /* =========================================================
+        Settings Dialogs
+    ========================================================= */
+
+    const closeNewtabDialog = (dialog, reason = "close") => {
+        if (!dialog) {
+            console.error("[Settings] Dialog close failed: element missing.");
+            return;
+        }
+        dialog.remove();
+        console.log(`[Settings] Dialog closed: ${reason}`);
+    };
+
+    const createNewtabDialog = (titleText, contentBuilder) => {
+        if (!document.body) {
+            console.error("[Settings] document.body not found.");
+            return null;
+        }
+
+        const existing = document.querySelector(".newtab-dialog");
+        if (existing) closeNewtabDialog(existing, "replaced");
+
+        const dialog = document.createElement("div");
+        dialog.className = "newtab-dialog";
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-modal", "true");
+
+        const content = document.createElement("div");
+        content.className = "newtab-dialog-content";
+
+        const header = document.createElement("div");
+        header.className = "newtab-dialog-header";
+
+        const title = document.createElement("h3");
+        title.className = "newtab-dialog-title";
+        title.textContent = titleText;
+
+        const closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "newtab-dialog-close";
+        closeBtn.setAttribute("aria-label", "閉じる");
+        closeBtn.textContent = "×";
+        closeBtn.addEventListener("click", () => closeNewtabDialog(dialog, "button"));
+
+        header.append(title, closeBtn);
+        content.appendChild(header);
+
+        if (typeof contentBuilder !== "function") {
+            console.error("[Settings] Dialog content builder missing.");
+        } else {
+            contentBuilder(content, dialog);
+        }
+
+        dialog.appendChild(content);
+
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) closeNewtabDialog(dialog, "backdrop");
+        });
+
+        document.body.appendChild(dialog);
+        closeBtn.focus();
+        console.log(`[Settings] Dialog opened: ${titleText}`);
+        return dialog;
+    };
+
+    const createSettingsSection = (parent, titleText) => {
+        const section = document.createElement("section");
+        section.className = "newtab-settings-section";
+
+        const title = document.createElement("h4");
+        title.className = "newtab-settings-section-title";
+        title.textContent = titleText;
+
+        section.appendChild(title);
+        parent.appendChild(section);
+        return section;
+    };
+
+    const createSettingsLink = (parent, label, url) => {
+        if (!url) {
+            console.error(`[Settings] Link URL missing: ${label}`);
+            return;
+        }
+
+        const link = document.createElement("a");
+        link.className = "newtab-settings-link";
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = label;
+        parent.appendChild(link);
+    };
+
+    const createChoiceButton = (parent, label, value, currentValue, onSelect) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "newtab-settings-choice";
+        button.textContent = label;
+        button.dataset.value = value;
+        button.setAttribute("aria-pressed", String(value === currentValue));
+
+        button.addEventListener("click", () => {
+            if (typeof onSelect !== "function") {
+                console.error(`[Settings] Choice handler missing: ${label}`);
+                return;
+            }
+            onSelect(value);
+        });
+
+        parent.appendChild(button);
+        return button;
+    };
+
+    const refreshChoiceButtons = (group, selectedValue) => {
+        if (!group) {
+            console.error("[Settings] Choice group missing.");
+            return;
+        }
+
+        group.querySelectorAll(".newtab-settings-choice").forEach((button) => {
+            button.setAttribute("aria-pressed", String(button.dataset.value === selectedValue));
+        });
+    };
+
+    const renderCustomShortcutDialogList = (listRoot, dialog) => {
+        if (!listRoot) {
+            console.error("[Settings] Custom shortcut list root missing.");
+            return;
+        }
+
+        listRoot.replaceChildren();
+
+        for (const shortcut of customShortcutsCache) {
+            const entry = document.createElement("div");
+            entry.className = "newtab-shortcut-entry";
+
+            const iconWrap = document.createElement("div");
+            iconWrap.className = "newtab-shortcut-entry-icon";
+
+            const iconUrl = customShortcutIconUrls.get(shortcut.id);
+            if (iconUrl) {
+                const img = document.createElement("img");
+                img.src = iconUrl;
+                img.alt = "";
+                img.width = 32;
+                img.height = 32;
+                img.decoding = "async";
+                img.addEventListener("error", () => {
+                    console.error(`[Settings] Custom dialog icon failed: ${shortcut.name}`);
+                    img.remove();
+                }, { once: true });
+                iconWrap.appendChild(img);
+            } else {
+                iconWrap.textContent = shortcut.name.slice(0, 1);
+            }
+
+            const info = document.createElement("div");
+            info.className = "newtab-shortcut-entry-info";
+
+            const name = document.createElement("div");
+            name.className = "newtab-shortcut-entry-name";
+            name.textContent = shortcut.name;
+
+            const url = document.createElement("div");
+            url.className = "newtab-shortcut-entry-url";
+            url.textContent = shortcut.url;
+
+            info.append(name, url);
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "newtab-settings-danger";
+            deleteButton.textContent = "削除";
+
+            deleteButton.addEventListener("click", async () => {
+                const index = customShortcutsCache.findIndex(item => item.id === shortcut.id);
+                if (index < 0) {
+                    console.error(`[Settings] Custom shortcut not found: ${shortcut.name}`);
+                    return;
+                }
+
+                const [removed] = customShortcutsCache.splice(index, 1);
+                const saved = await saveCustomShortcuts();
+                await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${removed.id}`);
+
+                const iconUrlToRelease = customShortcutIconUrls.get(removed.id);
+                if (iconUrlToRelease) {
+                    try { URL.revokeObjectURL(iconUrlToRelease); } catch (error) { console.error("[Settings] Icon URL revoke failed:", error); }
+                    customShortcutIconUrls.delete(removed.id);
+                }
+
+                if (!saved) {
+                    console.error(`[Settings] Custom shortcut metadata save failed after deleting: ${removed.name}`);
+                    return;
+                }
+
+                renderCustomShortcutDialogList(listRoot, dialog);
+                renderShortcuts(window._iconMap || new Map());
+                console.log(`[Settings] Custom shortcut deleted: ${removed.name}`);
+            });
+
+            entry.append(iconWrap, info, deleteButton);
+            listRoot.appendChild(entry);
+        }
+
+        console.log(`[Settings] Custom shortcut dialog list rendered: ${customShortcutsCache.length} item(s).`);
+    };
+
+    const showCustomizeDialog = () => {
+        createNewtabDialog("カスタマイズ", (content, dialog) => {
+            const shortcutSection = createSettingsSection(content, "ショートカット");
+
+            const addRow = document.createElement("div");
+            addRow.className = "newtab-settings-row";
+
+            const urlInput = document.createElement("input");
+            urlInput.type = "url";
+            urlInput.placeholder = "URLを入力";
+            urlInput.autocomplete = "off";
+            urlInput.inputMode = "url";
+
+            const nameInput = document.createElement("input");
+            nameInput.type = "text";
+            nameInput.placeholder = "ラベルを入力";
+            nameInput.maxLength = 80;
+            nameInput.autocomplete = "off";
+
+            const addButton = document.createElement("button");
+            addButton.type = "button";
+            addButton.className = "newtab-settings-action";
+            addButton.textContent = "追加";
+
+            const listRoot = document.createElement("div");
+            listRoot.className = "newtab-shortcut-list";
+
+            const addShortcut = async () => {
+                const name = nameInput.value.trim();
+                const normalizedUrl = normalizeShortcutUrl(urlInput.value);
+
+                if (!name) {
+                    console.error("[Settings] Custom shortcut add blocked: label is empty.");
+                    nameInput.focus();
+                    return;
+                }
+
+                if (!normalizedUrl) {
+                    console.error("[Settings] Custom shortcut add blocked: invalid URL.");
+                    urlInput.focus();
+                    return;
+                }
+
+                const existing = customShortcutsCache.find(
+                    shortcut => shortcut.url.toLowerCase() === normalizedUrl.toLowerCase()
+                );
+                if (existing) {
+                    console.error(`[Settings] Custom shortcut already exists: ${existing.name}`);
+                    return;
+                }
+
+                const id = typeof globalThis.crypto?.randomUUID === "function"
+                    ? globalThis.crypto.randomUUID()
+                    : `shortcut-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+                const iconKey = id;
+                const shortcut = {
+                    id,
+                    name,
+                    url: normalizedUrl,
+                    iconKey
+                };
+
+                const faviconSaved = await fetchAndStoreFavicon(id, normalizedUrl);
+                if (!faviconSaved) {
+                    console.error(`[Settings] Custom shortcut added without stored favicon: ${name}`);
+                }
+
+                customShortcutsCache.unshift(shortcut);
+                const saved = await saveCustomShortcuts();
+
+                if (!saved) {
+                    customShortcutsCache.shift();
+                    await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${iconKey}`);
+                    const orphanUrl = customShortcutIconUrls.get(id);
+                    if (orphanUrl) {
+                        try { URL.revokeObjectURL(orphanUrl); } catch (error) { console.error("[Settings] Orphan icon URL revoke failed:", error); }
+                        customShortcutIconUrls.delete(id);
+                    }
+                    console.error(`[Settings] Custom shortcut add failed: ${name}`);
+                    return;
+                }
+
+                urlInput.value = "";
+                nameInput.value = "";
+                renderCustomShortcutDialogList(listRoot, dialog);
+                renderShortcuts(window._iconMap || new Map());
+
+                console.log(`[Settings] Custom shortcut added: ${name} -> ${normalizedUrl}`);
+                urlInput.focus();
+            };
+
+            addButton.addEventListener("click", () => {
+                addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error));
+            });
+
+            urlInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error));
+                }
+            });
+
+            nameInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error));
+                }
+            });
+
+            addRow.append(urlInput, nameInput, addButton);
+            shortcutSection.appendChild(addRow);
+            shortcutSection.appendChild(listRoot);
+
+            renderCustomShortcutDialogList(listRoot, dialog);
+
+            const appearanceSection = createSettingsSection(content, "外観");
+
+            const wallpaperRow = document.createElement("div");
+            wallpaperRow.className = "newtab-settings-row";
+            createSettingsLink(wallpaperRow, "壁紙を変更", "https://search3958.github.io/project/images/2/");
+            appearanceSection.appendChild(wallpaperRow);
+
+            const labelRow = document.createElement("div");
+            labelRow.className = "newtab-settings-row";
+            const labelTitle = document.createElement("span");
+            labelTitle.textContent = "ラベルの表示";
+            labelRow.appendChild(labelTitle);
+
+            const labelChoices = document.createElement("div");
+            labelChoices.className = "newtab-settings-row";
+            const currentLabelVisible = getLabelVisibleSetting();
+
+            createChoiceButton(labelChoices, "表示する", "true", String(currentLabelVisible), (value) => {
+                const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value);
+                if (!saved) return;
+                const root = getEl("#mainShortcuts");
+                if (!root) {
+                    console.error("[Settings] #mainShortcuts missing while changing labels.");
+                    return;
+                }
+                root.dataset.labelVisible = value;
+                refreshChoiceButtons(labelChoices, value);
+                console.log(`[Settings] Label visibility changed: ${value}`);
+            });
+
+            createChoiceButton(labelChoices, "表示しない", "false", String(currentLabelVisible), (value) => {
+                const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value);
+                if (!saved) return;
+                const root = getEl("#mainShortcuts");
+                if (!root) {
+                    console.error("[Settings] #mainShortcuts missing while changing labels.");
+                    return;
+                }
+                root.dataset.labelVisible = value;
+                refreshChoiceButtons(labelChoices, value);
+                console.log(`[Settings] Label visibility changed: ${value}`);
+            });
+
+            appearanceSection.appendChild(labelRow);
+            appearanceSection.appendChild(labelChoices);
+
+            const iconSizeRow = document.createElement("div");
+            iconSizeRow.className = "newtab-settings-row";
+
+            const iconSizeTitle = document.createElement("span");
+            iconSizeTitle.textContent = "アイコンサイズ";
+
+            const iconSizeChoices = document.createElement("div");
+            iconSizeChoices.className = "newtab-settings-row";
+            const currentIconSize = getIconSizeSetting();
+
+            const applyIconSize = (value) => {
+                const saved = saveAppearanceSetting(ICON_SIZE_KEY, value);
+                if (!saved) return;
+                const root = getEl("#mainShortcuts");
+                if (!root) {
+                    console.error("[Settings] #mainShortcuts missing while changing icon size.");
+                    return;
+                }
+                root.dataset.iconSize = value;
+                refreshChoiceButtons(iconSizeChoices, value);
+                console.log(`[Settings] Icon size changed: ${value}`);
+            };
+
+            createChoiceButton(iconSizeChoices, "標準", "standard", currentIconSize, applyIconSize);
+            createChoiceButton(iconSizeChoices, "大", "large", currentIconSize, applyIconSize);
+            createChoiceButton(iconSizeChoices, "特大", "extra-large", currentIconSize, applyIconSize);
+
+            iconSizeRow.appendChild(iconSizeTitle);
+            appearanceSection.appendChild(iconSizeRow);
+            appearanceSection.appendChild(iconSizeChoices);
+        });
+
+        console.log("[Settings] Customize dialog requested.");
+    };
+
+    const showManagementDialog = () => {
+        createNewtabDialog("管理", (content) => {
+            const newtabSection = createSettingsSection(content, "Newtab v7");
+            const newtabLinks = document.createElement("div");
+            newtabLinks.className = "newtab-settings-links";
+            createSettingsLink(newtabLinks, "設定方法と詳細", "https://search3958.github.io/i/newtab/");
+            createSettingsLink(newtabLinks, "簡易版", "https://search3958.github.io/newtab/newtab-simple");
+            newtabSection.appendChild(newtabLinks);
+
+            const dataSection = createSettingsSection(content, "データ");
+
+            const resetButton = document.createElement("button");
+            resetButton.type = "button";
+            resetButton.className = "newtab-settings-action";
+            resetButton.textContent = "Newtab設定のリセット";
+            resetButton.addEventListener("click", () => {
+                resetNewtabSettings().catch(error => console.error("[Settings] Newtab reset error:", error));
+            });
+            dataSection.appendChild(resetButton);
+
+            const deleteHistoryButton = document.createElement("button");
+            deleteHistoryButton.type = "button";
+            deleteHistoryButton.className = "newtab-settings-danger";
+            deleteHistoryButton.textContent = "検索履歴の削除";
+            deleteHistoryButton.addEventListener("click", deleteSearchHistory);
+            dataSection.appendChild(deleteHistoryButton);
+
+            const infoSection = createSettingsSection(content, "情報");
+            const infoLinks = document.createElement("div");
+            infoLinks.className = "newtab-settings-links";
+            createSettingsLink(infoLinks, "利用規約 および 個人情報政策", "https://search3958.github.io/policies/");
+            createSettingsLink(infoLinks, "私について", "https://search3958.github.io/");
+            createSettingsLink(infoLinks, "Language", "https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/");
+            infoSection.appendChild(infoLinks);
+        });
+
+        console.log("[Settings] Management dialog requested.");
+    };
+
+    const setupSettingsControls = () => {
+        const customizeBtn = getEl("#customizeBtn");
+        const managementBtn = getEl("#managementBtn");
+
+        if (!customizeBtn) console.error("[Settings] Required element not found: #customizeBtn");
+        else customizeBtn.addEventListener("click", showCustomizeDialog);
+
+        if (!managementBtn) console.error("[Settings] Required element not found: #managementBtn");
+        else managementBtn.addEventListener("click", showManagementDialog);
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            const dialog = document.querySelector(".newtab-dialog");
+            if (dialog) {
+                event.preventDefault();
+                closeNewtabDialog(dialog, "Escape");
+            }
+        });
+
+        console.log("[Settings] Settings controls initialized.");
+    };
+
+    /* =========================================================
         Shortcut Rendering
     ========================================================= */
 
@@ -964,7 +1861,7 @@
         iconContainer.className = "main-shortcut-icon";
         if (link.bg) iconContainer.style.background = link.bg;
 
-        const iconUrl = resolveIconUrl(link.icon, iconMap);
+        const iconUrl = link.iconUrl || resolveIconUrl(link.icon, iconMap);
         if (iconUrl) {
             const img = document.createElement("img");
             img.src = iconUrl;
@@ -998,7 +1895,7 @@
         if (!root) return;
         root.replaceChildren();
         const fragment = document.createDocumentFragment();
-        const categories = Array.isArray(SHORTCUT_DATA.categories) ? SHORTCUT_DATA.categories : [];
+        const categories = getShortcutCategories();
         for (const category of categories) {
             if (!category || !Array.isArray(category.links)) continue;
             const section = document.createElement("section");
@@ -1259,11 +2156,22 @@
 
         await wallpaperTask;
 
+        try {
+            await loadCustomShortcutData();
+        } catch (error) {
+            customShortcutsCache = [];
+            console.error("[Settings] Custom shortcut init failed:", error);
+        }
+
+        applyAppearanceSettings();
+
         if (window.renderShortcuts && window._iconMap) {
             try { window.renderShortcuts(window._iconMap); }
             catch (e) { console.error("[Beta] renderShortcuts failed:", e); if (window.renderShortcuts) window.renderShortcuts(new Map()); }
         }
+
         if (window.setupSearchAndHistory) window.setupSearchAndHistory();
+        setupSettingsControls();
 
         console.log("[Wallpaper] Initialization completed.");
     };
