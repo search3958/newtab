@@ -35,7 +35,7 @@
 
     const UI_TRANSLATIONS = {
         ja: {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "スクロールして一覧を表示",
             appSearch: "アプリ連携",
             management: "管理",
@@ -65,7 +65,7 @@
             large: "大",
             extraLarge: "特大",
             managementTitle: "管理",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "設定方法と詳細",
             simpleVersion: "簡易版",
             data: "データ",
@@ -105,7 +105,7 @@
             }
         },
         en: {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "Scroll to show the list",
             appSearch: "App Search",
             management: "Manage",
@@ -135,7 +135,7 @@
             large: "Large",
             extraLarge: "Extra large",
             managementTitle: "Manage",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "Settings & details",
             simpleVersion: "Simple version",
             data: "Data",
@@ -175,7 +175,7 @@
             }
         },
         ko: {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "스크롤하여 목록 표시",
             appSearch: "앱 연동",
             management: "관리",
@@ -205,7 +205,7 @@
             large: "크게",
             extraLarge: "매우 크게",
             managementTitle: "관리",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "설정 방법 및 상세",
             simpleVersion: "간이 버전",
             data: "데이터",
@@ -245,7 +245,7 @@
             }
         },
         "ko-kp": {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "목록을 보려면 아래로 내리십시오",
             appSearch: "응용프로그램 연동",
             management: "관리",
@@ -275,7 +275,7 @@
             large: "크게",
             extraLarge: "매우 크게",
             managementTitle: "관리",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "설정 방법과 상세",
             simpleVersion: "간편판",
             data: "자료",
@@ -315,7 +315,7 @@
             }
         },
         zh: {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "向下滚动以显示列表",
             appSearch: "应用联动",
             management: "管理",
@@ -345,7 +345,7 @@
             large: "大",
             extraLarge: "特大",
             managementTitle: "管理",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "设置方法与详细信息",
             simpleVersion: "简易版",
             data: "数据",
@@ -385,7 +385,7 @@
             }
         },
         "zh-tw": {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "向下捲動以顯示清單",
             appSearch: "應用程式連動",
             management: "管理",
@@ -415,7 +415,7 @@
             large: "大",
             extraLarge: "特大",
             managementTitle: "管理",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "設定方式與詳細資訊",
             simpleVersion: "簡易版",
             data: "資料",
@@ -455,7 +455,7 @@
             }
         },
         ru: {
-            pageTitle: "SaeTab 7",
+            pageTitle: "SaeTab 7 Beta",
             searchPlaceholder: "Прокрутите, чтобы показать список",
             appSearch: "Поиск в приложениях",
             management: "Управление",
@@ -485,7 +485,7 @@
             large: "Большой",
             extraLarge: "Очень большой",
             managementTitle: "Управление",
-            saetab: "SaeTab 7",
+            saetab: "SaeTab 7 Beta",
             settingsDetails: "Настройки и подробности",
             simpleVersion: "Упрощённая версия",
             data: "Данные",
@@ -1223,14 +1223,14 @@
                     { name: "ストップウォッチ", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/stopwatch/ja.html", icon: "stopwatch.webp" },
                     { name: "デジタル時計", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/dclock/ja.html", icon: "dclock.webp" },
                     { name: "アナログ時計", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/aclock/ja.html", icon: "aclock.webp" },
-                    { name: "記録ノート", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/girog/", icon: "girog.png" },
+                    { name: "記録ノート", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/girog/", icon: "girog.webp" },
                     { name: "ToolBoard", bg: "var(--iconbg)", url: "https://search3958.github.io/toolboard", icon: "toolboard.webp" },
                     { name: "Baram Code", bg: "var(--iconbg)", url: "https://search3958.github.io/baram/", icon: "garam.webp" },
                     { name: "千里辞書", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/sajon/", icon: "cheonri.webp" },
-                    { name: "Oneul launcher", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/oneul-launcher", icon: "oneul-launcher.png" },
-                    { name: "Wo Checker", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/wo-checker", icon: "wo-checker.png" },
-                    { name: "Easy Flowchart", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/easy-flowchart", icon: "easy-flowchart.png" },
-                    { name: "WebP変換", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/webp.html", icon: "webp.png" }
+                    { name: "Oneul launcher", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/oneul-launcher", icon: "oneul-launcher.webp" },
+                    { name: "Wo Checker", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/wo-checker", icon: "wo-checker.webp" },
+                    { name: "Easy Flowchart", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/easy-flowchart", icon: "easy-flowchart.webp" },
+                    { name: "WebP変換", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/webp.html", icon: "webp.webp" }
                 ]
             },
             {
@@ -1240,8 +1240,8 @@
                     { name: "Monoxer", bg: "#0073ffbb", url: "https://app.monoxer.com/", icon: "monoxer.webp" },
                     { name: "MALU辞書", bg: "var(--iconbg)", url: "https://sy9-k.github.io/dictionary/", icon: "malu.png" },
                     { name: "Scratch", bg: "var(--iconbg)", url: "https://scratch.mit.edu/", icon: "scratch.webp" },
-                    { name: "ロイロノート", bg: "var(--iconbg)", url: "https://loilonote.app/", icon: "-.png" },
-                    { name: "Lit講座", bg: "var(--iconbg)", url: "https://member.lifeistech-lesson.jp/home", icon: "-.png" }
+                    { name: "ロイロノート", bg: "var(--iconbg)", url: "https://loilonote.app/", icon: "loilo.webp" },
+                    { name: "Lit講座", bg: "var(--iconbg)", url: "https://member.lifeistech-lesson.jp/home", icon: "lit.webp" }
                 ]
             },
             {
@@ -1330,7 +1330,7 @@
                     { name: "Qiita", bg: "var(--iconbg)", url: "https://qiita.com/", icon: "qitta.webp" },
                     { name: "NAVER", bg: "#07cd85", url: "https://www.naver.com/", icon: "naver.webp" },
                     { name: "Papago", bg: "var(--iconbg)", url: "https://papago.naver.com/", icon: "papago.webp" },
-                    { name: "豆包", bg: "var(--iconbg)", url: "https://www.doubao.com/", icon: "doubao.webp" },
+                    { name: "Dola", bg: "var(--iconbg)", url: "https://www.dola.com/chat/", icon: "doubao.webp" },
                     { name: "Kimi", bg: "#000b", url: "https://kimi.moonshot.cn/", icon: "kimi.webp" },
                     { name: "Perplexity", bg: "var(--iconbg)", url: "https://www.perplexity.ai/", icon: "perproxity.webp" }
                 ]
