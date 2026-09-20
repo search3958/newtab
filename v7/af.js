@@ -7,7 +7,7 @@
 
     const DB_NAME = "WallpaperDB";
     const STORE = "images";
-    const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-6-2.zip";
+    const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip";
     const FALLBACK_LIGHT = "bgimg/baram1.webp";
     const FALLBACK_DARK = "bgimg/baram1_dark.webp";
     const HISTORY_KEY = "searchHistory";
@@ -22,6 +22,600 @@
     const DEFAULT_LABEL_VISIBLE = true;
     const DEFAULT_ICON_SIZE = "standard";
     const FAVICON_API_URL = "https://www.google.com/s2/favicons";
+
+
+    /* =========================================================
+       UI Language
+       - selectedLang is the single source of truth.
+       - Supported: ja / en / ko / ko-kp / zh / zh-tw / ru
+    ========================================================= */
+
+    const SELECTED_LANG_KEY = "selectedLang";
+    const SUPPORTED_LANGS = new Set(["ja", "en", "ko", "ko-kp", "zh", "zh-tw", "ru"]);
+
+    const UI_TRANSLATIONS = {
+        ja: {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "スクロールして一覧を表示",
+            appSearch: "アプリ連携",
+            management: "管理",
+            customize: "カスタマイズ",
+            historyButton: "履歴表示",
+            close: "閉じる",
+            appNotFound: "該当するアプリが見つかりません",
+            appOpen: "アプリを開く",
+            calculate: "計算",
+            calculationResult: "計算結果",
+            googleCandidate: "Google候補",
+            searchHistory: "検索履歴",
+            historyEmpty: "履歴はありません",
+            shortcut: "ショートカット",
+            myShortcuts: "自分のショートカット",
+            add: "追加",
+            delete: "削除",
+            urlPlaceholder: "URLを入力",
+            labelPlaceholder: "ラベルを入力",
+            appearance: "外観",
+            changeWallpaper: "壁紙を変更",
+            labelVisibility: "ラベルの表示",
+            show: "表示する",
+            hide: "表示しない",
+            iconSize: "アイコンサイズ",
+            standard: "標準",
+            large: "大",
+            extraLarge: "特大",
+            managementTitle: "管理",
+            saetab: "SaeTab 7",
+            settingsDetails: "設定方法と詳細",
+            simpleVersion: "簡易版",
+            data: "データ",
+            resetSettings: "Newtab設定のリセット",
+            deleteHistory: "検索履歴の削除",
+            information: "情報",
+            termsPrivacy: "利用規約 および 個人情報政策",
+            aboutMe: "私について",
+            language: "Language",
+            resetConfirm: "Newtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
+            deleteHistoryConfirm: "検索履歴をすべて削除します。実行しますか？",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "学習と教育",
+                "作業効率化": "作業効率化",
+                "コミュニケーション": "コミュニケーション",
+                "エンターテイメント": "エンターテイメント",
+                "開発・技術": "開発・技術",
+                "ショッピング": "ショッピング",
+                "情報収集と知識": "情報収集と知識"
+            },
+            shortcuts: {
+                "私について": "私について",
+                "文字カウンター": "文字カウンター",
+                "タイマー": "タイマー",
+                "ストップウォッチ": "ストップウォッチ",
+                "デジタル時計": "デジタル時計",
+                "アナログ時計": "アナログ時計",
+                "記録ノート": "記録ノート",
+                "千里辞書": "千里辞書",
+                "ロイロノート": "ロイロノート",
+                "Lit講座": "Lit講座",
+                "リモート": "リモート",
+                "翻訳": "翻訳",
+                "Google AI検索": "Google AI検索",
+                "Yahoo!フリマ": "Yahoo!フリマ"
+            }
+        },
+        en: {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "Scroll to show the list",
+            appSearch: "App Search",
+            management: "Manage",
+            customize: "Customize",
+            historyButton: "History",
+            close: "Close",
+            appNotFound: "No matching apps found",
+            appOpen: "Open app",
+            calculate: "Calculate",
+            calculationResult: "Calculation result",
+            googleCandidate: "Google suggestion",
+            searchHistory: "Search history",
+            historyEmpty: "No history",
+            shortcut: "Shortcuts",
+            myShortcuts: "My Shortcuts",
+            add: "Add",
+            delete: "Delete",
+            urlPlaceholder: "Enter URL",
+            labelPlaceholder: "Enter label",
+            appearance: "Appearance",
+            changeWallpaper: "Change wallpaper",
+            labelVisibility: "Show labels",
+            show: "Show",
+            hide: "Hide",
+            iconSize: "Icon size",
+            standard: "Standard",
+            large: "Large",
+            extraLarge: "Extra large",
+            managementTitle: "Manage",
+            saetab: "SaeTab 7",
+            settingsDetails: "Settings & details",
+            simpleVersion: "Simple version",
+            data: "Data",
+            resetSettings: "Reset Newtab settings",
+            deleteHistory: "Delete search history",
+            information: "Information",
+            termsPrivacy: "Terms of Use & Privacy Policy",
+            aboutMe: "About me",
+            language: "Language",
+            resetConfirm: "Reset Newtab settings?\n\nOnly wallpaper, label visibility, and icon size will be restored to their defaults.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
+            deleteHistoryConfirm: "Delete all search history?\n\nContinue?",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "Learning & Education",
+                "作業効率化": "Productivity",
+                "コミュニケーション": "Communication",
+                "エンターテイメント": "Entertainment",
+                "開発・技術": "Development & Technology",
+                "ショッピング": "Shopping",
+                "情報収集と知識": "Information & Knowledge"
+            },
+            shortcuts: {
+                "私について": "About Me",
+                "文字カウンター": "Character Counter",
+                "タイマー": "Timer",
+                "ストップウォッチ": "Stopwatch",
+                "デジタル時計": "Digital Clock",
+                "アナログ時計": "Analog Clock",
+                "記録ノート": "Record Note",
+                "千里辞書": "Cheonri Dictionary",
+                "ロイロノート": "LoiLoNote",
+                "Lit講座": "Lit Course",
+                "リモート": "Remote Desktop",
+                "翻訳": "Translate",
+                "Google AI検索": "Google AI Search",
+                "Yahoo!フリマ": "Yahoo! Flea Market"
+            }
+        },
+        ko: {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "스크롤하여 목록 표시",
+            appSearch: "앱 연동",
+            management: "관리",
+            customize: "커스터마이즈",
+            historyButton: "기록 표시",
+            close: "닫기",
+            appNotFound: "일치하는 앱이 없습니다",
+            appOpen: "앱 열기",
+            calculate: "계산",
+            calculationResult: "계산 결과",
+            googleCandidate: "Google 추천",
+            searchHistory: "검색 기록",
+            historyEmpty: "기록이 없습니다",
+            shortcut: "바로가기",
+            myShortcuts: "내 바로가기",
+            add: "추가",
+            delete: "삭제",
+            urlPlaceholder: "URL 입력",
+            labelPlaceholder: "라벨 입력",
+            appearance: "외관",
+            changeWallpaper: "배경화면 변경",
+            labelVisibility: "라벨 표시",
+            show: "표시",
+            hide: "표시하지 않음",
+            iconSize: "아이콘 크기",
+            standard: "기본",
+            large: "크게",
+            extraLarge: "매우 크게",
+            managementTitle: "관리",
+            saetab: "SaeTab 7",
+            settingsDetails: "설정 방법 및 상세",
+            simpleVersion: "간이 버전",
+            data: "데이터",
+            resetSettings: "Newtab 설정 초기화",
+            deleteHistory: "검색 기록 삭제",
+            information: "정보",
+            termsPrivacy: "이용약관 및 개인정보 처리방침",
+            aboutMe: "소개",
+            language: "언어",
+            resetConfirm: "Newtab 설정을 초기화할까요?\n\n배경화면, 라벨 표시, 아이콘 크기만 기본값으로 돌아갑니다.\n검색 기록, 바로가기 및 기타 데이터는 삭제되지 않습니다.\n\n계속하시겠습니까?",
+            deleteHistoryConfirm: "모든 검색 기록을 삭제할까요?\n\n계속하시겠습니까?",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "학습 및 교육",
+                "作業効率化": "업무 효율",
+                "コミュニケーション": "커뮤니케이션",
+                "エンターテイメント": "엔터테인먼트",
+                "開発・技術": "개발 및 기술",
+                "ショッピング": "쇼핑",
+                "情報収集と知識": "정보 및 지식"
+            },
+            shortcuts: {
+                "私について": "소개",
+                "文字カウンター": "문자 카운터",
+                "タイマー": "타이머",
+                "ストップウォッチ": "스톱워치",
+                "デジタル時計": "디지털 시계",
+                "アナログ時計": "아날로그 시계",
+                "記録ノート": "기록 노트",
+                "千里辞書": "천리 사전",
+                "ロイロノート": "LoiLoNote",
+                "Lit講座": "Lit 강좌",
+                "リモート": "원격 데스크톱",
+                "翻訳": "번역",
+                "Google AI検索": "Google AI 검색",
+                "Yahoo!フリマ": "Yahoo! 플리마켓"
+            }
+        },
+        "ko-kp": {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "목록을 보려면 아래로 내리십시오",
+            appSearch: "응용프로그램 연동",
+            management: "관리",
+            customize: "맞춤설정",
+            historyButton: "기록 표시",
+            close: "닫기",
+            appNotFound: "일치하는 응용프로그램이 없습니다",
+            appOpen: "응용프로그램 열기",
+            calculate: "계산",
+            calculationResult: "계산 결과",
+            googleCandidate: "Google 추천",
+            searchHistory: "검색 기록",
+            historyEmpty: "기록이 없습니다",
+            shortcut: "지름길",
+            myShortcuts: "나의 지름길",
+            add: "추가",
+            delete: "삭제",
+            urlPlaceholder: "URL 입력",
+            labelPlaceholder: "표식 입력",
+            appearance: "외관",
+            changeWallpaper: "배경화면 변경",
+            labelVisibility: "표식 표시",
+            show: "표시",
+            hide: "표시하지 않음",
+            iconSize: "아이콘 크기",
+            standard: "표준",
+            large: "크게",
+            extraLarge: "매우 크게",
+            managementTitle: "관리",
+            saetab: "SaeTab 7",
+            settingsDetails: "설정 방법과 상세",
+            simpleVersion: "간편판",
+            data: "자료",
+            resetSettings: "Newtab 설정 초기화",
+            deleteHistory: "검색 기록 삭제",
+            information: "정보",
+            termsPrivacy: "리용규약 및 개인정보정책",
+            aboutMe: "소개",
+            language: "언어",
+            resetConfirm: "Newtab 설정을 초기화하겠습니까?\n\n배경화면, 표식 표시, 아이콘 크기만 초기 상태로 돌아갑니다.\n검색 기록, 지름길 및 기타 자료는 삭제되지 않습니다.\n\n계속하시겠습니까?",
+            deleteHistoryConfirm: "검색 기록을 모두 삭제하겠습니까?\n\n계속하시겠습니까?",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "학습과 교육",
+                "作業効率化": "작업 효률화",
+                "コミュニケーション": "호상교류",
+                "エンターテイメント": "오락",
+                "開発・技術": "개발과 기술",
+                "ショッピング": "상업",
+                "情報収集と知識": "정보와 지식"
+            },
+            shortcuts: {
+                "私について": "소개",
+                "文字カウンター": "문자 세기",
+                "タイマー": "시간기록기",
+                "ストップウォッチ": "초시계",
+                "デジタル時計": "전자시계",
+                "アナログ時計": "아날로그시계",
+                "記録ノート": "기록수첩",
+                "千里辞書": "천리사전",
+                "ロイロノート": "LoiLoNote",
+                "Lit講座": "Lit강좌",
+                "リモート": "원격조종",
+                "翻訳": "번역",
+                "Google AI検索": "Google 인공지능 검색",
+                "Yahoo!フリマ": "Yahoo! 벼룩시장"
+            }
+        },
+        zh: {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "向下滚动以显示列表",
+            appSearch: "应用联动",
+            management: "管理",
+            customize: "自定义",
+            historyButton: "显示历史",
+            close: "关闭",
+            appNotFound: "未找到匹配的应用",
+            appOpen: "打开应用",
+            calculate: "计算",
+            calculationResult: "计算结果",
+            googleCandidate: "Google 建议",
+            searchHistory: "搜索历史",
+            historyEmpty: "暂无历史记录",
+            shortcut: "快捷方式",
+            myShortcuts: "我的快捷方式",
+            add: "添加",
+            delete: "删除",
+            urlPlaceholder: "输入 URL",
+            labelPlaceholder: "输入标签",
+            appearance: "外观",
+            changeWallpaper: "更换壁纸",
+            labelVisibility: "标签显示",
+            show: "显示",
+            hide: "不显示",
+            iconSize: "图标大小",
+            standard: "标准",
+            large: "大",
+            extraLarge: "特大",
+            managementTitle: "管理",
+            saetab: "SaeTab 7",
+            settingsDetails: "设置方法与详细信息",
+            simpleVersion: "简易版",
+            data: "数据",
+            resetSettings: "重置 Newtab 设置",
+            deleteHistory: "删除搜索历史",
+            information: "信息",
+            termsPrivacy: "使用条款及隐私政策",
+            aboutMe: "关于我",
+            language: "语言",
+            resetConfirm: "重置 Newtab 设置？\n\n仅壁纸、标签显示和图标大小会恢复默认值。\n搜索历史、快捷方式和其他数据不会被删除。\n\n继续？",
+            deleteHistoryConfirm: "删除全部搜索历史？\n\n继续？",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "学习与教育",
+                "作業効率化": "效率工具",
+                "コミュニケーション": "交流",
+                "エンターテイメント": "娱乐",
+                "開発・技術": "开发与技术",
+                "ショッピング": "购物",
+                "情報収集と知識": "信息与知识"
+            },
+            shortcuts: {
+                "私について": "关于我",
+                "文字カウンター": "字数统计",
+                "タイマー": "计时器",
+                "ストップウォッチ": "秒表",
+                "デジタル時計": "数字时钟",
+                "アナログ時計": "模拟时钟",
+                "記録ノート": "记录笔记",
+                "千里辞書": "千里词典",
+                "ロイロノート": "LoiLoNote",
+                "Lit講座": "Lit 课程",
+                "リモート": "远程桌面",
+                "翻訳": "翻译",
+                "Google AI検索": "Google AI 搜索",
+                "Yahoo!フリマ": "Yahoo! 二手交易"
+            }
+        },
+        "zh-tw": {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "向下捲動以顯示清單",
+            appSearch: "應用程式連動",
+            management: "管理",
+            customize: "自訂",
+            historyButton: "顯示歷史",
+            close: "關閉",
+            appNotFound: "找不到符合的應用程式",
+            appOpen: "開啟應用程式",
+            calculate: "計算",
+            calculationResult: "計算結果",
+            googleCandidate: "Google 建議",
+            searchHistory: "搜尋紀錄",
+            historyEmpty: "沒有紀錄",
+            shortcut: "捷徑",
+            myShortcuts: "我的捷徑",
+            add: "新增",
+            delete: "刪除",
+            urlPlaceholder: "輸入 URL",
+            labelPlaceholder: "輸入標籤",
+            appearance: "外觀",
+            changeWallpaper: "更換桌布",
+            labelVisibility: "標籤顯示",
+            show: "顯示",
+            hide: "不顯示",
+            iconSize: "圖示大小",
+            standard: "標準",
+            large: "大",
+            extraLarge: "特大",
+            managementTitle: "管理",
+            saetab: "SaeTab 7",
+            settingsDetails: "設定方式與詳細資訊",
+            simpleVersion: "簡易版",
+            data: "資料",
+            resetSettings: "重設 Newtab 設定",
+            deleteHistory: "刪除搜尋紀錄",
+            information: "資訊",
+            termsPrivacy: "使用條款及隱私權政策",
+            aboutMe: "關於我",
+            language: "語言",
+            resetConfirm: "要重設 Newtab 設定嗎？\n\n僅桌布、標籤顯示和圖示大小會恢復預設值。\n搜尋紀錄、捷徑及其他資料不會被刪除。\n\n繼續？",
+            deleteHistoryConfirm: "要刪除全部搜尋紀錄嗎？\n\n繼續？",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "學習與教育",
+                "作業効率化": "效率工具",
+                "コミュニケーション": "社群交流",
+                "エンターテイメント": "娛樂",
+                "開発・技術": "開發與技術",
+                "ショッピング": "購物",
+                "情報収集と知識": "資訊與知識"
+            },
+            shortcuts: {
+                "私について": "關於我",
+                "文字カウンター": "字數統計",
+                "タイマー": "計時器",
+                "ストップウォッチ": "碼錶",
+                "デジタル時計": "數位時鐘",
+                "アナログ時計": "類比時鐘",
+                "記録ノート": "記錄筆記",
+                "千里辞書": "千里辭典",
+                "ロイロノート": "LoiLoNote",
+                "Lit講座": "Lit 課程",
+                "リモート": "遠端桌面",
+                "翻訳": "翻譯",
+                "Google AI検索": "Google AI 搜尋",
+                "Yahoo!フリマ": "Yahoo! 二手交易"
+            }
+        },
+        ru: {
+            pageTitle: "SaeTab 7",
+            searchPlaceholder: "Прокрутите, чтобы показать список",
+            appSearch: "Поиск в приложениях",
+            management: "Управление",
+            customize: "Настройка",
+            historyButton: "История",
+            close: "Закрыть",
+            appNotFound: "Подходящие приложения не найдены",
+            appOpen: "Открыть приложение",
+            calculate: "Вычислить",
+            calculationResult: "Результат вычисления",
+            googleCandidate: "Предложение Google",
+            searchHistory: "История поиска",
+            historyEmpty: "История пуста",
+            shortcut: "Ярлыки",
+            myShortcuts: "Мои ярлыки",
+            add: "Добавить",
+            delete: "Удалить",
+            urlPlaceholder: "Введите URL",
+            labelPlaceholder: "Введите название",
+            appearance: "Внешний вид",
+            changeWallpaper: "Изменить обои",
+            labelVisibility: "Показывать подписи",
+            show: "Показывать",
+            hide: "Не показывать",
+            iconSize: "Размер значков",
+            standard: "Стандартный",
+            large: "Большой",
+            extraLarge: "Очень большой",
+            managementTitle: "Управление",
+            saetab: "SaeTab 7",
+            settingsDetails: "Настройки и подробности",
+            simpleVersion: "Упрощённая версия",
+            data: "Данные",
+            resetSettings: "Сбросить настройки Newtab",
+            deleteHistory: "Удалить историю поиска",
+            information: "Информация",
+            termsPrivacy: "Условия использования и политика конфиденциальности",
+            aboutMe: "Обо мне",
+            language: "Язык",
+            resetConfirm: "Сбросить настройки Newtab?\n\nТолько обои, отображение подписей и размер значков будут возвращены к значениям по умолчанию.\nИстория поиска, ярлыки и другие данные удалены не будут.\n\nПродолжить?",
+            deleteHistoryConfirm: "Удалить всю историю поиска?\n\nПродолжить?",
+            categories: {
+                "Sentaro": "Sentaro",
+                "学習と教育": "Учёба и образование",
+                "作業効率化": "Продуктивность",
+                "コミュニケーション": "Общение",
+                "エンターテイメント": "Развлечения",
+                "開発・技術": "Разработка и технологии",
+                "ショッピング": "Покупки",
+                "情報収集と知識": "Информация и знания"
+            },
+            shortcuts: {
+                "私について": "Обо мне",
+                "文字カウンター": "Счётчик символов",
+                "タイマー": "Таймер",
+                "ストップウォッチ": "Секундомер",
+                "デジタル時計": "Цифровые часы",
+                "アナログ時計": "Аналоговые часы",
+                "記録ノート": "Заметки",
+                "千里辞書": "Словарь Cheonri",
+                "ロイロノート": "LoiLoNote",
+                "Lit講座": "Курс Lit",
+                "リモート": "Удалённый рабочий стол",
+                "翻訳": "Переводчик",
+                "Google AI検索": "Поиск Google AI",
+                "Yahoo!フリマ": "Yahoo! Flea Market"
+            }
+        }
+    };
+
+    const normalizeSelectedLanguage = (value) => {
+        const raw = String(value || "").trim().toLowerCase().replace(/_/g, "-");
+        const aliases = {
+            "kr": "ko",
+            "ko-kr": "ko",
+            "cn": "zh",
+            "zh-cn": "zh",
+            "zh-hans": "zh",
+            "tw": "zh-tw",
+            "zh-hant": "zh-tw",
+            "kp": "ko-kp"
+        };
+        const normalized = aliases[raw] || raw;
+        return SUPPORTED_LANGS.has(normalized) ? normalized : "ja";
+    };
+
+    const getSelectedLanguage = () => {
+        try {
+            return normalizeSelectedLanguage(localStorage.getItem(SELECTED_LANG_KEY));
+        } catch (error) {
+            console.error("[Language] selectedLang read failed:", error);
+            return "ja";
+        }
+    };
+
+    let currentLanguage = getSelectedLanguage();
+
+    const getCurrentTranslations = () =>
+        UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.ja;
+
+    const t = (key) => {
+        const translations = getCurrentTranslations();
+        return translations[key] ?? UI_TRANSLATIONS.ja[key] ?? key;
+    };
+
+    const translateCategoryTitle = (title) => {
+        const translations = getCurrentTranslations();
+        return translations.categories?.[title] || UI_TRANSLATIONS.ja.categories?.[title] || title;
+    };
+
+    const translateShortcutName = (name) => {
+        const translations = getCurrentTranslations();
+        return translations.shortcuts?.[name] || UI_TRANSLATIONS.ja.shortcuts?.[name] || name;
+    };
+
+    const applyUILanguage = () => {
+        const previousLanguage = currentLanguage;
+        currentLanguage = getSelectedLanguage();
+
+        try {
+            document.documentElement.lang = currentLanguage === "zh-tw" ? "zh-TW" : currentLanguage;
+            document.title = t("pageTitle");
+
+            const searchBox = document.querySelector("#searchBox");
+            if (!searchBox) console.error("[Language] Required element not found: #searchBox");
+            else searchBox.placeholder = t("searchPlaceholder");
+
+            document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+                const key = element.dataset.i18nPlaceholder;
+                if (!key) {
+                    console.error("[Language] data-i18n-placeholder key is empty.");
+                    return;
+                }
+                element.placeholder = t(key);
+            });
+
+            document.querySelectorAll("[data-i18n]").forEach((element) => {
+                const key = element.dataset.i18n;
+                if (!key) {
+                    console.error("[Language] data-i18n key is empty.");
+                    return;
+                }
+                element.textContent = t(key);
+            });
+
+            console.log(`[Language] UI applied: ${previousLanguage} -> ${currentLanguage}`);
+        } catch (error) {
+            console.error("[Language] UI apply failed:", error);
+        }
+    };
+
+
+    window.addEventListener("storage", (event) => {
+        if (event.key !== SELECTED_LANG_KEY) return;
+        applyUILanguage();
+        renderShortcuts(window._iconMap || new Map());
+        const openedDialog = document.querySelector(".newtab-dialog");
+        if (openedDialog) closeNewtabDialog(openedDialog, "language change");
+        console.log("[Language] selectedLang changed in another tab; UI refreshed.");
+    }, { passive: true });
 
     /* =========================================================
        Pre-compiled Regex
@@ -325,10 +919,28 @@
             customId: shortcut.id
         }));
 
-        return [
-            { title: "自分のショートカット", links: customLinks },
-            ...(Array.isArray(SHORTCUT_DATA?.categories) ? SHORTCUT_DATA.categories : [])
-        ];
+        const builtInCategories = Array.isArray(SHORTCUT_DATA?.categories)
+            ? SHORTCUT_DATA.categories.map((category) => ({
+                ...category,
+                title: translateCategoryTitle(category.title),
+                links: Array.isArray(category.links)
+                    ? category.links.map((link) => ({
+                        ...link,
+                        name: translateShortcutName(link.name)
+                    }))
+                    : []
+            }))
+            : [];
+
+        const categories = [...builtInCategories];
+        if (customLinks.length > 0) {
+            categories.unshift({ title: t("myShortcuts"), links: customLinks });
+            console.log(`[Shortcut] Added custom shortcut category: ${customLinks.length} item(s).`);
+        } else {
+            console.log("[Shortcut] Custom shortcut category hidden: 0 item(s).");
+        }
+
+        return categories;
     };
 
     const getLabelVisibleSetting = () => {
@@ -430,9 +1042,7 @@
     };
 
     const resetNewtabSettings = async () => {
-        const confirmed = window.confirm(
-            "Newtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？"
-        );
+        const confirmed = window.confirm(t("resetConfirm"));
 
         if (!confirmed) {
             console.log("[Settings] Newtab settings reset cancelled.");
@@ -458,7 +1068,7 @@
     };
 
     const deleteSearchHistory = () => {
-        const confirmed = window.confirm("検索履歴をすべて削除します。実行しますか？");
+        const confirmed = window.confirm(t("deleteHistoryConfirm"));
         if (!confirmed) {
             console.log("[Settings] Search history deletion cancelled.");
             return;
@@ -616,7 +1226,11 @@
                     { name: "記録ノート", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/girog/", icon: "girog.png" },
                     { name: "ToolBoard", bg: "var(--iconbg)", url: "https://search3958.github.io/toolboard", icon: "toolboard.webp" },
                     { name: "Baram Code", bg: "var(--iconbg)", url: "https://search3958.github.io/baram/", icon: "garam.webp" },
-                    { name: "千里辞書", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/sajon/", icon: "cheonri.webp" }
+                    { name: "千里辞書", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/sajon/", icon: "cheonri.webp" },
+                    { name: "Oneul launcher", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/oneul-launcher", icon: "oneul-launcher.png" },
+                    { name: "Wo Checker", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/wo-checker", icon: "wo-checker.png" },
+                    { name: "Easy Flowchart", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/easy-flowchart", icon: "easy-flowchart.png" },
+                    { name: "WebP変換", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/webp.html", icon: "webp.png" }
                 ]
             },
             {
@@ -834,23 +1448,7 @@
         dropdown = document.createElement("div");
         dropdown.id = MAIN_SUGGESTION_ID;
         dropdown.setAttribute("role", "listbox");
-        Object.assign(dropdown.style, {
-            position: "fixed",
-            top: "130px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "413px",
-            maxHeight: "300px",
-            overflowY: "auto",
-            background: "rgba(255,255,255,0.95)",
-            borderRadius: "16px",
-            backdropFilter: "blur(24px)",
-            zIndex: "150",
-            padding: "8px",
-            boxSizing: "border-box",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-            display: "none"
-        });
+        
 
         if (window.matchMedia?.("(prefers-color-scheme: dark)")?.matches) {
             dropdown.style.background = "rgba(28,28,28,0.95)";
@@ -926,13 +1524,12 @@
             width: "100%",
             border: "0",
             textAlign: "left",
-            background: "transparent",
             color: "inherit"
         });
 
         const icon = document.createElement("div");
         icon.className = "app-search-item-icon";
-        icon.style.cssText = "width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;";
+        icon.style.cssText = "width:32px;height:32px;border-radius:99px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;";
 
         if (item.icon) {
             const iconUrl = resolveAppIconUrlCached(item.icon, appSearchIconMap || new Map());
@@ -952,8 +1549,8 @@
         }
 
         if (!icon.firstChild) {
-            icon.textContent = item.type === "math" ? "=" : item.type === "app" ? (item.label?.[0] || "A") : "G";
-            icon.style.background = "rgba(24,90,242,0.12)";
+            icon.textContent = item.type === "math" ? "=" : item.type === "app" ? (item.label?.[0] || "") : "";
+            icon.style.background = "rgba(24,90,242,0)";
             icon.style.fontSize = "15px";
         }
 
@@ -963,7 +1560,7 @@
 
         const meta = document.createElement("span");
         meta.className = "app-search-item-url";
-        meta.textContent = item.meta || (item.type === "math" ? "計算" : "Google候補");
+        meta.textContent = item.meta || (item.type === "math" ? t("calculate") : t("googleCandidate"));
 
         button.append(icon, name, meta);
         return button;
@@ -1053,7 +1650,7 @@
                 value: app.name,
                 url: app.url,
                 icon: app.icon,
-                meta: "アプリを開く",
+                meta: t("appOpen"),
                 action: "open"
             });
         }
@@ -1065,7 +1662,7 @@
                 type: "math",
                 label: mathResult,
                 value: mathResult,
-                meta: "計算結果",
+                meta: t("calculationResult"),
                 action: "insert"
             });
         }
@@ -1084,7 +1681,7 @@
                 type: "google",
                 label: value,
                 value,
-                meta: "Google候補",
+                meta: t("googleCandidate"),
                 action: "insert"
             }));
 
@@ -1320,53 +1917,66 @@
 
     const showHistoryDialog = () => {
         const history = getHistory();
-        const existing = document.getElementById("historyDialog");
-        if (existing) existing.remove();
 
-        const dialog = document.createElement("div");
-        dialog.id = "historyDialog";
+        createNewtabDialog(t("searchHistory"), (content, dialog) => {
+            if (!content || !dialog) {
+                console.error("[History] Dialog content or dialog element missing.");
+                return;
+            }
 
-        const header = document.createElement("div");
-        header.className = "dialog-header";
-        const title = document.createElement("h3");
-        title.textContent = "検索履歴";
-        header.appendChild(title);
+            if (history.length === 0) {
+                const empty = document.createElement("p");
+                empty.className = "dialog-empty";
+                empty.textContent = t("historyEmpty");
+                content.appendChild(empty);
+                console.log("[History] Dialog opened with no history.");
+                return;
+            }
 
-        const closeBtn = document.createElement("button");
-        closeBtn.textContent = "×";
-        closeBtn.addEventListener("click", () => dialog.remove());
-
-        const content = document.createElement("div");
-        content.className = "dialog-content";
-
-        if (history.length === 0) {
-            const empty = document.createElement("p");
-            empty.className = "dialog-empty";
-            empty.textContent = "履歴はありません";
-            content.appendChild(empty);
-        } else {
             const list = document.createElement("ul");
-            history.slice(-40).reverse().forEach(item => {
-                const li = document.createElement("li");
-                const query = typeof item === "string" ? item : item.query;
-                const time = typeof item === "string" ? null : item.time;
+
+            history.slice(-40).reverse().forEach((item) => {
+                const query = typeof item === "string" ? item : item?.query;
+                if (!query) {
+                    console.error("[History] Skipped invalid history item.");
+                    return;
+                }
+
+                const time = typeof item === "string" ? null : item?.time;
                 const dateStr = time ? formatDateTime(new Date(time)) : "";
-                li.innerHTML = `<span>${query}</span><span style="color:#999;font-size:12px;white-space:nowrap">${dateStr}</span>`;
+
+                const li = document.createElement("li");
+
+                const queryText = document.createElement("span");
+                queryText.textContent = query;
+
+                const timeText = document.createElement("span");
+                timeText.textContent = dateStr;
+                timeText.style.color = "#999";
+                timeText.style.fontSize = "12px";
+                timeText.style.whiteSpace = "nowrap";
+
+                li.append(queryText, timeText);
+
                 li.addEventListener("click", () => {
-                    dialog.remove();
-                    if (query.startsWith("http://") || query.startsWith("https://")) window.location.href = query;
-                    else performSearch(query);
+                    closeNewtabDialog(dialog, "history item");
+                    if (query.startsWith("http://") || query.startsWith("https://")) {
+                        console.log(`[History] Opening URL from history: ${query}`);
+                        window.location.href = query;
+                    } else {
+                        console.log(`[History] Searching history item: ${query}`);
+                        performSearch(query);
+                    }
                 });
+
                 list.appendChild(li);
             });
-            content.appendChild(list);
-        }
 
-        content.insertBefore(header, content.firstChild);
-        content.appendChild(closeBtn);
-        dialog.appendChild(content);
-        dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.remove(); });
-        document.body.appendChild(dialog);
+            content.appendChild(list);
+            console.log(`[History] Dialog rendered: ${list.children.length} item(s).`);
+        });
+
+        console.log("[History] Dialog requested.");
     };
 
     /* =========================================================
@@ -1375,11 +1985,37 @@
 
     const closeNewtabDialog = (dialog, reason = "close") => {
         if (!dialog) {
-            console.error("[Settings] Dialog close failed: element missing.");
+            console.error("[Dialog] Close failed: element missing.");
             return;
         }
-        dialog.remove();
-        console.log(`[Settings] Dialog closed: ${reason}`);
+
+        if (!document.body.contains(dialog)) {
+            console.error("[Dialog] Close ignored: dialog is not attached.");
+            return;
+        }
+
+        if (dialog.dataset.closing === "true") {
+            console.log(`[Dialog] Close already running: ${reason}`);
+            return;
+        }
+
+        if (reason === "replaced") {
+            dialog.remove();
+            console.log("[Dialog] Replaced dialog removed immediately.");
+            return;
+        }
+
+        dialog.dataset.closing = "true";
+        dialog.setAttribute("aria-hidden", "true");
+        dialog.classList.remove("is-open");
+        dialog.classList.add("is-closing");
+
+        const removeDialog = () => {
+            if (dialog.parentNode) dialog.remove();
+            console.log(`[Dialog] Dialog closed: ${reason}`);
+        };
+
+        window.setTimeout(removeDialog, 170);
     };
 
     const createNewtabDialog = (titleText, contentBuilder) => {
@@ -1409,7 +2045,7 @@
         const closeBtn = document.createElement("button");
         closeBtn.type = "button";
         closeBtn.className = "newtab-dialog-close";
-        closeBtn.setAttribute("aria-label", "閉じる");
+        closeBtn.setAttribute("aria-label", t("close"));
         closeBtn.textContent = "×";
         closeBtn.addEventListener("click", () => closeNewtabDialog(dialog, "button"));
 
@@ -1429,8 +2065,17 @@
         });
 
         document.body.appendChild(dialog);
-        closeBtn.focus();
-        console.log(`[Settings] Dialog opened: ${titleText}`);
+
+        requestAnimationFrame(() => {
+            if (!document.body.contains(dialog)) {
+                console.error(`[Dialog] Open animation cancelled: ${titleText}`);
+                return;
+            }
+            dialog.classList.add("is-open");
+            closeBtn.focus();
+            console.log(`[Dialog] Dialog opened: ${titleText}`);
+        });
+
         return dialog;
     };
 
@@ -1448,18 +2093,37 @@
     };
 
     const createSettingsLink = (parent, label, url) => {
-        if (!url) {
-            console.error(`[Settings] Link URL missing: ${label}`);
-            return;
+        if (!parent) {
+            console.error(`[Settings] Link button parent missing: ${label}`);
+            return null;
         }
 
-        const link = document.createElement("a");
-        link.className = "newtab-settings-link";
-        link.href = url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.textContent = label;
-        parent.appendChild(link);
+        if (!url) {
+            console.error(`[Settings] Link URL missing: ${label}`);
+            return null;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "newtab-settings-link";
+        button.textContent = label;
+        button.title = label;
+
+        button.addEventListener("click", () => {
+            try {
+                const opened = window.open(url, "_blank", "noopener,noreferrer");
+                if (!opened) {
+                    console.error(`[Settings] Could not open link: ${url}`);
+                    return;
+                }
+                console.log(`[Settings] Opened link: ${url}`);
+            } catch (error) {
+                console.error(`[Settings] Link open failed: ${url}`, error);
+            }
+        });
+
+        parent.appendChild(button);
+        return button;
     };
 
     const createChoiceButton = (parent, label, value, currentValue, onSelect) => {
@@ -1541,7 +2205,7 @@
             const deleteButton = document.createElement("button");
             deleteButton.type = "button";
             deleteButton.className = "newtab-settings-danger";
-            deleteButton.textContent = "削除";
+            deleteButton.textContent = t("delete");
 
             deleteButton.addEventListener("click", async () => {
                 const index = customShortcutsCache.findIndex(item => item.id === shortcut.id);
@@ -1578,28 +2242,28 @@
     };
 
     const showCustomizeDialog = () => {
-        createNewtabDialog("カスタマイズ", (content, dialog) => {
-            const shortcutSection = createSettingsSection(content, "ショートカット");
+        createNewtabDialog(t("customize"), (content, dialog) => {
+            const shortcutSection = createSettingsSection(content, t("shortcut"));
 
             const addRow = document.createElement("div");
             addRow.className = "newtab-settings-row";
 
             const urlInput = document.createElement("input");
             urlInput.type = "url";
-            urlInput.placeholder = "URLを入力";
+            urlInput.placeholder = t("urlPlaceholder");
             urlInput.autocomplete = "off";
             urlInput.inputMode = "url";
 
             const nameInput = document.createElement("input");
             nameInput.type = "text";
-            nameInput.placeholder = "ラベルを入力";
+            nameInput.placeholder = t("labelPlaceholder");
             nameInput.maxLength = 80;
             nameInput.autocomplete = "off";
 
             const addButton = document.createElement("button");
             addButton.type = "button";
             addButton.className = "newtab-settings-action";
-            addButton.textContent = "追加";
+            addButton.textContent = t("add");
 
             const listRoot = document.createElement("div");
             listRoot.className = "newtab-shortcut-list";
@@ -1693,24 +2357,24 @@
 
             renderCustomShortcutDialogList(listRoot, dialog);
 
-            const appearanceSection = createSettingsSection(content, "外観");
+            const appearanceSection = createSettingsSection(content, t("appearance"));
 
             const wallpaperRow = document.createElement("div");
             wallpaperRow.className = "newtab-settings-row";
-            createSettingsLink(wallpaperRow, "壁紙を変更", "https://search3958.github.io/project/images/2/");
+            createSettingsLink(wallpaperRow, t("changeWallpaper"), "https://search3958.github.io/project/images/2/");
             appearanceSection.appendChild(wallpaperRow);
 
             const labelRow = document.createElement("div");
             labelRow.className = "newtab-settings-row";
             const labelTitle = document.createElement("span");
-            labelTitle.textContent = "ラベルの表示";
+            labelTitle.textContent = t("labelVisibility");
             labelRow.appendChild(labelTitle);
 
             const labelChoices = document.createElement("div");
             labelChoices.className = "newtab-settings-row";
             const currentLabelVisible = getLabelVisibleSetting();
 
-            createChoiceButton(labelChoices, "表示する", "true", String(currentLabelVisible), (value) => {
+            createChoiceButton(labelChoices, t("show"), "true", String(currentLabelVisible), (value) => {
                 const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value);
                 if (!saved) return;
                 const root = getEl("#mainShortcuts");
@@ -1723,7 +2387,7 @@
                 console.log(`[Settings] Label visibility changed: ${value}`);
             });
 
-            createChoiceButton(labelChoices, "表示しない", "false", String(currentLabelVisible), (value) => {
+            createChoiceButton(labelChoices, t("hide"), "false", String(currentLabelVisible), (value) => {
                 const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value);
                 if (!saved) return;
                 const root = getEl("#mainShortcuts");
@@ -1743,7 +2407,7 @@
             iconSizeRow.className = "newtab-settings-row";
 
             const iconSizeTitle = document.createElement("span");
-            iconSizeTitle.textContent = "アイコンサイズ";
+            iconSizeTitle.textContent = t("iconSize");
 
             const iconSizeChoices = document.createElement("div");
             iconSizeChoices.className = "newtab-settings-row";
@@ -1762,9 +2426,9 @@
                 console.log(`[Settings] Icon size changed: ${value}`);
             };
 
-            createChoiceButton(iconSizeChoices, "標準", "standard", currentIconSize, applyIconSize);
-            createChoiceButton(iconSizeChoices, "大", "large", currentIconSize, applyIconSize);
-            createChoiceButton(iconSizeChoices, "特大", "extra-large", currentIconSize, applyIconSize);
+            createChoiceButton(iconSizeChoices, t("standard"), "standard", currentIconSize, applyIconSize);
+            createChoiceButton(iconSizeChoices, t("large"), "large", currentIconSize, applyIconSize);
+            createChoiceButton(iconSizeChoices, t("extraLarge"), "extra-large", currentIconSize, applyIconSize);
 
             iconSizeRow.appendChild(iconSizeTitle);
             appearanceSection.appendChild(iconSizeRow);
@@ -1775,20 +2439,20 @@
     };
 
     const showManagementDialog = () => {
-        createNewtabDialog("管理", (content) => {
-            const newtabSection = createSettingsSection(content, "Newtab v7");
+        createNewtabDialog(t("managementTitle"), (content) => {
+            const newtabSection = createSettingsSection(content, t("saetab"));
             const newtabLinks = document.createElement("div");
             newtabLinks.className = "newtab-settings-links";
-            createSettingsLink(newtabLinks, "設定方法と詳細", "https://search3958.github.io/i/newtab/");
-            createSettingsLink(newtabLinks, "簡易版", "https://search3958.github.io/newtab/newtab-simple");
+            createSettingsLink(newtabLinks, t("settingsDetails"), "https://search3958.github.io/i/newtab/");
+            createSettingsLink(newtabLinks, t("simpleVersion"), "https://search3958.github.io/newtab/newtab-simple");
             newtabSection.appendChild(newtabLinks);
 
-            const dataSection = createSettingsSection(content, "データ");
+            const dataSection = createSettingsSection(content, t("data"));
 
             const resetButton = document.createElement("button");
             resetButton.type = "button";
             resetButton.className = "newtab-settings-action";
-            resetButton.textContent = "Newtab設定のリセット";
+            resetButton.textContent = t("resetSettings");
             resetButton.addEventListener("click", () => {
                 resetNewtabSettings().catch(error => console.error("[Settings] Newtab reset error:", error));
             });
@@ -1797,16 +2461,16 @@
             const deleteHistoryButton = document.createElement("button");
             deleteHistoryButton.type = "button";
             deleteHistoryButton.className = "newtab-settings-danger";
-            deleteHistoryButton.textContent = "検索履歴の削除";
+            deleteHistoryButton.textContent = t("deleteHistory");
             deleteHistoryButton.addEventListener("click", deleteSearchHistory);
             dataSection.appendChild(deleteHistoryButton);
 
-            const infoSection = createSettingsSection(content, "情報");
+            const infoSection = createSettingsSection(content, t("information"));
             const infoLinks = document.createElement("div");
             infoLinks.className = "newtab-settings-links";
-            createSettingsLink(infoLinks, "利用規約 および 個人情報政策", "https://search3958.github.io/policies/");
-            createSettingsLink(infoLinks, "私について", "https://search3958.github.io/");
-            createSettingsLink(infoLinks, "Language", "https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/");
+            createSettingsLink(infoLinks, t("termsPrivacy"), "https://search3958.github.io/policies/");
+            createSettingsLink(infoLinks, t("aboutMe"), "https://search3958.github.io/");
+            createSettingsLink(infoLinks, t("language"), "https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/");
             infoSection.appendChild(infoLinks);
         });
 
@@ -1890,31 +2554,110 @@
         return anchor;
     };
 
+    const ADSENSE_SCRIPT_SRC = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874";
+    const ADSENSE_CLIENT = "ca-pub-6151036058675874";
+    const ADSENSE_SLOT = "6909508295";
+
+    const ensureAdsenseScript = () => {
+        if (!document.head) {
+            console.error("[ShortcutAd] document.head not found.");
+            return false;
+        }
+
+        const existing = document.querySelector('script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
+        if (existing) {
+            console.log("[ShortcutAd] AdSense script already exists.");
+            return true;
+        }
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = ADSENSE_SCRIPT_SRC;
+        script.crossOrigin = "anonymous";
+
+        script.addEventListener("load", () => console.log("[ShortcutAd] AdSense script loaded."), { once: true });
+        script.addEventListener("error", (event) => console.error("[ShortcutAd] AdSense script failed to load.", event), { once: true });
+
+        document.head.appendChild(script);
+        console.log("[ShortcutAd] AdSense script appended.");
+        return true;
+    };
+
+    const createShortcutAd = () => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "main-shortcut-ad";
+
+        const ad = document.createElement("ins");
+        ad.className = "adsbygoogle";
+        ad.style.display = "block";
+        ad.dataset.adClient = ADSENSE_CLIENT;
+        ad.dataset.adSlot = ADSENSE_SLOT;
+        ad.dataset.adFormat = "auto";
+        ad.dataset.fullWidthResponsive = "true";
+
+        wrapper.appendChild(ad);
+
+        if (!ensureAdsenseScript()) {
+            console.error("[ShortcutAd] AdSense script could not be prepared.");
+            return wrapper;
+        }
+
+        try {
+            window.adsbygoogle = window.adsbygoogle || [];
+            window.adsbygoogle.push({});
+            console.log(`[ShortcutAd] Ad requested: slot=${ADSENSE_SLOT}`);
+        } catch (error) {
+            console.error("[ShortcutAd] Ad request failed.", error);
+        }
+
+        return wrapper;
+    };
+
     const renderShortcuts = (iconMap) => {
         const root = getRequiredElement("#mainShortcuts");
         if (!root) return;
+
         root.replaceChildren();
         const fragment = document.createDocumentFragment();
         const categories = getShortcutCategories();
+        let renderedCategoryCount = 0;
+
         for (const category of categories) {
-            if (!category || !Array.isArray(category.links)) continue;
+            if (!category || !Array.isArray(category.links)) {
+                console.error("[Shortcut] Skipped invalid category.");
+                continue;
+            }
+
             const section = document.createElement("section");
             section.className = "main-shortcut-category";
+
             const title = document.createElement("h2");
             title.className = "main-shortcut-title";
             title.textContent = category.title || "";
+
             const links = document.createElement("div");
             links.className = "main-shortcut-links";
+
             for (const link of category.links) {
                 const sc = createShortcut(link, iconMap);
                 if (sc) links.appendChild(sc);
             }
-            section.appendChild(title);
-            section.appendChild(links);
+
+            section.append(title, links);
             fragment.appendChild(section);
+            renderedCategoryCount += 1;
+
+            if (renderedCategoryCount === 5) {
+                fragment.appendChild(createShortcutAd());
+                console.log("[ShortcutAd] Inserted ad after the 5th category.");
+            }
         }
+
+        fragment.appendChild(createShortcutAd());
+        console.log("[ShortcutAd] Inserted final ad at the bottom of the shortcut list.");
+
         root.appendChild(fragment);
-        console.log(`[Shortcut] Rendered ${categories.length} categories.`);
+        console.log(`[Shortcut] Rendered ${renderedCategoryCount} categories and 2 ad slots.`);
     };
 
     /* =========================================================
@@ -2163,6 +2906,7 @@
             console.error("[Settings] Custom shortcut init failed:", error);
         }
 
+        applyUILanguage();
         applyAppearanceSettings();
 
         if (window.renderShortcuts && window._iconMap) {
