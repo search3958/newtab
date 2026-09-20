@@ -14,7 +14,7 @@ body {
 }
 
 body {
-    background: #fff var(--wallpaper-light, url("bgimg/baram1.webp"))
+    background: #fff var(--wallpaper-light, url("bgimg/samag3.webp"))
         center / cover no-repeat fixed;
     font-family:
         system-ui,
@@ -44,7 +44,7 @@ body::after{
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #000;
-        background-image: var(--wallpaper-dark, url("bgimg/baram1_dark.webp"));
+        background-image: var(--wallpaper-dark, url("bgimg/samag3_dark.webp"));
     }
 }
 
@@ -248,37 +248,9 @@ body::after{
     ================================ */
 
 .intelligence-box {
-    position: fixed;
-    top: 130px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 413px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    backdrop-filter: blur(24px);
-    z-index: 150;
-    padding: 8px 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-    pointer-events: none;
+    display:none;
 }
 
-@media (prefers-color-scheme: dark) {
-    .intelligence-box {
-        background: rgba(28, 28, 28, 0.95);
-    }
-}
-
-.intelligence-box.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-}
 
 .intelligence-answer {
     font-size: 16px;
@@ -871,7 +843,7 @@ body::after{
     <div class="main-shortcuts" id="mainShortcuts"></div>
 </div>
 
-<script src="v7/af.js"></script>
+<script src="beta/af.js"></script>
 <script src="https://search3958.github.io/check.js"></script>
 <script>
     const updateClock = () => {
