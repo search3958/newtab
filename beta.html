@@ -838,27 +838,151 @@ body::after{
     <div class="main-shortcuts" id="mainShortcuts"></div>
 </div>
 
-<script src="beta/af.js"></script>
 <script src="https://search3958.github.io/check.js"></script>
 <script>
+    (() => {
+    "use strict";
+
+    const NS = "[Clock]";
+    let afJsLoaded = false;
+
+    /**
+     * #searchBox にフォーカス
+     */
+    const focusSearchBox = () => {
+        const searchBox = document.getElementById("searchBox");
+
+        if (!searchBox) {
+            console.error(`${NS} Required element not found: #searchBox`);
+            return false;
+        }
+
+        try {
+            searchBox.focus({ preventScroll: true });
+            console.log(`${NS} Focused: #searchBox`);
+            return true;
+        } catch (error) {
+            console.error(`${NS} Failed to focus #searchBox:`, error);
+            return false;
+        }
+    };
+
+    // スクリプト開始時に即時フォーカスを試行
+    focusSearchBox();
+
+    // DOM未生成だった場合の再試行
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            focusSearchBox();
+        }, { once: true });
+    }
+
+    /**
+     * beta/af.js を動的ロード
+     */
+    const loadAfJs = () => {
+        if (afJsLoaded) {
+            console.log(`${NS} beta/af.js already loaded`);
+            return;
+        }
+
+        // 既存読み込みチェック
+        const existingScript = document.querySelector('script[data-af-js="true"]');
+        if (existingScript) {
+            afJsLoaded = true;
+            console.log(`${NS} beta/af.js already exists in document`);
+            return;
+        }
+
+        const script = document.createElement("script");
+
+        if (!script) {
+            console.error(`${NS} Failed to create <script> element`);
+            return;
+        }
+
+        script.src = "beta/af.js";
+        script.async = true;
+        script.dataset.afJs = "true";
+
+        script.addEventListener("load", () => {
+            afJsLoaded = true;
+            console.log(`${NS} Loaded: beta/af.js`);
+        }, { once: true });
+
+        script.addEventListener("error", (event) => {
+            console.error(`${NS} Failed to load: beta/af.js`, event);
+            script.remove();
+        }, { once: true });
+
+        document.head.appendChild(script);
+        console.log(`${NS} Loading: beta/af.js`);
+    };
+
+    /**
+     * ページ読み込み完了後、オンライン状態ならロード
+     */
+    const tryLoadAfJs = () => {
+        if (!navigator.onLine) {
+            console.warn(`${NS} Network offline. Waiting for connection...`);
+            return;
+        }
+
+        // 読み込み直後の処理集中を避ける
+        const startLoad = () => {
+            loadAfJs();
+        };
+
+        if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(startLoad, { timeout: 2000 });
+        } else {
+            window.setTimeout(startLoad, 300);
+        }
+    };
+
+    if (document.readyState === "complete") {
+        tryLoadAfJs();
+    } else {
+        window.addEventListener("load", () => {
+            tryLoadAfJs();
+        }, { once: true });
+    }
+
+    // オフライン状態から復帰した場合
+    window.addEventListener("online", () => {
+        console.log(`${NS} Network connection restored`);
+        tryLoadAfJs();
+    });
+
+    /**
+     * 時計
+     */
     const updateClock = () => {
         const now = new Date();
+
         const month = String(now.getMonth() + 1).padStart(2, "0");
         const day = String(now.getDate()).padStart(2, "0");
         const hours = String(now.getHours()).padStart(2, "0");
         const minutes = String(now.getMinutes()).padStart(2, "0");
+
         const clockEl = document.getElementById("clock");
+
         if (!clockEl) {
-            console.error("[Clock] Required element not found: #clock");
+            console.error(`${NS} Required element not found: #clock`);
             return;
         }
 
         const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const dayName = dayNames[now.getDay()];
+
         clockEl.textContent = `${month}.${day} ${dayName} ${hours}:${minutes}`;
     };
+
     updateClock();
     setInterval(updateClock, 1000);
+
+    console.log(`${NS} Clock script initialized`);
+})();
 </script>
 
 </body>
