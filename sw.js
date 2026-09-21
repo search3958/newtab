@@ -1,13 +1,10 @@
-const CACHE_NAME = 'newtab-cache-11'; // バージョンを更新
+const CACHE_NAME = 'newtab-cache-12'; // バージョンを更新
 const ASSETS = [
   '/',
   '/index.html',
-  '/v6.5/a.js',
-  '/lsr/icons-6-2.zip',
-  '/links-v6.json',
+  '/v7/af.js',
+  '/lsr/icons-7.zip',
   'https://search3958.github.io/check.js',
-  'https://search3958.github.io/newtab/xml/lang.js',
-  'https://search3958.github.io/newtab/xml/beta.xml'
 ];
 
 // インストール: 指定したファイルをすべてキャッシュ
