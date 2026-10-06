@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "SaeTab for Chrome",
+  "version": "1.0",
+  "description": "New tab redirects to SaeTab",
+  "permissions": ["tabs"],
+  "host_permissions": ["https://search3958.github.io/*"],
+  "action": {
+    "default_icon": {
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
