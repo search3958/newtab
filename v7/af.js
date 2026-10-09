@@ -2,7 +2,7 @@
 "use strict";
 const DB_NAME = "WallpaperDB";
 const STORE = "images";
-const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip?v=1";
+const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip?v=2";
 const FALLBACK_LIGHT = "bgimg/samag3.webp";
 const FALLBACK_DARK = "bgimg/samag3_dark.webp";
 const HISTORY_KEY = "searchHistory";
@@ -839,14 +839,17 @@ links: [
 { name: "ストップウォッチ", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/stopwatch/ja.html", icon: "stopwatch.webp" },
 { name: "デジタル時計", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/dclock/ja.html", icon: "dclock.webp" },
 { name: "アナログ時計", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/aclock/ja.html", icon: "aclock.webp" },
-{ name: "記録ノート", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/girog/", icon: "girog.webp" },
+{ name: "記録ノート", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/girog/", icon: "girog_main.svg" },
 { name: "ToolBoard", bg: "var(--iconbg)", url: "https://search3958.github.io/toolboard", icon: "toolboard.webp" },
-{ name: "Baram Code", bg: "var(--iconbg)", url: "https://search3958.github.io/baram/", icon: "garam.webp" },
+{ name: "Baram Code", bg: "var(--iconbg)", url: "https://search3958.github.io/baram/", icon: "baram_code_main.svg" },
 { name: "千里辞書", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/sajon/", icon: "cheonri.webp" },
 { name: "Oneul launcher", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/oneul-launcher", icon: "oneul-launcher.webp" },
 { name: "Wo Checker", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/wo-checker", icon: "wo-checker.webp" },
 { name: "Easy Flowchart", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/easy-flowchart", icon: "easy-flowchart.webp" },
-{ name: "WebP変換", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/webp.html", icon: "webp.webp" }
+{ name: "NaeWebp", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hiwebp/ja", icon: "hiwebp.svg" },
+{ name: "NaeCSS", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hicss/ja", icon: "hicss.svg" },
+{ name: "NaeJS", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hijs/ja", icon: "hijs.svg" },
+{ name: "NaeHTML", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hihtml/ja", icon: "hihtml.svg" }
 ]
 },
 {
@@ -1166,7 +1169,7 @@ await wallpaperTask;
 try { await loadCustomShortcutData(); } catch (error) { customShortcutsCache = []; console.error("[Settings] Custom shortcut init failed:", error); }
 applyUILanguage();
 applyAppearanceSettings();
-if (window.renderShortcuts && window._iconMap) { try { window.renderShortcuts(window._iconMap); } catch (e) { console.error("[v7] renderShortcuts failed:", e); if (window.renderShortcuts) window.renderShortcuts(new Map()); } }
+if (window.renderShortcuts && window._iconMap) { try { window.renderShortcuts(window._iconMap); } catch (e) { console.error("[Beta] renderShortcuts failed:", e); if (window.renderShortcuts) window.renderShortcuts(new Map()); } }
 if (window.setupSearchAndHistory) window.setupSearchAndHistory();
 setupSettingsControls();
 console.log("[Wallpaper] Initialization completed.");
