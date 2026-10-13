@@ -1599,11 +1599,11 @@ const wrapper = document.createElement("div");
 wrapper.className = "main-shortcut-ad";
 const ad = document.createElement("ins");
 ad.className = "adsbygoogle";
-ad.style.display = "block";
+ad.style.display = "inline-block"; // blockからinline-blockに変更
+ad.style.width = "728px";          // 横幅を728pxに固定
+ad.style.height = "90px";          // 高さを90pxに固定
 ad.dataset.adClient = ADSENSE_CLIENT;
 ad.dataset.adSlot = ADSENSE_SLOT;
-ad.dataset.adFormat = "auto";
-ad.dataset.fullWidthResponsive = "true";
 wrapper.appendChild(ad);
 console.log(`[ShortcutAd] Ad slot created: ${ADSENSE_SLOT}`);
 return wrapper;

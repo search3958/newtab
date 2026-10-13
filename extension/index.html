@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>角丸を4pxに固定 — Newtab7 拡張機能</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page: #f5f6f8;
+      --surface: #ffffff;
+      --surface-muted: #eef1f5;
+      --text: #20232a;
+      --muted: #626a76;
+      --line: #d8dde5;
+      --accent: #245fc7;
+      --accent-strong: #17499e;
+      --success: #16734a;
+      --warning: #9b5b00;
+      --danger: #b3261e;
+      --focus: #245fc7;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #111318;
+        --surface: #1a1d24;
+        --surface-muted: #252a33;
+        --text: #edf0f6;
+        --muted: #b1b8c5;
+        --line: #3b424e;
+        --accent: #a9c7ff;
+        --accent-strong: #c8dcff;
+        --success: #76d7a6;
+        --warning: #ffca7a;
+        --danger: #ffb4ab;
+        --focus: #a9c7ff;
+      }
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      border-radius: 4px !important;
+    }
+
+    body {
+      min-width: 280px;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .radius-settings-page {
+      width: min(100% - 32px, 760px);
+      margin: 0 auto;
+      padding: 48px 0 36px;
+    }
+
+    .radius-settings-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .radius-settings-mark {
+      display: grid;
+      flex: 0 0 44px;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      background: var(--accent);
+      color: #fff;
+      font-size: 19px;
+      font-weight: 750;
+      letter-spacing: -1px;
+    }
+
+    .radius-settings-eyebrow {
+      margin: 0 0 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: .04em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 5vw, 32px);
+      font-weight: 720;
+      letter-spacing: -.035em;
+      line-height: 1.25;
+    }
+
+    .radius-settings-description {
+      max-width: 650px;
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .radius-settings-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .radius-settings-control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px;
+    }
+
+    .radius-settings-control-copy { min-width: 0; }
+
+    .radius-settings-control-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 680;
+    }
+
+    .radius-settings-control-help {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .radius-settings-switch-label {
+      position: relative;
+      display: inline-flex;
+      flex: 0 0 auto;
+      width: 54px;
+      height: 32px;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .radius-settings-switch-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .radius-settings-switch-track {
+      display: flex;
+      width: 54px;
+      height: 32px;
+      align-items: center;
+      padding: 3px;
+      border: 1px solid var(--muted);
+      background: var(--surface-muted);
+      transition: background-color .15s ease, border-color .15s ease;
+    }
+
+    .radius-settings-switch-thumb {
+      display: block;
+      width: 24px;
+      height: 24px;
+      background: var(--muted);
+      transition: transform .15s ease, background-color .15s ease;
+    }
+
+    .radius-settings-switch-input:checked + .radius-settings-switch-track {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .radius-settings-switch-input:checked + .radius-settings-switch-track .radius-settings-switch-thumb {
+      background: #fff;
+      transform: translateX(22px);
+    }
+
+    .radius-settings-switch-input:focus-visible + .radius-settings-switch-track {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .radius-settings-switch-input:disabled + .radius-settings-switch-track {
+      cursor: wait;
+      opacity: .55;
+    }
+
+    .radius-settings-divider { height: 1px; background: var(--line); }
+
+    .radius-settings-status-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 22px;
+      background: var(--surface);
+    }
+
+    .radius-settings-status-dot {
+      flex: 0 0 9px;
+      width: 9px;
+      height: 9px;
+      margin-top: 7px;
+      background: var(--muted);
+    }
+
+    .radius-settings-status-dot[data-state="enabled"] { background: var(--success); }
+    .radius-settings-status-dot[data-state="error"] { background: var(--danger); }
+    .radius-settings-status-dot[data-state="saving"] { background: var(--warning); }
+
+    .radius-settings-status-text {
+      min-width: 0;
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .radius-settings-status-text strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .radius-settings-preview { margin-top: 24px; padding: 20px 22px; }
+    .radius-settings-section-title { margin: 0 0 12px; font-size: 15px; font-weight: 680; }
+    .radius-settings-preview-items { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+    .radius-settings-preview-button {
+      min-height: 38px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      background: var(--surface-muted);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .radius-settings-preview-panel {
+      display: flex;
+      width: 58px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--accent);
+      background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .radius-settings-preview-avatar {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--surface-muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .radius-settings-notice {
+      margin-top: 18px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .radius-settings-notice strong { color: var(--text); }
+
+    .radius-settings-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .radius-settings-page { width: min(100% - 24px, 760px); padding-top: 28px; }
+      .radius-settings-control-row { padding: 18px 16px; gap: 12px; }
+      .radius-settings-status-row { padding: 14px 16px; }
+      .radius-settings-preview { padding: 17px 16px; }
+      .radius-settings-footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="radius-settings-page">
+    <header class="radius-settings-header">
+      <div class="radius-settings-mark" aria-hidden="true">4px</div>
+      <div>
+        <p class="radius-settings-eyebrow">NEWTAB7 EXTENSION</p>
+        <h1>角丸を4pxに固定</h1>
+      </div>
+    </header>
+
+    <p class="radius-settings-description">
+      Newtab のページ内にある要素の角丸を4pxに統一します。あとから追加された要素や、CSSで指定された角丸にも適用します。
+    </p>
+
+    <section class="radius-settings-card" aria-labelledby="radius-settings-control-title">
+      <div class="radius-settings-control-row">
+        <div class="radius-settings-control-copy">
+          <h2 class="radius-settings-control-title" id="radius-settings-control-title">拡張機能を有効にする</h2>
+          <p class="radius-settings-control-help">オンにすると Newtab7 の拡張スクリプトとして保存されます。</p>
+        </div>
+        <label class="radius-settings-switch-label" aria-label="角丸を4pxに固定する">
+          <input class="radius-settings-switch-input" id="radius-settings-enabled" type="checkbox" role="switch" aria-describedby="radius-settings-status-message">
+          <span class="radius-settings-switch-track" aria-hidden="true"><span class="radius-settings-switch-thumb"></span></span>
+        </label>
+      </div>
+      <div class="radius-settings-divider"></div>
+      <div class="radius-settings-status-row" aria-live="polite">
+        <span class="radius-settings-status-dot" id="radius-settings-status-dot" data-state="loading" aria-hidden="true"></span>
+        <p class="radius-settings-status-text" id="radius-settings-status-message">
+          <strong id="radius-settings-status-title">状態を確認しています</strong>
+          IndexedDB の拡張スクリプトを確認しています。
+        </p>
+      </div>
+    </section>
+
+    <section class="radius-settings-card radius-settings-preview" aria-labelledby="radius-settings-preview-title">
+      <h2 class="radius-settings-section-title" id="radius-settings-preview-title">プレビュー</h2>
+      <div class="radius-settings-preview-items" aria-label="角丸4pxの表示例">
+        <button class="radius-settings-preview-button" type="button">ボタン</button>
+        <div class="radius-settings-preview-panel">パネル</div>
+        <div class="radius-settings-preview-avatar" aria-label="アイコンの例">Aa</div>
+      </div>
+    </section>
+
+    <aside class="radius-settings-notice">
+      <strong>反映について</strong><br>
+      このページは Newtab 本体と同じオリジンで開いてください。IndexedDB はオリジンごとに分かれています。拡張の追加・削除は、次に Newtab を開いたときに反映されます。
+    </aside>
+
+    <footer class="radius-settings-footer">
+      <span>保存先: Newtab7Extensions / scripts</span>
+      <span>拡張ID: newtab7-radius-4px</span>
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const RADIUS_SETTINGS_DB_NAME = "Newtab7Extensions";
+    const RADIUS_SETTINGS_STORE_NAME = "scripts";
+    const RADIUS_SETTINGS_EXTENSION_ID = "newtab7-radius-4px";
+    const RADIUS_SETTINGS_EXTENSION_NAME = "角丸を4pxに固定";
+    const RADIUS_SETTINGS_PREFIX = `ext:${RADIUS_SETTINGS_EXTENSION_ID}:`;
+
+    const RADIUS_SETTINGS_EXTENSION_CODE = String.raw`(function () {
+  "use strict";
+
+  const controllerKey = "__NEWTAB7_RADIUS_4PX_CONTROLLER__";
+  const previousController = window[controllerKey];
+  if (previousController && typeof previousController.destroy === "function") {
+    previousController.destroy();
+  }
+
+  const radiusValue = "4px";
+  const trackedElements = new Set();
+  const originalStyles = new WeakMap();
+  const observers = new Map();
+  const styleElements = new Map();
+  const observedRoots = new Set();
+  let destroyed = false;
+
+  const log = (...args) => {
+    if (typeof NT !== "undefined" && NT && typeof NT.log === "function") {
+      NT.log(...args);
+    } else {
+      console.info("[Ext:角丸を4pxに固定]", ...args);
+    }
+  };
+
+  const rememberAndApply = (element) => {
+    if (!element || !element.style || element.nodeType !== 1) return;
+    if (!originalStyles.has(element)) {
+      originalStyles.set(element, {
+        value: element.style.getPropertyValue("border-radius"),
+        priority: element.style.getPropertyPriority("border-radius")
+      });
+      trackedElements.add(element);
+    }
+    if (element.style.getPropertyValue("border-radius") !== radiusValue ||
+        element.style.getPropertyPriority("border-radius") !== "important") {
+      element.style.setProperty("border-radius", radiusValue, "important");
+    }
+  };
+
+  const ensureStyle = (root) => {
+    if (!root || styleElements.has(root)) return;
+    const ownerDocument = root.nodeType === 9 ? root : root.ownerDocument;
+    if (!ownerDocument || typeof ownerDocument.createElement !== "function") return;
+    const style = ownerDocument.createElement("style");
+    style.setAttribute("data-newtab7-radius-extension", "true");
+    style.textContent = "*, *::before, *::after { border-radius: 4px !important; }";
+    const target = root.nodeType === 9 ? (root.head || root.documentElement) : root;
+    if (!target || typeof target.appendChild !== "function") return;
+    target.appendChild(style);
+    styleElements.set(root, style);
+  };
+
+  const scanNode = (node) => {
+    if (destroyed || !node) return;
+    if (node.nodeType === 1) {
+      rememberAndApply(node);
+      if (node.shadowRoot) scanRoot(node.shadowRoot);
+      if (typeof node.querySelectorAll === "function") {
+        for (const element of node.querySelectorAll("*")) {
+          rememberAndApply(element);
+          if (element.shadowRoot) scanRoot(element.shadowRoot);
+        }
+      }
+    } else if (node.nodeType === 9 || node.nodeType === 11) {
+      scanRoot(node);
+    }
+  };
+
+  const scanRoot = (root) => {
+    if (destroyed || !root) return;
+    ensureStyle(root);
+    if (observedRoots.has(root)) {
+      if (root.nodeType === 9 && root.documentElement) scanNodeContents(root.documentElement);
+      else scanNodeContents(root);
+      return;
+    }
+    observedRoots.add(root);
+    const Observer = (root.ownerDocument && root.ownerDocument.defaultView && root.ownerDocument.defaultView.MutationObserver) || window.MutationObserver;
+    if (typeof Observer !== "function") {
+      log("MutationObserver が利用できないため、初期要素のみ適用しました");
+      scanNodeContents(root.nodeType === 9 ? root.documentElement : root);
+      return;
+    }
+    const observer = new Observer((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "childList") {
+          for (const addedNode of mutation.addedNodes) scanNode(addedNode);
+        } else if (mutation.type === "attributes" && mutation.attributeName === "style") {
+          rememberAndApply(mutation.target);
+        }
+      }
+    });
+    const target = root.nodeType === 9 ? root.documentElement : root;
+    if (target) observer.observe(target, { subtree: true, childList: true, attributes: true, attributeFilter: ["style"] });
+    observers.set(root, observer);
+    scanNodeContents(target);
+  };
+
+  const scanNodeContents = (node) => {
+    if (!node || destroyed) return;
+    if (node.nodeType === 1) rememberAndApply(node);
+    if (typeof node.querySelectorAll === "function") {
+      for (const element of node.querySelectorAll("*")) {
+        rememberAndApply(element);
+        if (element.shadowRoot) scanRoot(element.shadowRoot);
+      }
+    }
+  };
+
+  const destroy = () => {
+    if (destroyed) return;
+    destroyed = true;
+    for (const observer of observers.values()) observer.disconnect();
+    observers.clear();
+    for (const style of styleElements.values()) {
+      if (style && style.parentNode) style.parentNode.removeChild(style);
+    }
+    styleElements.clear();
+    observedRoots.clear();
+    for (const element of trackedElements) {
+      const original = originalStyles.get(element);
+      if (!element || !element.style || !original) continue;
+      if (original.value) element.style.setProperty("border-radius", original.value, original.priority);
+      else element.style.removeProperty("border-radius");
+    }
+    trackedElements.clear();
+    if (window[controllerKey] && window[controllerKey].destroy === destroy) {
+      delete window[controllerKey];
+    }
+    log("角丸固定を停止しました");
+  };
+
+  window[controllerKey] = { destroy };
+  scanRoot(document);
+  log("角丸を4pxに固定しました");
+})();`;
+
+    const radiusSettingsElements = {
+      enabled: document.getElementById("radius-settings-enabled"),
+      statusDot: document.getElementById("radius-settings-status-dot"),
+      statusTitle: document.getElementById("radius-settings-status-title"),
+      statusMessage: document.getElementById("radius-settings-status-message")
+    };
+
+    let radiusSettingsBusy = false;
+
+    function radiusSettingsLog(level, message, error) {
+      const prefix = "[Newtab7 Radius Settings]";
+      if (level === "error") console.error(prefix, message, error || "");
+      else if (level === "warn") console.warn(prefix, message, error || "");
+      else console.info(prefix, message, error || "");
+    }
+
+    function radiusSettingsSetStatus(state, title, detail) {
+      const dot = radiusSettingsElements.statusDot;
+      const statusTitle = radiusSettingsElements.statusTitle;
+      const statusMessage = radiusSettingsElements.statusMessage;
+      if (!dot) {
+        console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-status-dot");
+      } else {
+        dot.dataset.state = state;
+      }
+      if (!statusTitle) {
+        console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-status-title");
+      } else {
+        statusTitle.textContent = title;
+      }
+      if (!statusMessage) {
+        console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-status-message");
+      } else {
+        const existingStrong = statusMessage.querySelector("strong");
+        if (!existingStrong) {
+          console.error("[Newtab7 Radius Settings] 状態見出し要素が見つかりません: #radius-settings-status-message strong");
+          statusMessage.textContent = `${title} ${detail}`;
+        } else {
+          statusMessage.replaceChildren(existingStrong, document.createTextNode(detail));
+          existingStrong.textContent = title;
+        }
+      }
+    }
+
+    function radiusSettingsSetBusy(busy) {
+      radiusSettingsBusy = busy;
+      const toggle = radiusSettingsElements.enabled;
+      if (!toggle) {
+        console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-enabled");
+        return;
+      }
+      toggle.disabled = busy;
+    }
+
+    function radiusSettingsOpenDatabase() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error("この環境では IndexedDB を使用できません。Newtab 本体と同じオリジンで開いてください。"));
+          return;
+        }
+        let request;
+        try {
+          request = indexedDB.open(RADIUS_SETTINGS_DB_NAME);
+        } catch (error) {
+          reject(error);
+          return;
+        }
+        request.onupgradeneeded = (event) => {
+          const database = event.target.result;
+          if (!database.objectStoreNames.contains(RADIUS_SETTINGS_STORE_NAME)) {
+            database.createObjectStore(RADIUS_SETTINGS_STORE_NAME, { keyPath: "id" });
+            radiusSettingsLog("info", "scripts オブジェクトストアを作成しました");
+          }
+        };
+        request.onerror = () => reject(request.error || new Error("IndexedDB を開けませんでした。"));
+        request.onblocked = () => radiusSettingsLog("warn", "IndexedDB の更新が別の接続によって保留されています。");
+        request.onsuccess = () => {
+          const database = request.result;
+          if (!database.objectStoreNames.contains(RADIUS_SETTINGS_STORE_NAME)) {
+            database.close();
+            reject(new Error("scripts オブジェクトストアが見つかりません。Newtab 本体側でデータベースを確認してください。"));
+            return;
+          }
+          database.onversionchange = () => database.close();
+          resolve(database);
+        };
+      });
+    }
+
+    async function radiusSettingsGetRecord() {
+      const database = await radiusSettingsOpenDatabase();
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        const close = () => { try { database.close(); } catch (error) { radiusSettingsLog("warn", "データベースを閉じられませんでした。", error); } };
+        let transaction;
+        try {
+          transaction = database.transaction(RADIUS_SETTINGS_STORE_NAME, "readonly");
+          const request = transaction.objectStore(RADIUS_SETTINGS_STORE_NAME).get(RADIUS_SETTINGS_EXTENSION_ID);
+          request.onsuccess = () => {
+            if (settled) return;
+            settled = true;
+            resolve(request.result || null);
+          };
+          request.onerror = () => {
+            if (settled) return;
+            settled = true;
+            reject(request.error || new Error("拡張の状態を読み込めませんでした。"));
+          };
+          transaction.onabort = () => {
+            if (settled) return;
+            settled = true;
+            reject(transaction.error || new Error("読み取りトランザクションが中断されました。"));
+          };
+          transaction.oncomplete = close;
+          transaction.onerror = close;
+        } catch (error) {
+          close();
+          reject(error);
+        }
+      });
+    }
+
+    async function radiusSettingsSaveRecord() {
+      const database = await radiusSettingsOpenDatabase();
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        const close = () => { try { database.close(); } catch (error) { radiusSettingsLog("warn", "データベースを閉じられませんでした。", error); } };
+        let transaction;
+        try {
+          transaction = database.transaction(RADIUS_SETTINGS_STORE_NAME, "readwrite");
+          transaction.objectStore(RADIUS_SETTINGS_STORE_NAME).put({
+            id: RADIUS_SETTINGS_EXTENSION_ID,
+            name: RADIUS_SETTINGS_EXTENSION_NAME,
+            encoding: "plain",
+            code: RADIUS_SETTINGS_EXTENSION_CODE,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          transaction.oncomplete = () => {
+            if (settled) return;
+            settled = true;
+            close();
+            resolve();
+          };
+          transaction.onerror = () => {
+            if (settled) return;
+            settled = true;
+            close();
+            reject(transaction.error || new Error("拡張を保存できませんでした。"));
+          };
+          transaction.onabort = () => {
+            if (settled) return;
+            settled = true;
+            close();
+            reject(transaction.error || new Error("保存トランザクションが中断されました。"));
+          };
+        } catch (error) {
+          close();
+          reject(error);
+        }
+      });
+    }
+
+    async function radiusSettingsDeleteRecord() {
+      const database = await radiusSettingsOpenDatabase();
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        const close = () => { try { database.close(); } catch (error) { radiusSettingsLog("warn", "データベースを閉じられませんでした。", error); } };
+        let transaction;
+        try {
+          transaction = database.transaction(RADIUS_SETTINGS_STORE_NAME, "readwrite");
+          transaction.objectStore(RADIUS_SETTINGS_STORE_NAME).delete(RADIUS_SETTINGS_EXTENSION_ID);
+          transaction.oncomplete = () => {
+            if (settled) return;
+            settled = true;
+            close();
+            resolve();
+          };
+          transaction.onerror = () => {
+            if (settled) return;
+            settled = true;
+            close();
+            reject(transaction.error || new Error("拡張を削除できませんでした。"));
+          };
+          transaction.onabort = () => {
+            if (settled) return;
+            settled = true;
+            close();
+            reject(transaction.error || new Error("削除トランザクションが中断されました。"));
+          };
+        } catch (error) {
+          close();
+          reject(error);
+        }
+      });
+    }
+
+    function radiusSettingsRemoveStoredValues() {
+      let removedCount = 0;
+      try {
+        for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+          const key = localStorage.key(index);
+          if (typeof key === "string" && key.startsWith(RADIUS_SETTINGS_PREFIX)) {
+            localStorage.removeItem(key);
+            removedCount += 1;
+          }
+        }
+        radiusSettingsLog("info", `拡張用の保存値を ${removedCount} 件削除しました`);
+      } catch (error) {
+        radiusSettingsLog("warn", "拡張用の保存値を完全には削除できませんでした。", error);
+      }
+    }
+
+    async function radiusSettingsRefresh() {
+      const toggle = radiusSettingsElements.enabled;
+      if (!toggle) {
+        console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-enabled");
+        radiusSettingsSetStatus("error", "設定画面を初期化できません", "必要な要素が見つかりません。ページのHTMLを確認してください。");
+        return;
+      }
+      radiusSettingsSetBusy(true);
+      radiusSettingsSetStatus("loading", "状態を確認しています", "IndexedDB の拡張スクリプトを確認しています。");
+      try {
+        const record = await radiusSettingsGetRecord();
+        const isEnabled = Boolean(record && record.id === RADIUS_SETTINGS_EXTENSION_ID);
+        toggle.checked = isEnabled;
+        if (isEnabled) {
+          radiusSettingsSetStatus("enabled", "有効です", "拡張は保存済みです。次に Newtab を開いたとき、角丸が4pxに統一されます。");
+          radiusSettingsLog("info", "拡張が見つかりました");
+        } else {
+          radiusSettingsSetStatus("idle", "無効です", "スイッチをオンにすると拡張を IndexedDB に保存します。");
+          radiusSettingsLog("info", "拡張は未登録です");
+        }
+      } catch (error) {
+        toggle.checked = false;
+        radiusSettingsSetStatus("error", "保存先にアクセスできません", `${error && error.message ? error.message : String(error)} このページを Newtab 本体と同じオリジンで開いているか確認してください。`);
+        radiusSettingsLog("error", "状態の確認に失敗しました", error);
+      } finally {
+        radiusSettingsSetBusy(false);
+      }
+    }
+
+    async function radiusSettingsHandleToggle() {
+      const toggle = radiusSettingsElements.enabled;
+      if (!toggle || radiusSettingsBusy) {
+        if (!toggle) console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-enabled");
+        return;
+      }
+      const shouldEnable = toggle.checked;
+      radiusSettingsSetBusy(true);
+      radiusSettingsSetStatus("saving", shouldEnable ? "保存しています" : "削除しています", "IndexedDB を更新しています。");
+      try {
+        if (shouldEnable) {
+          await radiusSettingsSaveRecord();
+          toggle.checked = true;
+          radiusSettingsSetStatus("enabled", "有効にしました", "保存しました。角丸の固定は次に Newtab を開いたときに反映されます。");
+          radiusSettingsLog("info", "拡張を保存しました");
+        } else {
+          await radiusSettingsDeleteRecord();
+          radiusSettingsRemoveStoredValues();
+          toggle.checked = false;
+          radiusSettingsSetStatus("idle", "無効にしました", "拡張と専用の保存値を削除しました。現在開いている Newtab への影響は、再読み込み後に反映されます。");
+          radiusSettingsLog("info", "拡張を削除しました");
+        }
+      } catch (error) {
+        toggle.checked = !shouldEnable;
+        radiusSettingsSetStatus("error", "変更できませんでした", `${error && error.message ? error.message : String(error)} Newtab 本体と同じオリジンで開いているか確認してください。`);
+        radiusSettingsLog("error", shouldEnable ? "拡張の保存に失敗しました" : "拡張の削除に失敗しました", error);
+      } finally {
+        radiusSettingsSetBusy(false);
+      }
+    }
+
+    if (radiusSettingsElements.enabled) {
+      radiusSettingsElements.enabled.addEventListener("change", radiusSettingsHandleToggle);
+      console.info("[Newtab7 Radius Settings] イベントを登録しました: #radius-settings-enabled");
+    } else {
+      console.error("[Newtab7 Radius Settings] 要素が見つかりません: #radius-settings-enabled");
+    }
+
+    radiusSettingsRefresh();
+  </script>
+</body>
+</html>
