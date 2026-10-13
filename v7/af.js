@@ -17,6 +17,23 @@ const DEFAULT_LABEL_VISIBLE = true;
 const DEFAULT_ICON_SIZE = "standard";
 const FAVICON_API_URL = "https://www.google.com/s2/favicons";
 const SELECTED_LANG_KEY = "selectedLang";
+
+// アカウント同期
+const OF8_SCRIPT_URL = "https://search3958.github.io/frameworks/client-service.js";
+const SYNC_ENABLED_KEY = "newtab.syncEnabled";
+const SYNC_HISTORY_KEY = "newtab/searchHistory";
+const SYNC_SETTINGS_KEY = "newtab/settings";
+const SETTINGS_UPDATED_AT_KEY = "newtab.settingsUpdatedAt";
+const SETTINGS_SYNCED_AT_KEY = "newtab.settingsSyncedAt";
+const HISTORY_CLEARED_AT_KEY = "newtab.historyClearedAt";
+const ACCOUNT_URL = "https://search3958.github.io/accounts/index.html";
+const SETTINGS_SYNC_DELAY_MS = 1500;
+
+// 拡張機能
+const EXT_DB_NAME = "Newtab7Extensions";
+const EXT_STORE = "scripts";
+const BASE122_LIB_URL = ""; // base122デコーダのURL（window.base122.decode を提供するスクリプト）
+
 const SUPPORTED_LANGS = new Set(["ja", "en", "ko", "ko-kp", "zh", "zh-tw", "ru"]);
 const UI_TRANSLATIONS = {
 ja: {
@@ -53,14 +70,26 @@ managementTitle: "管理",
 saetab: "SaeTab 7",
 settingsDetails: "設定方法と詳細",
 simpleVersion: "簡易版",
+account: "アカウント同期",
+login: "ログイン",
+accountManage: "アカウント管理",
+syncLabel: "同期",
+syncOn: "オン",
+syncOff: "オフ",
+syncNeedsLogin: "同期を使うにはログインが必要です。",
+extensions: "拡張機能",
+extensionsEmpty: "保存された拡張機能はありません",
+extensionDeleteConfirm: "「{name}」を削除します。\n\n実行しますか？",
 data: "データ",
-resetSettings: "Newtab設定のリセット",
+resetSettings: "このデバイスのNewtab設定をリセット",
+resetAllDevices: "すべての端末からNewtab設定をリセット",
 deleteHistory: "検索履歴の削除",
 information: "情報",
 termsPrivacy: "利用規約 および 個人情報政策",
 aboutMe: "私について",
 language: "Language",
-resetConfirm: "Newtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
+resetConfirm: "このデバイスのNewtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n同期が有効な場合は、アカウントの設定もこの内容で更新されます。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
+resetAllConfirm: "すべての端末のNewtab設定をリセットします。\nアカウントに保存された設定も削除されます。\n\n実行しますか？",
 deleteHistoryConfirm: "検索履歴をすべて削除します。実行しますか？",
 categories: {
 "Sentaro": "Sentaro",
@@ -123,14 +152,26 @@ managementTitle: "Manage",
 saetab: "SaeTab 7",
 settingsDetails: "Settings & details",
 simpleVersion: "Simple version",
+account: "Account sync",
+login: "Log in",
+accountManage: "Manage account",
+syncLabel: "Sync",
+syncOn: "On",
+syncOff: "Off",
+syncNeedsLogin: "Log in to use sync.",
+extensions: "Extensions",
+extensionsEmpty: "No saved extensions",
+extensionDeleteConfirm: "Delete \"{name}\"?\n\nContinue?",
 data: "Data",
-resetSettings: "Reset Newtab settings",
+resetSettings: "Reset Newtab settings on this device",
+resetAllDevices: "Reset Newtab settings on all devices",
 deleteHistory: "Delete search history",
 information: "Information",
 termsPrivacy: "Terms of Use & Privacy Policy",
 aboutMe: "About me",
 language: "Language",
-resetConfirm: "Reset Newtab settings?\n\nOnly wallpaper, label visibility, and icon size will be restored to their defaults.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
+resetConfirm: "Reset Newtab settings on this device?\n\nOnly wallpaper, label visibility, and icon size will be restored to their defaults.\nIf sync is on, the account copy of these settings will also be updated.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
+resetAllConfirm: "Reset Newtab settings on all devices?\nThe settings saved to your account will also be deleted.\n\nContinue?",
 deleteHistoryConfirm: "Delete all search history?\n\nContinue?",
 categories: {
 "Sentaro": "Sentaro",
@@ -709,7 +750,14 @@ root.dataset.labelVisible = String(labelVisible);
 root.dataset.iconSize = iconSize;
 console.log(`[Settings] Appearance applied: labels=${labelVisible}, iconSize=${iconSize}`);
 };
-const saveAppearanceSetting = (key, value) => { try { localStorage.setItem(key, value); console.log(`[Settings] localStorage saved: ${key}=${value}`); return true; } catch (error) { console.error(`[Settings] localStorage save failed: ${key}`, error); return false; } };
+const saveAppearanceSetting = (key, value) => {
+try {
+localStorage.setItem(key, value);
+console.log(`[Settings] localStorage saved: ${key}=${value}`);
+markSettingsChanged();
+return true;
+} catch (error) { console.error(`[Settings] localStorage save failed: ${key}`, error); return false; }
+};
 const deleteOnlyWallpaperSettings = async () => {
 try {
 const request = indexedDB.open(DB_NAME);
@@ -731,21 +779,17 @@ console.log("[Settings] Wallpaper reset: only Newtab wallpaper records were dele
 return true;
 } catch (error) { console.error("[Settings] Wallpaper reset failed:", error); return false; }
 };
-const resetNewtabSettings = async () => {
-const confirmed = window.confirm(t("resetConfirm"));
-if (!confirmed) { console.log("[Settings] Newtab settings reset cancelled."); return; }
-let localStorageReset = false;
-try { localStorage.removeItem(LABEL_VISIBLE_KEY); localStorage.removeItem(ICON_SIZE_KEY); localStorageReset = true; console.log("[Settings] Appearance settings reset."); }
-catch (error) { console.error("[Settings] Appearance reset failed:", error); }
-const wallpaperReset = await deleteOnlyWallpaperSettings();
-applyAppearanceSettings();
-console.log(`[Settings] Newtab reset completed: appearance=${localStorageReset}, wallpaper=${wallpaperReset}.`);
-};
 const deleteSearchHistory = () => {
 const confirmed = window.confirm(t("deleteHistoryConfirm"));
 if (!confirmed) { console.log("[Settings] Search history deletion cancelled."); return; }
-try { localStorage.removeItem(HISTORY_KEY); historyCache = []; const historyList = getEl("#historyList"); if (historyList) historyList.replaceChildren(); console.log("[Settings] Search history deleted."); }
-catch (error) { console.error("[Settings] Search history deletion failed:", error); }
+try {
+localStorage.removeItem(HISTORY_KEY);
+historyCache = [];
+writeLocal(HISTORY_CLEARED_AT_KEY, Date.now());
+const historyList = getEl("#historyList");
+if (historyList) historyList.replaceChildren();
+console.log("[Settings] Search history deleted.");
+} catch (error) { console.error("[Settings] Search history deletion failed:", error); }
 };
 const setWallpaper = (light, dark) => {
 if (!document.body) return;
@@ -972,9 +1016,17 @@ const APP_MAP = new Map(APP_SEARCH_DATA.map(a => [a.name.toLowerCase(), a]));
 const fullWidthToHalf = (str) => { const map = { '０':'0','１':'1','２':'2','３':'3','４':'4','５':'5','６':'6','７':'7','８':'8','９':'9','＋':'+','－':'-','×':'*','÷':'/','＝':'=' }; return str.split('').map(c => map[c] || c).join(''); };
 const evaluateMath = (str) => { const cleaned = fullWidthToHalf(str).trim(); if (!cleaned || !RE_MATH.test(cleaned) || !cleaned.includes('+') && !cleaned.includes('-') && !cleaned.includes('*') && !cleaned.includes('/')) return null; try { const r = Function('"use strict"; return (' + cleaned + ')')(); if (typeof r === 'number' && isFinite(r)) return `${cleaned}=${r}`; } catch {} return null; };
 const resolveIconUrl = (iconName, iconMap) => { if (!iconName) return null; if (iconMap.has(iconName)) return iconMap.get(iconName); for (const [f, u] of iconMap) if (f.endsWith("/" + iconName) || f.endsWith("\\" + iconName)) return u; return null; };
+
+/* ===== 検索履歴（ローカル） ===== */
 let historyCache = null;
 const getHistory = () => { if (historyCache !== null) return historyCache; try { historyCache = JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch { historyCache = []; } return historyCache; };
-const updateHistory = (query) => { const h = getHistory().filter(s => s !== query); h.unshift({ query, time: Date.now() }); if (h.length > MAX_HISTORY) h.length = MAX_HISTORY; localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); historyCache = h; };
+const updateHistory = (query) => {
+const h = getHistory().filter((item) => normalizeHistoryItem(item)?.query !== query);
+h.unshift({ query, time: Date.now() });
+if (h.length > MAX_HISTORY) h.length = MAX_HISTORY;
+localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+historyCache = h;
+};
 const formatDateTime = (date) => { const m = String(date.getMonth() + 1).padStart(2, "0"); const d = String(date.getDate()).padStart(2, "0"); const h = String(date.getHours()).padStart(2, "0"); const min = String(date.getMinutes()).padStart(2, "0"); return `${m}.${d} ${h}:${min}`; };
 let appSearchIconMap = null;
 let lastDropdownQuery = null;
@@ -1015,9 +1067,496 @@ const createSettingsSection = (parent, titleText) => { const section = document.
 const createSettingsLink = (parent, label, url) => { if (!parent) { console.error(`[Settings] Link button parent missing: ${label}`); return null; } if (!url) { console.error(`[Settings] Link URL missing: ${label}`); return null; } const button = document.createElement("button"); button.type = "button"; button.className = "newtab-settings-link"; button.textContent = label; button.title = label; button.addEventListener("click", () => { try { const opened = window.open(url, "_blank", "noopener,noreferrer"); if (!opened) { console.error(`[Settings] Could not open link: ${url}`); return; } console.log(`[Settings] Opened link: ${url}`); } catch (error) { console.error(`[Settings] Link open failed: ${url}`, error); } }); parent.appendChild(button); return button; };
 const createChoiceButton = (parent, label, value, currentValue, onSelect) => { const button = document.createElement("button"); button.type = "button"; button.className = "newtab-settings-choice"; button.textContent = label; button.dataset.value = value; button.setAttribute("aria-pressed", String(value === currentValue)); button.addEventListener("click", () => { if (typeof onSelect !== "function") { console.error(`[Settings] Choice handler missing: ${label}`); return; } onSelect(value); }); parent.appendChild(button); return button; };
 const refreshChoiceButtons = (group, selectedValue) => { if (!group) { console.error("[Settings] Choice group missing."); return; } group.querySelectorAll(".newtab-settings-choice").forEach((button) => { button.setAttribute("aria-pressed", String(button.dataset.value === selectedValue)); }); };
-const renderCustomShortcutDialogList = (listRoot, dialog) => { if (!listRoot) { console.error("[Settings] Custom shortcut list root missing."); return; } listRoot.replaceChildren(); for (const shortcut of customShortcutsCache) { const entry = document.createElement("div"); entry.className = "newtab-shortcut-entry"; const iconWrap = document.createElement("div"); iconWrap.className = "newtab-shortcut-entry-icon"; const iconUrl = customShortcutIconUrls.get(shortcut.id); if (iconUrl) { const img = document.createElement("img"); img.src = iconUrl; img.alt = ""; img.width = 32; img.height = 32; img.decoding = "async"; img.addEventListener("error", () => { console.error(`[Settings] Custom dialog icon failed: ${shortcut.name}`); img.remove(); }, { once: true }); iconWrap.appendChild(img); } else iconWrap.textContent = shortcut.name.slice(0, 1); const info = document.createElement("div"); info.className = "newtab-shortcut-entry-info"; const name = document.createElement("div"); name.className = "newtab-shortcut-entry-name"; name.textContent = shortcut.name; const url = document.createElement("div"); url.className = "newtab-shortcut-entry-url"; url.textContent = shortcut.url; info.append(name, url); const deleteButton = document.createElement("button"); deleteButton.type = "button"; deleteButton.className = "newtab-settings-danger"; deleteButton.textContent = t("delete"); deleteButton.addEventListener("click", async () => { const index = customShortcutsCache.findIndex(item => item.id === shortcut.id); if (index < 0) { console.error(`[Settings] Custom shortcut not found: ${shortcut.name}`); return; } const [removed] = customShortcutsCache.splice(index, 1); const saved = await saveCustomShortcuts(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${removed.id}`); const iconUrlToRelease = customShortcutIconUrls.get(removed.id); if (iconUrlToRelease) { try { URL.revokeObjectURL(iconUrlToRelease); } catch (error) { console.error("[Settings] Icon URL revoke failed:", error); } customShortcutIconUrls.delete(removed.id); } if (!saved) { console.error(`[Settings] Custom shortcut metadata save failed after deleting: ${removed.name}`); return; } renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut deleted: ${removed.name}`); }); entry.append(iconWrap, info, deleteButton); listRoot.appendChild(entry); } console.log(`[Settings] Custom shortcut dialog list rendered: ${customShortcutsCache.length} item(s).`); };
-const showCustomizeDialog = () => { createNewtabDialog(t("customize"), (content, dialog) => { const shortcutSection = createSettingsSection(content, t("shortcut")); const addRow = document.createElement("div"); addRow.className = "newtab-settings-row"; const urlInput = document.createElement("input"); urlInput.type = "url"; urlInput.placeholder = t("urlPlaceholder"); urlInput.autocomplete = "off"; urlInput.inputMode = "url"; const nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = t("labelPlaceholder"); nameInput.maxLength = 80; nameInput.autocomplete = "off"; const addButton = document.createElement("button"); addButton.type = "button"; addButton.className = "newtab-settings-action"; addButton.textContent = t("add"); const listRoot = document.createElement("div"); listRoot.className = "newtab-shortcut-list"; const addShortcut = async () => { const name = nameInput.value.trim(); const normalizedUrl = normalizeShortcutUrl(urlInput.value); if (!name) { console.error("[Settings] Custom shortcut add blocked: label is empty."); nameInput.focus(); return; } if (!normalizedUrl) { console.error("[Settings] Custom shortcut add blocked: invalid URL."); urlInput.focus(); return; } const existing = customShortcutsCache.find(shortcut => shortcut.url.toLowerCase() === normalizedUrl.toLowerCase()); if (existing) { console.error(`[Settings] Custom shortcut already exists: ${existing.name}`); return; } const id = typeof globalThis.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID() : `shortcut-${Date.now()}-${Math.random().toString(36).slice(2)}`; const iconKey = id; const shortcut = { id, name, url: normalizedUrl, iconKey }; const faviconSaved = await fetchAndStoreFavicon(id, normalizedUrl); if (!faviconSaved) console.error(`[Settings] Custom shortcut added without stored favicon: ${name}`); customShortcutsCache.unshift(shortcut); const saved = await saveCustomShortcuts(); if (!saved) { customShortcutsCache.shift(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${iconKey}`); const orphanUrl = customShortcutIconUrls.get(id); if (orphanUrl) { try { URL.revokeObjectURL(orphanUrl); } catch (error) { console.error("[Settings] Orphan icon URL revoke failed:", error); } customShortcutIconUrls.delete(id); } console.error(`[Settings] Custom shortcut add failed: ${name}`); return; } urlInput.value = ""; nameInput.value = ""; renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut added: ${name} -> ${normalizedUrl}`); urlInput.focus(); }; addButton.addEventListener("click", () => { addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); }); urlInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); nameInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); addRow.append(urlInput, nameInput, addButton); shortcutSection.appendChild(addRow); shortcutSection.appendChild(listRoot); renderCustomShortcutDialogList(listRoot, dialog); const appearanceSection = createSettingsSection(content, t("appearance")); const wallpaperRow = document.createElement("div"); wallpaperRow.className = "newtab-settings-row"; createSettingsLink(wallpaperRow, t("changeWallpaper"), "https://search3958.github.io/project/images/2/"); appearanceSection.appendChild(wallpaperRow); const labelRow = document.createElement("div"); labelRow.className = "newtab-settings-row"; const labelTitle = document.createElement("span"); labelTitle.textContent = t("labelVisibility"); labelRow.appendChild(labelTitle); const labelChoices = document.createElement("div"); labelChoices.className = "newtab-settings-row"; const currentLabelVisible = getLabelVisibleSetting(); createChoiceButton(labelChoices, t("show"), "true", String(currentLabelVisible), (value) => { const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing labels."); return; } root.dataset.labelVisible = value; refreshChoiceButtons(labelChoices, value); console.log(`[Settings] Label visibility changed: ${value}`); }); createChoiceButton(labelChoices, t("hide"), "false", String(currentLabelVisible), (value) => { const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing labels."); return; } root.dataset.labelVisible = value; refreshChoiceButtons(labelChoices, value); console.log(`[Settings] Label visibility changed: ${value}`); }); appearanceSection.appendChild(labelRow); appearanceSection.appendChild(labelChoices); const iconSizeRow = document.createElement("div"); iconSizeRow.className = "newtab-settings-row"; const iconSizeTitle = document.createElement("span"); iconSizeTitle.textContent = t("iconSize"); const iconSizeChoices = document.createElement("div"); iconSizeChoices.className = "newtab-settings-row"; const currentIconSize = getIconSizeSetting(); const applyIconSize = (value) => { const saved = saveAppearanceSetting(ICON_SIZE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing icon size."); return; } root.dataset.iconSize = value; refreshChoiceButtons(iconSizeChoices, value); console.log(`[Settings] Icon size changed: ${value}`); }; createChoiceButton(iconSizeChoices, t("standard"), "standard", currentIconSize, applyIconSize); createChoiceButton(iconSizeChoices, t("large"), "large", currentIconSize, applyIconSize); createChoiceButton(iconSizeChoices, t("extraLarge"), "extra-large", currentIconSize, applyIconSize); iconSizeRow.appendChild(iconSizeTitle); appearanceSection.appendChild(iconSizeRow); appearanceSection.appendChild(iconSizeChoices); }); console.log("[Settings] Customize dialog requested."); };
-const showManagementDialog = () => { createNewtabDialog(t("managementTitle"), (content) => { const newtabSection = createSettingsSection(content, t("saetab")); const newtabLinks = document.createElement("div"); newtabLinks.className = "newtab-settings-links"; createSettingsLink(newtabLinks, t("settingsDetails"), "https://search3958.github.io/i/saetab/"); createSettingsLink(newtabLinks, t("simpleVersion"), "https://search3958.github.io/newtab/newtab-simple"); newtabSection.appendChild(newtabLinks); const dataSection = createSettingsSection(content, t("data")); const resetButton = document.createElement("button"); resetButton.type = "button"; resetButton.className = "newtab-settings-action"; resetButton.textContent = t("resetSettings"); resetButton.addEventListener("click", () => { resetNewtabSettings().catch(error => console.error("[Settings] Newtab reset error:", error)); }); dataSection.appendChild(resetButton); const deleteHistoryButton = document.createElement("button"); deleteHistoryButton.type = "button"; deleteHistoryButton.className = "newtab-settings-danger"; deleteHistoryButton.textContent = t("deleteHistory"); deleteHistoryButton.addEventListener("click", deleteSearchHistory); dataSection.appendChild(deleteHistoryButton); const infoSection = createSettingsSection(content, t("information")); const infoLinks = document.createElement("div"); infoLinks.className = "newtab-settings-links"; createSettingsLink(infoLinks, t("termsPrivacy"), "https://search3958.github.io/policies/"); createSettingsLink(infoLinks, t("aboutMe"), "https://search3958.github.io/"); createSettingsLink(infoLinks, t("language"), "https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/"); infoSection.appendChild(infoLinks); }); console.log("[Settings] Management dialog requested."); };
+const renderCustomShortcutDialogList = (listRoot, dialog) => { if (!listRoot) { console.error("[Settings] Custom shortcut list root missing."); return; } listRoot.replaceChildren(); for (const shortcut of customShortcutsCache) { const entry = document.createElement("div"); entry.className = "newtab-shortcut-entry"; const iconWrap = document.createElement("div"); iconWrap.className = "newtab-shortcut-entry-icon"; const iconUrl = customShortcutIconUrls.get(shortcut.id); if (iconUrl) { const img = document.createElement("img"); img.src = iconUrl; img.alt = ""; img.width = 32; img.height = 32; img.decoding = "async"; img.addEventListener("error", () => { console.error(`[Settings] Custom dialog icon failed: ${shortcut.name}`); img.remove(); }, { once: true }); iconWrap.appendChild(img); } else iconWrap.textContent = shortcut.name.slice(0, 1); const info = document.createElement("div"); info.className = "newtab-shortcut-entry-info"; const name = document.createElement("div"); name.className = "newtab-shortcut-entry-name"; name.textContent = shortcut.name; const url = document.createElement("div"); url.className = "newtab-shortcut-entry-url"; url.textContent = shortcut.url; info.append(name, url); const deleteButton = document.createElement("button"); deleteButton.type = "button"; deleteButton.className = "newtab-settings-danger"; deleteButton.textContent = t("delete"); deleteButton.addEventListener("click", async () => { const index = customShortcutsCache.findIndex(item => item.id === shortcut.id); if (index < 0) { console.error(`[Settings] Custom shortcut not found: ${shortcut.name}`); return; } const [removed] = customShortcutsCache.splice(index, 1); const saved = await saveCustomShortcuts(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${removed.id}`); const iconUrlToRelease = customShortcutIconUrls.get(removed.id); if (iconUrlToRelease) { try { URL.revokeObjectURL(iconUrlToRelease); } catch (error) { console.error("[Settings] Icon URL revoke failed:", error); } customShortcutIconUrls.delete(removed.id); } if (!saved) { console.error(`[Settings] Custom shortcut metadata save failed after deleting: ${removed.name}`); return; } markSettingsChanged(); renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut deleted: ${removed.name}`); }); entry.append(iconWrap, info, deleteButton); listRoot.appendChild(entry); } console.log(`[Settings] Custom shortcut dialog list rendered: ${customShortcutsCache.length} item(s).`); };
+const showCustomizeDialog = () => { createNewtabDialog(t("customize"), (content, dialog) => { const shortcutSection = createSettingsSection(content, t("shortcut")); const addRow = document.createElement("div"); addRow.className = "newtab-settings-row"; const urlInput = document.createElement("input"); urlInput.type = "url"; urlInput.placeholder = t("urlPlaceholder"); urlInput.autocomplete = "off"; urlInput.inputMode = "url"; const nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = t("labelPlaceholder"); nameInput.maxLength = 80; nameInput.autocomplete = "off"; const addButton = document.createElement("button"); addButton.type = "button"; addButton.className = "newtab-settings-action"; addButton.textContent = t("add"); const listRoot = document.createElement("div"); listRoot.className = "newtab-shortcut-list"; const addShortcut = async () => { const name = nameInput.value.trim(); const normalizedUrl = normalizeShortcutUrl(urlInput.value); if (!name) { console.error("[Settings] Custom shortcut add blocked: label is empty."); nameInput.focus(); return; } if (!normalizedUrl) { console.error("[Settings] Custom shortcut add blocked: invalid URL."); urlInput.focus(); return; } const existing = customShortcutsCache.find(shortcut => shortcut.url.toLowerCase() === normalizedUrl.toLowerCase()); if (existing) { console.error(`[Settings] Custom shortcut already exists: ${existing.name}`); return; } const id = typeof globalThis.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID() : `shortcut-${Date.now()}-${Math.random().toString(36).slice(2)}`; const iconKey = id; const shortcut = { id, name, url: normalizedUrl, iconKey }; const faviconSaved = await fetchAndStoreFavicon(id, normalizedUrl); if (!faviconSaved) console.error(`[Settings] Custom shortcut added without stored favicon: ${name}`); customShortcutsCache.unshift(shortcut); const saved = await saveCustomShortcuts(); if (!saved) { customShortcutsCache.shift(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${iconKey}`); const orphanUrl = customShortcutIconUrls.get(id); if (orphanUrl) { try { URL.revokeObjectURL(orphanUrl); } catch (error) { console.error("[Settings] Orphan icon URL revoke failed:", error); } customShortcutIconUrls.delete(id); } console.error(`[Settings] Custom shortcut add failed: ${name}`); return; } markSettingsChanged(); urlInput.value = ""; nameInput.value = ""; renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut added: ${name} -> ${normalizedUrl}`); urlInput.focus(); }; addButton.addEventListener("click", () => { addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); }); urlInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); nameInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); addRow.append(urlInput, nameInput, addButton); shortcutSection.appendChild(addRow); shortcutSection.appendChild(listRoot); renderCustomShortcutDialogList(listRoot, dialog); const appearanceSection = createSettingsSection(content, t("appearance")); const wallpaperRow = document.createElement("div"); wallpaperRow.className = "newtab-settings-row"; createSettingsLink(wallpaperRow, t("changeWallpaper"), "https://search3958.github.io/project/images/2/"); appearanceSection.appendChild(wallpaperRow); const labelRow = document.createElement("div"); labelRow.className = "newtab-settings-row"; const labelTitle = document.createElement("span"); labelTitle.textContent = t("labelVisibility"); labelRow.appendChild(labelTitle); const labelChoices = document.createElement("div"); labelChoices.className = "newtab-settings-row"; const currentLabelVisible = getLabelVisibleSetting(); createChoiceButton(labelChoices, t("show"), "true", String(currentLabelVisible), (value) => { const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing labels."); return; } root.dataset.labelVisible = value; refreshChoiceButtons(labelChoices, value); console.log(`[Settings] Label visibility changed: ${value}`); }); createChoiceButton(labelChoices, t("hide"), "false", String(currentLabelVisible), (value) => { const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing labels."); return; } root.dataset.labelVisible = value; refreshChoiceButtons(labelChoices, value); console.log(`[Settings] Label visibility changed: ${value}`); }); appearanceSection.appendChild(labelRow); appearanceSection.appendChild(labelChoices); const iconSizeRow = document.createElement("div"); iconSizeRow.className = "newtab-settings-row"; const iconSizeTitle = document.createElement("span"); iconSizeTitle.textContent = t("iconSize"); const iconSizeChoices = document.createElement("div"); iconSizeChoices.className = "newtab-settings-row"; const currentIconSize = getIconSizeSetting(); const applyIconSize = (value) => { const saved = saveAppearanceSetting(ICON_SIZE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing icon size."); return; } root.dataset.iconSize = value; refreshChoiceButtons(iconSizeChoices, value); console.log(`[Settings] Icon size changed: ${value}`); }; createChoiceButton(iconSizeChoices, t("standard"), "standard", currentIconSize, applyIconSize); createChoiceButton(iconSizeChoices, t("large"), "large", currentIconSize, applyIconSize); createChoiceButton(iconSizeChoices, t("extraLarge"), "extra-large", currentIconSize, applyIconSize); iconSizeRow.appendChild(iconSizeTitle); appearanceSection.appendChild(iconSizeRow); appearanceSection.appendChild(iconSizeChoices); }); console.log("[Settings] Customize dialog requested."); };
+
+/* ===== アカウント同期（client-service.js は必要になったときだけ読み込む） ===== */
+const readNumber = (key) => { try { const n = Number(localStorage.getItem(key)); return Number.isFinite(n) ? n : 0; } catch { return 0; } };
+const writeLocal = (key, value) => { try { localStorage.setItem(key, String(value)); return true; } catch (error) { console.error(`[Sync] localStorage write failed: ${key}`, error); return false; } };
+const removeLocal = (key) => { try { localStorage.removeItem(key); } catch (error) { console.error(`[Sync] localStorage remove failed: ${key}`, error); } };
+const isSyncEnabled = () => { try { return localStorage.getItem(SYNC_ENABLED_KEY) === "true"; } catch { return false; } };
+
+let of8LoadPromise = null;
+const ensureOF8 = () => {
+if (window.OF8Account) return Promise.resolve(window.OF8Account);
+if (of8LoadPromise) return of8LoadPromise;
+of8LoadPromise = new Promise((resolve, reject) => {
+const script = document.createElement("script");
+script.src = OF8_SCRIPT_URL;
+script.async = true;
+script.addEventListener("load", () => {
+if (window.OF8Account) { console.log("[Sync] client-service loaded."); resolve(window.OF8Account); }
+else reject(new Error("window.OF8Account is undefined after load."));
+}, { once: true });
+script.addEventListener("error", () => reject(new Error("client-service.js failed to load.")), { once: true });
+document.head.appendChild(script);
+}).catch((error) => { of8LoadPromise = null; throw error; });
+return of8LoadPromise;
+};
+
+const isLoggedIn = async () => {
+try { const OF8 = await ensureOF8(); return Boolean(await OF8.isLoggedIn()); }
+catch (error) { console.error("[Sync] Login check failed:", error); return false; }
+};
+const canSync = async () => isSyncEnabled() && await isLoggedIn();
+const remoteGet = async (key) => {
+const OF8 = await ensureOF8();
+const raw = await OF8.getItem(key);
+if (raw == null || raw === "") return null;
+try { return JSON.parse(raw); }
+catch (error) { console.error(`[Sync] Invalid remote JSON: ${key}`, error); return null; }
+};
+const remoteSet = async (key, value) => { const OF8 = await ensureOF8(); return OF8.setItem(key, JSON.stringify(value)); };
+
+/* --- ログイン（専用ポップアップ） --- */
+const loginWithPopup = async () => {
+try {
+const OF8 = await ensureOF8();
+const result = await OF8.login();
+const saved = writeLocal(SYNC_ENABLED_KEY, "true");
+if (!saved) console.error("[Account] Login succeeded, but the default sync setting could not be saved.");
+console.log(`[Account] Logged in: ${result?.account?.name || ""}`);
+// Do not wait for network synchronization before refreshing the management dialog.
+syncOnOpen().catch((error) => console.error("[Sync] Post-login sync failed:", error));
+} catch (error) { console.error("[Account] Login failed:", error); }
+await showManagementDialog();
+};
+
+/* --- 検索履歴の同期（Newtab起動時のみ） --- */
+const normalizeHistoryItem = (item) => {
+const query = typeof item === "string" ? item : item?.query;
+if (typeof query !== "string" || !query.trim()) return null;
+return { query, time: typeof item === "string" ? 0 : Number(item.time) || 0 };
+};
+const mergeHistory = (lists, clearedAt) => {
+const newest = new Map();
+for (const list of lists) {
+if (!Array.isArray(list)) continue;
+for (const raw of list) {
+const item = normalizeHistoryItem(raw);
+if (!item || (clearedAt > 0 && item.time <= clearedAt)) continue;
+const prev = newest.get(item.query);
+if (!prev || item.time > prev.time) newest.set(item.query, item);
+}
+}
+return [...newest.values()].sort((a, b) => b.time - a.time).slice(0, MAX_HISTORY);
+};
+const runHistorySync = async (reason) => {
+if (!(await canSync())) return false;
+const remote = await remoteGet(SYNC_HISTORY_KEY);
+const remoteItems = Array.isArray(remote?.items) ? remote.items : [];
+const clearedAt = Math.max(readNumber(HISTORY_CLEARED_AT_KEY), Number(remote?.clearedAt) || 0);
+const merged = mergeHistory([getHistory(), remoteItems], clearedAt);
+localStorage.setItem(HISTORY_KEY, JSON.stringify(merged));
+historyCache = merged;
+writeLocal(HISTORY_CLEARED_AT_KEY, clearedAt);
+const unchanged = remote && JSON.stringify(remote.items) === JSON.stringify(merged) && (Number(remote.clearedAt) || 0) === clearedAt;
+if (!unchanged) await remoteSet(SYNC_HISTORY_KEY, { items: merged, clearedAt, updatedAt: Date.now() });
+console.log(`[Sync] History synced (${reason}): ${merged.length} item(s).`);
+return true;
+};
+let historySyncChain = Promise.resolve(false);
+const syncSearchHistory = (reason = "open") => {
+historySyncChain = historySyncChain.then(() => runHistorySync(reason)).catch((error) => { console.error("[Sync] History sync failed:", error); return false; });
+return historySyncChain;
+};
+
+/* --- 設定の同期（変更時刻ベース） --- */
+let settingsSyncTimer = null;
+let settingsSyncChain = Promise.resolve(false);
+const getSettingsSnapshot = () => ({
+labelVisible: getLabelVisibleSetting(),
+iconSize: getIconSizeSetting(),
+customShortcuts: customShortcutsCache.map(({ id, name, url }) => ({ id, name, url })),
+});
+const markSettingsChanged = () => {
+writeLocal(SETTINGS_UPDATED_AT_KEY, Date.now());
+clearTimeout(settingsSyncTimer);
+settingsSyncTimer = setTimeout(() => syncSettings("debounced"), SETTINGS_SYNC_DELAY_MS);
+};
+const pushSettings = async (updatedAt) => {
+await remoteSet(SYNC_SETTINGS_KEY, { updatedAt, ...getSettingsSnapshot() });
+writeLocal(SETTINGS_SYNCED_AT_KEY, updatedAt);
+console.log(`[Sync] Settings pushed: ${updatedAt}`);
+};
+const applyRemoteSettings = async (remote) => {
+const previous = customShortcutsCache;
+const iconSize = ["standard", "large", "extra-large"].includes(remote.iconSize) ? remote.iconSize : DEFAULT_ICON_SIZE;
+writeLocal(LABEL_VISIBLE_KEY, String(remote.labelVisible !== false));
+writeLocal(ICON_SIZE_KEY, iconSize);
+
+const incoming = (Array.isArray(remote.customShortcuts) ? remote.customShortcuts : []).filter(isValidCustomShortcut);
+customShortcutsCache = incoming.map((s) => ({ id: s.id, name: s.name.trim(), url: s.url, iconKey: s.id }));
+await saveCustomShortcuts();
+
+for (const old of previous) {
+if (incoming.some((s) => s.id === old.id)) continue;
+await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${old.id}`);
+const url = customShortcutIconUrls.get(old.id);
+if (url) { URL.revokeObjectURL(url); customShortcutIconUrls.delete(old.id); }
+}
+for (const s of customShortcutsCache) if (!customShortcutIconUrls.has(s.id)) await fetchAndStoreFavicon(s.id, s.url);
+
+const updatedAt = Number(remote.updatedAt) || 0;
+writeLocal(SETTINGS_UPDATED_AT_KEY, updatedAt);
+writeLocal(SETTINGS_SYNCED_AT_KEY, updatedAt);
+applyAppearanceSettings();
+renderShortcuts(window._iconMap || new Map());
+};
+const resetLocalAppearance = (updatedAt) => {
+removeLocal(LABEL_VISIBLE_KEY);
+removeLocal(ICON_SIZE_KEY);
+writeLocal(SETTINGS_UPDATED_AT_KEY, updatedAt);
+applyAppearanceSettings();
+};
+const runSettingsSync = async (reason) => {
+if (!(await canSync())) return false;
+const localAt = readNumber(SETTINGS_UPDATED_AT_KEY);
+const syncedAt = readNumber(SETTINGS_SYNCED_AT_KEY);
+const remote = await remoteGet(SYNC_SETTINGS_KEY);
+
+if (!remote) {
+if (syncedAt > 0) {
+resetLocalAppearance(0);
+removeLocal(SETTINGS_SYNCED_AT_KEY);
+renderShortcuts(window._iconMap || new Map());
+console.log("[Sync] Settings were reset on another device.");
+return true;
+}
+if (localAt > 0) await pushSettings(localAt);
+return true;
+}
+
+const remoteAt = Number(remote.updatedAt) || 0;
+if (localAt === 0 || remoteAt > localAt) await applyRemoteSettings(remote);
+else if (localAt > remoteAt) await pushSettings(localAt);
+else writeLocal(SETTINGS_SYNCED_AT_KEY, remoteAt);
+console.log(`[Sync] Settings synced (${reason}).`);
+return true;
+};
+const syncSettings = (reason = "open") => {
+settingsSyncChain = settingsSyncChain.then(() => runSettingsSync(reason)).catch((error) => { console.error("[Sync] Settings sync failed:", error); return false; });
+return settingsSyncChain;
+};
+
+/* --- Newtab起動時の同期 --- */
+const syncOnOpen = async () => {
+if (!(await canSync())) return;
+await Promise.allSettled([syncSearchHistory("open"), syncSettings("open")]);
+};
+
+// If an existing login has no saved preference yet, enable sync as the default.
+// An explicit previous choice of "off" is preserved.
+const initializeAccountSync = async () => {
+let storedPreference = null;
+try { storedPreference = localStorage.getItem(SYNC_ENABLED_KEY); }
+catch (error) { console.error("[Sync] Could not read the saved sync preference:", error); }
+const loggedIn = await isLoggedIn();
+if (loggedIn && storedPreference === null) {
+if (writeLocal(SYNC_ENABLED_KEY, "true")) console.log("[Sync] Default sync enabled for the existing login.");
+}
+if (isSyncEnabled()) await syncOnOpen();
+};
+
+/* --- リセット --- */
+const resetNewtabSettings = async (allDevices) => {
+const confirmed = window.confirm(t(allDevices ? "resetAllConfirm" : "resetConfirm"));
+if (!confirmed) { console.log("[Settings] Newtab settings reset cancelled."); return; }
+
+if (allDevices) {
+if (!(await canSync())) { console.error("[Sync] All-device reset requires sync."); return; }
+try { const OF8 = await ensureOF8(); await OF8.removeItem(SYNC_SETTINGS_KEY); }
+catch (error) { console.error("[Sync] Remote settings removal failed:", error); return; }
+removeLocal(SETTINGS_SYNCED_AT_KEY);
+resetLocalAppearance(0);
+} else {
+resetLocalAppearance(Date.now());
+}
+
+const wallpaperReset = await deleteOnlyWallpaperSettings();
+if (!allDevices) await syncSettings("device reset");
+console.log(`[Settings] Newtab reset completed: allDevices=${allDevices}, wallpaper=${wallpaperReset}.`);
+};
+
+/* --- 同期のオンオフ --- */
+let syncToggleRevision = 0;
+const setSyncEnabledFromUI = (on, controls = {}) => {
+const enabled = Boolean(on);
+const revision = ++syncToggleRevision;
+const updateVisibleState = (value) => {
+if (controls.syncChoices) refreshChoiceButtons(controls.syncChoices, String(value));
+const resetAllButton = controls.dialog?.querySelector("[data-sync-required='true']");
+if (resetAllButton) { resetAllButton.hidden = !value; resetAllButton.style.display = value ? "" : "none"; }
+};
+
+// Persist and repaint immediately; never wait for authentication or network requests first.
+if (!writeLocal(SYNC_ENABLED_KEY, String(enabled))) {
+updateVisibleState(isSyncEnabled());
+console.error("[Sync] Could not save the sync switch state.");
+return;
+}
+updateVisibleState(enabled);
+console.log(`[Sync] Sync switch changed immediately: ${enabled ? "on" : "off"}`);
+
+if (!enabled) return;
+
+(async () => {
+const loggedIn = await isLoggedIn();
+if (revision !== syncToggleRevision) {
+console.log("[Sync] Ignored outdated switch verification.");
+return;
+}
+if (!loggedIn) {
+writeLocal(SYNC_ENABLED_KEY, "false");
+updateVisibleState(false);
+console.log("[Sync] Enabling sync cancelled: login required.");
+return;
+}
+await syncOnOpen();
+if (revision === syncToggleRevision) console.log("[Sync] Sync enabled; background synchronization requested.");
+})().catch((error) => console.error("[Sync] Enabling sync failed:", error));
+};
+
+/* ===== 拡張機能（IndexedDB: Newtab7Extensions / scripts） ===== */
+let extensionDbPromise = null;
+const openExtensionDb = () => {
+if (extensionDbPromise) return extensionDbPromise;
+extensionDbPromise = new Promise((resolve, reject) => {
+let request;
+try { request = indexedDB.open(EXT_DB_NAME, 1); }
+catch (error) { reject(error); return; }
+request.onupgradeneeded = (event) => {
+const db = event.target.result;
+if (!db.objectStoreNames.contains(EXT_STORE)) db.createObjectStore(EXT_STORE, { keyPath: "id" });
+};
+request.onsuccess = () => {
+const db = request.result;
+db.onversionchange = () => { db.close(); extensionDbPromise = null; };
+resolve(db);
+};
+request.onerror = () => { extensionDbPromise = null; reject(request.error || new Error("Extension DB open failed")); };
+request.onblocked = () => console.error("[Ext] Extension DB open blocked.");
+});
+return extensionDbPromise;
+};
+const isValidExtension = (record) => Boolean(
+record && typeof record === "object" &&
+typeof record.id === "string" && record.id &&
+typeof record.name === "string" && record.name.trim() &&
+typeof record.code === "string" && record.code &&
+(record.encoding === "base122" || record.encoding === "plain")
+);
+const listExtensions = async () => {
+const db = await openExtensionDb();
+const records = await new Promise((resolve, reject) => {
+const request = db.transaction(EXT_STORE, "readonly").objectStore(EXT_STORE).getAll();
+request.onsuccess = () => resolve(request.result || []);
+request.onerror = () => reject(request.error);
+});
+const valid = [];
+for (const record of records) {
+if (isValidExtension(record)) valid.push(record);
+else console.error("[Ext] Skipped invalid record:", record?.id ?? record);
+}
+return valid.sort((a, b) => a.name.localeCompare(b.name));
+};
+const listExtensionsSafe = async () => {
+try { return await listExtensions(); }
+catch (error) { console.error("[Ext] List failed:", error); return []; }
+};
+const removeExtensionStorage = (id) => {
+const prefix = `ext:${id}:`;
+try {
+for (let i = localStorage.length - 1; i >= 0; i--) {
+const key = localStorage.key(i);
+if (key && key.startsWith(prefix)) localStorage.removeItem(key);
+}
+} catch (error) { console.error("[Ext] Storage cleanup failed:", error); }
+};
+const deleteExtension = async (id) => {
+const db = await openExtensionDb();
+await new Promise((resolve, reject) => {
+const tx = db.transaction(EXT_STORE, "readwrite");
+tx.objectStore(EXT_STORE).delete(id);
+tx.oncomplete = () => resolve();
+tx.onerror = () => reject(tx.error);
+tx.onabort = () => reject(tx.error);
+});
+removeExtensionStorage(id);
+console.log(`[Ext] Deleted: ${id}`);
+};
+let base122LoadPromise = null;
+const ensureBase122 = () => {
+if (window.base122 && typeof window.base122.decode === "function") return Promise.resolve(window.base122);
+if (!BASE122_LIB_URL) return Promise.reject(new Error("BASE122_LIB_URL is not configured."));
+if (base122LoadPromise) return base122LoadPromise;
+base122LoadPromise = new Promise((resolve, reject) => {
+const script = document.createElement("script");
+script.src = BASE122_LIB_URL;
+script.async = true;
+script.addEventListener("load", () => {
+if (window.base122 && typeof window.base122.decode === "function") resolve(window.base122);
+else reject(new Error("window.base122.decode is missing."));
+}, { once: true });
+script.addEventListener("error", () => reject(new Error("Base122 library failed to load.")), { once: true });
+document.head.appendChild(script);
+}).catch((error) => { base122LoadPromise = null; throw error; });
+return base122LoadPromise;
+};
+const decodeExtensionCode = async (record) => {
+if (record.encoding === "plain") return record.code;
+const lib = await ensureBase122();
+const bytes = lib.decode(record.code);
+return new TextDecoder().decode(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
+};
+const createExtensionApi = (record) => {
+const prefix = `ext:${record.id}:`;
+return {
+id: record.id,
+name: record.name,
+log: (...args) => console.log(`[Ext:${record.name}]`, ...args),
+storage: {
+get: (key) => { try { return localStorage.getItem(prefix + key); } catch { return null; } },
+set: (key, value) => { try { localStorage.setItem(prefix + key, String(value)); return true; } catch { return false; } },
+remove: (key) => { try { localStorage.removeItem(prefix + key); } catch {} },
+},
+};
+};
+const runExtensions = async () => {
+const records = await listExtensionsSafe();
+for (const record of records) {
+try {
+const code = await decodeExtensionCode(record);
+const run = new Function("NT", `"use strict";\n${code}`);
+run(createExtensionApi(record));
+console.log(`[Ext] Started: ${record.name}`);
+} catch (error) {
+console.error(`[Ext] Failed: ${record.name}`, error);
+}
+}
+};
+
+/* --- 管理ダイアログ（ログイン状態で表示が自動で切り替わる） --- */
+const showManagementDialog = async () => {
+let dialogContent = null;
+const dialog = createNewtabDialog(t("managementTitle"), (content) => {
+dialogContent = content;
+const loading = document.createElement("p");
+loading.className = "newtab-settings-hint";
+loading.textContent = "…";
+loading.setAttribute("aria-live", "polite");
+content.appendChild(loading);
+});
+if (!dialog || !dialogContent) {
+console.error("[Settings] Management dialog could not be created.");
+return;
+}
+
+// The shell above is visible before either login verification or IndexedDB extension loading.
+const [loggedIn, extensions] = await Promise.all([isLoggedIn(), listExtensionsSafe()]);
+if (!document.body.contains(dialog) || dialog.dataset.closing === "true") {
+console.log("[Settings] Management content load ignored: dialog is no longer open.");
+return;
+}
+while (dialogContent.children.length > 1) dialogContent.lastElementChild.remove();
+const syncOn = loggedIn && isSyncEnabled();
+
+const newtabSection = createSettingsSection(dialogContent, t("saetab"));
+const newtabLinks = document.createElement("div");
+newtabLinks.className = "newtab-settings-links";
+createSettingsLink(newtabLinks, t("settingsDetails"), "https://search3958.github.io/i/saetab/");
+createSettingsLink(newtabLinks, t("simpleVersion"), "https://search3958.github.io/newtab/newtab-simple");
+newtabSection.appendChild(newtabLinks);
+
+const accountSection = createSettingsSection(dialogContent, t("account"));
+const accountButton = document.createElement("button");
+accountButton.type = "button";
+accountButton.className = "newtab-settings-action";
+accountButton.textContent = loggedIn ? t("accountManage") : t("login");
+accountButton.addEventListener("click", () => {
+if (loggedIn) window.open(ACCOUNT_URL, "_blank", "noopener,noreferrer");
+else loginWithPopup().catch((error) => console.error("[Account] Login error:", error));
+});
+accountSection.appendChild(accountButton);
+
+const syncTitle = document.createElement("span");
+syncTitle.textContent = t("syncLabel");
+const syncChoices = document.createElement("div");
+syncChoices.className = "newtab-settings-row";
+createChoiceButton(syncChoices, t("syncOn"), "true", String(syncOn), () => setSyncEnabledFromUI(true, { syncChoices, dialog }));
+createChoiceButton(syncChoices, t("syncOff"), "false", String(syncOn), () => setSyncEnabledFromUI(false, { syncChoices, dialog }));
+accountSection.append(syncTitle, syncChoices);
+if (!loggedIn) {
+const hint = document.createElement("p");
+hint.className = "newtab-settings-hint";
+hint.textContent = t("syncNeedsLogin");
+accountSection.appendChild(hint);
+}
+
+const extensionSection = createSettingsSection(dialogContent, t("extensions"));
+if (extensions.length === 0) {
+const empty = document.createElement("p");
+empty.className = "newtab-settings-hint";
+empty.textContent = t("extensionsEmpty");
+extensionSection.appendChild(empty);
+}
+for (const ext of extensions) {
+const row = document.createElement("div");
+row.className = "newtab-settings-row";
+const name = document.createElement("span");
+name.textContent = ext.name;
+const deleteButton = document.createElement("button");
+deleteButton.type = "button";
+deleteButton.className = "newtab-settings-danger";
+deleteButton.textContent = t("delete");
+deleteButton.addEventListener("click", async () => {
+if (!window.confirm(t("extensionDeleteConfirm").replace("{name}", ext.name))) return;
+try { await deleteExtension(ext.id); }
+catch (error) { console.error("[Ext] Delete failed:", error); return; }
+await showManagementDialog();
+});
+row.append(name, deleteButton);
+extensionSection.appendChild(row);
+}
+
+const dataSection = createSettingsSection(dialogContent, t("data"));
+const resetDeviceButton = document.createElement("button");
+resetDeviceButton.type = "button";
+resetDeviceButton.className = "newtab-settings-action";
+resetDeviceButton.textContent = t("resetSettings");
+resetDeviceButton.addEventListener("click", () => { resetNewtabSettings(false).catch((error) => console.error("[Settings] Reset error:", error)); });
+dataSection.appendChild(resetDeviceButton);
+
+const resetAllButton = document.createElement("button");
+resetAllButton.type = "button";
+resetAllButton.className = "newtab-settings-danger";
+resetAllButton.textContent = t("resetAllDevices");
+resetAllButton.dataset.syncRequired = "true";
+resetAllButton.hidden = !syncOn;
+resetAllButton.style.display = syncOn ? "" : "none";
+resetAllButton.addEventListener("click", () => {
+if (!isSyncEnabled()) { console.error("[Settings] All-device reset blocked: sync is off."); return; }
+resetNewtabSettings(true).catch((error) => console.error("[Settings] Reset error:", error));
+});
+dataSection.appendChild(resetAllButton);
+
+const deleteHistoryButton = document.createElement("button");
+deleteHistoryButton.type = "button";
+deleteHistoryButton.className = "newtab-settings-danger";
+deleteHistoryButton.textContent = t("deleteHistory");
+deleteHistoryButton.addEventListener("click", deleteSearchHistory);
+dataSection.appendChild(deleteHistoryButton);
+
+const infoSection = createSettingsSection(dialogContent, t("information"));
+const infoLinks = document.createElement("div");
+infoLinks.className = "newtab-settings-links";
+createSettingsLink(infoLinks, t("termsPrivacy"), "https://search3958.github.io/policies/");
+createSettingsLink(infoLinks, t("aboutMe"), "https://search3958.github.io/");
+createSettingsLink(infoLinks, t("language"), "https://search3958.github.io/accounts/lang?next=https://search3958.github.io/newtab/");
+infoSection.appendChild(infoLinks);
+console.log(`[Settings] Management dialog content loaded: loggedIn=${loggedIn}, extensions=${extensions.length}, sync=${syncOn}.`);
+};
+
 const setupSettingsControls = () => { const customizeBtn = getEl("#customizeBtn"); const managementBtn = getEl("#managementBtn"); if (!customizeBtn) console.error("[Settings] Required element not found: #customizeBtn"); else customizeBtn.addEventListener("click", showCustomizeDialog); if (!managementBtn) console.error("[Settings] Required element not found: #managementBtn"); else managementBtn.addEventListener("click", showManagementDialog); document.addEventListener("keydown", (event) => { if (event.key !== "Escape") return; const dialog = document.querySelector(".newtab-dialog"); if (dialog) { event.preventDefault(); closeNewtabDialog(dialog, "Escape"); } }); console.log("[Settings] Settings controls initialized."); };
 const getRequiredElement = (selector) => { const el = document.querySelector(selector); if (!el) console.error(`[Shortcut] Required element not found: ${selector}`); return el; };
 const createShortcut = (link, iconMap) => { if (!link || typeof link !== "object") return null; if (!link.name || !link.url) return null; const anchor = document.createElement("a"); anchor.className = "main-shortcut-item"; anchor.href = link.url; anchor.rel = "noopener noreferrer"; const box = document.createElement("div"); box.className = "main-shortcut-box"; const iconContainer = document.createElement("div"); iconContainer.className = "main-shortcut-icon"; if (link.bg) iconContainer.style.background = link.bg; const iconUrl = link.iconUrl || resolveIconUrl(link.icon, iconMap); if (iconUrl) { const img = document.createElement("img"); img.src = iconUrl; img.alt = ""; img.loading = "lazy"; img.decoding = "async"; img.addEventListener("error", () => { console.error(`[Shortcut] Icon failed: ${link.icon}`); img.remove(); }, { once: true }); iconContainer.appendChild(img); } box.appendChild(iconContainer); const name = document.createElement("span"); name.className = "main-shortcut-name"; name.textContent = link.name; anchor.appendChild(box); anchor.appendChild(name); anchor.addEventListener("mousemove", (e) => { const rect = box.getBoundingClientRect(); const x = (e.clientX - rect.left - rect.width / 2) / rect.width; const y = (e.clientY - rect.top - rect.height / 2) / rect.height; box.style.transform = `rotateX(${-y * 8}deg) rotateY(${x * 8}deg)`; }); anchor.addEventListener("mouseleave", () => { box.style.transform = "rotateX(0deg) rotateY(0deg)"; }); return anchor; };
@@ -1060,11 +1599,11 @@ const wrapper = document.createElement("div");
 wrapper.className = "main-shortcut-ad";
 const ad = document.createElement("ins");
 ad.className = "adsbygoogle";
-ad.style.display = "block";
+ad.style.display = "inline-block"; // blockからinline-blockに変更
+ad.style.width = "728px";          // 横幅を728pxに固定
+ad.style.height = "90px";          // 高さを90pxに固定
 ad.dataset.adClient = ADSENSE_CLIENT;
 ad.dataset.adSlot = ADSENSE_SLOT;
-ad.dataset.adFormat = "auto";
-ad.dataset.fullWidthResponsive = "true";
 wrapper.appendChild(ad);
 console.log(`[ShortcutAd] Ad slot created: ${ADSENSE_SLOT}`);
 return wrapper;
@@ -1169,9 +1708,12 @@ await wallpaperTask;
 try { await loadCustomShortcutData(); } catch (error) { customShortcutsCache = []; console.error("[Settings] Custom shortcut init failed:", error); }
 applyUILanguage();
 applyAppearanceSettings();
-if (window.renderShortcuts && window._iconMap) { try { window.renderShortcuts(window._iconMap); } catch (e) { console.error("[Beta] renderShortcuts failed:", e); if (window.renderShortcuts) window.renderShortcuts(new Map()); } }
+if (window.renderShortcuts && window._iconMap) { try { window.renderShortcuts(window._iconMap); } catch (e) { console.error("[v7] renderShortcuts failed:", e); if (window.renderShortcuts) window.renderShortcuts(new Map()); } }
 if (window.setupSearchAndHistory) window.setupSearchAndHistory();
 setupSettingsControls();
+// Newtab起動時の処理（描画は待たせない）
+runExtensions().catch((error) => console.error("[Ext] Run failed:", error));
+initializeAccountSync().catch((error) => console.error("[Sync] Initialization failed:", error));
 console.log("[Wallpaper] Initialization completed.");
 };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
