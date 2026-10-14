@@ -25,10 +25,27 @@
     iframe = document.createElement("iframe");
     iframe.id = IFRAME_ID;
     iframe.title = "saetab Bridge";
-    iframe.style.display = "none";
     document.body.appendChild(iframe);
   }
-  if (iframe.getAttribute("src") !== BRIDGE_URL) iframe.src = BRIDGE_URL;
+  iframe.setAttribute("allow", "storage-access");
+  iframe.src = BRIDGE_URL;
+
+  // ブラウザのストレージアクセス許可が必要な場合だけ操作できるよう、
+  // 接続確立までは iframe を表示する。データを受信したら非表示にする。
+  Object.assign(iframe.style, {
+    display: "block",
+    position: "fixed",
+    left: "50%",
+    bottom: "200px",
+    transform: "translateX(-50%)",
+    width: "min(92vw, 520px)",
+    height: "170px",
+    border: "1px solid #dadce0",
+    borderRadius: "16px",
+    background: "#fff",
+    boxShadow: "0 8px 28px rgba(0,0,0,.18)",
+    zIndex: "2147483000"
+  });
 
   // ===== スタイル =====
   const style = document.createElement("style");
@@ -79,6 +96,9 @@
     #${BANNER_ID} .sb-memo-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     #${BANNER_ID} .sb-memo-time { display: none; }
     #clock:hover { opacity: 0.7; cursor: pointer; }
+    @media (max-width: 600px) {
+      #${IFRAME_ID} { width: calc(100vw - 24px); }
+    }
   `;
   document.head.appendChild(style);
 
@@ -266,24 +286,18 @@
     if (showingTomorrow) return;
     const s = $("sb-status");
     if (!lastTimetable) {
-      s.textContent = Date.now() > pageStart + WAIT_MS ? "未受信（bridge 側の saetab_bridge_enabled を確認）" : "接続待ち";
+      s.textContent = Date.now() > pageStart + WAIT_MS ? "未受信（ブリッジの接続設定を確認）" : "接続待ち";
       return;
     }
     const stale = Date.now() - lastReceived > STALE_MS;
     s.textContent = (stale ? "途切れ · " : "") + "最終受信 " + clockFmt.format(new Date(lastReceived));
   }
 
-  // ===== 要求（保存値を添えて送る）=====
+  // ===== 要求 =====
+  // 許可設定やデータを親ページから渡さない。ブリッジは sk-hub.jp 側で確認する。
   function requestData() {
     if (!iframe.contentWindow) return;
-    iframe.contentWindow.postMessage({
-      type: REQUEST_TYPE,
-      storage: {
-        enabled: localStorage.getItem("saetab_bridge_enabled"),
-        timetable: localStorage.getItem("sk_timetable"),
-        memo: localStorage.getItem("sk_memo")
-      }
-    }, BRIDGE_ORIGIN);
+    iframe.contentWindow.postMessage({ type: REQUEST_TYPE }, BRIDGE_ORIGIN);
   }
 
   // ===== 受信 =====
@@ -301,6 +315,9 @@
     renderNow();
     renderMemo((data.memo && data.memo.items) || []);
     updateConnStatus();
+
+    // 正常にデータが届いたら接続用 iframe を隠す。
+    iframe.style.display = "none";
   });
 
   iframe.addEventListener("load", requestData);

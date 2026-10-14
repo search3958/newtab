@@ -20,9 +20,11 @@
 
   let parentOrigin = null;
 
-  // 親ページから最後に受信したストレージのスナップショット。
-  // ブリッジページ自身の localStorage は許可判定・データ取得に使わない。
-  let activeStorage = null;
+  // 許可設定とデータは sk-hub.jp の非分割ストレージのみを参照する。
+  // 親ページから送られた値を同意の根拠にはしない。
+  let bridgeStorage = null;
+  let storageAccessGranted = false;
+  let storageAccessPromise = null;
 
   const dateFmt = new Intl.DateTimeFormat("ja-JP", {
     year: "numeric",
@@ -64,41 +66,143 @@
     }
   }
 
-  // localStorage.getItem() の値は通常 "true"。
-  // 以前 JSON.stringify("true") で保存された値も扱う。
-  function isEnabledValue(value) {
-    if (value === true || value === "true") return true;
-    if (typeof value !== "string") return false;
+  // Chrome のクロスサイト iframe では StorageAccessHandle.localStorage を使って、
+  // sk-hub.jp のトップレベル保存領域へアクセスする。
+  async function acquireStorageAccess() {
+    if (bridgeStorage) return true;
+    if (storageAccessPromise) return storageAccessPromise;
 
-    try {
-      return JSON.parse(value) === "true";
-    } catch {
-      return false;
-    }
+    storageAccessPromise = (async () => {
+      try {
+        if (window.parent === window) {
+          bridgeStorage = window.localStorage;
+          storageAccessGranted = true;
+          return true;
+        }
+
+        if (typeof document.requestStorageAccess !== "function") {
+          logError("このブラウザは localStorage 用の Storage Access API に対応していません。");
+          return false;
+        }
+
+        const handle = await document.requestStorageAccess({ localStorage: true });
+        if (!handle || !handle.localStorage) {
+          logError("ブラウザから非分割 localStorage が返されませんでした。");
+          return false;
+        }
+
+        bridgeStorage = handle.localStorage;
+        storageAccessGranted = true;
+        return true;
+      } catch (error) {
+        // 初回ロード時はユーザー操作がないため、ここで拒否されても正常。
+        // 画面内のボタンを押した操作から再要求する。
+        log("ストレージアクセスはまだ許可されていません。");
+        return false;
+      } finally {
+        storageAccessPromise = null;
+      }
+    })();
+
+    return storageAccessPromise;
   }
 
-  // storage.enabled は、送信元の親ページが読み取って送ってきた許可値。
-  // 必ず送信元の検証後に使用する。
-  function checkBridgeEnabled(storage = activeStorage) {
-    return !!storage && isEnabledValue(storage.enabled);
+  function checkBridgeEnabled() {
+    return getRawStorageValue(BRIDGE_KEY) === "true";
+  }
+
+  function showStorageAccessGate() {
+    // 定期リクエストが来ても、表示中のボタンを作り直さない。
+    if (document.getElementById("bridgeStorageAccessGate")) return;
+    document.body.replaceChildren();
+    Object.assign(document.body.style, {
+      margin: "0",
+      padding: "16px",
+      boxSizing: "border-box",
+      fontFamily: "system-ui, sans-serif",
+      background: "#fff",
+      color: "#202124"
+    });
+
+    const panel = document.createElement("main");
+    panel.id = "bridgeStorageAccessGate";
+    Object.assign(panel.style, {
+      display: "grid",
+      gap: "10px",
+      alignContent: "start",
+      maxWidth: "560px",
+      margin: "0 auto"
+    });
+
+    const heading = document.createElement("strong");
+    heading.textContent = "Saetab Bridge の接続設定";
+    heading.style.fontSize = "16px";
+
+    const message = document.createElement("p");
+    message.textContent = "ブラウザが別サイト内の sk-hub.jp の保存領域を分離しています。sk-hub.jp 側で許可した連携設定と時間割・メモを読み取るには、ここでストレージアクセスを許可してください。";
+    Object.assign(message.style, {
+      margin: "0",
+      fontSize: "13px",
+      lineHeight: "1.5"
+    });
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "ストレージへのアクセスを許可";
+    Object.assign(button.style, {
+      justifySelf: "start",
+      border: "0",
+      borderRadius: "999px",
+      padding: "10px 16px",
+      background: "#1a73e8",
+      color: "white",
+      font: "inherit",
+      fontWeight: "600",
+      cursor: "pointer"
+    });
+
+    const status = document.createElement("p");
+    status.setAttribute("role", "status");
+    status.style.cssText = "margin:0;font-size:12px;line-height:1.45";
+
+    button.addEventListener("click", async () => {
+      if (typeof document.requestStorageAccess !== "function") {
+        status.textContent = "このブラウザでは localStorage のクロスサイトアクセスに対応していません。";
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = "ブラウザに保存領域へのアクセスを要求しています…";
+      try {
+        const handle = await document.requestStorageAccess({ localStorage: true });
+        if (!handle || !handle.localStorage) {
+          throw new Error("StorageAccessHandle.localStorage が返されませんでした。");
+        }
+        bridgeStorage = handle.localStorage;
+        storageAccessGranted = true;
+        // 許可後はトップレベルの保存領域を使えるようになったので再読み込みする。
+        // 再読み込み後は、保存済みの許可により handle を自動取得できる。
+        status.textContent = "許可されました。保存領域を読み直します…";
+        location.reload();
+      } catch (error) {
+        button.disabled = false;
+        status.textContent = "アクセスが許可されませんでした。ブラウザの許可画面でブロックされていないか確認してください。";
+        logError("ストレージアクセスが拒否されました。", error);
+      }
+    });
+
+    panel.append(heading, message, button, status);
+    document.body.appendChild(panel);
   }
 
   function getRawStorageValue(key) {
-    if (!activeStorage) return null;
-
-    if (key === TIMETABLE_KEY) {
-      return activeStorage.timetable ?? null;
+    try {
+      if (!bridgeStorage) return null;
+      return bridgeStorage.getItem(key);
+    } catch (error) {
+      logError(`保存データの読み込みに失敗しました: ${key}`, error);
+      return null;
     }
-
-    if (key === MEMO_KEY) {
-      return activeStorage.memo ?? null;
-    }
-
-    if (key === BRIDGE_KEY) {
-      return activeStorage.enabled ?? null;
-    }
-
-    return null;
   }
 
   function getElements() {
@@ -364,7 +468,6 @@
   function sendToParent(data) {
     if (!checkBridgeEnabled()) {
       parentOrigin = null;
-      activeStorage = null;
       showDisabled();
       log("許可されていないため、データ送信を拒否しました。");
       return false;
@@ -395,11 +498,11 @@
   }
 
   // ===== 親ページからのリクエスト =====
-  window.addEventListener("message", event => {
+  window.addEventListener("message", async event => {
     if (event.source !== window.parent) return;
     if (!event.data || event.data.type !== REQUEST_TYPE) return;
 
-    // 先に送信元を検証する。未許可の送信元の値は一切使わない。
+    // 親ページは要求だけを送る。許可設定・データの値は提供元自身で読む。
     if (!isAllowedParentOrigin(event.origin)) {
       log("許可されていない親ページからのリクエストを拒否しました。", {
         origin: event.origin
@@ -407,30 +510,28 @@
       return;
     }
 
-    const incomingStorage = event.data.storage;
-
-    if (!incomingStorage || typeof incomingStorage !== "object") {
+    let hasAccess = storageAccessGranted || !!bridgeStorage;
+    if (!hasAccess && storageAccessPromise) {
+      hasAccess = await storageAccessPromise;
+    }
+    if (!hasAccess) {
       parentOrigin = null;
-      activeStorage = null;
-      showDisabled();
-      logError("リクエストに storage が含まれていません。親ページ側の送信内容を確認してください。");
+      showStorageAccessGate();
+      log("ストレージアクセスの許可が必要です。");
       return;
     }
+    storageAccessGranted = true;
 
-    // 重要：許可判定は bridge 自身の localStorage ではなく、
-    // 検証済みの親ページから受信した storage.enabled で行う。
-    if (!checkBridgeEnabled(incomingStorage)) {
+    // 提供元 sk-hub.jp の同意がなければデータを読み出さない。
+    if (!checkBridgeEnabled()) {
       parentOrigin = null;
-      activeStorage = null;
       showDisabled();
-      log("ブリッジ側の許可設定が無効なため、リクエストを拒否しました。", {
-        enabledValue: incomingStorage.enabled
+      log("sk-hub.jp 側の許可設定が無効なため、リクエストを拒否しました。", {
+        enabledValue: getRawStorageValue(BRIDGE_KEY)
       });
       return;
     }
 
-    // 許可を確認した後にだけ、受信したデータを利用可能にする。
-    activeStorage = incomingStorage;
     parentOrigin = event.origin;
 
     try {
@@ -443,12 +544,15 @@
   });
 
   // ===== 更新 =====
-  function refresh() {
-    // 許可とデータは、最後に親ページから受け取ったスナップショットを使う。
-    // 親ページでデータや許可状態が変わった場合は、親ページが再度リクエストを送る。
+  async function refresh() {
+    if (!storageAccessGranted || !bridgeStorage) {
+      parentOrigin = null;
+      showStorageAccessGate();
+      return;
+    }
+
     if (!checkBridgeEnabled()) {
       parentOrigin = null;
-      activeStorage = null;
       showDisabled();
       return;
     }
@@ -456,31 +560,43 @@
     try {
       const payload = buildPayload();
       updateUI(payload);
-
-      if (parentOrigin) {
-        sendToParent(payload);
-      }
+      if (parentOrigin) sendToParent(payload);
     } catch (error) {
       logError("データ更新中にエラーが発生しました。", error);
     }
   }
 
   // ===== 初期化 =====
-  function init() {
+  async function init() {
     log("初期化を開始します。", {
       origin: window.location.origin,
       framed: window.parent !== window
     });
 
-    // 初期化時点では、親ページから許可とデータが届くまで読み込まない。
-    showDisabled();
+    const hasAccess = await acquireStorageAccess();
+    if (!hasAccess) {
+      showStorageAccessGate();
+      log("ストレージアクセス許可を待機しています。");
+      return;
+    }
 
-    window.setInterval(refresh, REFRESH_MS);
+    storageAccessGranted = true;
+    refresh();
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
+    window.addEventListener("storage", event => {
+      if (
+        event.key === null ||
+        event.key === BRIDGE_KEY ||
+        event.key === TIMETABLE_KEY ||
+        event.key === MEMO_KEY
+      ) {
         refresh();
       }
+    });
+
+    window.setInterval(refresh, REFRESH_MS);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") refresh();
     });
 
     log("初期化が完了しました。親ページからのリクエストを待機しています。");
