@@ -60,17 +60,35 @@
     console.error(`[${FEATURE_NAME}] ${message}`, error);
   }
 
-  // ===== ブリッジ側の許可確認 =====
-  // 必ずブリッジ自身のオリジンのlocalStorageを参照する。
-  // 読み取りエラーや未設定の場合は許可しない。
-  function checkBridgeEnabled() {
-    try {
-      return localStorage.getItem(BRIDGE_KEY) === "true";
-    } catch (error) {
-      logError("ブリッジの許可設定を読み取れません。連携を停止します。", error);
-      return false;
+
+function checkBridgeEnabled() {
+  try {
+    const rawValue = localStorage.getItem(BRIDGE_KEY);
+
+    // 通常の "true" と、JSON.stringify("true") で保存された値の両方に対応
+    let enabled = rawValue === "true";
+
+    if (!enabled && rawValue !== null) {
+      try {
+        enabled = JSON.parse(rawValue) === "true";
+      } catch {
+        // JSONとして解釈できない値は許可しない
+      }
     }
+
+    console.info(`[${FEATURE_NAME}] 許可設定の診断`, {
+      origin: location.origin,
+      key: BRIDGE_KEY,
+      rawValue,
+      enabled
+    });
+
+    return enabled;
+  } catch (error) {
+    logError("ブリッジの許可設定を読み取れません。連携を停止します。", error);
+    return false;
   }
+}
 
   function getElements() {
     return {
