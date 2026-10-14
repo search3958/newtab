@@ -18,27 +18,11 @@
     "https://search3958.github.io"
   ]);
 
-  // 開発環境の親ページも許可する
-  function isAllowedParentOrigin(origin) {
-    if (ALLOWED_PARENT_ORIGINS.has(origin)) {
-      return true;
-    }
-
-    try {
-      const url = new URL(origin);
-
-      return (
-        (url.hostname === "localhost" ||
-          url.hostname === "127.0.0.1" ||
-          url.hostname === "[::1]") &&
-        (url.protocol === "http:" || url.protocol === "https:")
-      );
-    } catch {
-      return false;
-    }
-  }
-
   let parentOrigin = null;
+
+  // 親ページから最後に受信したストレージのスナップショット。
+  // ブリッジページ自身の localStorage は許可判定・データ取得に使わない。
+  let activeStorage = null;
 
   const dateFmt = new Intl.DateTimeFormat("ja-JP", {
     year: "numeric",
@@ -60,35 +44,62 @@
     console.error(`[${FEATURE_NAME}] ${message}`, error);
   }
 
-
-function checkBridgeEnabled() {
-  try {
-    const rawValue = localStorage.getItem(BRIDGE_KEY);
-
-    // 通常の "true" と、JSON.stringify("true") で保存された値の両方に対応
-    let enabled = rawValue === "true";
-
-    if (!enabled && rawValue !== null) {
-      try {
-        enabled = JSON.parse(rawValue) === "true";
-      } catch {
-        // JSONとして解釈できない値は許可しない
-      }
+  // ===== 親ページ確認 =====
+  function isAllowedParentOrigin(origin) {
+    if (ALLOWED_PARENT_ORIGINS.has(origin)) {
+      return true;
     }
 
-    console.info(`[${FEATURE_NAME}] 許可設定の診断`, {
-      origin: location.origin,
-      key: BRIDGE_KEY,
-      rawValue,
-      enabled
-    });
-
-    return enabled;
-  } catch (error) {
-    logError("ブリッジの許可設定を読み取れません。連携を停止します。", error);
-    return false;
+    try {
+      const url = new URL(origin);
+      return (
+        (url.hostname === "localhost" ||
+          url.hostname === "127.0.0.1" ||
+          url.hostname === "[::1]" ||
+          url.hostname === "::1") &&
+        (url.protocol === "http:" || url.protocol === "https:")
+      );
+    } catch {
+      return false;
+    }
   }
-}
+
+  // localStorage.getItem() の値は通常 "true"。
+  // 以前 JSON.stringify("true") で保存された値も扱う。
+  function isEnabledValue(value) {
+    if (value === true || value === "true") return true;
+    if (typeof value !== "string") return false;
+
+    try {
+      return JSON.parse(value) === "true";
+    } catch {
+      return false;
+    }
+  }
+
+  // storage.enabled は、送信元の親ページが読み取って送ってきた許可値。
+  // 必ず送信元の検証後に使用する。
+  function checkBridgeEnabled(storage = activeStorage) {
+    return !!storage && isEnabledValue(storage.enabled);
+  }
+
+  function getRawStorageValue(key) {
+    if (!activeStorage) return null;
+
+    if (key === TIMETABLE_KEY) {
+      return activeStorage.timetable ?? null;
+    }
+
+    if (key === MEMO_KEY) {
+      return activeStorage.memo ?? null;
+    }
+
+    if (key === BRIDGE_KEY) {
+      return activeStorage.enabled ?? null;
+    }
+
+    return null;
+  }
 
   function getElements() {
     return {
@@ -112,16 +123,21 @@ function checkBridgeEnabled() {
 
   function readJson(key) {
     try {
-      const raw = localStorage.getItem(key);
+      const raw = getRawStorageValue(key);
 
-      if (raw === null) {
-        log(`保存データが見つかりません: ${key}`);
+      if (raw === null || raw === undefined || raw === "") {
+        log(`送信データが見つかりません: ${key}`);
         return null;
+      }
+
+      // postMessage 側が JSON 文字列ではなくオブジェクトを渡した場合にも対応。
+      if (typeof raw !== "string") {
+        return raw;
       }
 
       return JSON.parse(raw);
     } catch (error) {
-      logError(`保存データの読み込みに失敗しました: ${key}`, error);
+      logError(`送信データの読み込みに失敗しました: ${key}`, error);
       return null;
     }
   }
@@ -232,7 +248,6 @@ function checkBridgeEnabled() {
 
     for (let p = 0; p < periods; p++) {
       const cell = cells[di + "-" + p];
-
       if (!cell || !cell.subject) continue;
 
       const time = times[p] || {};
@@ -254,7 +269,6 @@ function checkBridgeEnabled() {
   // ===== 明日の時間割 =====
   function getTomorrowData() {
     const now = new Date();
-
     return getTimetableData(
       new Date(
         now.getFullYear(),
@@ -321,18 +335,9 @@ function checkBridgeEnabled() {
         "連携は無効です。ブリッジ側の設定を確認してください。";
     }
 
-    // 無効時は、以前表示したデータも画面から消す。
-    if (elements.timetable) {
-      elements.timetable.textContent = "連携は無効です。";
-    }
-
-    if (elements.tomorrow) {
-      elements.tomorrow.textContent = "連携は無効です。";
-    }
-
-    if (elements.memo) {
-      elements.memo.textContent = "連携は無効です。";
-    }
+    if (elements.timetable) elements.timetable.textContent = "連携は無効です。";
+    if (elements.tomorrow) elements.tomorrow.textContent = "連携は無効です。";
+    if (elements.memo) elements.memo.textContent = "連携は無効です。";
   }
 
   function updateUI(payload) {
@@ -349,24 +354,17 @@ function checkBridgeEnabled() {
     }
 
     elements.status.className = "status enabled";
-    elements.status.textContent =
-      "ブリッジは有効です。";
-
-    elements.timetable.textContent =
-      JSON.stringify(payload.timetable, null, 2);
-
-    elements.tomorrow.textContent =
-      JSON.stringify(payload.tomorrow, null, 2);
-
-    elements.memo.textContent =
-      JSON.stringify(payload.memo, null, 2);
+    elements.status.textContent = "ブリッジは有効です。";
+    elements.timetable.textContent = JSON.stringify(payload.timetable, null, 2);
+    elements.tomorrow.textContent = JSON.stringify(payload.tomorrow, null, 2);
+    elements.memo.textContent = JSON.stringify(payload.memo, null, 2);
   }
 
   // ===== 親ページへの送信 =====
   function sendToParent(data) {
-    // 送信直前にも許可を再確認する。
     if (!checkBridgeEnabled()) {
       parentOrigin = null;
+      activeStorage = null;
       showDisabled();
       log("許可されていないため、データ送信を拒否しました。");
       return false;
@@ -389,7 +387,6 @@ function checkBridgeEnabled() {
       log("親ページへデータを送信しました。", {
         targetOrigin: parentOrigin
       });
-
       return true;
     } catch (error) {
       logError("データ送信に失敗しました。", error);
@@ -399,15 +396,10 @@ function checkBridgeEnabled() {
 
   // ===== 親ページからのリクエスト =====
   window.addEventListener("message", event => {
-    if (event.source !== window.parent) {
-      return;
-    }
+    if (event.source !== window.parent) return;
+    if (!event.data || event.data.type !== REQUEST_TYPE) return;
 
-    if (!event.data || event.data.type !== REQUEST_TYPE) {
-      return;
-    }
-
-    // 受信先の確認
+    // 先に送信元を検証する。未許可の送信元の値は一切使わない。
     if (!isAllowedParentOrigin(event.origin)) {
       log("許可されていない親ページからのリクエストを拒否しました。", {
         origin: event.origin
@@ -415,20 +407,34 @@ function checkBridgeEnabled() {
       return;
     }
 
-    // ブリッジ側の許可を確認。オフならデータを読み出さない。
-    if (!checkBridgeEnabled()) {
+    const incomingStorage = event.data.storage;
+
+    if (!incomingStorage || typeof incomingStorage !== "object") {
       parentOrigin = null;
+      activeStorage = null;
       showDisabled();
-      log("ブリッジ側の許可設定が無効なため、リクエストを拒否しました。");
+      logError("リクエストに storage が含まれていません。親ページ側の送信内容を確認してください。");
       return;
     }
 
+    // 重要：許可判定は bridge 自身の localStorage ではなく、
+    // 検証済みの親ページから受信した storage.enabled で行う。
+    if (!checkBridgeEnabled(incomingStorage)) {
+      parentOrigin = null;
+      activeStorage = null;
+      showDisabled();
+      log("ブリッジ側の許可設定が無効なため、リクエストを拒否しました。", {
+        enabledValue: incomingStorage.enabled
+      });
+      return;
+    }
+
+    // 許可を確認した後にだけ、受信したデータを利用可能にする。
+    activeStorage = incomingStorage;
     parentOrigin = event.origin;
 
     try {
-      // 許可確認後に初めてデータを読み出す。
       const payload = buildPayload();
-
       updateUI(payload);
       sendToParent(payload);
     } catch (error) {
@@ -438,16 +444,17 @@ function checkBridgeEnabled() {
 
   // ===== 更新 =====
   function refresh() {
-    // 定期更新・復帰時も、最初にブリッジ側の許可を確認する。
+    // 許可とデータは、最後に親ページから受け取ったスナップショットを使う。
+    // 親ページでデータや許可状態が変わった場合は、親ページが再度リクエストを送る。
     if (!checkBridgeEnabled()) {
       parentOrigin = null;
+      activeStorage = null;
       showDisabled();
       return;
     }
 
     try {
       const payload = buildPayload();
-
       updateUI(payload);
 
       if (parentOrigin) {
@@ -465,21 +472,8 @@ function checkBridgeEnabled() {
       framed: window.parent !== window
     });
 
-    // 初期表示でも許可がオフならデータを読み出さない。
-    refresh();
-
-    // 同じオリジンの許可設定・データ変更を監視する。
-    window.addEventListener("storage", event => {
-      if (
-        event.key === null ||
-        event.key === BRIDGE_KEY ||
-        event.key === TIMETABLE_KEY ||
-        event.key === MEMO_KEY
-      ) {
-        log("localStorageの変更を検知しました。");
-        refresh();
-      }
-    });
+    // 初期化時点では、親ページから許可とデータが届くまで読み込まない。
+    showDisabled();
 
     window.setInterval(refresh, REFRESH_MS);
 
@@ -489,13 +483,11 @@ function checkBridgeEnabled() {
       }
     });
 
-    log("初期化が完了しました。");
+    log("初期化が完了しました。親ページからのリクエストを待機しています。");
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, {
-      once: true
-    });
+    document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
     init();
   }
