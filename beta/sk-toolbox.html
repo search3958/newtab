@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日の時間割・最新のメモ</title>
+<style>
+  body { font-family: system-ui, sans-serif; padding: 16px; max-width: 800px; margin: 0 auto; color: #222; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  h2 { font-size: 16px; margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ddd; }
+  .conn { font-size: 13px; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
+  .conn.ok { background: #e6ffed; color: #155724; }
+  .conn.wait { background: #f1f5f9; color: #475569; }
+  .conn.stale { background: #fff3cd; color: #856404; }
+  .muted { color: #666; font-size: 13px; margin: 6px 0; }
+  .tt-head { font-size: 15px; font-weight: 600; }
+  .tag { display: inline-block; font-size: 12px; background: #eef2ff; color: #3730a3; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+  .slot { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin: 6px 0; background: #f8fafc; border-left: 5px solid var(--cc, #2563eb); border-radius: 6px; }
+  .slot .period { font-weight: 700; min-width: 40px; }
+  .slot .time { font-size: 13px; color: #555; min-width: 110px; }
+  .slot .subject { font-weight: 600; }
+  .slot .room { margin-left: auto; font-size: 13px; color: #555; }
+  .memo { display: flex; justify-content: space-between; gap: 8px; padding: 8px 4px; border-bottom: 1px solid #eee; }
+  .memo .title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .memo time { color: #888; font-size: 12px; white-space: nowrap; }
+  #saetab-bridge { display: none; }
+</style>
+</head>
+<body>
+
+<h1>今日の時間割・最新のメモ</h1>
+<div id="conn" class="conn wait">接続を待っています…</div>
+
+<h2>今日の時間割</h2>
+<div id="tt-head" class="tt-head"></div>
+<div id="tt-meta" class="muted"></div>
+<div id="tt-list"></div>
+
+<h2>最新のメモ</h2>
+<div id="memo-list"></div>
+
+<!-- 受け取り用（画面には出さない）。src は後で差し替える -->
+<iframe id="saetab-bridge" src="http://127.0.0.1:5500/toolbox/saetab-bridge/" title="saetab Bridge"></iframe>
+
+<script>
+const BRIDGE_TYPE = 'saetab_bridge_data';
+const STALE_MS = 3 * 60 * 1000;   // 3分以上届かなければ「途切れ」表示
+const WAIT_MS = 8 * 1000;         // 8秒経っても届かなければ確認の案内
+
+const iframe = document.getElementById('saetab-bridge');
+const timeFmt = new Intl.DateTimeFormat('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+const clockFmt = new Intl.DateTimeFormat('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+let lastReceived = 0;
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+// ===== 受信 =====
+window.addEventListener('message', (e) => {
+  // 受け取るのは、この iframe からのメッセージだけ
+  if (e.source !== iframe.contentWindow) return;
+  if (!e.data || e.data.type !== BRIDGE_TYPE || !e.data.data) return;
+  lastReceived = Date.now();
+  render(e.data.data);
+  updateConn();
+});
+
+// ===== 表示 =====
+function render(data) {
+  renderTimetable(data.timetable || {});
+  renderMemo((data.memo && data.memo.items) || []);
+}
+
+function renderTimetable(tt) {
+  const head = document.getElementById('tt-head');
+  const meta = document.getElementById('tt-meta');
+  const list = document.getElementById('tt-list');
+  head.replaceChildren();
+  meta.textContent = '';
+  list.replaceChildren();
+
+  head.appendChild(document.createTextNode((tt.dateText || '') + '　' + (tt.title || '時間割')));
+  if (tt.special) head.appendChild(el('span', 'tag', tt.special));
+  meta.textContent = [tt.source, tt.note].filter(Boolean).join('　');
+
+  if (tt.none) { list.appendChild(el('p', 'muted', '今日は授業がありません')); return; }
+  if (tt.off) { list.appendChild(el('p', 'muted', '今日はお休みです')); return; }
+  if (!tt.slots || !tt.slots.length) { list.appendChild(el('p', 'muted', '今日の時間割はまだ入っていません')); return; }
+
+  tt.slots.forEach((s) => {
+    const row = el('div', 'slot');
+    if (s.color) row.style.setProperty('--cc', s.color);
+    row.appendChild(el('span', 'period', s.period + '限'));
+    row.appendChild(el('span', 'time', s.s && s.e ? s.s + '〜' + s.e : ''));
+    row.appendChild(el('span', 'subject', s.subject));
+    const place = [s.room, s.teacher].filter(Boolean).join(' · ');
+    if (place) row.appendChild(el('span', 'room', place));
+    list.appendChild(row);
+  });
+}
+
+function renderMemo(items) {
+  const list = document.getElementById('memo-list');
+  list.replaceChildren();
+  if (!items.length) { list.appendChild(el('p', 'muted', 'メモはまだありません')); return; }
+  items.forEach((m) => {
+    const row = el('div', 'memo');
+    const t = el('span', 'title');
+    if (m.pinned) t.appendChild(el('span', '', '📌 '));
+    if (m.locked) t.appendChild(el('span', '', '🔒 '));
+    t.appendChild(document.createTextNode(m.title || '（無題）'));
+    row.append(t, el('time', '', m.updated ? timeFmt.format(new Date(m.updated)) : ''));
+    list.appendChild(row);
+  });
+}
+
+// ===== 接続の状態 =====
+function updateConn() {
+  const conn = document.getElementById('conn');
+  if (!lastReceived) {
+    conn.className = 'conn wait';
+    conn.textContent = '接続を待っています…';
+    return;
+  }
+  const stale = Date.now() - lastReceived > STALE_MS;
+  conn.className = 'conn ' + (stale ? 'stale' : 'ok');
+  conn.textContent = (stale ? '⚠️ 接続が途切れています' : '✅ 接続中')
+    + '　最終受信 ' + clockFmt.format(new Date(lastReceived));
+}
+
+// 届かないまま時間が過ぎたら、確認の案内を出す
+setTimeout(() => {
+  if (!lastReceived) {
+    const conn = document.getElementById('conn');
+    conn.className = 'conn stale';
+    conn.textContent = '⚠️ まだ届いていません。iframe の URL と、そのページの「saetab_bridge_enabled」が true かを確認してください';
+  }
+}, WAIT_MS);
+setInterval(updateConn, 30 * 1000);
+</script>
+
+</body>
+</html>

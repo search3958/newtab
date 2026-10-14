@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>saetab-bridge 拡張の追加</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
+  button { font-size: 1.1rem; padding: .7rem 1.6rem; cursor: pointer; }
+  #msg { margin-top: 1.5rem; white-space: pre-wrap; }
+  .ok { color: #070; } .ng { color: #b00; }
+</style>
+</head>
+<body>
+<h1>saetab-bridge 拡張</h1>
+<p>Newtab を開くたびに <code>./beta/saetab-bridge</code> を自動で読み込みます。</p>
+<button id="add">追加</button>
+<div id="msg"></div>
+
+<script>"use strict";
+
+const DB_NAME = "Newtab7Extensions";
+const DB_VERSION = 1;
+const STORE = "scripts";
+const EXT_ID = "saetab-bridge";
+const EXT_NAME = "saetab-bridge";
+const TARGET = "./beta/saetab-bridge.js";   // 相対パスのまま保存する（Newtab 基準）
+
+function showMsg(text, ok) {
+  const el = document.getElementById("msg");
+  el.textContent = text;
+  el.className = ok ? "ok" : "ng";
+}
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        db.createObjectStore(STORE, { keyPath: "id" });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function put(db, record) {
+  return new Promise((resolve, reject) => {
+    const t = db.transaction(STORE, "readwrite");
+    t.objectStore(STORE).put(record);
+    t.oncomplete = () => resolve();
+    t.onerror = () => reject(t.error);
+  });
+}
+
+// 実行時（Newtab 上）に、相対パスを Newtab の location 基準で解決する
+function buildCode(relPath) {
+  return `(() => {
+  const src = new URL(${JSON.stringify(relPath)}, location.href).href;
+  const s = document.createElement("script");
+  s.src = src;
+  s.onload = () => NT.log("読み込み完了:", src);
+  s.onerror = () => console.error("[Ext:" + NT.name + "] 読み込み失敗:", src);
+  document.head.appendChild(s);
+})();`;
+}
+
+document.getElementById("add").onclick = async () => {
+  try {
+    const db = await openDB();
+    const now = Date.now();
+    await put(db, {
+      id: EXT_ID,
+      name: EXT_NAME,
+      encoding: "plain",
+      code: buildCode(TARGET),
+      createdAt: now,
+      updatedAt: now,
+    });
+    db.close();
+    showMsg(`追加しました。\n相対パス: ${TARGET}\n次に Newtab を開くと実行されます。`, true);
+  } catch (e) {
+    showMsg("追加に失敗しました: " + e, false);
+  }
+};
+</script>
+</body>
+</html>

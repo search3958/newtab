@@ -32,17 +32,17 @@ const SETTINGS_SYNC_DELAY_MS = 1500;
 // 拡張機能
 const EXT_DB_NAME = "Newtab7Extensions";
 const EXT_STORE = "scripts";
-const BASE122_LIB_URL = ""; // base122デコーダのURL（window.base122.decode を提供するスクリプト）
+const BASE122_LIB_URL = "";
 
 const SUPPORTED_LANGS = new Set(["ja", "en", "ko", "ko-kp", "zh", "zh-tw", "ru"]);
 const UI_TRANSLATIONS = {
 ja: {
 pageTitle: "SaeTab 7 Beta",
 searchPlaceholder: "スクロールして一覧を表示",
-appSearch: "アプリ連携",
-management: "管理",
-customize: "カスタマイズ",
-historyButton: "履歴表示",
+appSearch: "App内検索",
+management: "同期と管理",
+customize: "個人化",
+historyButton: "履歴",
 close: "閉じる",
 appNotFound: "該当するアプリが見つかりません",
 appOpen: "アプリを開く",
@@ -66,7 +66,7 @@ iconSize: "アイコンサイズ",
 standard: "標準",
 large: "大",
 extraLarge: "特大",
-managementTitle: "管理",
+managementTitle: "同期と管理",
 saetab: "SaeTab 7 Beta",
 settingsDetails: "設定方法と詳細",
 simpleVersion: "簡易版",
