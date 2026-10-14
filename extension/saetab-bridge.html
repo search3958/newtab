@@ -1,89 +1,419 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>saetab-bridge 拡張の追加</title>
-<style>
-  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 3rem auto; padding: 0 1rem; text-align: center; }
-  button { font-size: 1.1rem; padding: .7rem 1.6rem; cursor: pointer; }
-  #msg { margin-top: 1.5rem; white-space: pre-wrap; }
-  .ok { color: #070; } .ng { color: #b00; }
-</style>
-</head>
-<body>
-<h1>saetab-bridge 拡張</h1>
-<p>Newtab を開くたびに <code>./extension/saetab-bridge</code> を自動で読み込みます。</p>
-<button id="add">追加</button>
-<div id="msg"></div>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Saetab Bridge</title>
 
-<script>"use strict";
+  <style>
+    footer{display:none}
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #ffffff;
+      color: #202124;
+    }
 
-const DB_NAME = "Newtab7Extensions";
-const DB_VERSION = 1;
-const STORE = "scripts";
-const EXT_ID = "saetab-bridge";
-const EXT_NAME = "saetab-bridge";
-const TARGET = "./extension/saetab-bridge.js";   // 相対パスのまま保存する（Newtab 基準）
+    * {
+      box-sizing: border-box;
+    }
 
-function showMsg(text, ok) {
-  const el = document.getElementById("msg");
-  el.textContent = text;
-  el.className = ok ? "ok" : "ng";
-}
+    body {
+      min-height: 100vh;
+      min-height: 100svh;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { keyPath: "id" });
+    .main-container {
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 1.75rem;
+      font-weight: 650;
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 0 0 24px;
+      line-height: 1.9;
+      overflow-wrap: anywhere;
+    }
+
+    button {
+      font: inherit;
+      font-size: 1rem;
+      padding: 12px 32px;
+      border: 0;
+      border-radius: 99px;
+      background: #f0f0f0;
+      color: #000;
+      cursor: pointer;
+      transition: opacity 160ms ease;
+    }
+
+    button:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.6;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid #1967d2;
+      outline-offset: 4px;
+    }
+
+    .message {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.7;
+    }
+
+    .message:empty {
+      display: none;
+    }
+
+    .message.error {
+      color: #b3261e;
+    }
+
+    .completion-screen[hidden] {
+      display: none;
+    }
+
+    .success-icon {
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      color: #188038;
+    }
+
+    .completion-screen h1 {
+      margin-bottom: 12px;
+    }
+
+    .completion-screen p {
+      margin-bottom: 28px;
+    }
+
+    .completion-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .completion-links a {
+      color: #1967d2;
+      line-height: 1.8;
+      text-underline-offset: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 24px 20px;
       }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
 
-function put(db, record) {
-  return new Promise((resolve, reject) => {
-    const t = db.transaction(STORE, "readwrite");
-    t.objectStore(STORE).put(record);
-    t.oncomplete = () => resolve();
-    t.onerror = () => reject(t.error);
-  });
-}
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
 
-// 実行時（Newtab 上）に、相対パスを Newtab の location 基準で解決する
-function buildCode(relPath) {
-  return `(() => {
+    @media (prefers-reduced-motion: reduce) {
+      button {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="main-container">
+    <section id="setup-screen">
+      <h1>Saetab Bridge</h1>
+
+      <p>
+        SaetabにSK Toolboxの拡張機能を追加します。<br>
+        SentaroとSK両方の利用規約および個人情報処理政策をご確認ください。
+      </p>
+
+      <button id="add" type="button">追加</button>
+      <div id="msg" class="message" role="status" aria-live="polite"></div>
+    </section>
+
+    <section
+      id="completion-screen"
+      class="completion-screen"
+      aria-labelledby="completion-title"
+      hidden
+    >
+      <svg
+        class="success-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 64 64"
+        fill="none"
+        aria-hidden="true"
+      >
+        <circle
+          cx="32"
+          cy="32"
+          r="29"
+          stroke="currentColor"
+          stroke-width="4"
+        />
+        <path
+          d="M18 32.5L27.5 42L46 22"
+          stroke="currentColor"
+          stroke-width="4.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+
+      <h1 id="completion-title">追加が完了しました</h1>
+
+      <p>
+        Saetab Bridgeを追加しました。<br>
+        次にNewtabを開くと拡張機能が実行されます。
+      </p>
+
+      <nav class="completion-links" aria-label="次の操作">
+        <a
+          href="https://search3958.github.io/support/docs/ja/newtab_setup.html"
+        >新しいタブに設定する方法</a>
+
+        <a
+          href="https://search3958.github.io/newtab/?value=wowin"
+        >SaeTabへ移動する</a>
+      </nav>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const DB_NAME = "Newtab7Extensions";
+    const DB_VERSION = 1;
+    const STORE = "scripts";
+    const EXT_ID = "saetab-bridge";
+    const EXT_NAME = "saetab-bridge";
+
+    // 相対パスをNewtabのlocation基準で解決する。
+    const TARGET = "./extension/saetab-bridge.js";
+
+    function getRequiredElement(id) {
+      const element = document.getElementById(id);
+
+      if (!element) {
+        console.error(`[Saetab Bridge] 必要なHTML要素がありません: #${id}`);
+        return null;
+      }
+
+      return element;
+    }
+
+    function showMessage(element, text, isError = false) {
+      if (!element) {
+        console.error("[Saetab Bridge] メッセージ表示先がありません。");
+        return;
+      }
+
+      element.textContent = text;
+      element.classList.toggle("error", isError);
+    }
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        if (!("indexedDB" in window)) {
+          reject(new Error("このブラウザではIndexedDBを利用できません。"));
+          return;
+        }
+
+        let request;
+
+        try {
+          request = indexedDB.open(DB_NAME, DB_VERSION);
+        } catch (error) {
+          reject(error);
+          return;
+        }
+
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+
+          if (!db.objectStoreNames.contains(STORE)) {
+            db.createObjectStore(STORE, { keyPath: "id" });
+          }
+        };
+
+        request.onsuccess = () => {
+          console.info("[Saetab Bridge] データベースを開きました。");
+          resolve(request.result);
+        };
+
+        request.onerror = () => {
+          reject(
+            request.error || new Error("データベースを開けませんでした。")
+          );
+        };
+
+        request.onblocked = () => {
+          console.warn(
+            "[Saetab Bridge] データベースの更新がほかの接続によって待機しています。"
+          );
+        };
+      });
+    }
+
+    function put(db, record) {
+      return new Promise((resolve, reject) => {
+        let transaction;
+
+        try {
+          transaction = db.transaction(STORE, "readwrite");
+          transaction.objectStore(STORE).put(record);
+        } catch (error) {
+          reject(error);
+          return;
+        }
+
+        transaction.oncomplete = () => {
+          console.info(
+            `[Saetab Bridge] 拡張機能 "${record.id}" を保存しました。`
+          );
+          resolve();
+        };
+
+        transaction.onerror = () => {
+          reject(
+            transaction.error || new Error("データの保存に失敗しました。")
+          );
+        };
+
+        transaction.onabort = () => {
+          reject(
+            transaction.error || new Error("保存処理が中断されました。")
+          );
+        };
+      });
+    }
+
+    // Newtab上で実行する拡張機能の読み込みコードを生成する。
+    function buildCode(relPath) {
+      return `(() => {
+  "use strict";
+
   const src = new URL(${JSON.stringify(relPath)}, location.href).href;
-  const s = document.createElement("script");
-  s.src = src;
-  s.onload = () => NT.log("読み込み完了:", src);
-  s.onerror = () => console.error("[Ext:" + NT.name + "] 読み込み失敗:", src);
-  document.head.appendChild(s);
-})();`;
-}
+  const script = document.createElement("script");
 
-document.getElementById("add").onclick = async () => {
-  try {
-    const db = await openDB();
-    const now = Date.now();
-    await put(db, {
-      id: EXT_ID,
-      name: EXT_NAME,
-      encoding: "plain",
-      code: buildCode(TARGET),
-      createdAt: now,
-      updatedAt: now,
-    });
-    db.close();
-    showMsg(`追加しました。\n相対パス: ${TARGET}\n次に Newtab を開くと実行されます。`, true);
-  } catch (e) {
-    showMsg("追加に失敗しました: " + e, false);
-  }
-};
-</script>
+  script.src = src;
+
+  script.onload = () => {
+    if (typeof NT !== "undefined" && typeof NT.log === "function") {
+      NT.log("読み込み完了:", src);
+    } else {
+      console.info("[Ext:saetab-bridge] 読み込み完了:", src);
+    }
+  };
+
+  script.onerror = () => {
+    console.error("[Ext:saetab-bridge] 読み込み失敗:", src);
+  };
+
+  document.head.appendChild(script);
+})();`;
+    }
+
+    function initialize() {
+      const addButton = getRequiredElement("add");
+      const messageElement = getRequiredElement("msg");
+      const setupScreen = getRequiredElement("setup-screen");
+      const completionScreen = getRequiredElement("completion-screen");
+
+      if (
+        !addButton ||
+        !messageElement ||
+        !setupScreen ||
+        !completionScreen
+      ) {
+        console.error(
+          "[Saetab Bridge] 必要な要素を取得できないため、初期化を中止しました。"
+        );
+        return;
+      }
+
+      addButton.addEventListener("click", async () => {
+        addButton.disabled = true;
+        showMessage(messageElement, "追加しています…");
+
+        let db = null;
+
+        try {
+          db = await openDB();
+
+          const now = Date.now();
+
+          await put(db, {
+            id: EXT_ID,
+            name: EXT_NAME,
+            encoding: "plain",
+            code: buildCode(TARGET),
+            createdAt: now,
+            updatedAt: now
+          });
+
+          setupScreen.hidden = true;
+          completionScreen.hidden = false;
+          document.title = "追加完了 | Saetab Bridge";
+
+          console.info(
+            "[Saetab Bridge] 追加処理が正常に完了しました。"
+          );
+        } catch (error) {
+          console.error("[Saetab Bridge] 追加に失敗しました:", error);
+
+          const detail =
+            error instanceof Error ? error.message : String(error);
+
+          showMessage(
+            messageElement,
+            `追加に失敗しました。\n${detail}`,
+            true
+          );
+        } finally {
+          if (db) {
+            db.close();
+            console.info("[Saetab Bridge] データベースを閉じました。");
+          }
+
+          addButton.disabled = false;
+        }
+      });
+
+      console.info("[Saetab Bridge] 初期化が完了しました。");
+    }
+
+    initialize();
+  </script>
 </body>
+
+  <script src="https://search3958.github.io/frameworks/headerv2.js"></script>
+<script src="https://search3958.github.io/check.js"></script>
 </html>
