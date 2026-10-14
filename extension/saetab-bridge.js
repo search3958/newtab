@@ -2,7 +2,7 @@
   "use strict";
 
   // ===== 設定 =====
-  const BRIDGE_URL = "https://sk-hub.jp//toolbox/saetab-bridge/";
+  const BRIDGE_URL = "https://sk-hub.jp/toolbox/saetab-bridge/index.html";
   const BRIDGE_ORIGIN = new URL(BRIDGE_URL).origin;
   const IFRAME_ID = "saetab-bridge";
   const BANNER_ID = "sb-banner";
