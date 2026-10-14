@@ -8,1015 +8,873 @@
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth@12..36,110&display=swap" rel="stylesheet"><style>
 html,
 body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
+width: 100%;
+height: 100%;
+margin: 0;
 }
-
 *{
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+-ms-overflow-style: none;
+scrollbar-width: none;
 }
-
 *::-webkit-scrollbar {
-  display: none;
+display: none;
 }
-
 body {
-    background: #fff var(--wallpaper-light, url("bgimg/samag3.webp"))
-        center / cover no-repeat fixed;
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        sans-serif;
-    padding: 0;
-    margin: 0;
-    transition: background-image 0.3s ease;
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-    overflow-x: hidden;
+background: #fff var(--wallpaper-light, url("bgimg/samag3.webp"))
+center / cover no-repeat fixed;
+font-family:
+system-ui,
+-apple-system,
+BlinkMacSystemFont,
+sans-serif;
+padding: 0;
+margin: 0;
+transition: background-image 0.3s ease;
+background-attachment: fixed;
+background-size: cover;
+background-position: center;
+overflow-x: hidden;
 }
-
 body::after{
-    content:" ";
-    background: linear-gradient(0deg, rgba(0, 0, 0, 67%) 0%, rgba(0, 0, 0, 42%) 23%, rgba(0, 0, 0, 15%) 38%, rgba(0, 0, 0, 0%) 55%);
-    height:600px;
-    width:100vw;
-    position:fixed;
-    bottom:0;
-    left:0;
-    z-index:-1;
+content:" ";
+background: linear-gradient(0deg, rgba(0, 0, 0, 67%) 0%, rgba(0, 0, 0, 42%) 23%, rgba(0, 0, 0, 15%) 38%, rgba(0, 0, 0, 0%) 55%);
+height:600px;
+width:100vw;
+position:fixed;
+bottom:0;
+left:0;
+z-index:-1;
 }
-
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #000;
-        background-image: var(--wallpaper-dark, url("bgimg/samag3_dark.webp"));
-    }
+body {
+background-color: #000;
+background-image: var(--wallpaper-dark, url("bgimg/samag3_dark.webp"));
 }
-
+}
 #clock {
-    position: fixed;
-    bottom: 130px;
-    right: 0px;
-    color: #fff;
-    font-size: 48px;
-    width:100vw;
-    text-align:center;
-  font-family: "TikTok Sans", sans-serif;
+position: fixed;
+bottom: 130px;
+right: 0px;
+color: #fff;
+font-size: 48px;
+width:100vw;
+text-align:center;
+font-family: "TikTok Sans", sans-serif;
 }
-
-
 .search {
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 450px;
-    background: #fff;
-    border-radius: 99px;
-    padding: 8px;
-    position: fixed;
-    display: flex;
-    flex-wrap: nowrap;
-    corner-shape: superellipse(1.6);
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+width: 450px;
+background: #fff;
+border-radius: 99px;
+padding: 8px;
+position: fixed;
+display: flex;
+flex-wrap: nowrap;
+corner-shape: superellipse(1.6);
 }
 .RedCheck-info-widget{
-        right: 32px !important;
-    bottom: 32px !important;
-    transition: right 0.3s ease;
+right: 32px !important;
+bottom: 32px !important;
+transition: right 0.3s ease;
 }.RedCheck-info-widget:hover{
-        right: 16px !important;
+right: 16px !important;
 }
 #searchBox {
-    margin: 0;
-    width: 100%;
-    height: 42px;
-    font-size: 24px;
-    padding:0px;
-    padding-left: 16px;
-    border: none;
-    background: none;
-    outline: none;
-    border-radius: 100px;
-    font-family: inherit;
+margin: 0;
+width: 100%;
+height: 42px;
+font-size: 24px;
+padding:0px;
+padding-left: 16px;
+border: none;
+background: none;
+outline: none;
+border-radius: 100px;
+font-family: inherit;
 }
-
 .searchbtn {
-    margin: 0;
-    width: 55px;
-    height: 44px;
-    border: none;
-    background:#000;
-    border-radius: 100px;
-    cursor: pointer;
-    corner-shape: superellipse(1.6);
+margin: 0;
+width: 55px;
+height: 44px;
+border: none;
+background:#000;
+border-radius: 100px;
+cursor: pointer;
+corner-shape: superellipse(1.6);
 }
-
 /* ================================
-   History (v2.1 style)
-   ================================ */
-
+History (v2.1 style)
+================================ */
 .history-list {
-    position: fixed;
-    top: 140px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    z-index: 100;
-    max-width: 500px;
+position: fixed;
+top: 140px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+gap: 4px;
+z-index: 100;
+max-width: 500px;
 }
-
 .history {
-    position: relative;
-    margin: 4px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.5);
-    color: #000;
-    border-radius: 16px;
-    backdrop-filter: blur(16px);
-    height: 24px;
-    font-size: 14px;
-    cursor: pointer;
+position: relative;
+margin: 4px;
+padding: 8px 16px;
+background: rgba(255, 255, 255, 0.5);
+color: #000;
+border-radius: 16px;
+backdrop-filter: blur(16px);
+height: 24px;
+font-size: 14px;
+cursor: pointer;
 }
-
 @media (prefers-color-scheme: dark) {
-    .history {
-        background: rgba(28, 28, 28, 0.5);
-        color: #fff;
-    }
+.history {
+background: rgba(28, 28, 28, 0.5);
+color: #fff;
 }
-
+}
 .app-search-buttons {
-    position: fixed;
-    bottom: 90px;
-    left: 0px;
-    width:100vw;
-    display: flex;
-    gap: 4px;
-    justify-content: center;
+position: fixed;
+bottom: 90px;
+left: 0px;
+width:100vw;
+display: flex;
+gap: 4px;
+justify-content: center;
 }
-
 .search-btn {
-    margin: 4px;
-    padding: 8px 16px;
-    background: var(--b);
-    color: #000;
-    font-weight: 600;
-    border-radius: 99px;
-    height: 40px;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding-left: 12px;
-    corner-shape: superellipse(1.6);
+margin: 4px;
+padding: 8px 16px;
+background: var(--b);
+color: #000;
+font-weight: 600;
+border-radius: 99px;
+height: 40px;
+border: none;
+cursor: pointer;
+font-family: inherit;
+font-size: 14px;
+display: flex;
+align-items: center;
+gap: 5px;
+padding-left: 12px;
+corner-shape: superellipse(1.6);
 }
-
-
+.search-btn{
+transition: transform 0.3s cubic-bezier(.26,0,0,1);
+transform: translate(0, 0px) scale(1); 
+}
+.search-btn:hover{
+transform: translate(0, -3px) scale(1.05); 
+}
 .app-search-dropdown,#mainSuggestionDropdown {
-    position: fixed;
-    bottom: 145px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 413px;
-    max-height: 300px;
-    overflow-y: auto;
-    background: #fffd;
-    border-radius: 35px;
-    backdrop-filter: blur(24px);
-    z-index: 0;
-    padding: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    display: none;
-    corner-shape: superellipse(1.6);
+position: fixed;
+bottom: 145px;
+left: 50%;
+transform: translateX(-50%);
+width: 413px;
+max-height: 300px;
+overflow-y: auto;
+background: #fffd;
+border-radius: 35px;
+backdrop-filter: blur(24px);
+z-index: 2;
+padding: 8px;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+display: none;
+corner-shape: superellipse(1.6);
 }
-
 @media (prefers-color-scheme: dark) {
-    .app-search-dropdown {
-        background: #000d;
-    }
+.app-search-dropdown {
+background: #000d;
 }
-
+}
 .app-search-dropdown.visible {
-    display: block;
+display: block;
 }
-
 .app-search-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    border-radius: 99px;
-    cursor: pointer;
-    transition: background 0.15s ease;
-    corner-shape: superellipse(1.6);
-    background:#0000;
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 8px 12px;
+border-radius: 99px;
+cursor: pointer;
+transition: background 0.15s ease;
+corner-shape: superellipse(1.6);
+background:#0000;
 }
-
 .app-search-item:hover {
-    background: rgba(153, 153, 153, 0.14);
+background: rgba(153, 153, 153, 0.14);
 }
-
 .app-search-item-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+width: 32px;
+height: 32px;
+border-radius: 8px;
+overflow: hidden;
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
 }
-
 .app-search-item-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+width: 100%;
+height: 100%;
+object-fit: contain;
 }
-
 .app-search-item-name {
-    font-size: 14px;
-    color: #000;
+font-size: 14px;
+color: #000;
 }
-
 @media (prefers-color-scheme: dark) {
-    .app-search-item-name {
-        color: #fff;
-    }
+.app-search-item-name {
+color: #fff;
 }
-
+}
 .app-search-item-url {
-    display:none
+display:none
 }
-
 /* ================================
-    Intelligence Box
-    ================================ */
-
+Intelligence Box
+================================ */
 .intelligence-box {
-    display:none;
+display:none;
 }
-
-
 .intelligence-answer {
-    font-size: 16px;
-    color: #000;
-    text-align: center;
-    width: 100%;
-    cursor: pointer;
+font-size: 16px;
+color: #000;
+text-align: center;
+width: 100%;
+cursor: pointer;
 }
-
 @media (prefers-color-scheme: dark) {
-    .intelligence-answer {
-        color: #fff;
-    }
+.intelligence-answer {
+color: #fff;
 }
-
+}
 .intelligence-answer.hide {
-    color: #0059ff;
-    filter: blur(4px);
-    opacity: 0;
+color: #0059ff;
+filter: blur(4px);
+opacity: 0;
 }
-
 /* ================================
-   Shortcut Section (scrolls into view)
-   ================================ */
-
+Shortcut Section (scrolls into view)
+================================ */
 .shortcut {
-    position: relative;
-    top: 100vh;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(32px);
-    padding-top: 8px;
-    min-height: 100vh;
-    width: 100%;
-    z-index: 1;
+position: relative;
+top: 100vh;
+background: rgba(255, 255, 255, 0.5);
+backdrop-filter: blur(32px);
+padding-top: 8px;
+min-height: 100vh;
+width: 100%;
+z-index: 10;
 }
-
 @media (prefers-color-scheme: dark) {
-    .shortcut {
-        background: rgba(0, 0, 0, 0.3);
-    }
+.shortcut {
+background: rgba(0, 0, 0, 0.3);
 }
-
+}
 .main-shortcuts {
-    box-sizing: border-box;
-    padding: 32px;
+box-sizing: border-box;
+padding: 32px;
 }
-
 .main-shortcuts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    max-width: 1100px;
-    margin: 0 auto;
+display: flex;
+flex-direction: column;
+gap: 28px;
+max-width: 1100px;
+margin: 0 auto;
 }
-
 .main-shortcut-category {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+display: flex;
+flex-direction: column;
+gap: 5px;
 }
-
 .main-shortcut-title {
-    margin: 0;
-    font-size: 20px;
-    text-align: center;
-    font-weight:400;
-    color: #000;
-    margin-top:16px;
+margin: 0;
+font-size: 20px;
+text-align: center;
+font-weight:400;
+color: #000;
+margin-top:16px;
 }
-
 @media (prefers-color-scheme: dark) {
-    .main-shortcut-title {
-        color: #fff;
-    }
+.main-shortcut-title {
+color: #fff;
 }
-
+}
 .main-shortcut-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+gap: 4px;
 }
-
 /* ================================
-    Shortcut Items (v2.1 style)
-   ================================ */
-
+Shortcut Items (v2.1 style)
+================================ */
 .main-shortcut-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 7px;
-    min-width: 40px;
-    color: inherit;
-    text-decoration: none;
-    perspective: 800px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 7px;
+min-width: 40px;
+color: inherit;
+text-decoration: none;
+perspective: 800px;
 }
-
 .main-shortcut-box {
-    border-radius: 40px;
-    background-color: rgba(255, 255, 255, 0.7);
-    corner-shape: superellipse(1.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease-out;
-    transform: rotateX(0deg) rotateY(0deg);
-    overflow: hidden;
+border-radius: 40px;
+background-color: rgba(255, 255, 255, 0.7);
+corner-shape: superellipse(1.3);
+perspective: 800px;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.5s cubic-bezier(0, 0, 0, 1);
+transform: rotateX(0deg) rotateY(0deg);
+overflow: hidden;
 }
-
 @media (prefers-color-scheme: dark) {
-    .main-shortcut-box {
-        background-color: rgba(17, 17, 17, 0.7);
-    }
+.main-shortcut-box {
+background-color: rgba(17, 17, 17, 0.7);
 }
-
+}
 .main-shortcut-icon {
-    width: 52px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
+width: 52px;
+height: 52px;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+flex-shrink: 0;
 }
-
 .main-shortcut-icon img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
-    scale:0.9;
+width: 100%;
+height: 100%;
+display: block;
+object-fit: contain;
+scale:0.9;
 }
-
 .main-shortcut-name {
-    width: 70px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.3;
-    color: rgba(0, 0, 0, 0.88);
+width: 70px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+text-align: center;
+font-size: 12px;
+line-height: 1.3;
+color: rgba(0, 0, 0, 0.88);
 }
-
 @media (prefers-color-scheme: dark) {
-    .main-shortcut-name {
-        color: rgba(255, 255, 255, 0.92);
-    }
+.main-shortcut-name {
+color: rgba(255, 255, 255, 0.92);
 }
-
-.main-shortcut-box {
-    transition: transform 0.2s ease-out;
 }
-
 .main-shortcut-item:hover .main-shortcut-box {
-    transform: rotateX(0deg) rotateY(0deg);
+transform: rotateX(0deg) rotateY(0deg);
 }
-
 /* ================================
-    Shared Dialog / Settings
-    ================================ */
-
+Shared Dialog / Settings
+================================ */
 .newtab-dialog {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    box-sizing: border-box;
-    background: rgba(0, 0, 0, 0.38);
-    opacity: 0;
-    transition: opacity 0.16s ease;
+position: fixed;
+inset: 0;
+z-index: 300;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 16px;
+box-sizing: border-box;
+background: rgba(0, 0, 0, 0.38);
+opacity: 0;
+transition: opacity 0.16s ease;
 }
-
 .newtab-dialog.is-open {
-    opacity: 1;
+opacity: 1;
 }
-
 .newtab-dialog.is-closing {
-    opacity: 0;
+opacity: 0;
 }
-
 .newtab-dialog[hidden] {
-    display: none;
+display: none;
 }
-
 .newtab-dialog-content {
-    width: min(520px, 100%);
-    max-height: min(82vh, 760px);
-    overflow-y: auto;
-    position: relative;
-    box-sizing: border-box;
-    padding: 16px;
-    border-radius: 48px;
-        corner-shape: superellipse(1.6);
-    background: #fff;
-    color: #111;
-    box-shadow: 0 14px 80px #000a;
-    transform: scale(0.96);
-    opacity: 0;
-    transition: transform 0.16s ease, opacity 0.16s ease;
+width: min(520px, 100%);
+max-height: min(82vh, 760px);
+overflow-y: auto;
+position: relative;
+box-sizing: border-box;
+padding: 16px;
+border-radius: 48px;
+corner-shape: superellipse(1.6);
+background: #fff;
+color: #111;
+box-shadow: 0 14px 80px #000a;
+transform: scale(0.96);
+opacity: 0;
+transition: transform 0.16s ease, opacity 0.16s ease;
 }
-
 .newtab-dialog.is-open .newtab-dialog-content {
-    transform: scale(1);
-    opacity: 1;
+transform: scale(1);
+opacity: 1;
 }
-
 .newtab-dialog.is-closing .newtab-dialog-content {
-    transform: scale(0.96);
-    opacity: 0;
+transform: scale(0.96);
+opacity: 0;
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-dialog-content {
-        background: rgba(28, 28, 28, 0.97);
-        color: #fff;
-    }
+.newtab-dialog-content {
+background: rgba(28, 28, 28, 0.97);
+color: #fff;
 }
-
+}
 .newtab-dialog-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+margin-bottom: 14px;
 }
-
 .newtab-dialog-title {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 400;
+margin: 0;
+font-size: 32px;
+font-weight: 400;
 }
-
 .newtab-dialog-close {
-    flex: 0 0 auto;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.06);
-    color: inherit;
-    font: inherit;
-    font-size: 22px;
-    padding-bottom: 5px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.12s ease, transform 0.12s ease;
+flex: 0 0 auto;
+width: 40px;
+height: 40px;
+padding: 0;
+border: 0;
+border-radius: 50%;
+background: rgba(0, 0, 0, 0.06);
+color: inherit;
+font: inherit;
+font-size: 22px;
+padding-bottom: 5px;
+cursor: pointer;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+transition: background 0.12s ease, transform 0.12s ease;
 }
-
 .newtab-dialog-close:hover {
-    background: rgba(0, 0, 0, 0.1);
+background: rgba(0, 0, 0, 0.1);
 }
-
 .newtab-dialog-close:active {
-    transform: scale(0.94);
+transform: scale(0.94);
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-dialog-close {
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .newtab-dialog-close:hover {
-        background: rgba(255, 255, 255, 0.13);
-    }
+.newtab-dialog-close {
+background: rgba(255, 255, 255, 0.08);
 }
-
+.newtab-dialog-close:hover {
+background: rgba(255, 255, 255, 0.13);
+}
+}
 .newtab-dialog-content .dialog-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+margin-bottom: 14px;
 }
-
 .newtab-dialog-content .dialog-header h3 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 500;
+margin: 0;
+font-size: 20px;
+font-weight: 500;
 }
-
 .newtab-dialog-content .dialog-empty {
-    margin: 8px 0 0;
-    text-align: center;
-    color: #888;
+margin: 8px 0 0;
+text-align: center;
+color: #888;
 }
-
 .newtab-dialog-content > ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+list-style: none;
+padding: 0;
+margin: 0;
 }
-
 .newtab-dialog-content > ul > li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 4px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    cursor: pointer;
-    font-size: 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+padding: 10px 4px;
+border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+cursor: pointer;
+font-size: 14px;
 }
-
 .newtab-dialog-content > ul > li:last-child {
-    border-bottom: 0;
+border-bottom: 0;
 }
-
 .newtab-dialog-content > ul > li:hover {
-    background: rgba(0, 0, 0, 0.04);
+background: rgba(0, 0, 0, 0.04);
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-dialog-content > ul > li {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .newtab-dialog-content > ul > li:hover {
-        background: rgba(255, 255, 255, 0.05);
-    }
+.newtab-dialog-content > ul > li {
+border-bottom-color: rgba(255, 255, 255, 0.1);
 }
-
+.newtab-dialog-content > ul > li:hover {
+background: rgba(255, 255, 255, 0.05);
+}
+}
 .newtab-settings-section {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    margin-top: 18px;
+display: flex;
+flex-direction: column;
+gap: 9px;
+margin-top: 18px;
 }
-
 .newtab-settings-section:first-of-type {
-    margin-top: 0;
+margin-top: 0;
 }
-
 .newtab-settings-section-title {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 500;
+margin: 0;
+font-size: 15px;
+font-weight: 500;
 }
-
 .newtab-settings-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
+display: flex;
+align-items: center;
+gap: 7px;
+flex-wrap: wrap;
 }
-
 .newtab-settings-row > input {
-    min-width: 0;
-    flex: 1 1 180px;
-    height: 38px;
-    box-sizing: border-box;
-    padding: 0 11px;
-    border: 1px solid rgba(0, 0, 0, 0.13);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    color: inherit;
-    font: inherit;
-    outline: none;
+min-width: 0;
+flex: 1 1 180px;
+height: 38px;
+box-sizing: border-box;
+padding: 0 11px;
+border: 1px solid rgba(0, 0, 0, 0.13);
+border-radius: 10px;
+background: rgba(255, 255, 255, 0.9);
+color: inherit;
+font: inherit;
+outline: none;
 }
-
 .newtab-settings-row > input:focus {
-    border-color: rgba(24, 90, 242, 0.65);
-    box-shadow: 0 0 0 3px rgba(24, 90, 242, 0.1);
+border-color: rgba(24, 90, 242, 0.65);
+box-shadow: 0 0 0 3px rgba(24, 90, 242, 0.1);
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-settings-row > input {
-        border-color: rgba(255, 255, 255, 0.15);
-        background: rgba(0, 0, 0, 0.22);
-    }
+.newtab-settings-row > input {
+border-color: rgba(255, 255, 255, 0.15);
+background: rgba(0, 0, 0, 0.22);
 }
-
+}
 .newtab-settings-links {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
+display: flex;
+align-items: center;
+gap: 7px;
+flex-wrap: wrap;
 }
-
 .newtab-settings-action,
 .newtab-settings-choice,
 .newtab-settings-danger,
 .newtab-settings-link {
-    flex: 0 0 auto;
-    min-height: 38px;
-    box-sizing: border-box;
-    border: 0;
-    border-radius: 10px;
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.068);
-    color: #000000;
-    font: inherit;
-    font-size: 14px;
-    line-height: 1.25;
-    cursor: pointer;
-    white-space: nowrap;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.12s ease, transform 0.12s ease;
+flex: 0 0 auto;
+min-height: 38px;
+box-sizing: border-box;
+border: 0;
+border-radius: 10px;
+padding: 8px 12px;
+background: rgba(0, 0, 0, 0.068);
+color: #000000;
+font: inherit;
+font-size: 14px;
+line-height: 1.25;
+cursor: pointer;
+white-space: nowrap;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+transition: background 0.12s ease, transform 0.12s ease;
 }
-
 .newtab-settings-action:hover,
 .newtab-settings-choice:hover,
 .newtab-settings-danger:hover,
 .newtab-settings-link:hover {
-    background: rgba(0, 0, 0, 0.17);
+background: rgba(0, 0, 0, 0.17);
 }
-
 .newtab-settings-action:active,
 .newtab-settings-choice:active,
 .newtab-settings-danger:active,
 .newtab-settings-link:active {
-    transform: scale(0.97);
+transform: scale(0.97);
 }
-
 .newtab-settings-choice[aria-pressed="true"] {
-    background: rgb(0, 255, 123);
-    color: #000000;
+background: rgb(0, 255, 123);
+color: #000000;
 }
-
 .newtab-settings-danger {
-    background: rgb(221, 0, 0);
-    color: #ffffff;
+background: rgb(221, 0, 0);
+color: #ffffff;
 }
-
 .newtab-settings-danger:hover {
-    background: rgb(189, 0, 0);
+background: rgb(189, 0, 0);
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-settings-action,
-    .newtab-settings-choice,
-    .newtab-settings-link {
-        background: rgba(0, 0, 0, 0.417);
-        color: #ffffff;
-    }
-
+.newtab-settings-action,
+.newtab-settings-choice,
+.newtab-settings-link {
+background: rgba(0, 0, 0, 0.417);
+color: #ffffff;
 }
-
+}
 .newtab-settings-hint {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.5;
-    color: #777;
+margin: 0;
+font-size: 12px;
+line-height: 1.5;
+color: #777;
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-settings-hint {
-        color: #aaa;
-    }
+.newtab-settings-hint {
+color: #aaa;
 }
-
+}
 .newtab-shortcut-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+display: flex;
+flex-direction: column;
+gap: 6px;
 }
-
 .newtab-shortcut-entry {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-    padding: 8px 10px;
-    border-radius: 11px;
-    background: rgba(0, 0, 0, 0.045);
+display: flex;
+align-items: center;
+gap: 10px;
+min-width: 0;
+padding: 8px 10px;
+border-radius: 11px;
+background: rgba(0, 0, 0, 0.045);
 }
-
 @media (prefers-color-scheme: dark) {
-    .newtab-shortcut-entry {
-        background: rgba(255, 255, 255, 0.07);
-    }
+.newtab-shortcut-entry {
+background: rgba(255, 255, 255, 0.07);
 }
-
+}
 .newtab-shortcut-entry-icon {
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 9px;
-    background: rgba(255, 255, 255, 0.7);
+width: 32px;
+height: 32px;
+flex: 0 0 32px;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+border-radius: 9px;
+background: rgba(255, 255, 255, 0.7);
 }
-
 .newtab-shortcut-entry-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+width: 100%;
+height: 100%;
+object-fit: contain;
 }
-
 .newtab-shortcut-entry-info {
-    min-width: 0;
-    flex: 1 1 auto;
+min-width: 0;
+flex: 1 1 auto;
 }
-
 .newtab-shortcut-entry-name,
 .newtab-shortcut-entry-url {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
 }
-
 .newtab-shortcut-entry-name {
-    font-size: 14px;
+font-size: 14px;
 }
-
 .newtab-shortcut-entry-url {
-    margin-top: 2px;
-    font-size: 11px;
-    color: #888;
+margin-top: 2px;
+font-size: 11px;
+color: #888;
 }
-
 .main-shortcuts[data-icon-size="standard"] .main-shortcut-icon {
-    width: 52px;
-    height: 52px;
+width: 52px;
+height: 52px;
 }
-
 .main-shortcuts[data-icon-size="large"] .main-shortcut-icon {
-    width: 68px;
-    height: 68px;
+width: 68px;
+height: 68px;
 }
-
 .main-shortcuts[data-icon-size="extra-large"] .main-shortcut-icon {
-    width: 84px;
-    height: 84px;
+width: 84px;
+height: 84px;
 }
-
 .main-shortcuts[data-label-visible="false"] .main-shortcut-name {
-    display: none;
+display: none;
 }
-
 .main-shortcut-ad {
-    width: min(100%, 728px);
-    min-height: 90px;
-    margin: 8px auto 4px;
-    padding: 4px 0;
-    box-sizing: border-box;
-    display: block;
-    text-align: center;
+width: min(100%, 728px);
+min-height: 90px;
+margin: 8px auto 4px;
+padding: 4px 0;
+box-sizing: border-box;
+display: block;
+text-align: center;
 }
-
 .main-shortcut-ad .adsbygoogle {
-    display: block;
-    width: 100%;
-    min-height: 90px;
+display: block;
+width: 100%;
+min-height: 90px;
 }
 </style>
 </head>
-
 <body>
-
 <div id="clock"></div>
-
 <div class="search">
-    <input type="text" id="searchBox" data-i18n-placeholder="searchPlaceholder" placeholder="スクロールして一覧を表示" autocomplete="off" />
-    <button class="searchbtn" id="searchButton">
-        
+<input type="text" id="searchBox" data-i18n-placeholder="searchPlaceholder" placeholder="スクロールして一覧を表示" autocomplete="off" />
+<button class="searchbtn" id="searchButton">
 <svg width="18" height="20" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M8.64648 6.64645C8.84175 6.45118 9.15825 6.45118 9.35352 6.64645C9.54874 6.84171 9.54877 7.15823 9.35352 7.35348L5.85352 10.8535C5.65827 11.0487 5.34175 11.0487 5.14648 10.8535C4.95122 10.6582 4.95122 10.3417 5.14648 10.1464L8.64648 6.64645ZM5.14648 0.146447C5.34175 -0.0488155 5.65825 -0.0488155 5.85352 0.146447L7.71973 2.01168C8.25295 2.54491 8.68119 2.9727 8.96973 3.32711C9.24669 3.66735 9.48873 4.04834 9.47168 4.48238C9.45682 4.8581 9.30795 5.21601 9.05273 5.49215C8.75789 5.81109 8.31823 5.90932 7.88184 5.95406C7.42716 6.00067 6.82164 5.99996 6.06738 5.99996H0.5C0.22387 5.99996 2.03573e-05 5.77609 0 5.49996C0 5.22382 0.223858 4.99996 0.5 4.99996H6.06738C6.84453 4.99996 7.38799 4.99902 7.7793 4.95895C8.18878 4.91697 8.29253 4.84137 8.31836 4.81344C8.41208 4.71204 8.46723 4.58031 8.47266 4.44235C8.47399 4.40388 8.4532 4.27699 8.19434 3.95895C7.94598 3.65386 7.56144 3.26941 7.01172 2.71969L5.14648 0.853478C4.95123 0.658222 4.95124 0.34171 5.14648 0.146447Z" fill="white" style="fill:white;fill-opacity:1;"/>
 </svg>
-
-
-    </button>
+</button>
 </div>
-
 <div class="intelligence-box" id="intelBox">
-    <div class="intelligence-answer hide" id="intelAnswer"></div>
+<div class="intelligence-answer hide" id="intelAnswer"></div>
 </div>
-
 <div class="history-list" id="historyList"></div>
 <div class="app-search-buttons">
-    <button class="search-btn" style="--b:color(display-p3 0.61 1 0 / 1)" id="appSearchBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+<button class="search-btn" style="--b:color(display-p3 0.61 1 0 / 1)" id="appSearchBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M4.85645 3.91797C5.11915 3.92832 5.36938 4.03184 5.5625 4.20898C5.7946 4.422 5.85989 4.7331 5.88867 5.01172C5.91898 5.30525 5.91797 5.69393 5.91797 6.16797V9.68457C5.91777 9.91471 5.73005 10.0995 5.5 10.0996C5.26988 10.0996 5.08223 9.91475 5.08203 9.68457V6.16797C5.08203 5.67483 5.08148 5.33745 5.05664 5.09668C5.0357 4.89421 5.00227 4.83211 4.99512 4.82031C4.94798 4.7771 4.88706 4.75159 4.82324 4.74902L4.7832 4.76465C4.74607 4.78278 4.6821 4.82151 4.58203 4.90234C4.39289 5.05517 4.1523 5.2937 3.80078 5.64258L2.61328 6.82031C2.45005 6.98229 2.1857 6.98225 2.02246 6.82031C1.85917 6.65797 1.85922 6.3948 2.02246 6.23242L3.20996 5.05371C3.5477 4.71852 3.82423 4.44304 4.05469 4.25684C4.27345 4.08014 4.54116 3.90567 4.85645 3.91797ZM6.15918 4.02148C6.32243 3.85957 6.58678 3.85949 6.75 4.02148L8.97754 6.23242C9.14072 6.39479 9.14074 6.65798 8.97754 6.82031C8.81432 6.98231 8.54997 6.98226 8.38672 6.82031L6.15918 4.61035C5.99551 4.44791 5.99551 4.18392 6.15918 4.02148ZM7.5 1.59961C8.82548 1.59961 9.90039 2.67452 9.90039 4C9.90039 4.22091 9.72091 4.40039 9.5 4.40039C9.27909 4.40039 9.09961 4.22091 9.09961 4C9.09961 3.11634 8.38366 2.40039 7.5 2.40039H3.5C2.61634 2.40039 1.90039 3.11634 1.90039 4C1.90039 4.22091 1.72091 4.40039 1.5 4.40039C1.27909 4.40039 1.09961 4.22091 1.09961 4C1.09961 2.67452 2.17452 1.59961 3.5 1.59961H7.5Z" fill="black" style="fill:black;fill-opacity:1;"/>
 </svg><span data-i18n="appSearch">アプリ内検索</span></button>
-    <button class="search-btn" style="--b:#fff" id="managementBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+<button class="search-btn" style="--b:#fff" id="managementBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M3.01172 5.5C4.12277 5.50004 5.02344 6.39545 5.02344 7.5C5.02344 8.60455 4.12277 9.49996 3.01172 9.5C1.90079 9.49982 1 8.60446 1 7.5C1 6.39554 1.90079 5.50018 3.01172 5.5ZM3.01172 6.40039C2.39286 6.40057 1.89941 6.89757 1.89941 7.5C1.89941 8.10243 2.39286 8.59943 3.01172 8.59961C3.6307 8.59957 4.12305 8.10251 4.12305 7.5C4.12305 6.89749 3.6307 6.40043 3.01172 6.40039ZM9 7.0498C9.2485 7.04984 9.4502 7.25149 9.4502 7.5C9.4502 7.74851 9.2485 7.95016 9 7.9502H6.0293C5.78094 7.94999 5.58008 7.7484 5.58008 7.5C5.58008 7.2516 5.78094 7.05001 6.0293 7.0498H9ZM7.98828 1.5C9.09921 1.50018 10 2.39554 10 3.5C10 4.60446 9.09921 5.49982 7.98828 5.5C6.87723 5.49996 5.97656 4.60455 5.97656 3.5C5.97656 2.39545 6.87723 1.50004 7.98828 1.5ZM7.98828 2.40039C7.3693 2.40043 6.87695 2.89749 6.87695 3.5C6.87695 4.10251 7.3693 4.59957 7.98828 4.59961C8.60714 4.59943 9.10059 4.10243 9.10059 3.5C9.10059 2.89757 8.60714 2.40057 7.98828 2.40039ZM4.9707 3.0498C5.21906 3.05001 5.41992 3.2516 5.41992 3.5C5.41992 3.7484 5.21906 3.94999 4.9707 3.9502H2C1.7515 3.95016 1.5498 3.74851 1.5498 3.5C1.5498 3.25149 1.7515 3.04984 2 3.0498H4.9707Z" fill="black" style="fill:black;fill-opacity:1;"/>
 </svg>
 <span data-i18n="management">同期と管理</span></button>
-    <button class="search-btn" style="--b:color(display-p3 0.069 1 0.398 / 1)" id="customizeBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+<button class="search-btn" style="--b:color(display-p3 0.069 1 0.398 / 1)" id="customizeBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M5.00196 2.0957C5.22395 1.67253 5.87486 1.70249 6.03614 2.18555C6.47332 3.49709 7.50292 4.52669 8.81446 4.96387C9.32944 5.1358 9.32944 5.8642 8.81446 6.03613C7.50292 6.47331 6.47332 7.50291 6.03614 8.81445C5.8642 9.32944 5.13581 9.32944 4.96387 8.81445C4.52669 7.50291 3.4971 6.47331 2.18555 6.03613C1.67057 5.8642 1.67057 5.1358 2.18555 4.96387L2.42872 4.875C3.62394 4.39686 4.55405 3.41503 4.96387 2.18555L5.00196 2.0957ZM5.50001 3.21777C4.99557 4.19786 4.19787 4.99556 3.21778 5.5C4.19761 6.00431 4.99555 6.80151 5.50001 7.78125C6.00434 6.80177 6.80178 6.00433 7.78126 5.5C6.80152 4.99554 6.00431 4.1976 5.50001 3.21777Z" fill="black" style="fill:black;fill-opacity:1;"/>
 </svg>
 <span data-i18n="customize">カスタマイズ</span></button>
-    <button class="search-btn" style="--b:color(display-p3 0 0.866 1 / 1)" id="clearHistory"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+<button class="search-btn" style="--b:color(display-p3 0 0.866 1 / 1)" id="clearHistory"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M5.5 1.5498C7.68152 1.5498 9.4502 3.31848 9.4502 5.5C9.4502 7.68152 7.68152 9.4502 5.5 9.4502C3.31848 9.4502 1.5498 7.68152 1.5498 5.5C1.5498 3.31848 3.31848 1.5498 5.5 1.5498ZM5.5 2.4502C3.81553 2.4502 2.4502 3.81553 2.4502 5.5C2.4502 7.18447 3.81553 8.5498 5.5 8.5498C7.18447 8.5498 8.5498 7.18447 8.5498 5.5C8.5498 3.81553 7.18447 2.4502 5.5 2.4502ZM5.5 3.0498C5.74853 3.0498 5.9502 3.25147 5.9502 3.5V4.96484C5.9502 5.10389 5.95009 5.17781 5.95508 5.23145C5.95592 5.24046 5.95723 5.24761 5.95801 5.25293C5.9621 5.25671 5.96725 5.26277 5.97559 5.26953C6.01745 5.30345 6.07948 5.34563 6.19531 5.42285L7.25 6.12598C7.45642 6.26394 7.51178 6.54336 7.37402 6.75C7.23606 6.95642 6.95664 7.01178 6.75 6.87402L5.69531 6.1709C5.59331 6.1029 5.49098 6.03503 5.40918 5.96875C5.32013 5.89655 5.22965 5.80687 5.16211 5.68066C5.09459 5.55446 5.07024 5.42956 5.05957 5.31543C5.04978 5.21046 5.0498 5.0876 5.0498 4.96484V3.5C5.0498 3.25147 5.25147 3.0498 5.5 3.0498Z" fill="black" style="fill:black;fill-opacity:1;"/>
 </svg>
 <span data-i18n="historyButton">履歴</span></button>
 </div>
 <div class="app-search-dropdown" id="appSearchDropdown"></div>
-
 <div class="shortcut">
-    <div class="main-shortcuts" id="mainShortcuts"></div>
+<div class="main-shortcuts" id="mainShortcuts"></div>
 </div>
-
 <script src="https://search3958.github.io/check.js"></script>
 <script>
-    (() => {
-    "use strict";
-
-    const NS = "[Clock]";
-    let afJsLoaded = false;
-
-    /**
-     * #searchBox にフォーカス
-     */
-    const focusSearchBox = () => {
-        const searchBox = document.getElementById("searchBox");
-
-        if (!searchBox) {
-            console.error(`${NS} Required element not found: #searchBox`);
-            return false;
-        }
-
-        try {
-            searchBox.focus({ preventScroll: true });
-            console.log(`${NS} Focused: #searchBox`);
-            return true;
-        } catch (error) {
-            console.error(`${NS} Failed to focus #searchBox:`, error);
-            return false;
-        }
-    };
-
-    // スクリプト開始時に即時フォーカスを試行
-    focusSearchBox();
-
-    // DOM未生成だった場合の再試行
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-            focusSearchBox();
-        }, { once: true });
-    }
-
-    /**
-     * v7/af.js を動的ロード
-     */
-    const loadAfJs = () => {
-        if (afJsLoaded) {
-            console.log(`${NS} v7/af.js already loaded`);
-            return;
-        }
-
-        // 既存読み込みチェック
-        const existingScript = document.querySelector('script[data-af-js="true"]');
-        if (existingScript) {
-            afJsLoaded = true;
-            console.log(`${NS} v7/af.js already exists in document`);
-            return;
-        }
-
-        const script = document.createElement("script");
-
-        if (!script) {
-            console.error(`${NS} Failed to create <script> element`);
-            return;
-        }
-
-        script.src = "v7/af.js";
-        script.async = true;
-        script.dataset.afJs = "true";
-
-        script.addEventListener("load", () => {
-            afJsLoaded = true;
-            console.log(`${NS} Loaded: v7/af.js`);
-        }, { once: true });
-
-        script.addEventListener("error", (event) => {
-            console.error(`${NS} Failed to load: v7/af.js`, event);
-            script.remove();
-        }, { once: true });
-
-        document.head.appendChild(script);
-        console.log(`${NS} Loading: v7/af.js`);
-    };
-
-    /**
-     * ページ読み込み完了後、オンライン状態ならロード
-     */
-    const tryLoadAfJs = () => {
-        if (!navigator.onLine) {
-            console.warn(`${NS} Network offline. Waiting for connection...`);
-            return;
-        }
-
-        // 読み込み直後の処理集中を避ける
-        const startLoad = () => {
-            loadAfJs();
-        };
-
-        if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(startLoad, { timeout: 2000 });
-        } else {
-            window.setTimeout(startLoad, 300);
-        }
-    };
-
-    if (document.readyState === "complete") {
-        tryLoadAfJs();
-    } else {
-        window.addEventListener("load", () => {
-            tryLoadAfJs();
-        }, { once: true });
-    }
-
-    // オフライン状態から復帰した場合
-    window.addEventListener("online", () => {
-        console.log(`${NS} Network connection restored`);
-        tryLoadAfJs();
-    });
-
-    /**
-     * 時計
-     */
-    const updateClock = () => {
-        const now = new Date();
-
-        const month = String(now.getMonth() + 1).padStart(2, "0");
-        const day = String(now.getDate()).padStart(2, "0");
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-
-        const clockEl = document.getElementById("clock");
-
-        if (!clockEl) {
-            console.error(`${NS} Required element not found: #clock`);
-            return;
-        }
-
-        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const dayName = dayNames[now.getDay()];
-
-        clockEl.textContent = `${month}.${day} ${dayName} ${hours}:${minutes}`;
-    };
-
-    updateClock();
-    setInterval(updateClock, 1000);
-
-    console.log(`${NS} Clock script initialized`);
+(() => {
+"use strict";
+const NS = "[Clock]";
+let afJsLoaded = false;
+/**
+* #searchBox にフォーカス
+*/
+const focusSearchBox = () => {
+const searchBox = document.getElementById("searchBox");
+if (!searchBox) {
+console.error(`${NS} Required element not found: #searchBox`);
+return false;
+}
+try {
+searchBox.focus({ preventScroll: true });
+console.log(`${NS} Focused: #searchBox`);
+return true;
+} catch (error) {
+console.error(`${NS} Failed to focus #searchBox:`, error);
+return false;
+}
+};
+// スクリプト開始時に即時フォーカスを試行
+focusSearchBox();
+// DOM未生成だった場合の再試行
+if (document.readyState === "loading") {
+document.addEventListener("DOMContentLoaded", () => {
+focusSearchBox();
+}, { once: true });
+}
+/**
+* v7/af.js を動的ロード
+*/
+const loadAfJs = () => {
+if (afJsLoaded) {
+console.log(`${NS} v7/af.js already loaded`);
+return;
+}
+// 既存読み込みチェック
+const existingScript = document.querySelector('script[data-af-js="true"]');
+if (existingScript) {
+afJsLoaded = true;
+console.log(`${NS} v7/af.js already exists in document`);
+return;
+}
+const script = document.createElement("script");
+if (!script) {
+console.error(`${NS} Failed to create <script> element`);
+return;
+}
+script.src = "v7/af.js";
+script.async = true;
+script.dataset.afJs = "true";
+script.addEventListener("load", () => {
+afJsLoaded = true;
+console.log(`${NS} Loaded: v7/af.js`);
+}, { once: true });
+script.addEventListener("error", (event) => {
+console.error(`${NS} Failed to load: v7/af.js`, event);
+script.remove();
+}, { once: true });
+document.head.appendChild(script);
+console.log(`${NS} Loading: v7/af.js`);
+};
+/**
+* ページ読み込み完了後、オンライン状態ならロード
+*/
+const tryLoadAfJs = () => {
+if (!navigator.onLine) {
+console.warn(`${NS} Network offline. Waiting for connection...`);
+return;
+}
+// 読み込み直後の処理集中を避ける
+const startLoad = () => {
+loadAfJs();
+};
+if ("requestIdleCallback" in window) {
+window.requestIdleCallback(startLoad, { timeout: 2000 });
+} else {
+window.setTimeout(startLoad, 300);
+}
+};
+if (document.readyState === "complete") {
+tryLoadAfJs();
+} else {
+window.addEventListener("load", () => {
+tryLoadAfJs();
+}, { once: true });
+}
+// オフライン状態から復帰した場合
+window.addEventListener("online", () => {
+console.log(`${NS} Network connection restored`);
+tryLoadAfJs();
+});
+/**
+* 時計
+*/
+const updateClock = () => {
+const now = new Date();
+const month = String(now.getMonth() + 1).padStart(2, "0");
+const day = String(now.getDate()).padStart(2, "0");
+const hours = String(now.getHours()).padStart(2, "0");
+const minutes = String(now.getMinutes()).padStart(2, "0");
+const clockEl = document.getElementById("clock");
+if (!clockEl) {
+console.error(`${NS} Required element not found: #clock`);
+return;
+}
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const dayName = dayNames[now.getDay()];
+clockEl.textContent = `${month}.${day} ${dayName} ${hours}:${minutes}`;
+};
+updateClock();
+setInterval(updateClock, 1000);
+console.log(`${NS} Clock script initialized`);
 })();
 </script>
-
 </body>
 </html>
