@@ -1,451 +1,321 @@
-
-
 (() => {
   "use strict";
 
   // ===== 設定 =====
-  const REQUEST_TYPE = "saetab_bridge_request";
+  const BRIDGE_URL = "https://sk-hub.jp/toolbox/saetab-bridge/index.html";
+  const BRIDGE_ORIGIN = new URL(BRIDGE_URL).origin;
+  const IFRAME_ID = "saetab-bridge";
+  const BANNER_ID = "sb-banner";
+  const BANNER_BOTTOM = "146px";
+  const CLOCK_BOTTOM = "192px";
+  const CLOCK_URL = "https://sk-hub.jp/toolbox/clock/?value=from-saetab-bridge-7";
+  const MEMO_MAX = 8;
   const BRIDGE_TYPE = "saetab_bridge_data";
+  const REQUEST_TYPE = "saetab_bridge_request";
+  const REQUEST_EVERY_MS = 15 * 1000;
+  const WAIT_MS = 8 * 1000;
+  const STALE_MS = 3 * 60 * 1000;
+  const TICK_MS = 30 * 1000;
 
-  const TIMETABLE_KEY = "sk_timetable";
-  const MEMO_KEY = "sk_memo";
+  if (document.getElementById(BANNER_ID)) return;
 
-  const MEMO_LIMIT = 10;
-  const REFRESH_MS = 60 * 1000;
+  // ===== 受け取り用 iframe =====
+  let iframe = document.getElementById(IFRAME_ID);
+  if (!iframe) {
+    iframe = document.createElement("iframe");
+    iframe.id = IFRAME_ID;
+    iframe.title = "saetab Bridge";
+    document.body.appendChild(iframe);
+  }
+  iframe.setAttribute("allow", "storage-access");
+  iframe.src = BRIDGE_URL;
 
-  const FEATURE_NAME = "saetab Bridge";
-
-  // 本番の受信先とローカル開発環境のみ許可する。
-  // ブリッジHTML自体の配信元は検証しない。
-  const ALLOWED_PARENT_ORIGINS = new Set([
-    "https://search3958.github.io"
-  ]);
-
-  let parentOrigin = null;
-
-  const dateFmt = new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "short"
+  // ブラウザのストレージアクセス許可が必要な場合だけ操作できるよう、
+  // 接続確立までは iframe を表示する。データを受信したら非表示にする。
+  Object.assign(iframe.style, {
+    display: "none"
   });
 
-  // ===== ログ =====
-  function log(message, details) {
-    if (details === undefined) {
-      console.info(`[${FEATURE_NAME}] ${message}`);
-    } else {
-      console.info(`[${FEATURE_NAME}] ${message}`, details);
+  // ===== スタイル =====
+  const style = document.createElement("style");
+  style.textContent = `
+    #${BANNER_ID} {
+      position: fixed;
+      left: 50%;
+      bottom: ${BANNER_BOTTOM};
+      transform: translateX(-50%);
+      width: min(96vw, 1200px);
+      display: flex;
+      gap: 12px;
+      box-sizing: border-box;
+      font-size: 13px;
+      z-index: 0;
+      justify-content: center;
+      height: 46px;
     }
+    #${BANNER_ID} .sb-col { transform: translate(0, 0px) scale(1); width: fit-content; display: flex; flex-direction: column; padding: 6px 10px; border-radius: 99px; corner-shape: superellipse(1.6); transition: transform 0.3s cubic-bezier(.26,0,0,1); }
+    #${BANNER_ID} .sb-col[data-href] { cursor: pointer; }
+    #${BANNER_ID} .sb-col:hover { transform: translate(0, -3px) scale(1.05); }
+    #${BANNER_ID} .sb-col:active { opacity:0.7; }
+    #${BANNER_ID} .sb-col[data-href]:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    #${BANNER_ID} .sb-tt { background: linear-gradient(153deg,rgba(125, 205, 238, 1) 0%, rgba(37, 116, 234, 1) 100%); color: #FFFFFF; }
+    #${BANNER_ID} .sb-memo { background: linear-gradient(153deg,rgb(255, 193, 99) 0%, rgba(233, 137, 74, 1) 100%); color: #FFF; }
+    #${BANNER_ID} .sb-icon { padding: 0px; height: 100%; }
+    #${BANNER_ID} .sb-icon img { border-radius: 99px; corner-shape: superellipse(1.6); height: 100%; aspect-ratio: 1 / 1; }
+    #${BANNER_ID} .sb-head { width: fit-content; font-weight: 700; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1em; }
+    #${BANNER_ID} .sb-status { font-size: 11px; opacity: .6; margin-left: 6px; font-weight: 400; }
+    #${BANNER_ID} .sb-slots { width: fit-content; display: flex; gap: 8px; overflow-x: auto; }
+    #${BANNER_ID} .sb-slot {
+      flex: 0 0 auto;
+      min-width: 140px;
+      padding: 6px 8px;
+      background: rgba(255,255,255,.07);
+      border-left: 4px solid var(--cc, #60a5fa);
+      border-radius: 6px;
+    }
+    #${BANNER_ID} .sb-label { font-size: 11px; opacity: .75; margin-bottom: 2px; }
+    #${BANNER_ID} .sb-period { font-weight: 700; }
+    #${BANNER_ID} .sb-time { opacity: .7; font-size: 11px; }
+    #${BANNER_ID} .sb-subject { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #${BANNER_ID} .sb-room { opacity: .7; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #${BANNER_ID} .sb-muted { opacity: .6; padding: 6px 0; }
+    #${BANNER_ID} .sb-tomorrow { font-size: 14px; line-height: 1.6; }
+    #${BANNER_ID} .sb-memos { width: fit-content; overflow-y: auto; max-height: 96px; }
+    #${BANNER_ID} .sb-memo-row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    #${BANNER_ID} .sb-memo-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    #${BANNER_ID} .sb-memo-time { display: none; }
+    #clock:hover { opacity: 0.7; cursor: pointer; }
+    @media (max-width: 600px) {
+      #${IFRAME_ID} { width: calc(100vw - 24px); }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ===== バナー =====
+  const banner = document.createElement("div");
+  banner.id = BANNER_ID;
+  banner.innerHTML = `
+    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/?value=from-saetab-bridge-7">
+      <img src="https://sk-hub.jp/toolbox/icon.svg">
+    </div>
+    <div class="sb-col sb-tt" data-href="https://sk-hub.jp/toolbox/timetable/?value=from-saetab-bridge-7">
+      <div class="sb-head"><span id="sb-tt-head">時間割を待っています…</span><span class="sb-status" id="sb-status"></span></div>
+      <div class="sb-slots" id="sb-slots"></div>
+    </div>
+    <div class="sb-col sb-memo" data-href="https://sk-hub.jp/toolbox/memo/?value=from-saetab-bridge-7">
+      <div class="sb-head">最新のメモ</div>
+      <div class="sb-memos" id="sb-memos"></div>
+    </div>
+    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/todo/?value=from-saetab-bridge-7">
+      <img src="https://sk-hub.jp/toolbox/todo/icon.svg">
+    </div>
+    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/calc/?value=from-saetab-bridge-7">
+      <img src="https://sk-hub.jp/toolbox/calc/icon.svg">
+    </div>
+    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/countdown/?value=from-saetab-bridge-7">
+      <img src="https://sk-hub.jp/toolbox/countdown/icon.svg">
+    </div>
+    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/roulette/?value=from-saetab-bridge-7">
+      <img src="https://sk-hub.jp/toolbox/roulette/icon.svg">
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  // ===== リンク =====
+  const go = (url) => { location.href = url; };
+
+  banner.addEventListener("click", (e) => {
+    const target = e.target.closest("[data-href]");
+    if (target) go(target.dataset.href);
+  });
+
+  banner.querySelectorAll("[data-href]").forEach((c) => {
+    c.setAttribute("role", "link");
+    c.tabIndex = 0;
+    c.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") go(c.dataset.href);
+    });
+  });
+
+  // 時計
+  const clock = document.getElementById("clock");
+  if (clock) {
+    clock.style.bottom = CLOCK_BOTTOM;
+    clock.addEventListener("click", () => go(CLOCK_URL));
   }
 
-  function logError(message, error) {
-    console.error(`[${FEATURE_NAME}] ${message}`, error);
+  // ===== 表示ヘルパー =====
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  };
+  const timeFmt = new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  const clockFmt = new Intl.DateTimeFormat("ja-JP", { hour: "2-digit", minute: "2-digit" });
+
+  function toMin(hm) {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(hm || "");
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
   }
 
-  // ===== DOM取得 =====
-  function getElements() {
-    const elements = {
-      status: document.getElementById("bridgeStatus"),
-      timetable: document.getElementById("timetableDisplay"),
-      tomorrow: document.getElementById("tomorrowDisplay"),
-      memo: document.getElementById("memoDisplay")
-    };
+  // ===== 今日の時間割 =====
+  let lastTimetable = null;
+  let showingTomorrow = false;
 
-    const missing = Object.entries(elements)
-      .filter(([, element]) => !element)
-      .map(([name]) => name);
+  function renderNow() {
+    const head = $("sb-tt-head");
+    const status = $("sb-status");
+    const slotsBox = $("sb-slots");
+    slotsBox.replaceChildren();
+    showingTomorrow = false;
 
-    if (missing.length > 0) {
-      logError("必要なHTML要素が見つかりません。", missing);
-      return null;
+    if (!lastTimetable) {
+      head.textContent = "時間割を待っています…";
+      status.textContent = "";
+      return;
     }
 
-    return elements;
-  }
-
-  // ===== ユーティリティ =====
-  function pad(n) {
-    return (n < 10 ? "0" : "") + n;
-  }
-
-  function ymd(date) {
-    return date.getFullYear() + "-"
-      + pad(date.getMonth() + 1) + "-"
-      + pad(date.getDate());
-  }
-
-  function readJson(key) {
-    try {
-      const raw = localStorage.getItem(key);
-
-      if (raw === null) {
-        log(`保存データが見つかりません: ${key}`);
-        return null;
-      }
-
-      return JSON.parse(raw);
-    } catch (error) {
-      logError(`保存データの読み込みに失敗しました: ${key}`, error);
-      return null;
-    }
-  }
-
-  // ===== 時間割 =====
-  function getTimetableData(now = new Date()) {
-    const store = readJson(TIMETABLE_KEY) || {};
-
-    let tb = store.table || null;
-    let title = (tb && tb.name) || "時間割";
-    let source = "自分の時間割";
-
-    if (
-      store.view &&
-      store.view !== "mine" &&
-      store.received &&
-      store.received[store.view]
-    ) {
-      tb = store.received[store.view].table;
-      title = store.received[store.view].title || title;
-      source = "配信された時間割";
-    }
-
-    const result = {
-      title,
-      source,
-      dateText: dateFmt.format(now),
-      special: "",
-      note: "",
-      off: false,
-      none: false,
-      slots: []
-    };
-
-    if (!tb) {
-      result.none = true;
-      return result;
-    }
-
-    const ds = ymd(now);
-
-    const specials = (Array.isArray(tb.special) ? tb.special : [])
-      .filter(sp =>
-        sp &&
-        sp.from &&
-        sp.to &&
-        ds >= sp.from &&
-        ds <= sp.to
-      );
-
-    const sp = specials.length
-      ? specials[specials.length - 1]
-      : null;
-
-    const day = sp
-      ? ((sp.days || {})[ds] || {
-          type: sp.kind === "off" ? "off" : "normal"
-        })
-      : null;
-
-    if (sp) {
-      result.special = sp.name || "";
-      result.note = (day && day.note) || "";
-    }
-
-    if (day && day.type === "off") {
-      result.off = true;
-      return result;
-    }
-
-    if (day && day.type === "custom") {
-      result.slots = (Array.isArray(day.slots) ? day.slots : [])
-        .filter(x => x && x.subject)
-        .map(x => ({
-          period: "",
-          s: x.s || "",
-          e: x.e || "",
-          subject: x.subject,
-          room: x.room || ""
-        }))
-        .sort((a, b) =>
-          a.s < b.s ? -1 : a.s > b.s ? 1 : 0
-        )
-        .map((x, i) => ({
-          ...x,
-          period: String(i + 1)
-        }));
-
-      return result;
-    }
-
-    // 月曜日=0 ～ 土曜日=5
-    const di = (now.getDay() + 6) % 7;
-    const days = tb.days === 6 ? 6 : 5;
-
-    if (di >= days) {
-      result.none = true;
-      return result;
-    }
-
-    const periods = Math.min(
-      10,
-      Math.max(1, Number(tb.periods) || 6)
-    );
-
-    const cells = tb.cells || {};
-    const times = Array.isArray(tb.times) ? tb.times : [];
-
-    for (let p = 0; p < periods; p++) {
-      const cell = cells[di + "-" + p];
-
-      if (!cell || !cell.subject) continue;
-
-      const time = times[p] || {};
-
-      result.slots.push({
-        period: String(p + 1),
-        s: time.s || "",
-        e: time.e || "",
-        subject: cell.subject,
-        room: cell.room || "",
-        teacher: cell.teacher || "",
-        color: cell.color || ""
-      });
-    }
-
-    return result;
-  }
-
-  // ===== 明日の時間割 =====
-  function getTomorrowData() {
+    const tt = lastTimetable;
     const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
 
-    return getTimetableData(
-      new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + 1
-      )
-    );
+    const list = (tt.none || tt.off ? [] : (tt.slots || []))
+      .map((s) => ({ ...s, sm: toMin(s.s), em: toMin(s.e) }))
+      .filter((s) => s.sm !== null && s.em !== null && s.em > s.sm)
+      .sort((a, b) => a.sm - b.sm);
+
+    const cur = list.find((s) => nowMin >= s.sm && nowMin < s.em);
+    const next = list.find((s) => s.sm > nowMin);
+
+    if (cur || next) {
+      head.textContent = [tt.dateText, tt.title || "時間割", tt.special].filter(Boolean).join("　");
+      status.textContent = tt.source ? `（${tt.source}）` : "";
+      if (cur) slotsBox.appendChild(makeCard("いま", cur, `あと ${cur.em - nowMin} 分`));
+      if (next) slotsBox.appendChild(makeCard("次", next, `${next.s} から`));
+      return;
+    }
+
+    showingTomorrow = true;
+    renderTomorrow();
+  }
+
+  function makeCard(label, s, note) {
+    const card = el("div", "sb-slot");
+    if (s.color) card.style.setProperty("--cc", s.color);
+    card.appendChild(el("div", "sb-label", `${label} · ${note}`));
+    card.appendChild(el("div", "sb-period", s.period + "限"));
+    card.appendChild(el("div", "sb-time", s.s && s.e ? s.s + "〜" + s.e : ""));
+    card.appendChild(el("div", "sb-subject", s.subject || ""));
+    const place = [s.room, s.teacher].filter(Boolean).join(" · ");
+    if (place) card.appendChild(el("div", "sb-room", place));
+    return card;
+  }
+
+  function renderTomorrow() {
+    const head = $("sb-tt-head");
+    const status = $("sb-status");
+    const slotsBox = $("sb-slots");
+    status.textContent = "";
+
+    const tm = lastTimetable && lastTimetable.tomorrow;
+    if (!tm) {
+      head.textContent = "明日";
+      slotsBox.appendChild(el("div", "sb-muted", "明日の時間割はまだ届いていません"));
+      return;
+    }
+
+    head.textContent = ["明日", tm.dateText, tm.special].filter(Boolean).join("　");
+
+    if (tm.none) {
+      slotsBox.appendChild(el("div", "sb-muted", "明日は授業がありません"));
+      return;
+    }
+    if (tm.off) {
+      slotsBox.appendChild(el("div", "sb-muted", "明日はお休みです"));
+      return;
+    }
+
+    const lessons = (tm.slots || []).filter((s) => s.subject);
+    if (!lessons.length) {
+      slotsBox.appendChild(el("div", "sb-muted", "明日の時間割はまだ入っていません"));
+      return;
+    }
+
+    const line = lessons.map((s) => `${s.period}限 ${s.subject}`).join("　・　");
+    slotsBox.appendChild(el("div", "sb-tomorrow", line));
   }
 
   // ===== メモ =====
-  function getMemoData() {
-    const store = readJson(MEMO_KEY) || {};
-    const notes = Array.isArray(store.notes) ? store.notes : [];
-
-    const items = notes
-      .filter(note => note && !note.deleted)
-      .sort((a, b) =>
-        (b.updated || 0) - (a.updated || 0)
-      )
-      .slice(0, MEMO_LIMIT)
-      .map(note => {
-        let title;
-
-        if (note.locked) {
-          title = "ロックされたメモ";
-        } else {
-          title = String(note.text || "")
-            .split("\n")
-            .map(line => line.trim())
-            .find(Boolean) || "（無題）";
-        }
-
-        return {
-          id: note.id,
-          title,
-          updated: note.updated || note.created || 0,
-          locked: !!note.locked,
-          pinned: !!note.pinned
-        };
-      });
-
-    return {
-      lastUpdated: new Date().toISOString(),
-      items
-    };
-  }
-
-  // ===== 送信データ =====
-  function buildPayload() {
-    return {
-      timetable: getTimetableData(),
-      tomorrow: getTomorrowData(),
-      memo: getMemoData()
-    };
-  }
-
-  // ===== 受信先の判定 =====
-  // ブリッジHTMLの配信元は検証しない。
-  // データを受け取る親ページのオリジンのみ制限する。
-  function isAllowedParentOrigin(origin) {
-    if (ALLOWED_PARENT_ORIGINS.has(origin)) {
-      return true;
-    }
-
-    // 開発用: localhost / 127.0.0.1 のHTTP・HTTPSを許可
-    try {
-      const url = new URL(origin);
-
-      const isLocalHost =
-        url.hostname === "localhost" ||
-        url.hostname === "127.0.0.1" ||
-        url.hostname === "[::1]";
-
-      return isLocalHost &&
-        (url.protocol === "http:" || url.protocol === "https:");
-    } catch (error) {
-      logError("親ページのオリジンを解析できません。", error);
-      return false;
-    }
-  }
-
-  // ===== 親ページへの送信 =====
-  function sendToParent(data) {
-    if (window.parent === window) {
-      log("親ウィンドウが存在しないため送信できません。");
-      return false;
-    }
-
-    if (!parentOrigin) {
-      log("親ページからのリクエストを待っています。");
-      return false;
-    }
-
-    try {
-      window.parent.postMessage(
-        {
-          type: BRIDGE_TYPE,
-          timestamp: Date.now(),
-          data
-        },
-        parentOrigin
-      );
-
-      log("親ページへデータを送信しました。", {
-        targetOrigin: parentOrigin
-      });
-
-      return true;
-    } catch (error) {
-      logError("postMessageの送信に失敗しました。", error);
-      return false;
-    }
-  }
-
-  // ===== 親ページからのリクエスト =====
-  window.addEventListener("message", event => {
-    if (event.source !== window.parent) {
+  function renderMemo(items) {
+    const box = $("sb-memos");
+    box.replaceChildren();
+    if (!items.length) {
+      box.appendChild(el("div", "sb-muted", "メモはまだありません"));
       return;
     }
 
-    if (!event.data || event.data.type !== REQUEST_TYPE) {
-      return;
-    }
-
-    if (!isAllowedParentOrigin(event.origin)) {
-      log("許可されていない親ページからのリクエストを拒否しました。", {
-        origin: event.origin
-      });
-      return;
-    }
-
-    // 設定値 saetab_bridge_enabled は参照しない。
-    parentOrigin = event.origin;
-
-    log("親ページからのリクエストを受信しました。", {
-      origin: parentOrigin
+    items.slice(0, MEMO_MAX).forEach((m) => {
+      const row = el("div", "sb-memo-row");
+      const title = el("span", "sb-memo-title");
+      if (m.pinned) title.appendChild(document.createTextNode("📌 "));
+      if (m.locked) title.appendChild(document.createTextNode("🔒 "));
+      title.appendChild(document.createTextNode(m.title || "（無題）"));
+      row.append(title, el("span", "sb-memo-time", m.updated ? timeFmt.format(new Date(m.updated)) : ""));
+      box.appendChild(row);
     });
+  }
 
-    try {
-      sendToParent(buildPayload());
-    } catch (error) {
-      logError("リクエストへの応答に失敗しました。", error);
+  // ===== 接続状態 =====
+  const pageStart = Date.now();
+  let lastReceived = 0;
+
+  function updateConnStatus() {
+    if (showingTomorrow) return;
+    const s = $("sb-status");
+    if (!lastTimetable) {
+      s.textContent = Date.now() > pageStart + WAIT_MS ? "未受信（ブリッジの接続設定を確認）" : "接続待ち";
+      return;
     }
+    const stale = Date.now() - lastReceived > STALE_MS;
+    s.textContent = (stale ? "途切れ · " : "") + "最終受信 " + clockFmt.format(new Date(lastReceived));
+  }
+
+  // ===== 要求 =====
+  // 許可設定やデータを親ページから渡さない。ブリッジは sk-hub.jp 側で確認する。
+  function requestData() {
+    if (!iframe.contentWindow) return;
+    iframe.contentWindow.postMessage({ type: REQUEST_TYPE }, BRIDGE_ORIGIN);
+  }
+
+  // ===== 受信 =====
+  window.addEventListener("message", (e) => {
+    if (e.origin !== BRIDGE_ORIGIN) return;
+    if (e.source !== iframe.contentWindow) return;
+    if (!e.data || e.data.type !== BRIDGE_TYPE || !e.data.data) return;
+
+    const data = e.data.data;
+    lastReceived = Date.now();
+    lastTimetable = {
+      ...(data.timetable || {}),
+      tomorrow: data.tomorrow || null
+    };
+    renderNow();
+    renderMemo((data.memo && data.memo.items) || []);
+    updateConnStatus();
+
+    // 正常にデータが届いたら接続用 iframe を隠す。
+    iframe.style.display = "none";
   });
 
-  // ===== 画面表示 =====
-  function updateUI(elements, timetable, tomorrow, memo) {
-    if (!elements) return;
+  iframe.addEventListener("load", requestData);
+  setInterval(requestData, REQUEST_EVERY_MS);
+  setInterval(() => { renderNow(); updateConnStatus(); }, TICK_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") { renderNow(); requestData(); }
+  });
 
-    elements.status.className = "status enabled";
-    elements.status.textContent =
-      "✅ ブリッジ有効 — 親ウィンドウへデータを送信しています";
-
-    elements.timetable.textContent =
-      JSON.stringify(timetable, null, 2);
-
-    elements.tomorrow.textContent =
-      JSON.stringify(tomorrow, null, 2);
-
-    elements.memo.textContent =
-      JSON.stringify(memo, null, 2);
-  }
-
-  // ===== 更新 =====
-  function refresh() {
-    const elements = getElements();
-
-    if (!elements) return;
-
-    try {
-      const payload = buildPayload();
-
-      updateUI(
-        elements,
-        payload.timetable,
-        payload.tomorrow,
-        payload.memo
-      );
-
-      if (parentOrigin) {
-        sendToParent(payload);
-      }
-
-      log("データの更新が完了しました。");
-    } catch (error) {
-      logError("データ更新中にエラーが発生しました。", error);
-    }
-  }
-
-  // ===== 初期化 =====
-  function init() {
-    log("初期化を開始します。", {
-      origin: window.location.origin,
-      framed: window.parent !== window
-    });
-
-    refresh();
-
-    window.addEventListener("storage", event => {
-      if (
-        event.key === null ||
-        event.key === TIMETABLE_KEY ||
-        event.key === MEMO_KEY
-      ) {
-        log("保存データの変更を検知しました。");
-        refresh();
-      }
-    });
-
-    window.setInterval(refresh, REFRESH_MS);
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        log("ページが表示状態になりました。");
-        refresh();
-      }
-    });
-
-    log("初期化が完了しました。");
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, {
-      once: true
-    });
-  } else {
-    init();
-  }
+  renderNow();
+  updateConnStatus();
 })();
