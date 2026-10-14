@@ -86,7 +86,7 @@
   const banner = document.createElement("div");
   banner.id = BANNER_ID;
   banner.innerHTML = `
-    <div class="sb-col sb-icon">
+    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/?value=from-saetab-bridge-7">
       <img src="https://sk-hub.jp/toolbox/icon.svg">
     </div>
     <div class="sb-col sb-tt" data-href="https://sk-hub.jp/toolbox/timetable/?value=from-saetab-bridge-7">
