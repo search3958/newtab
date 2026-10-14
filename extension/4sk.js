@@ -1,5 +1,4 @@
-
-
+<script>
 (() => {
   "use strict";
 
@@ -7,19 +6,38 @@
   const REQUEST_TYPE = "saetab_bridge_request";
   const BRIDGE_TYPE = "saetab_bridge_data";
 
+  const BRIDGE_KEY = "saetab_bridge_enabled";
   const TIMETABLE_KEY = "sk_timetable";
   const MEMO_KEY = "sk_memo";
 
   const MEMO_LIMIT = 10;
   const REFRESH_MS = 60 * 1000;
-
   const FEATURE_NAME = "saetab Bridge";
 
-  // 本番の受信先とローカル開発環境のみ許可する。
-  // ブリッジHTML自体の配信元は検証しない。
+  // データの受信を許可する親ページ
   const ALLOWED_PARENT_ORIGINS = new Set([
     "https://search3958.github.io"
   ]);
+
+  // 開発環境の親ページも許可する
+  function isAllowedParentOrigin(origin) {
+    if (ALLOWED_PARENT_ORIGINS.has(origin)) {
+      return true;
+    }
+
+    try {
+      const url = new URL(origin);
+
+      return (
+        (url.hostname === "localhost" ||
+          url.hostname === "127.0.0.1" ||
+          url.hostname === "[::1]") &&
+        (url.protocol === "http:" || url.protocol === "https:")
+      );
+    } catch {
+      return false;
+    }
+  }
 
   let parentOrigin = null;
 
@@ -43,25 +61,25 @@
     console.error(`[${FEATURE_NAME}] ${message}`, error);
   }
 
-  // ===== DOM取得 =====
+  // ===== ブリッジ側の許可確認 =====
+  // 必ずブリッジ自身のオリジンのlocalStorageを参照する。
+  // 読み取りエラーや未設定の場合は許可しない。
+  function checkBridgeEnabled() {
+    try {
+      return localStorage.getItem(BRIDGE_KEY) === "true";
+    } catch (error) {
+      logError("ブリッジの許可設定を読み取れません。連携を停止します。", error);
+      return false;
+    }
+  }
+
   function getElements() {
-    const elements = {
+    return {
       status: document.getElementById("bridgeStatus"),
       timetable: document.getElementById("timetableDisplay"),
       tomorrow: document.getElementById("tomorrowDisplay"),
       memo: document.getElementById("memoDisplay")
     };
-
-    const missing = Object.entries(elements)
-      .filter(([, element]) => !element)
-      .map(([name]) => name);
-
-    if (missing.length > 0) {
-      logError("必要なHTML要素が見つかりません。", missing);
-      return null;
-    }
-
-    return elements;
   }
 
   // ===== ユーティリティ =====
@@ -70,9 +88,9 @@
   }
 
   function ymd(date) {
-    return date.getFullYear() + "-"
-      + pad(date.getMonth() + 1) + "-"
-      + pad(date.getDate());
+    return date.getFullYear() + "-" +
+      pad(date.getMonth() + 1) + "-" +
+      pad(date.getDate());
   }
 
   function readJson(key) {
@@ -276,40 +294,68 @@
     };
   }
 
-  // ===== 受信先の判定 =====
-  // ブリッジHTMLの配信元は検証しない。
-  // データを受け取る親ページのオリジンのみ制限する。
-  function isAllowedParentOrigin(origin) {
-    if (ALLOWED_PARENT_ORIGINS.has(origin)) {
-      return true;
+  // ===== 画面表示 =====
+  function showDisabled() {
+    const elements = getElements();
+
+    if (elements.status) {
+      elements.status.className = "status disabled";
+      elements.status.textContent =
+        "連携は無効です。ブリッジ側の設定を確認してください。";
     }
 
-    // 開発用: localhost / 127.0.0.1 のHTTP・HTTPSを許可
-    try {
-      const url = new URL(origin);
-
-      const isLocalHost =
-        url.hostname === "localhost" ||
-        url.hostname === "127.0.0.1" ||
-        url.hostname === "[::1]";
-
-      return isLocalHost &&
-        (url.protocol === "http:" || url.protocol === "https:");
-    } catch (error) {
-      logError("親ページのオリジンを解析できません。", error);
-      return false;
+    // 無効時は、以前表示したデータも画面から消す。
+    if (elements.timetable) {
+      elements.timetable.textContent = "連携は無効です。";
     }
+
+    if (elements.tomorrow) {
+      elements.tomorrow.textContent = "連携は無効です。";
+    }
+
+    if (elements.memo) {
+      elements.memo.textContent = "連携は無効です。";
+    }
+  }
+
+  function updateUI(payload) {
+    const elements = getElements();
+
+    if (
+      !elements.status ||
+      !elements.timetable ||
+      !elements.tomorrow ||
+      !elements.memo
+    ) {
+      logError("必要なHTML要素が見つかりません。");
+      return;
+    }
+
+    elements.status.className = "status enabled";
+    elements.status.textContent =
+      "ブリッジは有効です。";
+
+    elements.timetable.textContent =
+      JSON.stringify(payload.timetable, null, 2);
+
+    elements.tomorrow.textContent =
+      JSON.stringify(payload.tomorrow, null, 2);
+
+    elements.memo.textContent =
+      JSON.stringify(payload.memo, null, 2);
   }
 
   // ===== 親ページへの送信 =====
   function sendToParent(data) {
-    if (window.parent === window) {
-      log("親ウィンドウが存在しないため送信できません。");
+    // 送信直前にも許可を再確認する。
+    if (!checkBridgeEnabled()) {
+      parentOrigin = null;
+      showDisabled();
+      log("許可されていないため、データ送信を拒否しました。");
       return false;
     }
 
-    if (!parentOrigin) {
-      log("親ページからのリクエストを待っています。");
+    if (window.parent === window || !parentOrigin) {
       return false;
     }
 
@@ -329,7 +375,7 @@
 
       return true;
     } catch (error) {
-      logError("postMessageの送信に失敗しました。", error);
+      logError("データ送信に失敗しました。", error);
       return false;
     }
   }
@@ -344,6 +390,7 @@
       return;
     }
 
+    // 受信先の確認
     if (!isAllowedParentOrigin(event.origin)) {
       log("許可されていない親ページからのリクエストを拒否しました。", {
         origin: event.origin
@@ -351,59 +398,44 @@
       return;
     }
 
-    // 設定値 saetab_bridge_enabled は参照しない。
+    // ブリッジ側の許可を確認。オフならデータを読み出さない。
+    if (!checkBridgeEnabled()) {
+      parentOrigin = null;
+      showDisabled();
+      log("ブリッジ側の許可設定が無効なため、リクエストを拒否しました。");
+      return;
+    }
+
     parentOrigin = event.origin;
 
-    log("親ページからのリクエストを受信しました。", {
-      origin: parentOrigin
-    });
-
     try {
-      sendToParent(buildPayload());
+      // 許可確認後に初めてデータを読み出す。
+      const payload = buildPayload();
+
+      updateUI(payload);
+      sendToParent(payload);
     } catch (error) {
       logError("リクエストへの応答に失敗しました。", error);
     }
   });
 
-  // ===== 画面表示 =====
-  function updateUI(elements, timetable, tomorrow, memo) {
-    if (!elements) return;
-
-    elements.status.className = "status enabled";
-    elements.status.textContent =
-      "✅ ブリッジ有効 — 親ウィンドウへデータを送信しています";
-
-    elements.timetable.textContent =
-      JSON.stringify(timetable, null, 2);
-
-    elements.tomorrow.textContent =
-      JSON.stringify(tomorrow, null, 2);
-
-    elements.memo.textContent =
-      JSON.stringify(memo, null, 2);
-  }
-
   // ===== 更新 =====
   function refresh() {
-    const elements = getElements();
-
-    if (!elements) return;
+    // 定期更新・復帰時も、最初にブリッジ側の許可を確認する。
+    if (!checkBridgeEnabled()) {
+      parentOrigin = null;
+      showDisabled();
+      return;
+    }
 
     try {
       const payload = buildPayload();
 
-      updateUI(
-        elements,
-        payload.timetable,
-        payload.tomorrow,
-        payload.memo
-      );
+      updateUI(payload);
 
       if (parentOrigin) {
         sendToParent(payload);
       }
-
-      log("データの更新が完了しました。");
     } catch (error) {
       logError("データ更新中にエラーが発生しました。", error);
     }
@@ -416,15 +448,18 @@
       framed: window.parent !== window
     });
 
+    // 初期表示でも許可がオフならデータを読み出さない。
     refresh();
 
+    // 同じオリジンの許可設定・データ変更を監視する。
     window.addEventListener("storage", event => {
       if (
         event.key === null ||
+        event.key === BRIDGE_KEY ||
         event.key === TIMETABLE_KEY ||
         event.key === MEMO_KEY
       ) {
-        log("保存データの変更を検知しました。");
+        log("localStorageの変更を検知しました。");
         refresh();
       }
     });
@@ -433,7 +468,6 @@
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        log("ページが表示状態になりました。");
         refresh();
       }
     });
@@ -449,3 +483,4 @@
     init();
   }
 })();
+</script>
