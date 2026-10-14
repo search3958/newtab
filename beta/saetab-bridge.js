@@ -2,7 +2,7 @@
   "use strict";
 
   // ===== 設定 =====
-  const BRIDGE_URL = "http://127.0.0.1:5500/toolbox/saetab-bridge/";
+  const BRIDGE_URL = "https://sk-hub.jp//toolbox/saetab-bridge/";
   const BRIDGE_ORIGIN = new URL(BRIDGE_URL).origin;
   const IFRAME_ID = "saetab-bridge";
   const BANNER_ID = "sb-banner";
@@ -15,7 +15,7 @@
   const REQUEST_EVERY_MS = 15 * 1000;
   const WAIT_MS = 8 * 1000;
   const STALE_MS = 3 * 60 * 1000;
-  const TICK_MS = 30 * 1000;            // 時刻の見直し（いま・次・明日の切り替え）
+  const TICK_MS = 30 * 1000;
 
   if (document.getElementById(BANNER_ID)) return;
 
@@ -120,7 +120,6 @@
     if (target) go(target.dataset.href);
   });
 
-  // キーボードでも開けるように（Tab で移動、Enter で開く）
   banner.querySelectorAll("[data-href]").forEach((c) => {
     c.setAttribute("role", "link");
     c.tabIndex = 0;
@@ -147,13 +146,12 @@
   const timeFmt = new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
   const clockFmt = new Intl.DateTimeFormat("ja-JP", { hour: "2-digit", minute: "2-digit" });
 
-  // "HH:MM" → 0時からの分（おかしければ null）
   function toMin(hm) {
     const m = /^(\d{1,2}):(\d{2})$/.exec(hm || "");
     return m ? Number(m[1]) * 60 + Number(m[2]) : null;
   }
 
-  // ===== 今日の時間割（受け取ったデータを保持し、時刻に合わせて表示）=====
+  // ===== 今日の時間割 =====
   let lastTimetable = null;
   let showingTomorrow = false;
 
@@ -174,7 +172,6 @@
     const now = new Date();
     const nowMin = now.getHours() * 60 + now.getMinutes();
 
-    // 時刻のある授業だけを、始まりの順に並べる
     const list = (tt.none || tt.off ? [] : (tt.slots || []))
       .map((s) => ({ ...s, sm: toMin(s.s), em: toMin(s.e) }))
       .filter((s) => s.sm !== null && s.em !== null && s.em > s.sm)
@@ -183,7 +180,6 @@
     const cur = list.find((s) => nowMin >= s.sm && nowMin < s.em);
     const next = list.find((s) => s.sm > nowMin);
 
-    // 今日まだ授業が残っている → いま・次
     if (cur || next) {
       head.textContent = [tt.dateText, tt.title || "時間割", tt.special].filter(Boolean).join("　");
       status.textContent = tt.source ? `（${tt.source}）` : "";
@@ -192,7 +188,6 @@
       return;
     }
 
-    // 今日はもう授業がない → 明日の一言
     showingTomorrow = true;
     renderTomorrow();
   }
@@ -209,7 +204,6 @@
     return card;
   }
 
-  // 明日の授業を 1 行で
   function renderTomorrow() {
     const head = $("sb-tt-head");
     const status = $("sb-status");
@@ -269,7 +263,6 @@
   let lastReceived = 0;
 
   function updateConnStatus() {
-    // 明日の一言を出しているときは、接続の状態は出さない
     if (showingTomorrow) return;
     const s = $("sb-status");
     if (!lastTimetable) {
@@ -280,13 +273,21 @@
     s.textContent = (stale ? "途切れ · " : "") + "最終受信 " + clockFmt.format(new Date(lastReceived));
   }
 
-  // ===== 受信・リクエスト =====
+  // ===== 要求（保存値を添えて送る）=====
   function requestData() {
-    if (iframe.contentWindow) iframe.contentWindow.postMessage({ type: REQUEST_TYPE }, BRIDGE_ORIGIN);
+    if (!iframe.contentWindow) return;
+    iframe.contentWindow.postMessage({
+      type: REQUEST_TYPE,
+      storage: {
+        enabled: localStorage.getItem("saetab_bridge_enabled"),
+        timetable: localStorage.getItem("sk_timetable"),
+        memo: localStorage.getItem("sk_memo")
+      }
+    }, BRIDGE_ORIGIN);
   }
 
+  // ===== 受信 =====
   window.addEventListener("message", (e) => {
-    // origin と送信元の両方を確かめる（ほかのページからのメッセージは受け取らない）
     if (e.origin !== BRIDGE_ORIGIN) return;
     if (e.source !== iframe.contentWindow) return;
     if (!e.data || e.data.type !== BRIDGE_TYPE || !e.data.data) return;
