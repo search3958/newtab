@@ -24,6 +24,14 @@
   if (window.__saetabSearchShortcuts) return;
   window.__saetabSearchShortcuts = true;
 
+  // 「Developed by SK」の表示（extension/sk-credit.js。何回読み込んでも1回だけ動く）
+  if (!document.querySelector("script[data-sk-credit]")) {
+    const credit = document.createElement("script");
+    credit.src = new URL("sk-credit.js", (document.currentScript && document.currentScript.src) || new URL("./extension/", location.href)).href;
+    credit.dataset.skCredit = "";
+    document.head.appendChild(credit);
+  }
+
   function loadShortcuts() {
     try {
       const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");

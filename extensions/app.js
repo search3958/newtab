@@ -163,6 +163,24 @@ ${theme.js ? theme.js.trim() : ""}
     return b;
   }
 
+  // SK が作った拡張機能・テーマの印（英語）
+  function devBadge(item) {
+    if (!item || item.developer !== "SK") return null;
+    const a = el("a", "dev-badge");
+    a.href = "https://sk-hub.jp/";
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.title = "SK Hub";
+    const logo = el("img");
+    logo.src = "https://sk-hub.jp/assets/sk-32.png";
+    logo.alt = "";
+    logo.width = 14;
+    logo.height = 14;
+    a.append(logo, "Developed by SK");
+    return a;
+  }
+  const appendBadge = (parent, item) => { const b = devBadge(item); if (b) parent.appendChild(b); };
+
   function activeChip() {
     const chip = el("span", "chip");
     chip.append(el("span", "msr", "check_circle"), "使用中");
@@ -177,6 +195,7 @@ ${theme.js ? theme.js.trim() : ""}
       const body = el("div", "card-body");
       const name = el("div", "card-name", ext.name);
       if (installed) name.appendChild(activeChip());
+      appendBadge(name, ext);
       body.append(name, el("span", "card-desc", ext.description));
       if (ext.note) {
         const note = el("p", "card-note", ext.note + " ");
@@ -362,7 +381,9 @@ ${theme.js ? theme.js.trim() : ""}
       const known = EXTENSIONS.find((ext) => ext.id === r.id);
       const card = el("article", "card ext-card");
       const body = el("div", "card-body");
-      body.appendChild(el("div", "card-name", displayName(r)));
+      const nameRow = el("div", "card-name", displayName(r));
+      appendBadge(nameRow, known);
+      body.appendChild(nameRow);
       const when = r.updatedAt || r.createdAt;
       const from = known ? "おすすめから追加" : r.custom ? "自分で追加" : "ほかのページから追加";
       body.appendChild(el("span", "card-desc", when ? `${from}・${new Date(when).toLocaleDateString("ja-JP")}` : from));
@@ -490,6 +511,7 @@ ${theme.js ? theme.js.trim() : ""}
       const body = el("div", "theme-body");
       const name = el("div", "card-name", theme.name);
       if (isActive) name.appendChild(activeChip());
+      appendBadge(name, theme);
       body.append(name, el("span", "card-desc", theme.description));
       const color = theme.colors ? (isActive ? active.themeColor || "default" : pendingColor[theme.id] || "default") : null;
       if (theme.colors) body.appendChild(swatches(theme, color, isActive));

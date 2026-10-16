@@ -19,6 +19,14 @@
 
   if (document.getElementById(BANNER_ID)) return;
 
+  // 「Developed by SK」の表示（extension/sk-credit.js。何回読み込んでも1回だけ動く）
+  if (!document.querySelector("script[data-sk-credit]")) {
+    const credit = document.createElement("script");
+    credit.src = new URL("sk-credit.js", (document.currentScript && document.currentScript.src) || new URL("./extension/", location.href)).href;
+    credit.dataset.skCredit = "";
+    document.head.appendChild(credit);
+  }
+
   // ===== 表示の設定（拡張機能ページの「設定」で変えられる。localStorage の ext:saetab-bridge:settings）=====
   const SETTINGS_KEY = "ext:saetab-bridge:settings";
   const SETTINGS = (() => {

@@ -5,13 +5,15 @@
      ホーム（.search / .searchbtn / .search-btn / .history / #clock）・アプリ一覧（.shortcut / .main-shortcut-*）
      検索候補（.app-search-dropdown / #mainSuggestionDropdown）
      ダイアログ（.newtab-dialog* … 同期と管理・カスタマイズ・履歴）と中の部品（.newtab-settings-* / .newtab-shortcut-*）
-   css は <style> に入れる。js があれば、テーマを読み込むときに一緒に実行する */
+   css は <style> に入れる。js があれば、テーマを読み込むときに一緒に実行する
+   developer: "SK" のものは「Developed by SK」と表示する（拡張機能ページと SaeTab の中。extension/sk-credit.js） */
 (() => {
   "use strict";
 
   const EXTENSIONS = [
     {
       id: "saetab-bridge",
+      developer: "SK",
       // saetab-bridge.html が保存するときと同じ名前・同じ読み込みコードにする（どちらから入れても同じ扱いになる）
       recordName: "saetab-bridge",
       name: "SK's Toolbox 連携",
@@ -31,6 +33,7 @@
     },
     {
       id: "search-shortcuts",
+      developer: "SK",
       name: "検索の近道",
       icon: "bolt",
       description: "検索ボックスに「!yt 猫」と打つと、YouTube で「猫」をさがします。「!」だけ打つと、使える近道が出ます。",
@@ -55,6 +58,7 @@
     },
     {
       id: "today-anniversary",
+      developer: "SK",
       name: "今日は何の日",
       icon: "event",
       description: "今日の記念日やできごとを、検索ボックスの中に1つずつ表示します。何か打ちはじめると消えます。",
@@ -188,6 +192,7 @@ html.saetab-lg-refract .search,html.saetab-lg-refract .search-btn,html.saetab-lg
        面は primary を少し混ぜた色、背景に淡い光、押したときはばねのように動く */
     {
       id: "material3",
+      developer: "SK",
       name: "SK Material",
       description: "SK Hub のアプリと同じマテリアル。M PLUS 1 の文字と、やわらかい角と色。色は SK's Brand から選べます。",
       colors: SK_COLORS,
@@ -199,6 +204,13 @@ html.saetab-lg-refract .search,html.saetab-lg-refract .search-btn,html.saetab-lg
 let zone = "";
 try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
 const strict = /^(Europe\\/|Atlantic\\/(Canary|Madeira|Azores|Reykjavik|Faroe)|Africa\\/Ceuta|Asia\\/(Nicosia|Famagusta)|Arctic\\/)/.test(zone);
+// 「Developed by SK」の表示（SK Material のときはホームの左上にも出る）
+if (!document.querySelector("script[data-sk-credit]")) {
+  const credit = document.createElement("script");
+  credit.src = new URL("./extension/sk-credit.js", location.href).href;
+  credit.dataset.skCredit = "";
+  document.head.appendChild(credit);
+}
 if (!strict && !document.getElementById("saetab-m3-font")) {
   const link = document.createElement("link");
   link.id = "saetab-m3-font";

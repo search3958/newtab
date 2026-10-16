@@ -17,6 +17,14 @@
 
   if (document.getElementById(CHIP_ID)) return;
 
+  // 「Developed by SK」の表示（extension/sk-credit.js。何回読み込んでも1回だけ動く）
+  if (!document.querySelector("script[data-sk-credit]")) {
+    const credit = document.createElement("script");
+    credit.src = new URL("sk-credit.js", (document.currentScript && document.currentScript.src) || new URL("./extension/", location.href)).href;
+    credit.dataset.skCredit = "";
+    document.head.appendChild(credit);
+  }
+
   const now = new Date();
   const pageTitle = `${now.getMonth() + 1}月${now.getDate()}日`;
   const dayKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
