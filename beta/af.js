@@ -2,7 +2,7 @@
 "use strict";
 const DB_NAME = "WallpaperDB";
 const STORE = "images";
-const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip?v=2";
+const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip?v=3";
 const FALLBACK_LIGHT = "bgimg/samag3.webp";
 const FALLBACK_DARK = "bgimg/samag3_dark.webp";
 const HISTORY_KEY = "searchHistory";
@@ -93,6 +93,7 @@ resetAllConfirm: "すべての端末のNewtab設定をリセットします。\n
 deleteHistoryConfirm: "検索履歴をすべて削除します。実行しますか？",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "学習と教育",
 "作業効率化": "作業効率化",
 "コミュニケーション": "コミュニケーション",
@@ -110,12 +111,14 @@ shortcuts: {
 "アナログ時計": "アナログ時計",
 "記録ノート": "記録ノート",
 "千里辞書": "千里辞書",
+"SKについて": "SKについて",
 "ロイロノート": "ロイロノート",
 "Lit講座": "Lit講座",
 "リモート": "リモート",
 "翻訳": "翻訳",
 "Google AI検索": "Google AI検索",
-"Yahoo!フリマ": "Yahoo!フリマ"
+"Yahoo!フリマ": "Yahoo!フリマ",
+"スマートダッシュボード": "スマートダッシュボード"
 }
 },
 en: {
@@ -175,6 +178,7 @@ resetAllConfirm: "Reset Newtab settings on all devices?\nThe settings saved to y
 deleteHistoryConfirm: "Delete all search history?\n\nContinue?",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "Learning & Education",
 "作業効率化": "Productivity",
 "コミュニケーション": "Communication",
@@ -192,12 +196,14 @@ shortcuts: {
 "アナログ時計": "Analog Clock",
 "記録ノート": "Record Note",
 "千里辞書": "Cheonri Dictionary",
+"SKについて": "About SK",
 "ロイロノート": "LoiLoNote",
 "Lit講座": "Lit Course",
 "リモート": "Remote Desktop",
 "翻訳": "Translate",
 "Google AI検索": "Google AI Search",
-"Yahoo!フリマ": "Yahoo! Flea Market"
+"Yahoo!フリマ": "Yahoo! Flea Market",
+"スマートダッシュボード": "Smart Dashboard"
 }
 },
 ko: {
@@ -245,6 +251,7 @@ resetConfirm: "Newtab 설정을 초기화할까요?\n\n배경화면, 라벨 표�
 deleteHistoryConfirm: "모든 검색 기록을 삭제할까요?\n\n계속하시겠습니까?",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "학습 및 교육",
 "作業効率化": "업무 효율",
 "コミュニケーション": "커뮤니케이션",
@@ -262,12 +269,14 @@ shortcuts: {
 "アナログ時計": "아날로그 시계",
 "記録ノート": "기록 노트",
 "千里辞書": "천리 사전",
+"SKについて": "SK 소개",
 "ロイロノート": "LoiLoNote",
 "Lit講座": "Lit 강좌",
 "リモート": "원격 데스크톱",
 "翻訳": "번역",
 "Google AI検索": "Google AI 검색",
-"Yahoo!フリマ": "Yahoo! 플리마켓"
+"Yahoo!フリマ": "Yahoo! 플리마켓",
+"スマートダッシュボード": "스마트 대시보드"
 }
 },
 "ko-kp": {
@@ -315,6 +324,7 @@ resetConfirm: "Newtab 설정을 초기화하겠습니까?\n\n배경화면, 표�
 deleteHistoryConfirm: "검색 기록을 모두 삭제하겠습니까?\n\n계속하시겠습니까?",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "학습과 교육",
 "作業効率化": "작업 효률화",
 "コミュニケーション": "호상교류",
@@ -332,12 +342,14 @@ shortcuts: {
 "アナログ時計": "아날로그시계",
 "記録ノート": "기록수첩",
 "千里辞書": "천리사전",
+"SKについて": "SK 소개",
 "ロイロノート": "LoiLoNote",
 "Lit講座": "Lit강좌",
 "リモート": "원격조종",
 "翻訳": "번역",
 "Google AI検索": "Google 인공지능 검색",
-"Yahoo!フリマ": "Yahoo! 벼룩시장"
+"Yahoo!フリマ": "Yahoo! 벼룩시장",
+"スマートダッシュボード": "지능형 계기판"
 }
 },
 zh: {
@@ -385,6 +397,7 @@ resetConfirm: "重置 Newtab 设置？\n\n仅壁纸、标签显示和图标大�
 deleteHistoryConfirm: "删除全部搜索历史？\n\n继续？",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "学习与教育",
 "作業効率化": "效率工具",
 "コミュニケーション": "交流",
@@ -402,12 +415,14 @@ shortcuts: {
 "アナログ時計": "模拟时钟",
 "記録ノート": "记录笔记",
 "千里辞書": "千里词典",
+"SKについて": "关于 SK",
 "ロイロノート": "LoiLoNote",
 "Lit講座": "Lit 课程",
 "リモート": "远程桌面",
 "翻訳": "翻译",
 "Google AI検索": "Google AI 搜索",
-"Yahoo!フリマ": "Yahoo! 二手交易"
+"Yahoo!フリマ": "Yahoo! 二手交易",
+"スマートダッシュボード": "智能仪表板"
 }
 },
 "zh-tw": {
@@ -455,6 +470,7 @@ resetConfirm: "要重設 Newtab 設定嗎？\n\n僅桌布、標籤顯示和圖�
 deleteHistoryConfirm: "要刪除全部搜尋紀錄嗎？\n\n繼續？",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "學習與教育",
 "作業効率化": "效率工具",
 "コミュニケーション": "社群交流",
@@ -472,12 +488,14 @@ shortcuts: {
 "アナログ時計": "類比時鐘",
 "記録ノート": "記錄筆記",
 "千里辞書": "千里辭典",
+"SKについて": "關於 SK",
 "ロイロノート": "LoiLoNote",
 "Lit講座": "Lit 課程",
 "リモート": "遠端桌面",
 "翻訳": "翻譯",
 "Google AI検索": "Google AI 搜尋",
-"Yahoo!フリマ": "Yahoo! 二手交易"
+"Yahoo!フリマ": "Yahoo! 二手交易",
+"スマートダッシュボード": "智慧儀表板"
 }
 },
 ru: {
@@ -525,6 +543,7 @@ resetConfirm: "Сбросить настройки Newtab?\n\nТолько об�
 deleteHistoryConfirm: "Удалить всю историю поиска?\n\nПродолжить?",
 categories: {
 "Sentaro": "Sentaro",
+"SK Hub": "SK Hub",
 "学習と教育": "Учёба и образование",
 "作業効率化": "Продуктивность",
 "コミュニケーション": "Общение",
@@ -542,12 +561,14 @@ shortcuts: {
 "アナログ時計": "Аналоговые часы",
 "記録ノート": "Заметки",
 "千里辞書": "Словарь Cheonri",
+"SKについて": "О SK",
 "ロイロノート": "LoiLoNote",
 "Lit講座": "Курс Lit",
 "リモート": "Удалённый рабочий стол",
 "翻訳": "Переводчик",
 "Google AI検索": "Поиск Google AI",
-"Yahoo!フリマ": "Yahoo! Flea Market"
+"Yahoo!フリマ": "Yahoo! Flea Market",
+"スマートダッシュボード": "Умная панель"
 }
 }
 };
@@ -894,6 +915,17 @@ links: [
 { name: "NaeCSS", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hicss/ja", icon: "hicss.svg" },
 { name: "NaeJS", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hijs/ja", icon: "hijs.svg" },
 { name: "NaeHTML", bg: "var(--iconbg)", url: "https://search3958.github.io/namu/hihtml/ja", icon: "hihtml.svg" }
+]
+},
+{
+title: "SK Hub",
+links: [
+{ name: "SKについて", bg: "var(--iconbg)", url: "https://sk-hub.jp/", icon: "skhub.webp" },
+{ name: "MALU", bg: "var(--iconbg)", url: "https://sk-hub.jp/dictionary/", icon: "skhub-malu.webp" },
+{ name: "Nagi", bg: "var(--iconbg)", url: "https://sk-hub.jp/nagi/", icon: "skhub-nagi.webp" },
+{ name: "SK's Toolbox", bg: "var(--iconbg)", url: "https://sk-hub.jp/toolbox/", icon: "skhub-toolbox.webp" },
+{ name: "QR Drop", bg: "var(--iconbg)", url: "https://sk-hub.jp/qr-prj/", icon: "skhub-qrdrop.webp" },
+{ name: "スマートダッシュボード", bg: "var(--iconbg)", url: "https://sk-hub.jp/smart-dash/", icon: "skhub-smartdash.webp" }
 ]
 },
 {
