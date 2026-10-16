@@ -80,6 +80,7 @@ syncNeedsLogin: "同期を使うにはログインが必要です。",
 extensions: "拡張機能",
 extensionsEmpty: "保存された拡張機能はありません",
 extensionDeleteConfirm: "「{name}」を削除します。\n\n実行しますか？",
+extensionsBrowse: "拡張機能とテーマを探す",
 data: "データ",
 resetSettings: "このデバイスのNewtab設定をリセット",
 resetAllDevices: "すべての端末からNewtab設定をリセット",
@@ -162,6 +163,7 @@ syncNeedsLogin: "Log in to use sync.",
 extensions: "Extensions",
 extensionsEmpty: "No saved extensions",
 extensionDeleteConfirm: "Delete \"{name}\"?\n\nContinue?",
+extensionsBrowse: "Browse extensions & themes",
 data: "Data",
 resetSettings: "Reset Newtab settings on this device",
 resetAllDevices: "Reset Newtab settings on all devices",
@@ -1518,6 +1520,10 @@ await showManagementDialog();
 row.append(name, deleteButton);
 extensionSection.appendChild(row);
 }
+const extensionLinks = document.createElement("div");
+extensionLinks.className = "newtab-settings-links";
+createSettingsLink(extensionLinks, t("extensionsBrowse"), "https://search3958.github.io/newtab/extensions/");
+extensionSection.appendChild(extensionLinks);
 
 const dataSection = createSettingsSection(dialogContent, t("data"));
 const resetDeviceButton = document.createElement("button");

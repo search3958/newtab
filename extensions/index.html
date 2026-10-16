@@ -3,209 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>拡張機能管理</title>
-
-  <link rel="stylesheet" href="./style.css">
-
-  <script type="text/javascript" src="//typesquare.com/3/tsst/script/ja/typesquare.js?67afe5719990420aa8d92d04ac1e02e5" charset="utf-8"></script>
+  <title>拡張機能 | SaeTab</title>
+  <meta name="description" content="SaeTab 7 に機能を足す拡張機能と、見た目を変えるテーマを選べます。">
+  <meta name="theme-color" content="#f9f9ff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100..900&family=Noto+Sans+JP:wght@100..900&family=Unbounded:wght@200..900&display=swap" rel="stylesheet">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874"
-     crossorigin="anonymous"></script>
-  <script type="importmap">
-    {
-      "imports": {
-        "@material/web/": "https://esm.run/@material/web/"
-      }
-    }
-  </script>
-  <script type="module">
-    import '@material/web/all.js';
-    import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
-
-    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-  </script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+1:wght@300;400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div id="animateButton" style="display:flex;margin:40px 10px;">
-      <a href="https://search3958.github.io/newtab/" >
-     <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#000000"><path d="M647.44-93.85 261.28-480l386.16-386.15 49.33 50L360.61-480l336.16 336.15-49.33 50Z"/></svg>
-       
-     </a>
-     <div class="h2">Extensions(Beta)</div>
-       </div>
+  <header class="top-bar">
+    <a class="icon-btn m3-state" href="../" aria-label="SaeTab に戻る" title="SaeTab に戻る"><span class="msr">arrow_back</span></a>
+    <span class="top-bar-label">SaeTab</span>
+  </header>
 
-       <div class="h3">デザイン拡張</div>
-       <div class="container smooth">
-        <div class="card">
-          <img class="card-img" src="./img/design/liquidglass.png">
-          <div class="card-title">Ultra Glass</div>
-          <div class="card-text">もっと透明感のあるLiquid Glass</div>
-          <button id="setNewtab" onclick="
-            document.getElementById('extName').value = 'Ultra Glass';
-            document.getElementById('cssBox').value = ':root { --textboxbg: #fff0; } .search-container,.bar{backdrop-filter: blur(0px);}canvas{filter:brightness(1)!important;}';
-            document.getElementById('jsBox').value = '';
-            document.getElementById('addExt').click();
-          ">拡張機能を追加<md-ripple></md-ripple></button>
-        </div>
+  <main class="page">
+    <h1 class="headline">拡張機能</h1>
+    <p class="lead">SaeTab に機能を足したり、見た目を変えたりできます。追加・削除は、SaeTab を開き直すと反映されます。</p>
 
-        <div class="card">
-          <img class="card-img" src="./img/design/win10.png">
-          <div class="card-title">Windowa10</div>
-          <div class="card-text">いい感じにWindows10感。ほんまに試してみて！！</div>
-          <button id="setNewtab" onclick="
-            document.getElementById('extName').value = 'Windowa10';
-            document.getElementById('cssBox').value = ':root{--textboxbg:#fffa!important}canvas{display:none}.search-container{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#fff3!important;mix-blend-mode:unset!important;padding:18px 19px!important;border-radius:0px!important;box-shadow:0 2px 4px 0 #0001!important;transform:translate(calc(-50% + 11px),-46px)!important}svg{fill:#000!important}.bar{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}#aisearch,#setting{border-radius:0px!important}.pill{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:0px!important;background:#f9f9f9!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:0px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:0px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:0px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}#aisearch{mix-blend-mode:unset!important;top:4px!important;right:5.5px!important;padding:16px 16px!important;padding-bottom:11px!important}#setting{background:#fff8!important;mix-blend-mode:unset!important;color:#000000!important;top:4px!important;right:61px!important;padding:16px 16px!important;padding-bottom:11px!important;width:fit-content!important}#setting.show{right:5.5px!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#0008!important}#searchButton{background:#4cc1fe!important}.settingbtn{background:#111!important}.bg.active{background:#00000057!important}}';
-            document.getElementById('jsBox').value = '';
-            document.getElementById('addExt').click();
-          ">拡張機能を追加<md-ripple></md-ripple></button>
-        </div>
+    <div class="segmented" role="tablist" aria-label="種類">
+      <button class="segment m3-state" role="tab" id="tab-extensions" aria-controls="panel-extensions" aria-selected="true" data-tab="extensions">
+        <span class="msr">extension</span>拡張機能
+      </button>
+      <button class="segment m3-state" role="tab" id="tab-themes" aria-controls="panel-themes" aria-selected="false" data-tab="themes">
+        <span class="msr">palette</span>テーマ
+      </button>
+    </div>
 
-        <div class="card">
-          <img class="card-img" src="./img/design/win11.png">
-          <div class="card-title">Windows11</div>
-          <div class="card-text">v3.6が拡張機能として生き返ったのかもしれない。</div>
-          <button id="setNewtab" onclick="
-            document.getElementById('extName').value = 'Windows11';
-            document.getElementById('cssBox').value = ':root{--textboxbg:#fff8!important}canvas{display:none}.search-container{border-radius:12px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#0166c0!important;mix-blend-mode:unset!important;padding:7px 19px!important;border-radius:5px!important;box-shadow:0 2px 4px 0 #0001!important}.bar{border-radius:12px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}#aisearch,#setting{border-radius:5px!important}.pill{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:6px!important;background:#f9f9f9!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:6px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:5px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#0008!important}#searchButton{background:#4cc1fe!important}.settingbtn{background:#111!important}.bg.active{background:#00000057!important}}';
-            document.getElementById('jsBox').value = '';
-            document.getElementById('addExt').click();
-          ">拡張機能を追加<md-ripple></md-ripple></button>
-        </div>
+    <section class="panel" id="panel-extensions" role="tabpanel" aria-labelledby="tab-extensions">
+      <h2 class="title">おすすめ</h2>
+      <div class="list" id="extensionCatalog"></div>
 
-        <div class="card">
-          <img class="card-img" src="./img/design/material3.png">
-          <div class="card-title">Material3</div>
-          <div class="card-text">いい感じにMaterial Youって感じ。</div>
-          <button id="setNewtab" onclick="
-            document.getElementById('extName').value = 'Material3';
-            document.getElementById('cssBox').value = ':root{--textboxbg:#f3f3faaa!important;--searchbtn:#415f91!important}*{box-shadow:none!important}canvas{filter:brightness(1)!important}#searchButton{mix-blend-mode:unset!important}#setting{background:#d6e3ff!important;mix-blend-mode:unset!important;color:#284777!important}#aisearch{background:#573e5c!important;mix-blend-mode:unset!important;color:#fad8fd!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#191c20aa!important;--searchbtn:#aac7ff!important}#setting{background:#284777!important;color:#d6e3ff!important}#aisearch{background:#ddbce0!important;color:#3f2844!important}}';
-            document.getElementById('jsBox').value = '';
-            document.getElementById('addExt').click();
-          ">拡張機能を追加<md-ripple></md-ripple></button>
-        </div>
+      <h2 class="title">入っている拡張機能</h2>
+      <div class="list" id="installedList"></div>
 
+      <details class="card custom">
+        <summary class="custom-summary m3-state">
+          <span class="card-icon"><span class="msr">code</span></span>
+          <span class="custom-summary-text">
+            <span class="card-name">自分で追加</span>
+            <span class="card-desc">CSS や JavaScript を書いて、自分だけの拡張機能を追加します。</span>
+          </span>
+          <span class="msr custom-chevron">expand_more</span>
+        </summary>
+        <form class="custom-form" id="customForm">
+          <label class="field">
+            <span class="field-label">名前</span>
+            <input id="customName" type="text" maxlength="40" required placeholder="例: 時計を大きく">
+          </label>
+          <label class="field">
+            <span class="field-label">CSS</span>
+            <textarea id="customCss" rows="4" spellcheck="false" placeholder="#clock { font-size: 72px; }"></textarea>
+          </label>
+          <label class="field">
+            <span class="field-label">JavaScript</span>
+            <textarea id="customJs" rows="4" spellcheck="false" placeholder="NT.log(&quot;こんにちは&quot;);"></textarea>
+          </label>
+          <p class="warn"><span class="msr">warning</span>拡張機能は SaeTab と同じ権限で動きます。信頼できるコードだけを追加してください。</p>
+          <div class="actions">
+            <button class="btn btn-filled m3-state" type="submit"><span class="msr">add</span>追加</button>
+          </div>
+        </form>
+      </details>
+    </section>
 
-        <div class="card">
-          <img class="card-img" src="./img/design/material2.png">
-          <div class="card-title">Material2</div>
-          <div class="card-text">やっぱM2はGoogle感あるなー。</div>
-          <button id="setNewtab" onclick="
-            document.getElementById('extName').value = 'Material2';
-            document.getElementById('cssBox').value = ':root{--textboxbg:#fffb!important}canvas{display:none}.search-container{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important;padding:0px!important;transform:translate(-50%,calc(-50px + 4px))!important}#searchButton{background:#3f51b5!important;mix-blend-mode:unset!important;padding:7px 19px!important;border-radius:3px!important;box-shadow:0 2px 4px 0 #0001!important}#aisearch{mix-blend-mode:unset!important;background:#f50057!important}#setting{mix-blend-mode:unset!important;background:#3f51b5!important}.bar{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important;backdrop-filter:blur(16px)!important}.pill{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.settingbtn{padding:0 16px!important;border-radius:6px!important;background:#1565c0!important;color:#fff!important;height:40px!important;box-shadow:0 2px 4px 0 #0001!important}input#bgUrlInput{font-size:16px!important;padding:8px 13px!important;border-radius:6px!important;width:374px!important}.bar.show{padding-bottom:334px!important}.history,button.ai-engine-btn{border-radius:10px!important;box-shadow:0 0 14px 0 #00000011,0 10px 20px 0 #00000011!important}.pillicon{border-radius:5px!important}.bg.active{background:#ffffff57!important;backdrop-filter:blur(48px)!important}@media (prefers-color-scheme:dark){:root{--textboxbg:#000b!important}svg{fill:#fff!important}.bg.active{background:#00000057!important}}';
-            document.getElementById('jsBox').value = '';
-            document.getElementById('addExt').click();
-          ">拡張機能を追加<md-ripple></md-ripple></button>
-        </div>
+    <section class="panel" id="panel-themes" role="tabpanel" aria-labelledby="tab-themes" hidden>
+      <p class="hint">テーマは1つだけ使えます。別のテーマを選ぶと入れかわります。</p>
+      <div class="theme-grid" id="themeGrid"></div>
+    </section>
+  </main>
 
-       </div>
+  <div class="dialog-scrim" id="confirmDialog" hidden>
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+      <span class="msr dialog-icon">delete</span>
+      <h2 class="dialog-title" id="confirmTitle"></h2>
+      <p class="dialog-text" id="confirmText"></p>
+      <div class="dialog-actions">
+        <button class="text-btn m3-state" type="button" data-answer="no">キャンセル</button>
+        <button class="text-btn m3-state" type="button" data-answer="yes">削除</button>
+      </div>
+    </div>
+  </div>
 
-    <div class="h3">使用中の拡張機能</div>
-    <div class="ext-list container smooth" id="extList"></div>
+  <div class="snackbar" id="snackbar" role="status" aria-live="polite" hidden>
+    <span id="snackbarText"></span>
+    <a class="snackbar-action" href="../">SaeTab を開く</a>
+  </div>
 
-<div class="debug">
-  <label>名前:</label>
-  <input id="extName" type="text" placeholder="拡張機能名を入力">
-  <label>CSS:</label>
-  <textarea id="cssBox" placeholder="ここにCSSを入力"></textarea>
-  <label>JavaScript:</label>
-  <textarea id="jsBox" placeholder="ここにJavaScriptを入力"></textarea>
-  <button id="addExt">読み込む</button>
-  <button id="allDelete" class="all-delete">全て削除</button>
-</div>
-  <script>
-    // 拡張機能データの取得
-    function getExtensions() {
-      return JSON.parse(localStorage.getItem('extensions') || '[]');
-    }
-    // 拡張機能データの保存
-    function saveExtensions(exts) {
-      localStorage.setItem('extensions', JSON.stringify(exts));
-    }
-    // 拡張機能のリスト表示
-    function renderList() {
-      const list = document.getElementById('extList');
-      list.innerHTML = '';
-      const exts = getExtensions();
-      exts.forEach((ext, i) => {
-        const div = document.createElement('div');
-        div.className = 'card-c';
-        div.innerHTML =
-          '<div class="card-title">' + (ext.name ? ext.name : '拡張機能 ' + (i+1)) + '<div>' +
-          '<button class="delete setNewtab" data-id="' + ext.id + '">削除</button>';
-        list.appendChild(div);
-      });
-      // 削除ボタンイベント
-      document.querySelectorAll('.delete').forEach(btn => {
-        btn.onclick = function() {
-          const id = this.dataset.id;
-          const newExts = getExtensions().filter(ext => ext.id !== id);
-          saveExtensions(newExts);
-          renderList();
-        };
-      });
-    }
-    // 拡張機能の全削除
-    document.getElementById('allDelete').onclick = function() {
-      saveExtensions([]);
-      renderList();
-    };
-    // 拡張機能の追加
-    document.getElementById('addExt').onclick = function() {
-      const name = document.getElementById('extName').value;
-      const css = document.getElementById('cssBox').value;
-      const js = document.getElementById('jsBox').value;
-      if (!name) return alert('名前を入力してください');
-      if (!css && !js) return alert('CSSまたはJavaScriptを入力してください');
-      const id = 'ext_' + Date.now();
-      const exts = getExtensions();
-      exts.push({ id, name, css, js });
-      saveExtensions(exts);
-      renderList();
-      document.getElementById('extName').value = '';
-      document.getElementById('cssBox').value = '';
-      document.getElementById('jsBox').value = '';
-    };
-    // ページ読み込み時、リストのみ表示
-    window.onload = function() {
-      renderList();
-    };
-  </script>
-  <script>
-    function updateSmoothCorners() {
-      // 対象: .smooth クラスを持つ要素
-      const elements = document.querySelectorAll('.smooth');
-    
-      elements.forEach(el => {
-        // 現在の computed style で --smooth-corners が使われているかチェック
-        const style = getComputedStyle(el);
-        const hasSmoothCorners = style.getPropertyValue('--smooth-corners');
-    
-        if (hasSmoothCorners !== '') {
-          const height = el.offsetHeight;
-          const width = el.offsetWidth;
-          const smoothValue = `${(width / 50).toFixed(2)}, ${(height / 50).toFixed(2)}`;
-          el.style.setProperty('--smooth-corners', smoothValue);
-        }
-      });
-    }
-    
-    // 初回実行
-    updateSmoothCorners();
-    
-    // ウィンドウサイズ変更時にも再計算
-    window.addEventListener('resize', updateSmoothCorners);
-    
-    // DOM追加時にも対応（必要なら）
-    const observer = new MutationObserver(updateSmoothCorners);
-    observer.observe(document.body, { childList: true, subtree: true });
-    </script>
-    <script>
-      if (CSS && 'paintWorklet' in CSS) CSS.paintWorklet.addModule('https://unpkg.com/smooth-corners')
-    </script>
-    
+  <script src="./catalog.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

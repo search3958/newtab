@@ -19,6 +19,14 @@
 
   if (document.getElementById(BANNER_ID)) return;
 
+  // ===== 表示の設定（拡張機能ページの「設定」で変えられる。localStorage の ext:saetab-bridge:settings）=====
+  const SETTINGS_KEY = "ext:saetab-bridge:settings";
+  const SETTINGS = (() => {
+    const defaults = { timetable: true, memo: true, apps: true, clockLink: true };
+    try { return { ...defaults, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}") }; }
+    catch { return defaults; }
+  })();
+
   // ===== 受け取り用 iframe =====
   let iframe = document.getElementById(IFRAME_ID);
   if (!iframe) {
@@ -84,7 +92,8 @@
     #${BANNER_ID} .sb-memo-row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
     #${BANNER_ID} .sb-memo-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     #${BANNER_ID} .sb-memo-time { display: none; }
-    #clock:hover { opacity: 0.7; cursor: pointer; }
+    #${BANNER_ID} [hidden] { display: none !important; }
+    ${SETTINGS.clockLink ? "#clock:hover { opacity: 0.7; cursor: pointer; }" : ""}
     @media (max-width: 600px) {
       #${IFRAME_ID} { width: calc(100vw - 24px); }
     }
@@ -95,7 +104,7 @@
   const banner = document.createElement("div");
   banner.id = BANNER_ID;
   banner.innerHTML = `
-    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/?value=from-saetab-bridge-7">
+    <div class="sb-col sb-icon" data-app="toolbox" data-href="https://sk-hub.jp/toolbox/?value=from-saetab-bridge-7">
       <img src="https://sk-hub.jp/toolbox/icon.svg">
     </div>
     <div class="sb-col sb-tt" data-href="https://sk-hub.jp/toolbox/timetable/?value=from-saetab-bridge-7">
@@ -106,20 +115,25 @@
       <div class="sb-head">最新のメモ</div>
       <div class="sb-memos" id="sb-memos"></div>
     </div>
-    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/todo/?value=from-saetab-bridge-7">
+    <div class="sb-col sb-icon" data-app="todo" data-href="https://sk-hub.jp/toolbox/todo/?value=from-saetab-bridge-7">
       <img src="https://sk-hub.jp/toolbox/todo/icon.svg">
     </div>
-    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/calc/?value=from-saetab-bridge-7">
+    <div class="sb-col sb-icon" data-app="calc" data-href="https://sk-hub.jp/toolbox/calc/?value=from-saetab-bridge-7">
       <img src="https://sk-hub.jp/toolbox/calc/icon.svg">
     </div>
-    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/countdown/?value=from-saetab-bridge-7">
+    <div class="sb-col sb-icon" data-app="countdown" data-href="https://sk-hub.jp/toolbox/countdown/?value=from-saetab-bridge-7">
       <img src="https://sk-hub.jp/toolbox/countdown/icon.svg">
     </div>
-    <div class="sb-col sb-icon" data-href="https://sk-hub.jp/toolbox/roulette/?value=from-saetab-bridge-7">
+    <div class="sb-col sb-icon" data-app="roulette" data-href="https://sk-hub.jp/toolbox/roulette/?value=from-saetab-bridge-7">
       <img src="https://sk-hub.jp/toolbox/roulette/icon.svg">
     </div>
   `;
   document.body.appendChild(banner);
+
+  // 設定で消したものを隠す
+  banner.querySelector(".sb-tt").hidden = !SETTINGS.timetable;
+  banner.querySelector(".sb-memo").hidden = !SETTINGS.memo;
+  banner.querySelectorAll("[data-app]").forEach((c) => { c.hidden = !SETTINGS.apps; });
 
   // ===== リンク =====
   const go = (url) => { location.href = url; };
@@ -139,7 +153,7 @@
 
   // 時計
   const clock = document.getElementById("clock");
-  if (clock) {
+  if (clock && SETTINGS.clockLink) {
     clock.style.bottom = CLOCK_BOTTOM;
     clock.addEventListener("click", () => go(CLOCK_URL));
   }
