@@ -119,13 +119,22 @@
 
   const THEMES = [
     /* ---------- Ultra Glass（Liquid Glass 風） ---------- */
-    {
-      id: "ultra-glass",
-      name: "Ultra Glass",
-      description: "Liquid Glass のような、向こうが曲がって見える透明なガラス。",
-      preview: { wall: "linear-gradient(135deg,#5b7fd6,#b78ad8 55%,#f2a7b5)", bar: "linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.08) 50%,rgba(255,255,255,.22))", barInk: "#fff", btn: "rgba(255,255,255,.4)", box: "linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.1))", radius: "99px", boxRadius: "14px", border: "rgba(255,255,255,.7)", shadow: "0 6px 16px rgba(0,0,0,.18)" },
-      // Chrome 系だけ、SVG フィルターで背景を曲げる（Safari・Firefox は backdrop-filter の url() を使えないので、ふつうのガラスになる）
-      js: `
+   {
+  id: "ultra-glass",
+  name: "Ultra Glass",
+  description: "Liquid Glass のような、向こうが曲がって見える透明なガラス。",
+  preview: { 
+    wall: "linear-gradient(135deg,#5b7fd6,#b78ad8 55%,#f2a7b5)", 
+    bar: "linear-gradient(135deg,rgba(255,255,255,.4),rgba(255,255,255,.08) 50%,rgba(255,255,255,.22))", 
+    barInk: "#fff", 
+    btn: "rgba(255,255,255,.4)", 
+    box: "linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.1))", 
+    radius: "99px", 
+    boxRadius: "14px", 
+    border: "rgba(255,255,255,.7)", 
+    shadow: "0 6px 16px rgba(0,0,0,.18)" 
+  },
+  js: `
 const NS = "http://www.w3.org/2000/svg";
 if (!document.getElementById("saetab-lg-svg")) {
   const svg = document.createElementNS(NS, "svg");
@@ -143,49 +152,199 @@ if (!document.getElementById("saetab-lg-svg")) {
 const brands = (navigator.userAgentData && navigator.userAgentData.brands) || [];
 if (brands.some((b) => /Chromium/.test(b.brand))) document.documentElement.classList.add("saetab-lg-refract");
 `,
-      css: `
-:root{--lg-tint:rgba(255,255,255,.08);--lg-sheen:linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.04) 42%,rgba(255,255,255,0) 60%,rgba(255,255,255,.12));--lg-rim:inset 1.5px 1.5px 0 rgba(255,255,255,.75),inset -1px -1px 0 rgba(255,255,255,.28),inset 0 0 0 1px rgba(255,255,255,.18),inset 0 0 18px rgba(255,255,255,.12);--lg-drop:0 10px 30px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.1);--lg-blur:blur(3px) saturate(1.9) brightness(1.08);--lg-blur-strong:blur(22px) saturate(1.9) brightness(1.04)}
-.search,.search-btn,.history,.main-shortcut-box,.searchbtn{background:var(--lg-sheen),var(--lg-tint)!important;-webkit-backdrop-filter:var(--lg-blur)!important;backdrop-filter:var(--lg-blur)!important;box-shadow:var(--lg-rim),var(--lg-drop)!important}
-html.saetab-lg-refract .search,html.saetab-lg-refract .search-btn,html.saetab-lg-refract .history,html.saetab-lg-refract .main-shortcut-box{backdrop-filter:url(#saetab-lg) blur(1.5px) saturate(1.9) brightness(1.08)!important}
-.searchbtn{background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.18))!important}
-#searchBox,.search-btn,.history,#clock{color:#fff!important}
-#searchBox::placeholder{color:rgba(255,255,255,.78)!important}
-#searchBox,.search-btn,.history{text-shadow:0 1px 3px rgba(0,0,0,.35)}
-#clock{text-shadow:0 2px 16px rgba(0,0,0,.25)}
-.search-btn svg path,.searchbtn svg path{fill:#fff!important}
-.search-btn{transition:transform .5s cubic-bezier(.2,1.6,.4,1)!important}
-.search-btn:hover{transform:translate(0,-2px) scale(1.07)!important}
-.search-btn:active{transform:scale(.96)!important}
-.shortcut{background:rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(40px) saturate(1.8);backdrop-filter:blur(40px) saturate(1.8)}
-.main-shortcut-title,.main-shortcut-name{color:#fff!important;text-shadow:0 1px 8px rgba(0,0,0,.4)}
-.app-search-dropdown,#mainSuggestionDropdown{background:var(--lg-sheen),rgba(255,255,255,.12)!important;-webkit-backdrop-filter:var(--lg-blur-strong)!important;backdrop-filter:var(--lg-blur-strong)!important;box-shadow:var(--lg-rim),var(--lg-drop)!important}
-.app-search-item-name{color:#fff!important}
-.app-search-item:hover{background:rgba(255,255,255,.16)!important}
-.newtab-dialog{background:rgba(0,0,0,.12)!important}
-.newtab-dialog-content{background:var(--lg-sheen),rgba(255,255,255,.3)!important;color:#111!important;-webkit-backdrop-filter:var(--lg-blur-strong)!important;backdrop-filter:var(--lg-blur-strong)!important;box-shadow:var(--lg-rim),0 24px 80px rgba(0,0,0,.3)!important}
-.newtab-dialog-close,${BTN}{background:rgba(255,255,255,.32)!important;color:inherit!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.8),inset 0 0 0 1px rgba(255,255,255,.3)!important;border-radius:99px!important}
-.newtab-settings-action:hover,.newtab-settings-choice:hover,.newtab-settings-link:hover,.newtab-dialog-close:hover{background:rgba(255,255,255,.5)!important}
-.newtab-settings-choice[aria-pressed="true"]{background:rgba(255,255,255,.92)!important;color:#0a64ff!important;font-weight:600}
-.newtab-settings-danger{background:rgba(255,59,48,.78)!important;color:#fff!important;border-radius:99px!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.45)!important}
-.newtab-settings-row>input{background:rgba(255,255,255,.35)!important;border:0!important;border-radius:99px!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.12),inset 0 0 0 1px rgba(255,255,255,.4)!important}
-.newtab-settings-hint,.newtab-shortcut-entry-url,.dialog-empty{color:rgba(0,0,0,.6)!important}
-.newtab-shortcut-entry{background:rgba(255,255,255,.28)!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.6)}
-.newtab-dialog-content>ul>li{border-bottom-color:rgba(255,255,255,.35)!important}
-@media (prefers-color-scheme:dark){
-.newtab-dialog-content{background:var(--lg-sheen),rgba(40,40,46,.38)!important;color:#fff!important}
-.newtab-dialog-close,${BTN}{background:rgba(255,255,255,.12)!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.12)!important}
-.newtab-settings-action:hover,.newtab-settings-choice:hover,.newtab-settings-link:hover,.newtab-dialog-close:hover{background:rgba(255,255,255,.22)!important}
-.newtab-settings-choice[aria-pressed="true"]{background:rgba(255,255,255,.9)!important;color:#0a64ff!important}
-.newtab-settings-row>input{background:rgba(0,0,0,.25)!important}
-.newtab-settings-hint,.newtab-shortcut-entry-url,.dialog-empty{color:rgba(255,255,255,.65)!important}
-.newtab-shortcut-entry{background:rgba(255,255,255,.08)!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.2)}
-.newtab-dialog-content>ul>li{border-bottom-color:rgba(255,255,255,.12)!important}
+  css: `
+:root{
+  --lg-tint:rgba(255,255,255,.08);
+  --lg-sheen:linear-gradient(135deg,rgba(255,255,255,.26),rgba(255,255,255,.04) 42%,rgba(255,255,255,0) 60%,rgba(255,255,255,.12));
+  /* ✅ ライトテーマ用シャドウ（ご指定の値に置換） */
+  --lg-rim:inset 0px 1px 0.5px 0px rgba(255, 255, 255, 0.45),inset 0px -1px 0.5px 0px rgba(255, 255, 255, 0.45),inset 1px 0px 0.5px 0px rgba(0, 0, 0, 0.45),inset -1px 0px 0.5px 0px rgba(0, 0, 0, 0.45);
+  --lg-drop:0px 4px 27px 0px rgba(0, 0, 0, 0.06);
+  --lg-blur:blur(3px) saturate(1.9) brightness(1.08);
+  --lg-blur-strong:blur(22px) saturate(1.9) brightness(1.04)
 }
+
+.search,.search-btn,.history,.main-shortcut-box,.searchbtn{
+  background:var(--lg-sheen),var(--lg-tint)!important;
+  -webkit-backdrop-filter:var(--lg-blur)!important;
+  backdrop-filter:var(--lg-blur)!important;
+  box-shadow:var(--lg-rim),var(--lg-drop)!important
+}
+
+html.saetab-lg-refract .search,
+html.saetab-lg-refract .search-btn,
+html.saetab-lg-refract .history,
+html.saetab-lg-refract .main-shortcut-box{
+  backdrop-filter:url(#saetab-lg) blur(1.5px) saturate(1.9) brightness(1.08)!important
+}
+
+.searchbtn{
+  background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.18))!important
+}
+
+#searchBox,.search-btn,.history,#clock{
+  color:#fff!important
+}
+
+#searchBox::placeholder{
+  color:rgba(255,255,255,.78)!important
+}
+
+#searchBox,.search-btn,.history{
+  text-shadow:0 1px 3px rgba(0,0,0,.35)
+}
+
+#clock{
+  text-shadow:0 2px 16px rgba(0,0,0,.25)
+}
+
+.search-btn svg path,.searchbtn svg path{
+  fill:#fff!important
+}
+
+.search-btn{
+  transition:transform .5s cubic-bezier(.2,1.6,.4,1)!important
+}
+
+.search-btn:hover{
+  transform:translate(0,-2px) scale(1.07)!important
+}
+
+.search-btn:active{
+  transform:scale(.96)!important
+}
+
+.shortcut{
+  background:rgba(255,255,255,.06)!important;
+  -webkit-backdrop-filter:blur(40px) saturate(1.8);
+  backdrop-filter:blur(40px) saturate(1.8)
+}
+
+.main-shortcut-title,.main-shortcut-name{
+  color:#fff!important;
+  text-shadow:0 1px 8px rgba(0,0,0,.4)
+}
+
+.app-search-dropdown,#mainSuggestionDropdown{
+  background:var(--lg-sheen),rgba(255,255,255,.12)!important;
+  -webkit-backdrop-filter:var(--lg-blur-strong)!important;
+  backdrop-filter:var(--lg-blur-strong)!important;
+  box-shadow:var(--lg-rim),var(--lg-drop)!important
+}
+
+.app-search-item-name{
+  color:#fff!important
+}
+
+.app-search-item:hover{
+  background:rgba(255,255,255,.16)!important
+}
+
+.newtab-dialog{
+  background:rgba(0,0,0,.12)!important
+}
+
+.newtab-dialog-content{
+  background:var(--lg-sheen),rgba(255,255,255,.3)!important;
+  color:#111!important;
+  -webkit-backdrop-filter:var(--lg-blur-strong)!important;
+  backdrop-filter:var(--lg-blur-strong)!important;
+  box-shadow:var(--lg-rim),var(--lg-drop)!important
+}
+
+.newtab-dialog-close,${BTN}{
+  background:rgba(255,255,255,.32)!important;
+  color:inherit!important;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.8),inset 0 0 0 1px rgba(255,255,255,.3)!important;
+  border-radius:99px!important
+}
+
+.newtab-settings-action:hover,
+.newtab-settings-choice:hover,
+.newtab-settings-link:hover,
+.newtab-dialog-close:hover{
+  background:rgba(255,255,255,.5)!important
+}
+
+.newtab-settings-choice[aria-pressed="true"]{
+  background:rgba(255,255,255,.92)!important;
+  color:#0a64ff!important;
+  font-weight:600
+}
+
+.newtab-settings-danger{
+  background:rgba(255,59,48,.78)!important;
+  color:#fff!important;
+  border-radius:99px!important;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.45)!important
+}
+
+.newtab-settings-row>input{
+  background:rgba(255,255,255,.35)!important;
+  border:0!important;
+  border-radius:99px!important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.12),inset 0 0 0 1px rgba(255,255,255,.4)!important
+}
+
+.newtab-settings-hint,.newtab-shortcut-entry-url,.dialog-empty{
+  color:rgba(0,0,0,.6)!important
+}
+
+.newtab-shortcut-entry{
+  background:rgba(255,255,255,.28)!important;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.6)
+}
+
+.newtab-dialog-content>ul>li{
+  border-bottom-color:rgba(255,255,255,.35)!important
+}
+
+@media (prefers-color-scheme:dark){
+  :root{
+    /* ✅ ダークテーマ用シャドウ（ご指定の値に置換） */
+    --lg-rim:inset 1px 0px 0.5px 0px rgba(0, 0, 0, 0.45),inset -1px 0px 0.5px 0px rgba(0, 0, 0, 0.45),inset 0px 1px 0.5px 0px rgba(255, 255, 255, 0.45),inset 0px -1px 0.5px 0px rgba(255, 255, 255, 0.45);
+    --lg-drop:0px 4px 27px 0px rgba(0, 0, 0, 0.1);
+  }
+  .newtab-dialog-content{
+    background:var(--lg-sheen),rgba(40,40,46,.38)!important;
+    color:#fff!important
+  }
+  .newtab-dialog-close,${BTN}{
+    background:rgba(255,255,255,.12)!important;
+    box-shadow:inset 1px 1px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.12)!important
+  }
+  .newtab-settings-action:hover,
+  .newtab-settings-choice:hover,
+  .newtab-settings-link:hover,
+  .newtab-dialog-close:hover{
+    background:rgba(255,255,255,.22)!important
+  }
+  .newtab-settings-choice[aria-pressed="true"]{
+    background:rgba(255,255,255,.9)!important;
+    color:#0a64ff!important
+  }
+  .newtab-settings-row>input{
+    background:rgba(0,0,0,.25)!important
+  }
+  .newtab-settings-hint,.newtab-shortcut-entry-url,.dialog-empty{
+    color:rgba(255,255,255,.65)!important
+  }
+  .newtab-shortcut-entry{
+    background:rgba(255,255,255,.08)!important;
+    box-shadow:inset 1px 1px 0 rgba(255,255,255,.2)
+  }
+  .newtab-dialog-content>ul>li{
+    border-bottom-color:rgba(255,255,255,.12)!important
+  }
+}
+
 @media (prefers-reduced-transparency:reduce){
-.search,.search-btn,.history,.main-shortcut-box,.newtab-dialog-content,.app-search-dropdown,#mainSuggestionDropdown{background:rgba(40,40,46,.85)!important;backdrop-filter:none!important}
+  .search,.search-btn,.history,.main-shortcut-box,.newtab-dialog-content,.app-search-dropdown,#mainSuggestionDropdown{
+    background:rgba(40,40,46,.85)!important;
+    backdrop-filter:none!important
+  }
 }
 `
-    },
+},
 
     /* ---------- Material 3（SK Hub のアプリと同じ M3） ----------
        色は SK's Toolbox（/toolbox/home.css）と同じ --md-*。文字は M PLUS 1、角は 28〜32px、
