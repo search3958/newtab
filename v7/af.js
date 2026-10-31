@@ -2,7 +2,7 @@
 "use strict";
 const DB_NAME = "WallpaperDB";
 const STORE = "images";
-const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip?v=3";
+const ICON_ZIP_URL = "https://search3958.github.io/newtab/lsr/icons-7.zip?v=4";
 const FALLBACK_LIGHT = "bgimg/samag3.webp";
 const FALLBACK_DARK = "bgimg/samag3_dark.webp";
 const HISTORY_KEY = "searchHistory";
@@ -83,7 +83,7 @@ resetSettings: "このデバイスのNewtab設定をリセット",
 resetAllDevices: "すべての端末からNewtab設定をリセット",
 deleteHistory: "検索履歴の削除",
 information: "情報",
-termsPrivacy: "利用規約 および 個人情報政策",
+termsPrivacy: "利用規約 および 個人情報処理政策",
 aboutMe: "私について",
 language: "Language",
 resetConfirm: "このデバイスのNewtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n同期が有効な場合は、アカウントの設定もこの内容で更新されます。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
@@ -906,7 +906,6 @@ links: [
 { name: "記録ノート", bg: "var(--iconbg)", url: "https://search3958.github.io/tools/girog/", icon: "girog_main.svg" },
 { name: "ToolBoard", bg: "var(--iconbg)", url: "https://search3958.github.io/toolboard", icon: "toolboard.webp" },
 { name: "Baram Code", bg: "var(--iconbg)", url: "https://search3958.github.io/baram/", icon: "baram_code_main.svg" },
-{ name: "千里馬事典", bg: "#50f9", url: "https://search3958.github.io/namu/sajon-2/", icon: "cheonri.svg" },
 { name: "Oneul launcher", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/oneul-launcher", icon: "oneul-launcher.webp" },
 { name: "Wo Checker", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/wo-checker", icon: "wo-checker.webp" },
 { name: "Easy Flowchart", bg: "var(--iconbg)", url: "https://nidele206.github.io/product/ja/easy-flowchart", icon: "easy-flowchart.webp" },
