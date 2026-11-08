@@ -59,6 +59,7 @@ body::after{
 
 #clock {
     position: fixed;
+    z-index: 1;
     bottom: 130px;
     right: 0px;
     color: #fff;
@@ -70,10 +71,12 @@ body::after{
 
 
 .search {
+    z-index: 1;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 450px;
+    width:60vw;
+    max-width: 480px;
     background: #fff;
     border-radius: 99px;
     padding: 8px;
@@ -154,6 +157,7 @@ body::after{
 
 .app-search-buttons {
     position: fixed;
+    z-index: 1;
     bottom: 90px;
     left: 0px;
     width:100vw;
@@ -200,7 +204,7 @@ body::after{
     background: #fffd;
     border-radius: 35px;
     backdrop-filter: blur(24px);
-    z-index: 2;
+    z-index: 3;
     padding: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     display: none;
@@ -300,19 +304,13 @@ body::after{
 
 .shortcut {
     position: relative;
-    top: 100vh;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(32px);
-    padding-top: 8px;
+    top: 0;
+    /* Keep the first and last shortcut rows reachable at the viewport focus line. */
+    padding-top: max(8px, calc(50vh - 58px));
+    padding-bottom: max(300px, calc(50vh - 58px));
     min-height: 100vh;
     width: 100%;
-    z-index: 10;
-}
-
-@media (prefers-color-scheme: dark) {
-    .shortcut {
-        background: rgba(0, 0, 0, 0.3);
-    }
+    z-index: 0;
 }
 
 .main-shortcuts {
@@ -331,22 +329,19 @@ body::after{
 .main-shortcut-category {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 0;
 }
 
 .main-shortcut-title {
-    margin: 0;
-    font-size: 20px;
-    text-align: center;
-    font-weight:400;
-    color: #000;
-    margin-top:16px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .main-shortcut-title {
-        color: #fff;
-    }
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .main-shortcut-links {
@@ -354,7 +349,6 @@ body::after{
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 4px;
 }
 
 /* ================================
@@ -363,26 +357,35 @@ body::after{
 
 .main-shortcut-item {
     display: flex;
-    flex-direction: column;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
     align-items: center;
-    gap: 7px;
-    min-width: 40px;
+    justify-content: center;
     color: inherit;
     text-decoration: none;
     perspective: 800px;
+    -webkit-tap-highlight-color: transparent;
+    cursor: none;
+    /* The depth controller writes transform/filter/opacity inline. */
 }
 
 .main-shortcut-box {
+    width: 64px;
+    height: 56px;
+    margin:4px;
+    box-sizing: border-box;
     border-radius: 40px;
     background-color: rgba(255, 255, 255, 0.7);
     corner-shape: superellipse(1.3);
-    perspective: 800px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.5s cubic-bezier(0, 0, 0, 1);
-    transform: rotateX(0deg) rotateY(0deg);
+    transform: translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    transform-origin: center;
     overflow: hidden;
+    will-change: transform;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -392,13 +395,15 @@ body::after{
 }
 
 .main-shortcut-icon {
-    width: 52px;
-    height: 52px;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
+    /* Do not inherit the anchor's depth transform: the icon stays inside its box. */
 }
 
 .main-shortcut-icon img {
@@ -406,29 +411,54 @@ body::after{
     height: 100%;
     display: block;
     object-fit: contain;
-    scale:0.9;
+    scale:0.8;
 }
 
-.main-shortcut-name {
-    width: 70px;
+.shortcut-tooltip {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    max-width: min(240px, calc(100vw - 16px));
+    box-sizing: border-box;
+    padding: 8px 16px;
+    border-radius: 24px;
+    corner-shape: superellipse(1.6);
+    background: rgba(20, 20, 20, 0.7);
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(-50%, 0, 0) scale(0.96);
+    transform-origin: top center;
+    will-change: transform, opacity;
+}
+
+.shortcut-tooltip-name {
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: center;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1.3;
-    color: rgba(0, 0, 0, 0.88);
 }
 
-@media (prefers-color-scheme: dark) {
-    .main-shortcut-name {
-        color: rgba(255, 255, 255, 0.92);
-    }
-}
-
-
-.main-shortcut-item:hover .main-shortcut-box {
-    transform: rotateX(0deg) rotateY(0deg);
+.shortcut-tooltip-category {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 10px;
+    line-height: 1.25;
 }
 
 /* ================================
@@ -795,25 +825,6 @@ body::after{
     color: #888;
 }
 
-.main-shortcuts[data-icon-size="standard"] .main-shortcut-icon {
-    width: 52px;
-    height: 52px;
-}
-
-.main-shortcuts[data-icon-size="large"] .main-shortcut-icon {
-    width: 68px;
-    height: 68px;
-}
-
-.main-shortcuts[data-icon-size="extra-large"] .main-shortcut-icon {
-    width: 84px;
-    height: 84px;
-}
-
-.main-shortcuts[data-label-visible="false"] .main-shortcut-name {
-    display: none;
-}
-
 .main-shortcut-ad {
     width: min(100%, 728px);
     min-height: 90px;
@@ -874,6 +885,10 @@ body::after{
 
 <div class="shortcut">
     <div class="main-shortcuts" id="mainShortcuts"></div>
+</div>
+<div id="shortcutTooltip" class="shortcut-tooltip" aria-hidden="true">
+    <span class="shortcut-tooltip-name"></span>
+    <span class="shortcut-tooltip-category"></span>
 </div>
 
 <script src="https://search3958.github.io/check.js"></script>

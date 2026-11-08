@@ -11,10 +11,8 @@ const SETTINGS_DB_NAME = "NewtabSettingsDB";
 const SETTINGS_STORE = "data";
 const CUSTOM_SHORTCUTS_KEY = "customShortcuts";
 const CUSTOM_SHORTCUT_ICON_PREFIX = "customShortcutIcon:";
-const LABEL_VISIBLE_KEY = "newtab.labelVisible";
-const ICON_SIZE_KEY = "newtab.iconSize";
-const DEFAULT_LABEL_VISIBLE = true;
-const DEFAULT_ICON_SIZE = "standard";
+const LEGACY_LABEL_VISIBLE_KEY = "newtab.labelVisible";
+const LEGACY_ICON_SIZE_KEY = "newtab.iconSize";
 const FAVICON_API_URL = "https://www.google.com/s2/favicons";
 const SELECTED_LANG_KEY = "selectedLang";
 
@@ -37,7 +35,7 @@ const BASE122_LIB_URL = "";
 const SUPPORTED_LANGS = new Set(["ja", "en", "ko", "ko-kp", "zh", "zh-tw", "ru"]);
 const UI_TRANSLATIONS = {
 ja: {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "スクロールして一覧を表示",
 appSearch: "App内検索",
 management: "同期と管理",
@@ -59,15 +57,8 @@ urlPlaceholder: "URLを入力",
 labelPlaceholder: "ラベルを入力",
 appearance: "外観",
 changeWallpaper: "壁紙を変更",
-labelVisibility: "ラベルの表示",
-show: "表示する",
-hide: "表示しない",
-iconSize: "アイコンサイズ",
-standard: "標準",
-large: "大",
-extraLarge: "特大",
 managementTitle: "同期と管理",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "設定方法と詳細",
 simpleVersion: "簡易版",
 account: "アカウント同期",
@@ -89,7 +80,7 @@ information: "情報",
 termsPrivacy: "利用規約 および 個人情報処理政策",
 aboutMe: "私について",
 language: "Language",
-resetConfirm: "このデバイスのNewtab設定をリセットします。\n\n壁紙、ラベル表示、アイコンサイズのみが初期状態に戻ります。\n同期が有効な場合は、アカウントの設定もこの内容で更新されます。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
+resetConfirm: "このデバイスのNewtab設定をリセットします。\n\n壁紙のみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
 resetAllConfirm: "すべての端末のNewtab設定をリセットします。\nアカウントに保存された設定も削除されます。\n\n実行しますか？",
 deleteHistoryConfirm: "検索履歴をすべて削除します。実行しますか？",
 categories: {
@@ -123,7 +114,7 @@ shortcuts: {
 }
 },
 en: {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "Scroll to show the list",
 appSearch: "App Search",
 management: "Manage",
@@ -145,15 +136,8 @@ urlPlaceholder: "Enter URL",
 labelPlaceholder: "Enter label",
 appearance: "Appearance",
 changeWallpaper: "Change wallpaper",
-labelVisibility: "Show labels",
-show: "Show",
-hide: "Hide",
-iconSize: "Icon size",
-standard: "Standard",
-large: "Large",
-extraLarge: "Extra large",
 managementTitle: "Manage",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "Settings & details",
 simpleVersion: "Simple version",
 account: "Account sync",
@@ -175,7 +159,7 @@ information: "Information",
 termsPrivacy: "Terms of Use & Privacy Policy",
 aboutMe: "About me",
 language: "Language",
-resetConfirm: "Reset Newtab settings on this device?\n\nOnly wallpaper, label visibility, and icon size will be restored to their defaults.\nIf sync is on, the account copy of these settings will also be updated.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
+resetConfirm: "Reset Newtab settings on this device?\n\nOnly wallpaper settings will be restored to their defaults.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
 resetAllConfirm: "Reset Newtab settings on all devices?\nThe settings saved to your account will also be deleted.\n\nContinue?",
 deleteHistoryConfirm: "Delete all search history?\n\nContinue?",
 categories: {
@@ -209,7 +193,7 @@ shortcuts: {
 }
 },
 ko: {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "스크롤하여 목록 표시",
 appSearch: "앱 연동",
 management: "관리",
@@ -231,15 +215,8 @@ urlPlaceholder: "URL 입력",
 labelPlaceholder: "라벨 입력",
 appearance: "외관",
 changeWallpaper: "배경화면 변경",
-labelVisibility: "라벨 표시",
-show: "표시",
-hide: "표시하지 않음",
-iconSize: "아이콘 크기",
-standard: "기본",
-large: "크게",
-extraLarge: "매우 크게",
 managementTitle: "관리",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "설정 방법 및 상세",
 simpleVersion: "간이 버전",
 data: "데이터",
@@ -249,7 +226,7 @@ information: "정보",
 termsPrivacy: "이용약관 및 개인정보 처리방침",
 aboutMe: "소개",
 language: "언어",
-resetConfirm: "Newtab 설정을 초기화할까요?\n\n배경화면, 라벨 표시, 아이콘 크기만 기본값으로 돌아갑니다.\n검색 기록, 바로가기 및 기타 데이터는 삭제되지 않습니다.\n\n계속하시겠습니까?",
+resetConfirm: "이 기기의 Newtab 설정을 초기화할까요?\n\n배경화면 설정만 기본값으로 돌아갑니다.\n검색 기록, 바로가기 및 기타 데이터는 삭제되지 않습니다.\n\n계속하시겠습니까?",
 deleteHistoryConfirm: "모든 검색 기록을 삭제할까요?\n\n계속하시겠습니까?",
 categories: {
 "Sentaro": "Sentaro",
@@ -282,7 +259,7 @@ shortcuts: {
 }
 },
 "ko-kp": {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "목록을 보려면 아래로 내리십시오",
 appSearch: "응용프로그램 연동",
 management: "관리",
@@ -304,15 +281,8 @@ urlPlaceholder: "URL 입력",
 labelPlaceholder: "표식 입력",
 appearance: "외관",
 changeWallpaper: "배경화면 변경",
-labelVisibility: "표식 표시",
-show: "표시",
-hide: "표시하지 않음",
-iconSize: "아이콘 크기",
-standard: "표준",
-large: "크게",
-extraLarge: "매우 크게",
 managementTitle: "관리",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "설정 방법과 상세",
 simpleVersion: "간편판",
 data: "자료",
@@ -322,7 +292,7 @@ information: "정보",
 termsPrivacy: "리용규약 및 개인정보정책",
 aboutMe: "소개",
 language: "언어",
-resetConfirm: "Newtab 설정을 초기화하겠습니까?\n\n배경화면, 표식 표시, 아이콘 크기만 초기 상태로 돌아갑니다.\n검색 기록, 지름길 및 기타 자료는 삭제되지 않습니다.\n\n계속하시겠습니까?",
+resetConfirm: "이 기기의 Newtab 설정을 초기화하겠습니까?\n\n배경화면 설정만 기본 상태로 돌아갑니다.\n검색 기록, 지름길 및 기타 자료는 삭제되지 않습니다.\n\n계속하시겠습니까?",
 deleteHistoryConfirm: "검색 기록을 모두 삭제하겠습니까?\n\n계속하시겠습니까?",
 categories: {
 "Sentaro": "Sentaro",
@@ -355,7 +325,7 @@ shortcuts: {
 }
 },
 zh: {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "向下滚动以显示列表",
 appSearch: "应用联动",
 management: "管理",
@@ -377,15 +347,8 @@ urlPlaceholder: "输入 URL",
 labelPlaceholder: "输入标签",
 appearance: "外观",
 changeWallpaper: "更换壁纸",
-labelVisibility: "标签显示",
-show: "显示",
-hide: "不显示",
-iconSize: "图标大小",
-standard: "标准",
-large: "大",
-extraLarge: "特大",
 managementTitle: "管理",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "设置方法与详细信息",
 simpleVersion: "简易版",
 data: "数据",
@@ -395,7 +358,7 @@ information: "信息",
 termsPrivacy: "使用条款及隐私政策",
 aboutMe: "关于我",
 language: "语言",
-resetConfirm: "重置 Newtab 设置？\n\n仅壁纸、标签显示和图标大小会恢复默认值。\n搜索历史、快捷方式和其他数据不会被删除。\n\n继续？",
+resetConfirm: "重置此设备上的 Newtab 设置？\n\n仅壁纸设置会恢复默认值。\n搜索历史、快捷方式和其他数据不会被删除。\n\n继续？",
 deleteHistoryConfirm: "删除全部搜索历史？\n\n继续？",
 categories: {
 "Sentaro": "Sentaro",
@@ -428,7 +391,7 @@ shortcuts: {
 }
 },
 "zh-tw": {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "向下捲動以顯示清單",
 appSearch: "應用程式連動",
 management: "管理",
@@ -450,15 +413,8 @@ urlPlaceholder: "輸入 URL",
 labelPlaceholder: "輸入標籤",
 appearance: "外觀",
 changeWallpaper: "更換桌布",
-labelVisibility: "標籤顯示",
-show: "顯示",
-hide: "不顯示",
-iconSize: "圖示大小",
-standard: "標準",
-large: "大",
-extraLarge: "特大",
 managementTitle: "管理",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "設定方式與詳細資訊",
 simpleVersion: "簡易版",
 data: "資料",
@@ -468,7 +424,7 @@ information: "資訊",
 termsPrivacy: "使用條款及隱私權政策",
 aboutMe: "關於我",
 language: "語言",
-resetConfirm: "要重設 Newtab 設定嗎？\n\n僅桌布、標籤顯示和圖示大小會恢復預設值。\n搜尋紀錄、捷徑及其他資料不會被刪除。\n\n繼續？",
+resetConfirm: "要重設此裝置上的 Newtab 設定嗎？\n\n僅桌布設定會恢復預設值。\n搜尋紀錄、捷徑及其他資料不會被刪除。\n\n繼續？",
 deleteHistoryConfirm: "要刪除全部搜尋紀錄嗎？\n\n繼續？",
 categories: {
 "Sentaro": "Sentaro",
@@ -501,7 +457,7 @@ shortcuts: {
 }
 },
 ru: {
-pageTitle: "SaeTab 7 Beta",
+pageTitle: "SaeTab 7.1 Beta",
 searchPlaceholder: "Прокрутите, чтобы показать список",
 appSearch: "Поиск в приложениях",
 management: "Управление",
@@ -523,15 +479,8 @@ urlPlaceholder: "Введите URL",
 labelPlaceholder: "Введите название",
 appearance: "Внешний вид",
 changeWallpaper: "Изменить обои",
-labelVisibility: "Показывать подписи",
-show: "Показывать",
-hide: "Не показывать",
-iconSize: "Размер значков",
-standard: "Стандартный",
-large: "Большой",
-extraLarge: "Очень большой",
 managementTitle: "Управление",
-saetab: "SaeTab 7 Beta",
+saetab: "SaeTab 7.1 Beta",
 settingsDetails: "Настройки и подробности",
 simpleVersion: "Упрощённая версия",
 data: "Данные",
@@ -541,7 +490,7 @@ information: "Информация",
 termsPrivacy: "Условия использования и политика конфиденциальности",
 aboutMe: "Обо мне",
 language: "Язык",
-resetConfirm: "Сбросить настройки Newtab?\n\nТолько обои, отображение подписей и размер значков будут возвращены к значениям по умолчанию.\nИстория поиска, ярлыки и другие данные удалены не будут.\n\nПродолжить?",
+resetConfirm: "Сбросить настройки Newtab на этом устройстве?\n\nБудут восстановлены только настройки обоев.\nИстория поиска, ярлыки и другие данные не будут удалены.\n\nПродолжить?",
 deleteHistoryConfirm: "Удалить всю историю поиска?\n\nПродолжить?",
 categories: {
 "Sentaro": "Sentaro",
@@ -762,24 +711,18 @@ if (customLinks.length > 0) { categories.unshift({ title: t("myShortcuts"), link
 else console.log("[Shortcut] Custom shortcut category hidden: 0 item(s).");
 return categories;
 };
-const getLabelVisibleSetting = () => { try { const stored = localStorage.getItem(LABEL_VISIBLE_KEY); return stored === null ? DEFAULT_LABEL_VISIBLE : stored !== "false"; } catch (error) { console.error("[Settings] Label visibility read failed:", error); return DEFAULT_LABEL_VISIBLE; } };
-const getIconSizeSetting = () => { try { const stored = localStorage.getItem(ICON_SIZE_KEY); return ["standard", "large", "extra-large"].includes(stored) ? stored : DEFAULT_ICON_SIZE; } catch (error) { console.error("[Settings] Icon size read failed:", error); return DEFAULT_ICON_SIZE; } };
 const applyAppearanceSettings = () => {
 const root = getEl("#mainShortcuts");
 if (!root) { console.error("[Settings] Required element not found: #mainShortcuts"); return; }
-const labelVisible = getLabelVisibleSetting();
-const iconSize = getIconSizeSetting();
-root.dataset.labelVisible = String(labelVisible);
-root.dataset.iconSize = iconSize;
-console.log(`[Settings] Appearance applied: labels=${labelVisible}, iconSize=${iconSize}`);
-};
-const saveAppearanceSetting = (key, value) => {
+for (const legacyKey of [LEGACY_LABEL_VISIBLE_KEY, LEGACY_ICON_SIZE_KEY]) {
 try {
-localStorage.setItem(key, value);
-console.log(`[Settings] localStorage saved: ${key}=${value}`);
-markSettingsChanged();
-return true;
-} catch (error) { console.error(`[Settings] localStorage save failed: ${key}`, error); return false; }
+if (localStorage.getItem(legacyKey) !== null) {
+localStorage.removeItem(legacyKey);
+console.log(`[Settings] Removed obsolete appearance preference: ${legacyKey}`);
+}
+} catch (error) { console.error(`[Settings] Obsolete preference cleanup failed: ${legacyKey}`, error); }
+}
+console.log("[Settings] Fixed shortcut icon size applied: 52x52px.");
 };
 const deleteOnlyWallpaperSettings = async () => {
 try {
@@ -1101,7 +1044,7 @@ const createSettingsLink = (parent, label, url) => { if (!parent) { console.erro
 const createChoiceButton = (parent, label, value, currentValue, onSelect) => { const button = document.createElement("button"); button.type = "button"; button.className = "newtab-settings-choice"; button.textContent = label; button.dataset.value = value; button.setAttribute("aria-pressed", String(value === currentValue)); button.addEventListener("click", () => { if (typeof onSelect !== "function") { console.error(`[Settings] Choice handler missing: ${label}`); return; } onSelect(value); }); parent.appendChild(button); return button; };
 const refreshChoiceButtons = (group, selectedValue) => { if (!group) { console.error("[Settings] Choice group missing."); return; } group.querySelectorAll(".newtab-settings-choice").forEach((button) => { button.setAttribute("aria-pressed", String(button.dataset.value === selectedValue)); }); };
 const renderCustomShortcutDialogList = (listRoot, dialog) => { if (!listRoot) { console.error("[Settings] Custom shortcut list root missing."); return; } listRoot.replaceChildren(); for (const shortcut of customShortcutsCache) { const entry = document.createElement("div"); entry.className = "newtab-shortcut-entry"; const iconWrap = document.createElement("div"); iconWrap.className = "newtab-shortcut-entry-icon"; const iconUrl = customShortcutIconUrls.get(shortcut.id); if (iconUrl) { const img = document.createElement("img"); img.src = iconUrl; img.alt = ""; img.width = 32; img.height = 32; img.decoding = "async"; img.addEventListener("error", () => { console.error(`[Settings] Custom dialog icon failed: ${shortcut.name}`); img.remove(); }, { once: true }); iconWrap.appendChild(img); } else iconWrap.textContent = shortcut.name.slice(0, 1); const info = document.createElement("div"); info.className = "newtab-shortcut-entry-info"; const name = document.createElement("div"); name.className = "newtab-shortcut-entry-name"; name.textContent = shortcut.name; const url = document.createElement("div"); url.className = "newtab-shortcut-entry-url"; url.textContent = shortcut.url; info.append(name, url); const deleteButton = document.createElement("button"); deleteButton.type = "button"; deleteButton.className = "newtab-settings-danger"; deleteButton.textContent = t("delete"); deleteButton.addEventListener("click", async () => { const index = customShortcutsCache.findIndex(item => item.id === shortcut.id); if (index < 0) { console.error(`[Settings] Custom shortcut not found: ${shortcut.name}`); return; } const [removed] = customShortcutsCache.splice(index, 1); const saved = await saveCustomShortcuts(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${removed.id}`); const iconUrlToRelease = customShortcutIconUrls.get(removed.id); if (iconUrlToRelease) { try { URL.revokeObjectURL(iconUrlToRelease); } catch (error) { console.error("[Settings] Icon URL revoke failed:", error); } customShortcutIconUrls.delete(removed.id); } if (!saved) { console.error(`[Settings] Custom shortcut metadata save failed after deleting: ${removed.name}`); return; } markSettingsChanged(); renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut deleted: ${removed.name}`); }); entry.append(iconWrap, info, deleteButton); listRoot.appendChild(entry); } console.log(`[Settings] Custom shortcut dialog list rendered: ${customShortcutsCache.length} item(s).`); };
-const showCustomizeDialog = () => { createNewtabDialog(t("customize"), (content, dialog) => { const shortcutSection = createSettingsSection(content, t("shortcut")); const addRow = document.createElement("div"); addRow.className = "newtab-settings-row"; const urlInput = document.createElement("input"); urlInput.type = "url"; urlInput.placeholder = t("urlPlaceholder"); urlInput.autocomplete = "off"; urlInput.inputMode = "url"; const nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = t("labelPlaceholder"); nameInput.maxLength = 80; nameInput.autocomplete = "off"; const addButton = document.createElement("button"); addButton.type = "button"; addButton.className = "newtab-settings-action"; addButton.textContent = t("add"); const listRoot = document.createElement("div"); listRoot.className = "newtab-shortcut-list"; const addShortcut = async () => { const name = nameInput.value.trim(); const normalizedUrl = normalizeShortcutUrl(urlInput.value); if (!name) { console.error("[Settings] Custom shortcut add blocked: label is empty."); nameInput.focus(); return; } if (!normalizedUrl) { console.error("[Settings] Custom shortcut add blocked: invalid URL."); urlInput.focus(); return; } const existing = customShortcutsCache.find(shortcut => shortcut.url.toLowerCase() === normalizedUrl.toLowerCase()); if (existing) { console.error(`[Settings] Custom shortcut already exists: ${existing.name}`); return; } const id = typeof globalThis.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID() : `shortcut-${Date.now()}-${Math.random().toString(36).slice(2)}`; const iconKey = id; const shortcut = { id, name, url: normalizedUrl, iconKey }; const faviconSaved = await fetchAndStoreFavicon(id, normalizedUrl); if (!faviconSaved) console.error(`[Settings] Custom shortcut added without stored favicon: ${name}`); customShortcutsCache.unshift(shortcut); const saved = await saveCustomShortcuts(); if (!saved) { customShortcutsCache.shift(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${iconKey}`); const orphanUrl = customShortcutIconUrls.get(id); if (orphanUrl) { try { URL.revokeObjectURL(orphanUrl); } catch (error) { console.error("[Settings] Orphan icon URL revoke failed:", error); } customShortcutIconUrls.delete(id); } console.error(`[Settings] Custom shortcut add failed: ${name}`); return; } markSettingsChanged(); urlInput.value = ""; nameInput.value = ""; renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut added: ${name} -> ${normalizedUrl}`); urlInput.focus(); }; addButton.addEventListener("click", () => { addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); }); urlInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); nameInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); addRow.append(urlInput, nameInput, addButton); shortcutSection.appendChild(addRow); shortcutSection.appendChild(listRoot); renderCustomShortcutDialogList(listRoot, dialog); const appearanceSection = createSettingsSection(content, t("appearance")); const wallpaperRow = document.createElement("div"); wallpaperRow.className = "newtab-settings-row"; createSettingsLink(wallpaperRow, t("changeWallpaper"), "https://search3958.github.io/project/images/2/"); appearanceSection.appendChild(wallpaperRow); const labelRow = document.createElement("div"); labelRow.className = "newtab-settings-row"; const labelTitle = document.createElement("span"); labelTitle.textContent = t("labelVisibility"); labelRow.appendChild(labelTitle); const labelChoices = document.createElement("div"); labelChoices.className = "newtab-settings-row"; const currentLabelVisible = getLabelVisibleSetting(); createChoiceButton(labelChoices, t("show"), "true", String(currentLabelVisible), (value) => { const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing labels."); return; } root.dataset.labelVisible = value; refreshChoiceButtons(labelChoices, value); console.log(`[Settings] Label visibility changed: ${value}`); }); createChoiceButton(labelChoices, t("hide"), "false", String(currentLabelVisible), (value) => { const saved = saveAppearanceSetting(LABEL_VISIBLE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing labels."); return; } root.dataset.labelVisible = value; refreshChoiceButtons(labelChoices, value); console.log(`[Settings] Label visibility changed: ${value}`); }); appearanceSection.appendChild(labelRow); appearanceSection.appendChild(labelChoices); const iconSizeRow = document.createElement("div"); iconSizeRow.className = "newtab-settings-row"; const iconSizeTitle = document.createElement("span"); iconSizeTitle.textContent = t("iconSize"); const iconSizeChoices = document.createElement("div"); iconSizeChoices.className = "newtab-settings-row"; const currentIconSize = getIconSizeSetting(); const applyIconSize = (value) => { const saved = saveAppearanceSetting(ICON_SIZE_KEY, value); if (!saved) return; const root = getEl("#mainShortcuts"); if (!root) { console.error("[Settings] #mainShortcuts missing while changing icon size."); return; } root.dataset.iconSize = value; refreshChoiceButtons(iconSizeChoices, value); console.log(`[Settings] Icon size changed: ${value}`); }; createChoiceButton(iconSizeChoices, t("standard"), "standard", currentIconSize, applyIconSize); createChoiceButton(iconSizeChoices, t("large"), "large", currentIconSize, applyIconSize); createChoiceButton(iconSizeChoices, t("extraLarge"), "extra-large", currentIconSize, applyIconSize); iconSizeRow.appendChild(iconSizeTitle); appearanceSection.appendChild(iconSizeRow); appearanceSection.appendChild(iconSizeChoices); }); console.log("[Settings] Customize dialog requested."); };
+const showCustomizeDialog = () => { createNewtabDialog(t("customize"), (content, dialog) => { const shortcutSection = createSettingsSection(content, t("shortcut")); const addRow = document.createElement("div"); addRow.className = "newtab-settings-row"; const urlInput = document.createElement("input"); urlInput.type = "url"; urlInput.placeholder = t("urlPlaceholder"); urlInput.autocomplete = "off"; urlInput.inputMode = "url"; const nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = t("labelPlaceholder"); nameInput.maxLength = 80; nameInput.autocomplete = "off"; const addButton = document.createElement("button"); addButton.type = "button"; addButton.className = "newtab-settings-action"; addButton.textContent = t("add"); const listRoot = document.createElement("div"); listRoot.className = "newtab-shortcut-list"; const addShortcut = async () => { const name = nameInput.value.trim(); const normalizedUrl = normalizeShortcutUrl(urlInput.value); if (!name) { console.error("[Settings] Custom shortcut add blocked: label is empty."); nameInput.focus(); return; } if (!normalizedUrl) { console.error("[Settings] Custom shortcut add blocked: invalid URL."); urlInput.focus(); return; } const existing = customShortcutsCache.find(shortcut => shortcut.url.toLowerCase() === normalizedUrl.toLowerCase()); if (existing) { console.error(`[Settings] Custom shortcut already exists: ${existing.name}`); return; } const id = typeof globalThis.crypto?.randomUUID === "function" ? globalThis.crypto.randomUUID() : `shortcut-${Date.now()}-${Math.random().toString(36).slice(2)}`; const iconKey = id; const shortcut = { id, name, url: normalizedUrl, iconKey }; const faviconSaved = await fetchAndStoreFavicon(id, normalizedUrl); if (!faviconSaved) console.error(`[Settings] Custom shortcut added without stored favicon: ${name}`); customShortcutsCache.unshift(shortcut); const saved = await saveCustomShortcuts(); if (!saved) { customShortcutsCache.shift(); await settingsDelete(`${CUSTOM_SHORTCUT_ICON_PREFIX}${iconKey}`); const orphanUrl = customShortcutIconUrls.get(id); if (orphanUrl) { try { URL.revokeObjectURL(orphanUrl); } catch (error) { console.error("[Settings] Orphan icon URL revoke failed:", error); } customShortcutIconUrls.delete(id); } console.error(`[Settings] Custom shortcut add failed: ${name}`); return; } markSettingsChanged(); urlInput.value = ""; nameInput.value = ""; renderCustomShortcutDialogList(listRoot, dialog); renderShortcuts(window._iconMap || new Map()); console.log(`[Settings] Custom shortcut added: ${name} -> ${normalizedUrl}`); urlInput.focus(); }; addButton.addEventListener("click", () => { addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); }); urlInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); nameInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addShortcut().catch(error => console.error("[Settings] Custom shortcut add error:", error)); } }); addRow.append(urlInput, nameInput, addButton); shortcutSection.appendChild(addRow); shortcutSection.appendChild(listRoot); renderCustomShortcutDialogList(listRoot, dialog); const appearanceSection = createSettingsSection(content, t("appearance")); const wallpaperRow = document.createElement("div"); wallpaperRow.className = "newtab-settings-row"; createSettingsLink(wallpaperRow, t("changeWallpaper"), "https://search3958.github.io/project/images/2/"); appearanceSection.appendChild(wallpaperRow); }); console.log("[Settings] Customize dialog requested."); };
 
 /* ===== アカウント同期（client-service.js は必要になったときだけ読み込む） ===== */
 const readNumber = (key) => { try { const n = Number(localStorage.getItem(key)); return Number.isFinite(n) ? n : 0; } catch { return 0; } };
@@ -1198,8 +1141,6 @@ return historySyncChain;
 let settingsSyncTimer = null;
 let settingsSyncChain = Promise.resolve(false);
 const getSettingsSnapshot = () => ({
-labelVisible: getLabelVisibleSetting(),
-iconSize: getIconSizeSetting(),
 customShortcuts: customShortcutsCache.map(({ id, name, url }) => ({ id, name, url })),
 });
 const markSettingsChanged = () => {
@@ -1214,10 +1155,6 @@ console.log(`[Sync] Settings pushed: ${updatedAt}`);
 };
 const applyRemoteSettings = async (remote) => {
 const previous = customShortcutsCache;
-const iconSize = ["standard", "large", "extra-large"].includes(remote.iconSize) ? remote.iconSize : DEFAULT_ICON_SIZE;
-writeLocal(LABEL_VISIBLE_KEY, String(remote.labelVisible !== false));
-writeLocal(ICON_SIZE_KEY, iconSize);
-
 const incoming = (Array.isArray(remote.customShortcuts) ? remote.customShortcuts : []).filter(isValidCustomShortcut);
 customShortcutsCache = incoming.map((s) => ({ id: s.id, name: s.name.trim(), url: s.url, iconKey: s.id }));
 await saveCustomShortcuts();
@@ -1237,8 +1174,8 @@ applyAppearanceSettings();
 renderShortcuts(window._iconMap || new Map());
 };
 const resetLocalAppearance = (updatedAt) => {
-removeLocal(LABEL_VISIBLE_KEY);
-removeLocal(ICON_SIZE_KEY);
+removeLocal(LEGACY_LABEL_VISIBLE_KEY);
+removeLocal(LEGACY_ICON_SIZE_KEY);
 writeLocal(SETTINGS_UPDATED_AT_KEY, updatedAt);
 applyAppearanceSettings();
 };
@@ -1596,7 +1533,570 @@ console.log(`[Settings] Management dialog content loaded: loggedIn=${loggedIn}, 
 
 const setupSettingsControls = () => { const customizeBtn = getEl("#customizeBtn"); const managementBtn = getEl("#managementBtn"); if (!customizeBtn) console.error("[Settings] Required element not found: #customizeBtn"); else customizeBtn.addEventListener("click", showCustomizeDialog); if (!managementBtn) console.error("[Settings] Required element not found: #managementBtn"); else managementBtn.addEventListener("click", showManagementDialog); document.addEventListener("keydown", (event) => { if (event.key !== "Escape") return; const dialog = document.querySelector(".newtab-dialog"); if (dialog) { event.preventDefault(); closeNewtabDialog(dialog, "Escape"); } }); console.log("[Settings] Settings controls initialized."); };
 const getRequiredElement = (selector) => { const el = document.querySelector(selector); if (!el) console.error(`[Shortcut] Required element not found: ${selector}`); return el; };
-const createShortcut = (link, iconMap) => { if (!link || typeof link !== "object") return null; if (!link.name || !link.url) return null; const anchor = document.createElement("a"); anchor.className = "main-shortcut-item"; anchor.href = link.url; anchor.rel = "noopener noreferrer"; const box = document.createElement("div"); box.className = "main-shortcut-box"; const iconContainer = document.createElement("div"); iconContainer.className = "main-shortcut-icon"; if (link.bg) iconContainer.style.background = link.bg; const iconUrl = link.iconUrl || resolveIconUrl(link.icon, iconMap); if (iconUrl) { const img = document.createElement("img"); img.src = iconUrl; img.alt = ""; img.loading = "lazy"; img.decoding = "async"; img.addEventListener("error", () => { console.error(`[Shortcut] Icon failed: ${link.icon}`); img.remove(); }, { once: true }); iconContainer.appendChild(img); } box.appendChild(iconContainer); const name = document.createElement("span"); name.className = "main-shortcut-name"; name.textContent = link.name; anchor.appendChild(box); anchor.appendChild(name); anchor.addEventListener("mousemove", (e) => { const rect = box.getBoundingClientRect(); const x = (e.clientX - rect.left - rect.width / 2) / rect.width; const y = (e.clientY - rect.top - rect.height / 2) / rect.height; box.style.transform = `rotateX(${-y * 30}deg) translateX(${x * 20}px) rotateY(${x * 30}deg) translateY(${y * 20}px) scale(1.1)`; }); anchor.addEventListener("mouseleave", () => { box.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)"; }); return anchor; };
+const createShortcut = (link, iconMap, categoryTitle = "") => {
+if (!link || typeof link !== "object" || !link.name || !link.url) {
+console.error("[Shortcut] Skipped invalid shortcut link:", link);
+return null;
+}
+const anchor = document.createElement("a");
+anchor.className = "main-shortcut-item";
+anchor.href = link.url;
+anchor.rel = "noopener noreferrer";
+anchor.dataset.shortcutName = String(link.name);
+anchor.dataset.shortcutCategory = String(categoryTitle || "");
+anchor.setAttribute("aria-label", categoryTitle ? `${link.name} — ${categoryTitle}` : String(link.name));
+
+const box = document.createElement("div");
+box.className = "main-shortcut-box";
+const iconContainer = document.createElement("div");
+iconContainer.className = "main-shortcut-icon";
+if (link.bg) iconContainer.style.background = link.bg;
+
+const iconUrl = link.iconUrl || resolveIconUrl(link.icon, iconMap);
+if (iconUrl) {
+const img = document.createElement("img");
+img.src = iconUrl;
+img.alt = "";
+img.width = 52;
+img.height = 52;
+img.loading = "lazy";
+img.decoding = "async";
+img.addEventListener("error", () => {
+console.error(`[Shortcut] Icon failed: ${link.name}`);
+img.remove();
+}, { once: true });
+iconContainer.appendChild(img);
+} else {
+console.error(`[Shortcut] Icon URL unavailable: ${link.name}`);
+}
+box.appendChild(iconContainer);
+anchor.appendChild(box);
+return anchor;
+};
+
+const setupShortcutInteractions = (root) => {
+if (!root) { console.error("[ShortcutMotion] Root element is missing."); return; }
+if (root.__shortcutInteractions) {
+root.__shortcutInteractions.reset();
+return;
+}
+
+const tooltip = document.getElementById("shortcutTooltip");
+if (!tooltip) { console.error("[ShortcutMotion] Required element not found: #shortcutTooltip"); return; }
+
+let tooltipName = tooltip.querySelector(".shortcut-tooltip-name");
+let tooltipCategory = tooltip.querySelector(".shortcut-tooltip-category");
+if (!tooltipName) {
+tooltipName = document.createElement("span");
+tooltipName.className = "shortcut-tooltip-name";
+tooltip.appendChild(tooltipName);
+console.log("[ShortcutMotion] Tooltip name node was created.");
+}
+if (!tooltipCategory) {
+tooltipCategory = document.createElement("span");
+tooltipCategory.className = "shortcut-tooltip-category";
+tooltip.appendChild(tooltipCategory);
+console.log("[ShortcutMotion] Tooltip category node was created.");
+}
+
+const motionStates = new Map();
+let activeAnchor = null;
+let frameId = 0;
+let gapTimer = 0;
+const tooltipTarget = { x: 0, y: 0, opacity: 0 };
+const tooltipCurrent = { x: 0, y: 0, opacity: 0 };
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const lerp = (from, to, amount) => from + (to - from) * amount;
+const near = (value, target, epsilon = 0.025) => Math.abs(value - target) <= epsilon;
+
+const requestMotionFrame = () => {
+if (frameId) return;
+frameId = window.requestAnimationFrame(animateMotion);
+};
+
+const getMotionState = (anchor) => {
+let state = motionStates.get(anchor);
+if (!state) {
+const box = anchor.querySelector(".main-shortcut-box");
+if (!box) { console.error("[ShortcutMotion] Icon box is missing for:", anchor.dataset.shortcutName || "(unnamed)"); return null; }
+state = {
+box,
+rx: 0, ry: 0, tx: 0, ty: 0, scale: 1,
+targetRx: 0, targetRy: 0, targetTx: 0, targetTy: 0, targetScale: 1
+};
+motionStates.set(anchor, state);
+}
+return state;
+};
+
+const updateTooltipTarget = (anchor) => {
+if (!anchor || !root.contains(anchor)) {
+console.error("[ShortcutMotion] Cannot position tooltip: shortcut is unavailable.");
+return;
+}
+const box = anchor.querySelector(".main-shortcut-box");
+if (!box) { console.error("[ShortcutMotion] Tooltip anchor has no icon box."); return; }
+
+const rect = box.getBoundingClientRect();
+const tooltipRect = tooltip.getBoundingClientRect();
+const halfWidth = Math.max(tooltipRect.width / 2, 72);
+const x = clamp(rect.left + rect.width / 2, halfWidth + 8, window.innerWidth - halfWidth - 8);
+const tooltipHeight = tooltipRect.height || 38;
+let y = rect.bottom + 8;
+if (y + tooltipHeight > window.innerHeight - 8) y = Math.max(8, rect.top - tooltipHeight - 8);
+
+if (tooltipTarget.opacity === 0 && tooltipCurrent.opacity <= 0.01) {
+tooltipCurrent.x = x;
+tooltipCurrent.y = y;
+}
+tooltipTarget.x = x;
+tooltipTarget.y = y;
+tooltipTarget.opacity = 1;
+tooltip.style.visibility = "visible";
+};
+
+const animateMotion = () => {
+frameId = 0;
+let needsAnotherFrame = false;
+
+for (const [anchor, state] of motionStates) {
+state.rx = lerp(state.rx, state.targetRx, 0.24);
+state.ry = lerp(state.ry, state.targetRy, 0.24);
+state.tx = lerp(state.tx, state.targetTx, 0.24);
+state.ty = lerp(state.ty, state.targetTy, 0.24);
+state.scale = lerp(state.scale, state.targetScale, 0.24);
+
+state.box.style.transform =
+`rotateX(${state.rx.toFixed(2)}deg) rotateY(${state.ry.toFixed(2)}deg) ` +
+`translate3d(${state.tx.toFixed(2)}px, ${state.ty.toFixed(2)}px, 0) scale(${state.scale.toFixed(3)})`;
+
+const settled = near(state.rx, state.targetRx) && near(state.ry, state.targetRy) &&
+near(state.tx, state.targetTx) && near(state.ty, state.targetTy) &&
+near(state.scale, state.targetScale, 0.002);
+
+if (settled) {
+state.rx = state.targetRx;
+state.ry = state.targetRy;
+state.tx = state.targetTx;
+state.ty = state.targetTy;
+state.scale = state.targetScale;
+if (state.targetScale === 1 && state.targetRx === 0 && state.targetRy === 0 &&
+state.targetTx === 0 && state.targetTy === 0) {
+state.box.style.transform = "";
+motionStates.delete(anchor);
+}
+} else {
+needsAnotherFrame = true;
+}
+}
+
+tooltipCurrent.x = lerp(tooltipCurrent.x, tooltipTarget.x, 0.24);
+tooltipCurrent.y = lerp(tooltipCurrent.y, tooltipTarget.y, 0.24);
+tooltipCurrent.opacity = lerp(tooltipCurrent.opacity, tooltipTarget.opacity, 0.24);
+tooltip.style.transform =
+`translate3d(${tooltipCurrent.x.toFixed(2)}px, ${tooltipCurrent.y.toFixed(2)}px, 0) ` +
+`translateX(-50%) scale(${(0.96 + tooltipCurrent.opacity * 0.04).toFixed(3)})`;
+tooltip.style.opacity = String(tooltipCurrent.opacity);
+
+if (near(tooltipCurrent.x, tooltipTarget.x) && near(tooltipCurrent.y, tooltipTarget.y) &&
+near(tooltipCurrent.opacity, tooltipTarget.opacity, 0.002)) {
+tooltipCurrent.x = tooltipTarget.x;
+tooltipCurrent.y = tooltipTarget.y;
+tooltipCurrent.opacity = tooltipTarget.opacity;
+if (tooltipTarget.opacity === 0) tooltip.style.visibility = "hidden";
+} else {
+needsAnotherFrame = true;
+}
+
+if (needsAnotherFrame) requestMotionFrame();
+};
+
+const resetActive = () => {
+window.clearTimeout(gapTimer);
+gapTimer = 0;
+activeAnchor = null;
+for (const state of motionStates.values()) {
+state.targetRx = 0;
+state.targetRy = 0;
+state.targetTx = 0;
+state.targetTy = 0;
+state.targetScale = 1;
+}
+tooltipTarget.opacity = 0;
+requestMotionFrame();
+};
+
+const activateShortcut = (anchor, pointerEvent = null) => {
+if (!anchor || !root.contains(anchor)) return;
+if (activeAnchor !== anchor) {
+if (activeAnchor) {
+const previousState = motionStates.get(activeAnchor);
+if (previousState) {
+previousState.targetRx = 0;
+previousState.targetRy = 0;
+previousState.targetTx = 0;
+previousState.targetTy = 0;
+previousState.targetScale = 1;
+}
+}
+activeAnchor = anchor;
+tooltipName.textContent = anchor.dataset.shortcutName || "";
+tooltipCategory.textContent = anchor.dataset.shortcutCategory || "";
+updateTooltipTarget(anchor);
+}
+
+const state = getMotionState(anchor);
+if (!state) return;
+if (pointerEvent && pointerEvent.pointerType !== "touch") {
+const rect = state.box.getBoundingClientRect();
+const x = clamp(((pointerEvent.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1, -1, 1);
+const y = clamp(((pointerEvent.clientY - rect.top) / Math.max(rect.height, 1)) * 2 - 1, -1, 1);
+state.targetRx = -y * 15;
+state.targetRy = x * 15;
+state.targetTx = x * 10;
+state.targetTy = y * 10;
+state.targetScale = 1.1;
+} else {
+state.targetRx = 0;
+state.targetRy = 0;
+state.targetTx = 0;
+state.targetTy = 0;
+state.targetScale = 1.045;
+}
+requestMotionFrame();
+};
+
+const onPointerMove = (event) => {
+if (event.pointerType === "touch") return;
+const target = event.target instanceof Element ? event.target : null;
+const anchor = target?.closest(".main-shortcut-item");
+if (!anchor || !root.contains(anchor)) {
+if (activeAnchor && !gapTimer) {
+gapTimer = window.setTimeout(() => resetActive(), 110);
+}
+return;
+}
+window.clearTimeout(gapTimer);
+gapTimer = 0;
+activateShortcut(anchor, event);
+};
+const onFocusIn = (event) => {
+const target = event.target instanceof Element ? event.target : null;
+const anchor = target?.closest(".main-shortcut-item");
+if (anchor && root.contains(anchor)) activateShortcut(anchor);
+};
+const onFocusOut = (event) => {
+const nextTarget = event.relatedTarget instanceof Element ? event.relatedTarget : null;
+if (!nextTarget?.closest(".main-shortcut-item")) resetActive();
+};
+
+root.addEventListener("pointermove", onPointerMove, { passive: true });
+root.addEventListener("pointerleave", resetActive, { passive: true });
+root.addEventListener("pointercancel", resetActive, { passive: true });
+root.addEventListener("focusin", onFocusIn);
+root.addEventListener("focusout", onFocusOut);
+
+const onViewportChange = () => {
+if (activeAnchor && tooltipTarget.opacity > 0) {
+updateTooltipTarget(activeAnchor);
+requestMotionFrame();
+}
+};
+window.addEventListener("scroll", onViewportChange, { passive: true, capture: true });
+window.addEventListener("resize", onViewportChange, { passive: true });
+document.addEventListener("visibilitychange", () => {
+if (document.hidden) resetActive();
+});
+
+root.__shortcutInteractions = {
+reset: resetActive,
+refreshTooltip: () => {
+if (!activeAnchor || tooltipTarget.opacity <= 0 || !root.contains(activeAnchor)) return;
+updateTooltipTarget(activeAnchor);
+requestMotionFrame();
+}
+};
+console.log("[ShortcutMotion] Shared tooltip and JS-driven 3D interaction initialized.");
+};
+
+const setupShortcutDepthEffect = (root) => {
+if (!root) {
+console.error("[ShortcutDepth] Root element is missing.");
+return;
+}
+root.__shortcutDepthEffect?.destroy?.();
+
+/*
+ * Native continuous scrolling remains untouched.
+ * Vertical movement is centered at 30vh and uses x^2.5.
+ * Horizontal position increases the Y displacement with an x^5 curve;
+ * no horizontal translation or horizontal spacing is introduced.
+ * The independent 3D hover transform remains on the child .main-shortcut-box.
+ */
+const MAX_VERTICAL_SHIFT_PX = 150;
+/* Horizontal distance adds vertical travel; it never changes the X position. */
+const HORIZONTAL_BASE_SHIFT_PX = 200;
+const MAX_BLUR_PX = 10;
+const MIN_OPACITY = 0.1;
+const DISTANCE_RANGE_RATIO = 0.62;
+const VERTICAL_CURVE_POWER = 2.5;
+const HORIZONTAL_CURVE_POWER = 5;
+const SAFE_HORIZONTAL_EDGE_PX = 80;
+
+let rows = [];
+let frameId = 0;
+let measureFrameId = 0;
+let destroyed = false;
+let resizeObserver = null;
+let mutationObserver = null;
+let measuredItemCount = 0;
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const getScrollY = () => window.scrollY || document.documentElement.scrollTop || 0;
+
+/*
+ * Pure 1.5-power curves are used on both axes.
+ * The vertical response stays almost unchanged close to the reference line,
+ * then increases progressively toward the top and bottom of the viewport.
+ */
+const getPowerProgress = (normalizedDistance, power) =>
+Math.pow(clamp(normalizedDistance, 0, 1), power);
+
+const getDepthNodes = () => Array.from(
+root.querySelectorAll(".main-shortcut-item, .main-shortcut-ad")
+).filter((element) => element instanceof HTMLElement);
+
+const clearDepthStyles = (elements = getDepthNodes()) => {
+for (const element of elements) {
+element.style.removeProperty("transform");
+element.style.removeProperty("filter");
+element.style.removeProperty("opacity");
+element.style.removeProperty("will-change");
+}
+};
+
+const applyDepthEffect = () => {
+frameId = 0;
+if (destroyed || rows.length === 0) return;
+
+const viewportWidth = Math.max(window.innerWidth || document.documentElement.clientWidth || 1, 1);
+const viewportHeight = Math.max(window.innerHeight || document.documentElement.clientHeight || 1, 1);
+const viewportCenterX = viewportWidth * 0.5;
+/* Focus line: 20% above the viewport midpoint (50% -> 30% height). */
+const verticalReferenceDocumentY = getScrollY() + viewportHeight * 0.30;
+const distanceRange = Math.max(viewportHeight * DISTANCE_RANGE_RATIO, 260);
+const horizontalRange = Math.max(viewportCenterX - SAFE_HORIZONTAL_EDGE_PX, 1);
+
+for (const row of rows) {
+const verticalDistance = row.documentCenterY - verticalReferenceDocumentY;
+const normalizedVerticalDistance = clamp(Math.abs(verticalDistance) / distanceRange, 0, 1);
+const verticalProgress = getPowerProgress(normalizedVerticalDistance, VERTICAL_CURVE_POWER);
+const verticalDirection = verticalDistance < 0 ? -1 : verticalDistance > 0 ? 1 : 0;
+const baseVerticalShift = MAX_VERTICAL_SHIFT_PX * verticalProgress;
+const blur = MAX_BLUR_PX * verticalProgress;
+const opacity = 1 - (1 - MIN_OPACITY) * Math.pow(verticalProgress, 1.08);
+
+if (![baseVerticalShift, blur, opacity].every(Number.isFinite)) {
+console.error("[ShortcutDepth] Invalid vertical effect values; row was reset.", row);
+for (const element of row.elements) clearDepthStyles([element]);
+continue;
+}
+
+const filterValue = `blur(${blur.toFixed(2)}px)`;
+const opacityValue = opacity.toFixed(3);
+
+for (const element of row.elements) {
+let horizontalProgress = 0;
+
+if (element.classList.contains("main-shortcut-item")) {
+const itemCenterX = row.horizontalCenters.get(element);
+if (!Number.isFinite(itemCenterX)) {
+console.error("[ShortcutDepth] Missing horizontal measurement; using center vertical strength.", element);
+} else {
+const horizontalDistance = itemCenterX - viewportCenterX;
+const normalizedHorizontalDistance = clamp(Math.abs(horizontalDistance) / horizontalRange, 0, 1);
+/* Power 5 keeps the center almost unchanged and strengthens vertical travel near the sides. */
+horizontalProgress = getPowerProgress(normalizedHorizontalDistance, HORIZONTAL_CURVE_POWER);
+}
+}
+
+/*
+ * The horizontal curve is converted into extra Y travel, not an X translation.
+ * Its additional vertical component is 2x at the horizontal center and 3x
+ * near the safe outer edge: 20px * (2 + horizontalProgress).
+ * This component also follows the vertical curve, so the focus line itself
+ * remains stationary and the layout flow is never modified.
+ */
+const horizontalVerticalBoost = HORIZONTAL_BASE_SHIFT_PX * (2 + horizontalProgress) * verticalProgress;
+const verticalShift = verticalDirection * (baseVerticalShift + horizontalVerticalBoost);
+
+if (!Number.isFinite(verticalShift)) {
+console.error("[ShortcutDepth] Invalid per-item vertical shift; item reset.", element);
+clearDepthStyles([element]);
+continue;
+}
+
+const transformValue = `translate3d(0, ${verticalShift.toFixed(2)}px, 0)`;
+/* The horizontal position only affects Y travel; there is deliberately no X translation. */
+if (element.style.transform !== transformValue) element.style.transform = transformValue;
+if (element.classList.contains("main-shortcut-item")) {
+if (element.style.filter !== filterValue) element.style.filter = filterValue;
+if (element.style.opacity !== opacityValue) element.style.opacity = opacityValue;
+if (element.style.willChange !== "transform, filter, opacity") {
+element.style.willChange = "transform, filter, opacity";
+}
+} else if (element.style.willChange !== "transform") {
+element.style.willChange = "transform";
+}
+}
+}
+
+/* The shared tooltip follows the transformed anchor rather than a stale position. */
+root.__shortcutInteractions?.refreshTooltip?.();
+};
+
+const scheduleVisualUpdate = () => {
+if (destroyed || frameId) return;
+frameId = window.requestAnimationFrame(applyDepthEffect);
+};
+
+const collectLayout = () => {
+measureFrameId = 0;
+if (destroyed) return;
+
+const depthNodes = getDepthNodes();
+if (depthNodes.length === 0) {
+rows = [];
+measuredItemCount = 0;
+console.warn("[ShortcutDepth] No shortcut or ad elements found; waiting for content.");
+return;
+}
+
+/* Read the natural flex layout without any previous depth transform. */
+clearDepthStyles(depthNodes);
+const scrollY = getScrollY();
+const rowBuckets = new Map();
+const nextRows = [];
+let adIndex = 0;
+
+for (const element of depthNodes) {
+const rect = element.getBoundingClientRect();
+if (!Number.isFinite(rect.top) || !Number.isFinite(rect.bottom) || !Number.isFinite(rect.left) || !Number.isFinite(rect.right)) {
+console.error("[ShortcutDepth] Invalid element geometry; skipped.", element);
+continue;
+}
+
+if (element.classList.contains("main-shortcut-ad")) {
+nextRows.push({
+elements: [element],
+horizontalCenters: new Map(),
+documentCenterY: rect.top + scrollY + rect.height * 0.5,
+order: rect.top + adIndex++ * 0.001
+});
+continue;
+}
+
+const parent = element.parentElement;
+if (!parent || !parent.classList.contains("main-shortcut-links")) {
+console.error("[ShortcutDepth] Shortcut item is outside .main-shortcut-links; skipped.", element);
+continue;
+}
+
+let parentBuckets = rowBuckets.get(parent);
+if (!parentBuckets) {
+parentBuckets = new Map();
+rowBuckets.set(parent, parentBuckets);
+}
+/* Items sharing the same flex-line top are animated as one visual row. */
+const rowKey = Math.round(rect.top * 2) / 2;
+let bucket = parentBuckets.get(rowKey);
+if (!bucket) {
+bucket = { elements: [], horizontalCenters: new Map(), top: rect.top, bottom: rect.bottom };
+parentBuckets.set(rowKey, bucket);
+}
+bucket.elements.push(element);
+bucket.horizontalCenters.set(element, rect.left + rect.width * 0.5);
+bucket.top = Math.min(bucket.top, rect.top);
+bucket.bottom = Math.max(bucket.bottom, rect.bottom);
+}
+
+for (const parentBuckets of rowBuckets.values()) {
+for (const bucket of parentBuckets.values()) {
+nextRows.push({
+elements: bucket.elements,
+horizontalCenters: bucket.horizontalCenters,
+documentCenterY: (bucket.top + bucket.bottom) * 0.5 + scrollY,
+order: bucket.top
+});
+}
+}
+
+nextRows.sort((a, b) => a.order - b.order);
+rows = nextRows;
+measuredItemCount = depthNodes.length;
+applyDepthEffect();
+console.log(`[ShortcutDepth] Measured ${rows.length} visual row(s) / ${measuredItemCount} element(s). CenterY=30vh, vertical curve=x^${VERTICAL_CURVE_POWER}, base max=${MAX_VERTICAL_SHIFT_PX}px, horizontal-to-vertical curve=x^${HORIZONTAL_CURVE_POWER}, extra Y=${HORIZONTAL_BASE_SHIFT_PX}px at 2x..3x, X shift=0px, blur=${MAX_BLUR_PX}px.`);
+};
+
+const scheduleMeasure = () => {
+if (destroyed || measureFrameId) return;
+measureFrameId = window.requestAnimationFrame(collectLayout);
+};
+
+const onScroll = () => scheduleVisualUpdate();
+const onResize = () => scheduleMeasure();
+const onVisibilityChange = () => {
+if (!document.hidden) scheduleMeasure();
+};
+
+/* Passive listeners: do not preventDefault, quantize, or call scrollTo. */
+window.addEventListener("scroll", onScroll, { passive: true });
+window.addEventListener("resize", onResize, { passive: true });
+document.addEventListener("visibilitychange", onVisibilityChange);
+if (window.visualViewport) window.visualViewport.addEventListener("resize", onResize, { passive: true });
+
+if (typeof ResizeObserver === "function") {
+resizeObserver = new ResizeObserver(() => scheduleMeasure());
+resizeObserver.observe(root);
+} else {
+console.warn("[ShortcutDepth] ResizeObserver unavailable; using window resize fallback.");
+}
+if (typeof MutationObserver === "function") {
+mutationObserver = new MutationObserver(() => scheduleMeasure());
+mutationObserver.observe(root, { childList: true, subtree: true });
+} else {
+console.warn("[ShortcutDepth] MutationObserver unavailable; dynamic content changes require refresh().");
+}
+
+root.__shortcutDepthEffect = {
+refresh: scheduleMeasure,
+update: scheduleVisualUpdate,
+getStatus: () => ({ rowCount: rows.length, elementCount: measuredItemCount, active: !destroyed }),
+destroy: () => {
+if (destroyed) return;
+destroyed = true;
+if (frameId) window.cancelAnimationFrame(frameId);
+if (measureFrameId) window.cancelAnimationFrame(measureFrameId);
+frameId = 0;
+measureFrameId = 0;
+window.removeEventListener("scroll", onScroll);
+window.removeEventListener("resize", onResize);
+document.removeEventListener("visibilitychange", onVisibilityChange);
+if (window.visualViewport) window.visualViewport.removeEventListener("resize", onResize);
+resizeObserver?.disconnect();
+mutationObserver?.disconnect();
+clearDepthStyles();
+rows = [];
+measuredItemCount = 0;
+if (root.__shortcutDepthEffect) delete root.__shortcutDepthEffect;
+console.log("[ShortcutDepth] Controller destroyed; depth and horizontal-to-vertical styles removed.");
+}
+};
+
+scheduleMeasure();
+console.log("[ShortcutDepth] Vertical depth controller initialized. Horizontal position only amplifies Y movement; native continuous scroll is untouched.");
+};
 const ADSENSE_SCRIPT_SRC = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6151036058675874";
 const ADSENSE_CLIENT = "ca-pub-6151036058675874";
 const ADSENSE_SLOT = "6909508295";
@@ -1669,6 +2169,8 @@ console.log(`[ShortcutAd] Ad request processing completed: ${requestedCount}/${a
 const renderShortcuts = (iconMap) => {
 const root = getRequiredElement("#mainShortcuts");
 if (!root) return;
+if (root.__shortcutInteractions?.reset) root.__shortcutInteractions.reset();
+root.__shortcutDepthEffect?.destroy?.();
 root.replaceChildren();
 const fragment = document.createDocumentFragment();
 const categories = getShortcutCategories();
@@ -1678,12 +2180,13 @@ for (const category of categories) {
 if (!category || !Array.isArray(category.links)) { console.error("[Shortcut] Skipped invalid category."); continue; }
 const section = document.createElement("section");
 section.className = "main-shortcut-category";
+section.setAttribute("aria-label", category.title || "");
 const title = document.createElement("h2");
 title.className = "main-shortcut-title";
 title.textContent = category.title || "";
 const links = document.createElement("div");
 links.className = "main-shortcut-links";
-for (const link of category.links) { const sc = createShortcut(link, iconMap); if (sc) links.appendChild(sc); }
+for (const link of category.links) { const sc = createShortcut(link, iconMap, category.title || ""); if (sc) links.appendChild(sc); }
 section.append(title, links);
 fragment.appendChild(section);
 renderedCategoryCount += 1;
@@ -1692,6 +2195,8 @@ if (renderedCategoryCount === 5) { const adWrapper = createShortcutAd(); if (adW
 const finalAdWrapper = createShortcutAd();
 if (finalAdWrapper) { fragment.appendChild(finalAdWrapper); adSlotCount += 1; console.log("[ShortcutAd] Inserted final ad at the bottom of the shortcut list."); }
 root.appendChild(fragment);
+setupShortcutInteractions(root);
+setupShortcutDepthEffect(root);
 console.log(`[Shortcut] Rendered ${renderedCategoryCount} categories and ${adSlotCount} ad slot(s).`);
 requestShortcutAds(root).catch(error => console.error("[ShortcutAd] Ad request processing failed:", error));
 };
