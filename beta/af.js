@@ -1834,15 +1834,17 @@ root.__shortcutDepthEffect?.destroy?.();
  * no horizontal translation or horizontal spacing is introduced.
  * The independent 3D hover transform remains on the child .main-shortcut-box.
  */
-const MAX_VERTICAL_SHIFT_PX = 150;
+const MAX_VERTICAL_SHIFT_PX = 100;
 /* Horizontal distance adds vertical travel; it never changes the X position. */
-const HORIZONTAL_BASE_SHIFT_PX = 200;
+const HORIZONTAL_BASE_SHIFT_PX = 150;
 const MAX_BLUR_PX = 10;
-const MIN_OPACITY = 0.1;
-const DISTANCE_RANGE_RATIO = 0.62;
+/* Blur is restricted to the bottom 130px of the viewport. */
+const BLUR_ZONE_HEIGHT_PX = 230;
+const MIN_OPACITY = 0;
+const DISTANCE_RANGE_RATIO = 0.65;
 const VERTICAL_CURVE_POWER = 2.5;
-const HORIZONTAL_CURVE_POWER = 5;
-const SAFE_HORIZONTAL_EDGE_PX = 80;
+const HORIZONTAL_CURVE_POWER = 3;
+const SAFE_HORIZONTAL_EDGE_PX = 100;
 
 let rows = [];
 let frameId = 0;
@@ -1884,8 +1886,10 @@ const viewportWidth = Math.max(window.innerWidth || document.documentElement.cli
 const viewportHeight = Math.max(window.innerHeight || document.documentElement.clientHeight || 1, 1);
 const viewportCenterX = viewportWidth * 0.5;
 /* Focus line: 20% above the viewport midpoint (50% -> 30% height). */
-const verticalReferenceDocumentY = getScrollY() + viewportHeight * 0.30;
+const scrollY = getScrollY();
+const verticalReferenceDocumentY = scrollY + viewportHeight * 0.30;
 const distanceRange = Math.max(viewportHeight * DISTANCE_RANGE_RATIO, 260);
+const blurZoneStartY = viewportHeight - BLUR_ZONE_HEIGHT_PX;
 const horizontalRange = Math.max(viewportCenterX - SAFE_HORIZONTAL_EDGE_PX, 1);
 
 for (const row of rows) {
@@ -1894,16 +1898,15 @@ const normalizedVerticalDistance = clamp(Math.abs(verticalDistance) / distanceRa
 const verticalProgress = getPowerProgress(normalizedVerticalDistance, VERTICAL_CURVE_POWER);
 const verticalDirection = verticalDistance < 0 ? -1 : verticalDistance > 0 ? 1 : 0;
 const baseVerticalShift = MAX_VERTICAL_SHIFT_PX * verticalProgress;
-const blur = MAX_BLUR_PX * verticalProgress;
+const rowViewportCenterY = row.documentCenterY - scrollY;
 const opacity = 1 - (1 - MIN_OPACITY) * Math.pow(verticalProgress, 1.08);
 
-if (![baseVerticalShift, blur, opacity].every(Number.isFinite)) {
+if (![baseVerticalShift, opacity].every(Number.isFinite)) {
 console.error("[ShortcutDepth] Invalid vertical effect values; row was reset.", row);
 for (const element of row.elements) clearDepthStyles([element]);
 continue;
 }
 
-const filterValue = `blur(${blur.toFixed(2)}px)`;
 const opacityValue = opacity.toFixed(3);
 
 for (const element of row.elements) {
@@ -1941,10 +1944,29 @@ const transformValue = `translate3d(0, ${verticalShift.toFixed(2)}px, 0)`;
 /* The horizontal position only affects Y travel; there is deliberately no X translation. */
 if (element.style.transform !== transformValue) element.style.transform = transformValue;
 if (element.classList.contains("main-shortcut-item")) {
-if (element.style.filter !== filterValue) element.style.filter = filterValue;
+    /*
+     * Evaluate blur against the translated position. This makes the blur band
+     * rise from the viewport's bottom edge while the item is still visible,
+     * instead of waiting for its untransformed layout position to pass below.
+     */
+    const shiftedViewportCenterY = rowViewportCenterY + verticalShift;
+    const blurProgress = getPowerProgress(
+        (shiftedViewportCenterY - blurZoneStartY) / BLUR_ZONE_HEIGHT_PX,
+        1
+    );
+    const blur = MAX_BLUR_PX * blurProgress;
+    if (!Number.isFinite(blur)) {
+        console.error("[ShortcutDepth] Invalid blur value; item blur was reset.", element);
+        element.style.removeProperty("filter");
+    } else if (blur > 0.01) {
+        const filterValue = `blur(${blur.toFixed(2)}px)`;
+        if (element.style.filter !== filterValue) element.style.filter = filterValue;
+    } else if (element.style.filter) {
+        element.style.removeProperty("filter");
+    }
 if (element.style.opacity !== opacityValue) element.style.opacity = opacityValue;
-if (element.style.willChange !== "transform, filter, opacity") {
-element.style.willChange = "transform, filter, opacity";
+if (element.style.willChange !== "transform, opacity") {
+element.style.willChange = "transform, opacity";
 }
 } else if (element.style.willChange !== "transform") {
 element.style.willChange = "transform";
@@ -1998,8 +2020,19 @@ continue;
 }
 
 const parent = element.parentElement;
-if (!parent || !parent.classList.contains("main-shortcut-links")) {
-console.error("[ShortcutDepth] Shortcut item is outside .main-shortcut-links; skipped.", element);
+const isDirectListChild = parent?.classList.contains("main-shortcut-links") === true;
+const isManagedRowChild =
+    parent?.classList.contains("main-shortcut-row") === true &&
+    parent.parentElement?.classList.contains("main-shortcut-links") === true;
+
+/*
+ * The JS row renderer wraps each shortcut in .main-shortcut-row.
+ * Accept both that managed structure and the older direct-child structure.
+ * Buckets are keyed by the immediate layout parent, so managed rows are
+ * measured together without reconstructing their flex-line grouping.
+ */
+if (!isDirectListChild && !isManagedRowChild) {
+console.error("[ShortcutDepth] Shortcut item has an unexpected parent; expected .main-shortcut-links or .main-shortcut-row inside it.", element);
 continue;
 }
 
@@ -2036,7 +2069,7 @@ nextRows.sort((a, b) => a.order - b.order);
 rows = nextRows;
 measuredItemCount = depthNodes.length;
 applyDepthEffect();
-console.log(`[ShortcutDepth] Measured ${rows.length} visual row(s) / ${measuredItemCount} element(s). CenterY=30vh, vertical curve=x^${VERTICAL_CURVE_POWER}, base max=${MAX_VERTICAL_SHIFT_PX}px, horizontal-to-vertical curve=x^${HORIZONTAL_CURVE_POWER}, extra Y=${HORIZONTAL_BASE_SHIFT_PX}px at 2x..3x, X shift=0px, blur=${MAX_BLUR_PX}px.`);
+console.log(`[ShortcutDepth] Measured ${rows.length} visual row(s) / ${measuredItemCount} element(s). CenterY=30vh, vertical curve=x^${VERTICAL_CURVE_POWER}, base max=${MAX_VERTICAL_SHIFT_PX}px, horizontal-to-vertical curve=x^${HORIZONTAL_CURVE_POWER}, extra Y=${HORIZONTAL_BASE_SHIFT_PX}px at 2x..3x, X shift=0px, blur=${MAX_BLUR_PX}px rising from the viewport bottom across ${BLUR_ZONE_HEIGHT_PX}px using translated item positions.`);
 };
 
 const scheduleMeasure = () => {
@@ -2132,18 +2165,20 @@ console.log("[ShortcutAd] AdSense script appended.");
 return adsenseScriptPromise;
 };
 const createShortcutAd = () => {
-const wrapper = document.createElement("div");
-wrapper.className = "main-shortcut-ad";
-const ad = document.createElement("ins");
-ad.className = "adsbygoogle";
-ad.style.display = "inline-block"; // blockからinline-blockに変更
-ad.style.width = "728px";          // 横幅を728pxに固定
-ad.style.height = "90px";          // 高さを90pxに固定
-ad.dataset.adClient = ADSENSE_CLIENT;
-ad.dataset.adSlot = ADSENSE_SLOT;
-wrapper.appendChild(ad);
-console.log(`[ShortcutAd] Ad slot created: ${ADSENSE_SLOT}`);
-return wrapper;
+  const wrapper = document.createElement("div");
+  wrapper.className = "main-shortcut-ad";
+  wrapper.style.cssText = "width:100%;display:flex;justify-content:center;";
+
+  const ad = document.createElement("ins");
+  ad.className = "adsbygoogle";
+  ad.style.display = "inline-block";
+  ad.style.width = "728px";
+  ad.style.height = "90px";
+  ad.dataset.adClient = ADSENSE_CLIENT;
+  ad.dataset.adSlot = ADSENSE_SLOT;
+  wrapper.appendChild(ad);
+  console.log(`[ShortcutAd] Ad slot created: ${ADSENSE_SLOT}`);
+  return wrapper;
 };
 const requestShortcutAds = async (root) => {
 if (!root) { console.error("[ShortcutAd] Root element is missing."); return; }
@@ -2166,39 +2201,132 @@ console.log(`[ShortcutAd] Ad requested successfully: slot=${ADSENSE_SLOT}`);
 }
 console.log(`[ShortcutAd] Ad request processing completed: ${requestedCount}/${ads.length}`);
 };
+
 const renderShortcuts = (iconMap) => {
-const root = getRequiredElement("#mainShortcuts");
-if (!root) return;
-if (root.__shortcutInteractions?.reset) root.__shortcutInteractions.reset();
-root.__shortcutDepthEffect?.destroy?.();
-root.replaceChildren();
-const fragment = document.createDocumentFragment();
-const categories = getShortcutCategories();
-let renderedCategoryCount = 0;
-let adSlotCount = 0;
-for (const category of categories) {
-if (!category || !Array.isArray(category.links)) { console.error("[Shortcut] Skipped invalid category."); continue; }
-const section = document.createElement("section");
-section.className = "main-shortcut-category";
-section.setAttribute("aria-label", category.title || "");
-const title = document.createElement("h2");
-title.className = "main-shortcut-title";
-title.textContent = category.title || "";
-const links = document.createElement("div");
-links.className = "main-shortcut-links";
-for (const link of category.links) { const sc = createShortcut(link, iconMap, category.title || ""); if (sc) links.appendChild(sc); }
-section.append(title, links);
-fragment.appendChild(section);
-renderedCategoryCount += 1;
-if (renderedCategoryCount === 5) { const adWrapper = createShortcutAd(); if (adWrapper) { fragment.appendChild(adWrapper); adSlotCount += 1; console.log("[ShortcutAd] Inserted ad after the 5th category."); } }
-}
-const finalAdWrapper = createShortcutAd();
-if (finalAdWrapper) { fragment.appendChild(finalAdWrapper); adSlotCount += 1; console.log("[ShortcutAd] Inserted final ad at the bottom of the shortcut list."); }
-root.appendChild(fragment);
-setupShortcutInteractions(root);
-setupShortcutDepthEffect(root);
-console.log(`[Shortcut] Rendered ${renderedCategoryCount} categories and ${adSlotCount} ad slot(s).`);
-requestShortcutAds(root).catch(error => console.error("[ShortcutAd] Ad request processing failed:", error));
+  const root = getRequiredElement("#mainShortcuts");
+  if (!root) return;
+  if (root.__shortcutInteractions?.reset) root.__shortcutInteractions.reset();
+  root.__shortcutDepthEffect?.destroy?.();
+  root.__shortcutRowLayout?.destroy?.();
+  root.replaceChildren();
+
+  const section = document.createElement("section");
+  section.className = "main-shortcut-category";
+  section.setAttribute("aria-label", t("shortcut"));
+  const links = document.createElement("div");
+  links.className = "main-shortcut-links";
+
+  let renderedShortcutCount = 0;
+  let skippedCategoryCount = 0;
+  const shortcutItems = [];
+  let rowResizeHandler = null;
+
+  for (const category of getShortcutCategories()) {
+    if (!category || !Array.isArray(category.links)) {
+      console.error("[Shortcut] Skipped invalid category.");
+      skippedCategoryCount += 1;
+      continue;
+    }
+    const categoryTitle = String(category.title || "");
+    for (const link of category.links) {
+      const shortcut = createShortcut(link, iconMap, categoryTitle);
+      if (!shortcut) continue;
+      shortcutItems.push(shortcut);
+      renderedShortcutCount += 1;
+    }
+  }
+// 行の個数は「通常 → 1つ減らす → 通常 → 1つ減らす…」を繰り返す
+// 各行の中では、奇数番号と偶数番号のうち少ない方を先頭にする（同数なら行ごとに交互）
+const buildOddEvenRows = (items, maxPerRow) => {
+  const reducedPerRow = Math.max(1, maxPerRow - 1);
+  const rows = [];
+  let cursor = 0;
+  let rowIndex = 0;
+
+  while (cursor < items.length) {
+    const isNormalRow = rowIndex % 2 === 0;
+    const size = isNormalRow ? maxPerRow : reducedPerRow;
+    const count = Math.min(size, items.length - cursor);
+
+    const chunk = items.slice(cursor, cursor + count).map((item, i) => ({ item, number: cursor + i + 1 }));
+    const odd = chunk.filter((c) => c.number % 2 === 1).map((c) => c.item);
+    const even = chunk.filter((c) => c.number % 2 === 0).map((c) => c.item);
+
+    const oddFirst = odd.length !== even.length
+      ? odd.length < even.length
+      : rowIndex % 2 === 1;
+
+    rows.push(oddFirst ? [...odd, ...even] : [...even, ...odd]);
+
+    cursor += count;
+    rowIndex += 1;
+  }
+  return rows;
+};
+const renderShortcutRows = () => {
+  if (!links.isConnected) {
+    console.error("[ShortcutLayout] Cannot calculate rows: shortcut list is not connected.");
+    return;
+  }
+
+  const itemWidth = 64;
+  const availableWidth = Math.max(links.clientWidth || root.clientWidth || window.innerWidth, itemWidth);
+  const maxPerRow = Math.max(1, Math.floor(availableWidth / itemWidth));
+  const rows = buildOddEvenRows(shortcutItems, maxPerRow);
+  const nextFragment = document.createDocumentFragment();
+
+  rows.forEach((ordered, rowIndex) => {
+    const row = document.createElement("div");
+    row.className = "main-shortcut-row";
+    row.dataset.rowIndex = String(rowIndex);
+    row.style.setProperty("display", "flex", "important");
+    row.style.setProperty("flex-wrap", "nowrap", "important");
+    row.style.setProperty("justify-content", "center", "important");
+    row.style.setProperty("width", "100%", "important");
+    row.append(...ordered);
+    nextFragment.appendChild(row);
+
+    if ((rowIndex + 1) % 3 === 0 && rowIndex + 1 < rows.length) {
+      nextFragment.appendChild(createShortcutAd());
+    }
+  });
+
+  links.replaceChildren(nextFragment);
+
+  rows.forEach((ordered, rowIndex) => {
+    const names = ordered.map((el) => el.dataset.shortcutName).join(" | ");
+    console.log(`[ShortcutLayout] row ${rowIndex + 1} (${ordered.length}件): ${names}`);
+  });
+  requestShortcutAds(root).catch((error) => console.error("[ShortcutAd] Ad request processing failed:", error));
+};
+
+  section.appendChild(links);
+  root.appendChild(section);
+  renderShortcutRows();
+
+  if (root.__shortcutRowLayout?.destroy) root.__shortcutRowLayout.destroy();
+  let lastRowWidth = links.clientWidth;
+  rowResizeHandler = () => {
+    const nextWidth = links.clientWidth;
+    if (nextWidth <= 0 || Math.abs(nextWidth - lastRowWidth) < 1) return;
+    lastRowWidth = nextWidth;
+    renderShortcutRows();
+    root.__shortcutDepthEffect?.refresh?.();
+  };
+  window.addEventListener("resize", rowResizeHandler, { passive: true });
+  root.__shortcutRowLayout = {
+    refresh: renderShortcutRows,
+    destroy: () => {
+      if (rowResizeHandler) window.removeEventListener("resize", rowResizeHandler);
+      rowResizeHandler = null;
+      if (root.__shortcutRowLayout) delete root.__shortcutRowLayout;
+      console.log("[ShortcutLayout] Row layout controller destroyed.");
+    }
+  };
+
+  setupShortcutInteractions(root);
+  setupShortcutDepthEffect(root);
+  console.log(`[Shortcut] Rendered ${renderedShortcutCount} shortcut(s) in JS-managed rows; skipped ${skippedCategoryCount} invalid category(ies).`);
 };
 const setupSearchAndHistory = () => {
 const searchBox = getEl("#searchBox");
@@ -2241,22 +2369,50 @@ if (appSearchBtn) appSearchBtn.addEventListener("click", () => { hideMainSuggest
 document.addEventListener("click", (e) => { const dropdown = getEl("#appSearchDropdown"); const appBtn = getEl("#appSearchBtn"); const mainDropdown = getEl(`#${MAIN_SUGGESTION_ID}`); if (dropdown && !dropdown.contains(e.target) && appBtn && !appBtn.contains(e.target) && e.target !== searchBox && !e.target.closest(".app-search-item")) console.log("[AppSearch] Outside click ignored; suggestions remain visible."); if (mainDropdown && !mainDropdown.contains(e.target) && e.target !== searchBox) console.log("[MainSuggestion] Outside click ignored; suggestions remain visible."); });
 console.log("[Search] Search handlers initialized.");
 };
+const revealShortcuts = () => {
+  const root = getEl("#mainShortcuts");
+  if (!root) { console.error("[Shortcut] Reveal failed: #mainShortcuts not found."); return; }
+  if (!root.querySelector(".main-shortcut-item")) { console.error("[Shortcut] Reveal skipped: no shortcuts rendered."); return; }
+  // 2フレーム待って、レイアウトと行の配置が確定してから表示する
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.classList.add("show");
+    console.log("[Shortcut] .show added to #mainShortcuts.");
+  }));
+};
 const init = async () => {
-console.log("[Wallpaper] Initializing...");
-const wallpaperTask = Promise.resolve().then(initWallpaper);
-const iconTask = loadIconsFromZip();
-try { const iconMap = await iconTask; window._iconMap = iconMap; } catch (error) { console.error("[Shortcut] Icon init failed.", error); window._iconMap = new Map(); }
-await wallpaperTask;
-try { await loadCustomShortcutData(); } catch (error) { customShortcutsCache = []; console.error("[Settings] Custom shortcut init failed:", error); }
-applyUILanguage();
-applyAppearanceSettings();
-if (window.renderShortcuts && window._iconMap) { try { window.renderShortcuts(window._iconMap); } catch (e) { console.error("[Beta] renderShortcuts failed:", e); if (window.renderShortcuts) window.renderShortcuts(new Map()); } }
-if (window.setupSearchAndHistory) window.setupSearchAndHistory();
-setupSettingsControls();
-// Newtab起動時の処理（描画は待たせない）
-runExtensions().catch((error) => console.error("[Ext] Run failed:", error));
-initializeAccountSync().catch((error) => console.error("[Sync] Initialization failed:", error));
-console.log("[Wallpaper] Initialization completed.");
+  console.log("[Wallpaper] Initializing...");
+  const wallpaperTask = Promise.resolve().then(initWallpaper);
+  const iconTask = loadIconsFromZip();
+  let iconsReady = false;
+
+  try {
+    const iconMap = await iconTask;
+    window._iconMap = iconMap;
+    iconsReady = iconMap.size > 0; // ZIPの解凍に成功したときだけtrue
+  } catch (error) {
+    console.error("[Shortcut] Icon init failed.", error);
+    window._iconMap = new Map();
+  }
+
+  await wallpaperTask;
+  try { await loadCustomShortcutData(); } catch (error) { customShortcutsCache = []; console.error("[Settings] Custom shortcut init failed:", error); }
+  applyUILanguage();
+  applyAppearanceSettings();
+
+  if (window.renderShortcuts && window._iconMap) {
+    try { window.renderShortcuts(window._iconMap); }
+    catch (e) { console.error("[Beta] renderShortcuts failed:", e); window.renderShortcuts(new Map()); }
+  }
+
+  if (window.setupSearchAndHistory) window.setupSearchAndHistory();
+  setupSettingsControls();
+
+  // ショートカットの描画とZIP解凍が完了している場合のみ表示する
+  if (iconsReady) revealShortcuts();
+
+  runExtensions().catch((error) => console.error("[Ext] Run failed:", error));
+  initializeAccountSync().catch((error) => console.error("[Sync] Initialization failed:", error));
+  console.log("[Wallpaper] Initialization completed.");
 };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
 else init();
