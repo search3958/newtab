@@ -12,13 +12,16 @@ width: 100%;
 height: 100%;
 margin: 0;
 }
+
 *{
 -ms-overflow-style: none;
 scrollbar-width: none;
 }
+
 *::-webkit-scrollbar {
 display: none;
 }
+
 body {
 background: #fff var(--wallpaper-light, url("bgimg/samag3.webp"))
 center / cover no-repeat fixed;
@@ -35,6 +38,7 @@ background-size: cover;
 background-position: center;
 overflow-x: hidden;
 }
+
 body::after{
 content:" ";
 background: linear-gradient(0deg, rgba(0, 0, 0, 67%) 0%, rgba(0, 0, 0, 42%) 23%, rgba(0, 0, 0, 15%) 38%, rgba(0, 0, 0, 0%) 55%);
@@ -45,45 +49,43 @@ bottom:0;
 left:0;
 z-index:-1;
 }
+
 @media (prefers-color-scheme: dark) {
 body {
 background-color: #000;
 background-image: var(--wallpaper-dark, url("bgimg/samag3_dark.webp"));
 }
 }
+
 #clock {
-position: fixed;
-bottom: 130px;
-right: 0px;
-color: #fff;
-font-size: 48px;
-width:100vw;
-text-align:center;
-font-family: "TikTok Sans", sans-serif;
+display:none;
+}
+
+input::placeholder {
+color: #fff9;
 }
 .search {
-bottom: 20px;
-left: 50%;
-transform: translateX(-50%);
-width: 450px;
-background: #fff;
-border-radius: 99px;
-padding: 8px;
+bottom: 0;
+left: 0;
+width: calc(100vw - 32px);
+background: linear-gradient(to bottom, #0000, #0001, #0004, #0009);
+padding: 16px;
 position: fixed;
+z-index:1;
 display: flex;
 flex-wrap: nowrap;
+justify-content: center;
 corner-shape: superellipse(1.6);
 }
 .RedCheck-info-widget{
-right: 32px !important;
-bottom: 32px !important;
+right: 19px !important;
+bottom: 19px !important;
 transition: right 0.3s ease;
-}.RedCheck-info-widget:hover{
-right: 16px !important;
 }
 #searchBox {
+font-family: "TikTok Sans", sans-serif;
 margin: 0;
-width: 100%;
+width: 60vw;
 height: 42px;
 font-size: 24px;
 padding:0px;
@@ -93,20 +95,26 @@ background: none;
 outline: none;
 border-radius: 100px;
 font-family: inherit;
+color: #fff;
+}
+#searchBox:not(:placeholder-shown) {
+font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 .searchbtn {
 margin: 0;
 width: 55px;
 height: 44px;
 border: none;
-background:#000;
+background:#fff;
 border-radius: 100px;
 cursor: pointer;
 corner-shape: superellipse(1.6);
 }
+
 /* ================================
 History (v2.1 style)
 ================================ */
+
 .history-list {
 position: fixed;
 top: 140px;
@@ -120,6 +128,7 @@ gap: 4px;
 z-index: 100;
 max-width: 500px;
 }
+
 .history {
 position: relative;
 margin: 4px;
@@ -132,24 +141,28 @@ height: 24px;
 font-size: 14px;
 cursor: pointer;
 }
+
 @media (prefers-color-scheme: dark) {
 .history {
 background: rgba(28, 28, 28, 0.5);
 color: #fff;
 }
 }
+
 .app-search-buttons {
 position: fixed;
-bottom: 90px;
+z-index: 1;
+bottom: 74px;
 left: 0px;
 width:100vw;
 display: flex;
 gap: 4px;
 justify-content: center;
 }
+
 .search-btn {
 margin: 4px;
-padding: 8px 16px;
+padding: 8px 10px;
 background: var(--b);
 color: #000;
 font-weight: 600;
@@ -162,16 +175,22 @@ font-size: 14px;
 display: flex;
 align-items: center;
 gap: 5px;
-padding-left: 12px;
 corner-shape: superellipse(1.6);
 }
+
+.search-btn span{
+display:block
+}
+
 .search-btn{
 transition: transform 0.3s cubic-bezier(.26,0,0,1);
 transform: translate(0, 0px) scale(1); 
 }
+
 .search-btn:hover{
 transform: translate(0, -3px) scale(1.05); 
 }
+
 .app-search-dropdown,#mainSuggestionDropdown {
 position: fixed;
 bottom: 145px;
@@ -183,20 +202,23 @@ overflow-y: auto;
 background: #fffd;
 border-radius: 35px;
 backdrop-filter: blur(24px);
-z-index: 2;
+z-index: 3;
 padding: 8px;
 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 display: none;
 corner-shape: superellipse(1.6);
 }
+
 @media (prefers-color-scheme: dark) {
 .app-search-dropdown {
 background: #000d;
 }
 }
+
 .app-search-dropdown.visible {
 display: block;
 }
+
 .app-search-item {
 display: flex;
 align-items: center;
@@ -208,9 +230,11 @@ transition: background 0.15s ease;
 corner-shape: superellipse(1.6);
 background:#0000;
 }
+
 .app-search-item:hover {
 background: rgba(153, 153, 153, 0.14);
 }
+
 .app-search-item-icon {
 width: 32px;
 height: 32px;
@@ -221,29 +245,37 @@ display: flex;
 align-items: center;
 justify-content: center;
 }
+
 .app-search-item-icon img {
 width: 100%;
 height: 100%;
 object-fit: contain;
 }
+
 .app-search-item-name {
 font-size: 14px;
 color: #000;
 }
+
 @media (prefers-color-scheme: dark) {
 .app-search-item-name {
 color: #fff;
 }
 }
+
 .app-search-item-url {
 display:none
 }
+
 /* ================================
 Intelligence Box
 ================================ */
+
 .intelligence-box {
 display:none;
 }
+
+
 .intelligence-answer {
 font-size: 16px;
 color: #000;
@@ -251,38 +283,50 @@ text-align: center;
 width: 100%;
 cursor: pointer;
 }
+
 @media (prefers-color-scheme: dark) {
 .intelligence-answer {
 color: #fff;
 }
 }
+
 .intelligence-answer.hide {
 color: #0059ff;
 filter: blur(4px);
 opacity: 0;
 }
+
 /* ================================
 Shortcut Section (scrolls into view)
 ================================ */
+
 .shortcut {
 position: relative;
-top: 100vh;
-background: rgba(255, 255, 255, 0.5);
-backdrop-filter: blur(32px);
-padding-top: 8px;
+top: 0;
+/* Keep the first and last shortcut rows reachable at the viewport focus line. */
+padding-top: max(8px, calc(50vh - 58px));
+padding-bottom: max(300px, calc(50vh - 58px));
 min-height: 100vh;
 width: 100%;
-z-index: 10;
+z-index: 0;
 }
-@media (prefers-color-scheme: dark) {
-.shortcut {
-background: rgba(0, 0, 0, 0.3);
-}
-}
+
 .main-shortcuts {
 box-sizing: border-box;
 padding: 32px;
+padding-top: 10px;
+opacity:0;
+transform:translateY(60px);
+transition: padding 1s cubic-bezier(.2,.1,0,1),opacity 1s cubic-bezier(.2,.1,0,1), transform 1s cubic-bezier(.2,.1,0,1);
 }
+
+.main-shortcuts.show{
+padding: 3px;
+opacity:1;
+transform:translateY(0px);
+
+}
+
 .main-shortcuts-list {
 display: flex;
 flex-direction: column;
@@ -290,98 +334,156 @@ gap: 28px;
 max-width: 1100px;
 margin: 0 auto;
 }
+
 .main-shortcut-category {
 display: flex;
 flex-direction: column;
-gap: 5px;
+gap: 0;
 }
+
 .main-shortcut-title {
-margin: 0;
-font-size: 20px;
-text-align: center;
-font-weight:400;
-color: #000;
-margin-top:16px;
+position: absolute;
+width: 1px;
+height: 1px;
+padding: 0;
+margin: -1px;
+overflow: hidden;
+clip: rect(0, 0, 0, 0);
+white-space: nowrap;
+border: 0;
 }
-@media (prefers-color-scheme: dark) {
-.main-shortcut-title {
-color: #fff;
-}
-}
+
 .main-shortcut-links {
-display: flex;
-flex-wrap: wrap;
-justify-content: center;
-align-items: center;
-gap: 4px;
-}
-/* ================================
-Shortcut Items (v2.1 style)
-================================ */
-.main-shortcut-item {
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: 7px;
-min-width: 40px;
+gap: 0;
+}
+
+/* Each row is a single, non-wrapping line; JavaScript controls parity order. */
+.main-shortcut-row {
+display: flex;
+flex-wrap: nowrap;
+justify-content: center;
+align-items: center;
+width: max-content;
+max-width: 100%;
+}
+
+/* ================================
+Shortcut Items (v2.1 style)
+================================ */
+
+.main-shortcut-item {
+display: flex;
+width: 64px;
+height: 52px;
+flex: 0 0 64px;
+align-items: center;
+justify-content: center;
 color: inherit;
 text-decoration: none;
 perspective: 800px;
+-webkit-tap-highlight-color: transparent;
+cursor: none;
+/* The depth controller writes transform/filter/opacity inline. */
 }
+
 .main-shortcut-box {
+width: 46px;
+height: 46px;
+margin:4px;.main-shortcut-icon img
+box-sizing: border-box;
 border-radius: 40px;
 background-color: rgba(255, 255, 255, 0.7);
 corner-shape: superellipse(1.3);
-perspective: 800px;
 display: flex;
 align-items: center;
 justify-content: center;
-transition: transform 0.5s cubic-bezier(0, 0, 0, 1);
-transform: rotateX(0deg) rotateY(0deg);
+transform: translate3d(0, 0, 0);
+transform-style: preserve-3d;
+transform-origin: center;
 overflow: hidden;
+will-change: transform;
 }
+
 @media (prefers-color-scheme: dark) {
 .main-shortcut-box {
 background-color: rgba(17, 17, 17, 0.7);
 }
 }
+
 .main-shortcut-icon {
-width: 52px;
-height: 52px;
+width: 64px;
+height: 64px;
+flex: 0 0 64px;
 display: flex;
 align-items: center;
 justify-content: center;
 overflow: hidden;
 flex-shrink: 0;
+/* Do not inherit the anchor's depth transform: the icon stays inside its box. */
 }
+
 .main-shortcut-icon img {
 width: 100%;
 height: 100%;
 display: block;
 object-fit: contain;
-scale:0.9;
+scale:0.65;
 }
-.main-shortcut-name {
-width: 70px;
+
+.shortcut-tooltip {
+position: fixed;
+left: 0;
+top: 0;
+z-index: 1000;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 2px;
+max-width: min(240px, calc(100vw - 16px));
+box-sizing: border-box;
+padding: 8px 16px;
+border-radius: 24px;
+corner-shape: superellipse(1.6);
+background: rgba(20, 20, 20, 0.7);
+color: #fff;
+box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+backdrop-filter: blur(8px);
+pointer-events: none;
+user-select: none;
+white-space: nowrap;
+overflow: hidden;
+opacity: 0;
+visibility: hidden;
+transform: translate3d(-50%, 0, 0) scale(0.96);
+transform-origin: top center;
+will-change: transform, opacity;
+}
+
+.shortcut-tooltip-name {
+max-width: 100%;
 overflow: hidden;
 text-overflow: ellipsis;
-white-space: nowrap;
-text-align: center;
-font-size: 12px;
+font-size: 13px;
+font-weight: 600;
 line-height: 1.3;
-color: rgba(0, 0, 0, 0.88);
 }
-@media (prefers-color-scheme: dark) {
-.main-shortcut-name {
-color: rgba(255, 255, 255, 0.92);
+
+.shortcut-tooltip-category {
+max-width: 100%;
+overflow: hidden;
+text-overflow: ellipsis;
+color: rgba(255, 255, 255, 0.72);
+font-size: 10px;
+line-height: 1.25;
 }
-}
-.main-shortcut-item:hover .main-shortcut-box {
-transform: rotateX(0deg) rotateY(0deg);
-}
+
 /* ================================
 Shared Dialog / Settings
 ================================ */
+
 .newtab-dialog {
 position: fixed;
 inset: 0;
@@ -395,15 +497,19 @@ background: rgba(0, 0, 0, 0.38);
 opacity: 0;
 transition: opacity 0.16s ease;
 }
+
 .newtab-dialog.is-open {
 opacity: 1;
 }
+
 .newtab-dialog.is-closing {
 opacity: 0;
 }
+
 .newtab-dialog[hidden] {
 display: none;
 }
+
 .newtab-dialog-content {
 width: min(520px, 100%);
 max-height: min(82vh, 760px);
@@ -420,20 +526,24 @@ transform: scale(0.96);
 opacity: 0;
 transition: transform 0.16s ease, opacity 0.16s ease;
 }
+
 .newtab-dialog.is-open .newtab-dialog-content {
 transform: scale(1);
 opacity: 1;
 }
+
 .newtab-dialog.is-closing .newtab-dialog-content {
 transform: scale(0.96);
 opacity: 0;
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-dialog-content {
 background: rgba(28, 28, 28, 0.97);
 color: #fff;
 }
 }
+
 .newtab-dialog-header {
 display: flex;
 align-items: center;
@@ -441,11 +551,13 @@ justify-content: space-between;
 gap: 12px;
 margin-bottom: 14px;
 }
+
 .newtab-dialog-title {
 margin: 0;
 font-size: 32px;
 font-weight: 400;
 }
+
 .newtab-dialog-close {
 flex: 0 0 auto;
 width: 40px;
@@ -464,20 +576,25 @@ align-items: center;
 justify-content: center;
 transition: background 0.12s ease, transform 0.12s ease;
 }
+
 .newtab-dialog-close:hover {
 background: rgba(0, 0, 0, 0.1);
 }
+
 .newtab-dialog-close:active {
 transform: scale(0.94);
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-dialog-close {
 background: rgba(255, 255, 255, 0.08);
 }
+
 .newtab-dialog-close:hover {
 background: rgba(255, 255, 255, 0.13);
 }
 }
+
 .newtab-dialog-content .dialog-header {
 display: flex;
 align-items: center;
@@ -485,21 +602,25 @@ justify-content: space-between;
 gap: 12px;
 margin-bottom: 14px;
 }
+
 .newtab-dialog-content .dialog-header h3 {
 margin: 0;
 font-size: 20px;
 font-weight: 500;
 }
+
 .newtab-dialog-content .dialog-empty {
 margin: 8px 0 0;
 text-align: center;
 color: #888;
 }
+
 .newtab-dialog-content > ul {
 list-style: none;
 padding: 0;
 margin: 0;
 }
+
 .newtab-dialog-content > ul > li {
 display: flex;
 align-items: center;
@@ -510,40 +631,49 @@ border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 cursor: pointer;
 font-size: 14px;
 }
+
 .newtab-dialog-content > ul > li:last-child {
 border-bottom: 0;
 }
+
 .newtab-dialog-content > ul > li:hover {
 background: rgba(0, 0, 0, 0.04);
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-dialog-content > ul > li {
 border-bottom-color: rgba(255, 255, 255, 0.1);
 }
+
 .newtab-dialog-content > ul > li:hover {
 background: rgba(255, 255, 255, 0.05);
 }
 }
+
 .newtab-settings-section {
 display: flex;
 flex-direction: column;
 gap: 9px;
 margin-top: 18px;
 }
+
 .newtab-settings-section:first-of-type {
 margin-top: 0;
 }
+
 .newtab-settings-section-title {
 margin: 0;
 font-size: 15px;
 font-weight: 500;
 }
+
 .newtab-settings-row {
 display: flex;
 align-items: center;
 gap: 7px;
 flex-wrap: wrap;
 }
+
 .newtab-settings-row > input {
 min-width: 0;
 flex: 1 1 180px;
@@ -557,22 +687,26 @@ color: inherit;
 font: inherit;
 outline: none;
 }
+
 .newtab-settings-row > input:focus {
 border-color: rgba(24, 90, 242, 0.65);
 box-shadow: 0 0 0 3px rgba(24, 90, 242, 0.1);
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-settings-row > input {
 border-color: rgba(255, 255, 255, 0.15);
 background: rgba(0, 0, 0, 0.22);
 }
 }
+
 .newtab-settings-links {
 display: flex;
 align-items: center;
 gap: 7px;
 flex-wrap: wrap;
 }
+
 .newtab-settings-action,
 .newtab-settings-choice,
 .newtab-settings-danger,
@@ -596,29 +730,35 @@ align-items: center;
 justify-content: center;
 transition: background 0.12s ease, transform 0.12s ease;
 }
+
 .newtab-settings-action:hover,
 .newtab-settings-choice:hover,
 .newtab-settings-danger:hover,
 .newtab-settings-link:hover {
 background: rgba(0, 0, 0, 0.17);
 }
+
 .newtab-settings-action:active,
 .newtab-settings-choice:active,
 .newtab-settings-danger:active,
 .newtab-settings-link:active {
 transform: scale(0.97);
 }
+
 .newtab-settings-choice[aria-pressed="true"] {
 background: rgb(0, 255, 123);
 color: #000000;
 }
+
 .newtab-settings-danger {
 background: rgb(221, 0, 0);
 color: #ffffff;
 }
+
 .newtab-settings-danger:hover {
 background: rgb(189, 0, 0);
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-settings-action,
 .newtab-settings-choice,
@@ -626,23 +766,28 @@ background: rgb(189, 0, 0);
 background: rgba(0, 0, 0, 0.417);
 color: #ffffff;
 }
+
 }
+
 .newtab-settings-hint {
 margin: 0;
 font-size: 12px;
 line-height: 1.5;
 color: #777;
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-settings-hint {
 color: #aaa;
 }
 }
+
 .newtab-shortcut-list {
 display: flex;
 flex-direction: column;
 gap: 6px;
 }
+
 .newtab-shortcut-entry {
 display: flex;
 align-items: center;
@@ -652,11 +797,13 @@ padding: 8px 10px;
 border-radius: 11px;
 background: rgba(0, 0, 0, 0.045);
 }
+
 @media (prefers-color-scheme: dark) {
 .newtab-shortcut-entry {
 background: rgba(255, 255, 255, 0.07);
 }
 }
+
 .newtab-shortcut-entry-icon {
 width: 32px;
 height: 32px;
@@ -668,44 +815,35 @@ overflow: hidden;
 border-radius: 9px;
 background: rgba(255, 255, 255, 0.7);
 }
+
 .newtab-shortcut-entry-icon img {
 width: 100%;
 height: 100%;
 object-fit: contain;
 }
+
 .newtab-shortcut-entry-info {
 min-width: 0;
 flex: 1 1 auto;
 }
+
 .newtab-shortcut-entry-name,
 .newtab-shortcut-entry-url {
 overflow: hidden;
 text-overflow: ellipsis;
 white-space: nowrap;
 }
+
 .newtab-shortcut-entry-name {
 font-size: 14px;
 }
+
 .newtab-shortcut-entry-url {
 margin-top: 2px;
 font-size: 11px;
 color: #888;
 }
-.main-shortcuts[data-icon-size="standard"] .main-shortcut-icon {
-width: 52px;
-height: 52px;
-}
-.main-shortcuts[data-icon-size="large"] .main-shortcut-icon {
-width: 68px;
-height: 68px;
-}
-.main-shortcuts[data-icon-size="extra-large"] .main-shortcut-icon {
-width: 84px;
-height: 84px;
-}
-.main-shortcuts[data-label-visible="false"] .main-shortcut-name {
-display: none;
-}
+
 .main-shortcut-ad {
 width: min(100%, 728px);
 min-height: 90px;
@@ -715,6 +853,7 @@ box-sizing: border-box;
 display: block;
 text-align: center;
 }
+
 .main-shortcut-ad .adsbygoogle {
 display: block;
 width: 100%;
@@ -722,19 +861,27 @@ min-height: 90px;
 }
 </style>
 </head>
+
 <body>
+
 <div id="clock"></div>
+
 <div class="search">
-<input type="text" id="searchBox" data-i18n-placeholder="searchPlaceholder" placeholder="スクロールして一覧を表示" autocomplete="off" />
+<input type="text" id="searchBox" autocomplete="off" />
 <button class="searchbtn" id="searchButton">
+
 <svg width="18" height="20" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8.64648 6.64645C8.84175 6.45118 9.15825 6.45118 9.35352 6.64645C9.54874 6.84171 9.54877 7.15823 9.35352 7.35348L5.85352 10.8535C5.65827 11.0487 5.34175 11.0487 5.14648 10.8535C4.95122 10.6582 4.95122 10.3417 5.14648 10.1464L8.64648 6.64645ZM5.14648 0.146447C5.34175 -0.0488155 5.65825 -0.0488155 5.85352 0.146447L7.71973 2.01168C8.25295 2.54491 8.68119 2.9727 8.96973 3.32711C9.24669 3.66735 9.48873 4.04834 9.47168 4.48238C9.45682 4.8581 9.30795 5.21601 9.05273 5.49215C8.75789 5.81109 8.31823 5.90932 7.88184 5.95406C7.42716 6.00067 6.82164 5.99996 6.06738 5.99996H0.5C0.22387 5.99996 2.03573e-05 5.77609 0 5.49996C0 5.22382 0.223858 4.99996 0.5 4.99996H6.06738C6.84453 4.99996 7.38799 4.99902 7.7793 4.95895C8.18878 4.91697 8.29253 4.84137 8.31836 4.81344C8.41208 4.71204 8.46723 4.58031 8.47266 4.44235C8.47399 4.40388 8.4532 4.27699 8.19434 3.95895C7.94598 3.65386 7.56144 3.26941 7.01172 2.71969L5.14648 0.853478C4.95123 0.658222 4.95124 0.34171 5.14648 0.146447Z" fill="white" style="fill:white;fill-opacity:1;"/>
+<path d="M8.64648 6.64645C8.84175 6.45118 9.15825 6.45118 9.35352 6.64645C9.54874 6.84171 9.54877 7.15823 9.35352 7.35348L5.85352 10.8535C5.65827 11.0487 5.34175 11.0487 5.14648 10.8535C4.95122 10.6582 4.95122 10.3417 5.14648 10.1464L8.64648 6.64645ZM5.14648 0.146447C5.34175 -0.0488155 5.65825 -0.0488155 5.85352 0.146447L7.71973 2.01168C8.25295 2.54491 8.68119 2.9727 8.96973 3.32711C9.24669 3.66735 9.48873 4.04834 9.47168 4.48238C9.45682 4.8581 9.30795 5.21601 9.05273 5.49215C8.75789 5.81109 8.31823 5.90932 7.88184 5.95406C7.42716 6.00067 6.82164 5.99996 6.06738 5.99996H0.5C0.22387 5.99996 2.03573e-05 5.77609 0 5.49996C0 5.22382 0.223858 4.99996 0.5 4.99996H6.06738C6.84453 4.99996 7.38799 4.99902 7.7793 4.95895C8.18878 4.91697 8.29253 4.84137 8.31836 4.81344C8.41208 4.71204 8.46723 4.58031 8.47266 4.44235C8.47399 4.40388 8.4532 4.27699 8.19434 3.95895C7.94598 3.65386 7.56144 3.26941 7.01172 2.71969L5.14648 0.853478C4.95123 0.658222 4.95124 0.34171 5.14648 0.146447Z" fill="black" style="fill:black;fill-opacity:1;"/>
 </svg>
+
+
 </button>
 </div>
+
 <div class="intelligence-box" id="intelBox">
 <div class="intelligence-answer hide" id="intelAnswer"></div>
 </div>
+
 <div class="history-list" id="historyList"></div>
 <div class="app-search-buttons">
 <button class="search-btn" style="--b:color(display-p3 0.61 1 0 / 1)" id="appSearchBtn"><svg width="22" height="22" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -754,24 +901,34 @@ min-height: 90px;
 <span data-i18n="historyButton">履歴</span></button>
 </div>
 <div class="app-search-dropdown" id="appSearchDropdown"></div>
+
 <div class="shortcut">
 <div class="main-shortcuts" id="mainShortcuts"></div>
 </div>
+<div id="shortcutTooltip" class="shortcut-tooltip" aria-hidden="true">
+<span class="shortcut-tooltip-name"></span>
+<span class="shortcut-tooltip-category"></span>
+</div>
+
 <script src="https://search3958.github.io/check.js"></script>
 <script>
 (() => {
 "use strict";
+
 const NS = "[Clock]";
 let afJsLoaded = false;
+
 /**
-* #searchBox にフォーカス
-*/
+ * #searchBox にフォーカス
+ */
 const focusSearchBox = () => {
 const searchBox = document.getElementById("searchBox");
+
 if (!searchBox) {
 console.error(`${NS} Required element not found: #searchBox`);
 return false;
 }
+
 try {
 searchBox.focus({ preventScroll: true });
 console.log(`${NS} Focused: #searchBox`);
@@ -781,66 +938,80 @@ console.error(`${NS} Failed to focus #searchBox:`, error);
 return false;
 }
 };
+
 // スクリプト開始時に即時フォーカスを試行
 focusSearchBox();
+
 // DOM未生成だった場合の再試行
 if (document.readyState === "loading") {
 document.addEventListener("DOMContentLoaded", () => {
 focusSearchBox();
 }, { once: true });
 }
+
 /**
-* v7/af.js を動的ロード
-*/
+ * v7.1/af.js を動的ロード
+ */
 const loadAfJs = () => {
 if (afJsLoaded) {
-console.log(`${NS} v7/af.js already loaded`);
+console.log(`${NS} v7.1/af.js already loaded`);
 return;
 }
+
 // 既存読み込みチェック
 const existingScript = document.querySelector('script[data-af-js="true"]');
 if (existingScript) {
 afJsLoaded = true;
-console.log(`${NS} v7/af.js already exists in document`);
+console.log(`${NS} v7.1/af.js already exists in document`);
 return;
 }
+
 const script = document.createElement("script");
+
 if (!script) {
 console.error(`${NS} Failed to create <script> element`);
 return;
 }
-script.src = "v7/af.js";
+
+script.src = "v7.1/af.js";
 script.async = true;
 script.dataset.afJs = "true";
+
 script.addEventListener("load", () => {
 afJsLoaded = true;
-console.log(`${NS} Loaded: v7/af.js`);
+console.log(`${NS} Loaded: v7.1/af.js`);
 }, { once: true });
+
 script.addEventListener("error", (event) => {
-console.error(`${NS} Failed to load: v7/af.js`, event);
+console.error(`${NS} Failed to load: v7.1/af.js`, event);
 script.remove();
 }, { once: true });
+
 document.head.appendChild(script);
-console.log(`${NS} Loading: v7/af.js`);
+console.log(`${NS} Loading: v7.1/af.js`);
 };
+
 /**
-* ページ読み込み完了後、オンライン状態ならロード
-*/
+ * ページ読み込み完了後、オンライン状態ならロード
+ */
 const tryLoadAfJs = () => {
 if (!navigator.onLine) {
 console.warn(`${NS} Network offline. Waiting for connection...`);
 return;
 }
+
 // 読み込み直後の処理集中を避ける
 const startLoad = () => {
 loadAfJs();
 };
+
 if ("requestIdleCallback" in window) {
 window.requestIdleCallback(startLoad, { timeout: 2000 });
 } else {
 window.setTimeout(startLoad, 300);
 }
 };
+
 if (document.readyState === "complete") {
 tryLoadAfJs();
 } else {
@@ -848,34 +1019,54 @@ window.addEventListener("load", () => {
 tryLoadAfJs();
 }, { once: true });
 }
+
 // オフライン状態から復帰した場合
 window.addEventListener("online", () => {
 console.log(`${NS} Network connection restored`);
 tryLoadAfJs();
 });
+
 /**
-* 時計
-*/
-const updateClock = () => {
-const now = new Date();
+ * 時計（検索ボックスのplaceholderに表示）
+ * 表示が変わるときだけ更新し、次の分の境界に合わせて予約する
+ */
+let lastClockText = "";
+
+const formatClock = (now) => {
 const month = String(now.getMonth() + 1).padStart(2, "0");
 const day = String(now.getDate()).padStart(2, "0");
 const hours = String(now.getHours()).padStart(2, "0");
 const minutes = String(now.getMinutes()).padStart(2, "0");
-const clockEl = document.getElementById("clock");
-if (!clockEl) {
-console.error(`${NS} Required element not found: #clock`);
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+return `${month}.${day} ${dayNames[now.getDay()]} ${hours}:${minutes}`;
+};
+
+const updateClock = () => {
+const searchBox = document.getElementById("searchBox");
+if (!searchBox) {
+console.error(`${NS} Required element not found: #searchBox`);
 return;
 }
-const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const dayName = dayNames[now.getDay()];
-clockEl.textContent = `${month}.${day} ${dayName} ${hours}:${minutes}`;
+
+const text = formatClock(new Date());
+if (text === lastClockText) return;
+
+lastClockText = text;
+searchBox.placeholder = text;
 };
+
+const scheduleClockUpdate = () => {
 updateClock();
-setInterval(updateClock, 1000);
+// 次の「分」の境界の少し後に再実行（毎秒の更新はしない）
+const delay = 60000 - (Date.now() % 60000) + 20;
+window.setTimeout(scheduleClockUpdate, delay);
+};
+
+scheduleClockUpdate();
 console.log(`${NS} Clock script initialized`);
 })();
 </script>
 <script src="https://zs1.takesen2278.workers.dev/s.js" data-app="a8698bd4-ce41-4a83-ab24-44985ae31b58" defer></script>
+
 </body>
 </html>
