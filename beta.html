@@ -58,43 +58,34 @@ body::after{
 }
 
 #clock {
-    position: fixed;
-    z-index: 1;
-    bottom: 130px;
-    right: 0px;
-    color: #fff;
-    font-size: 48px;
-    width:100vw;
-    text-align:center;
-  font-family: "TikTok Sans", sans-serif;
+    display:none;
 }
 
-
+input::placeholder {
+  color: #fff9;
+}
 .search {
-    z-index: 1;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width:60vw;
-    max-width: 480px;
-    background: #fff;
-    border-radius: 99px;
-    padding: 8px;
-    position: fixed;
-    display: flex;
-    flex-wrap: nowrap;
-    corner-shape: superellipse(1.6);
+bottom: 0;
+left: 0;
+width: calc(100vw - 32px);
+background: linear-gradient(to bottom, #0000, #0001, #0004, #0009);
+padding: 16px;
+position: fixed;
+z-index:1;
+display: flex;
+flex-wrap: nowrap;
+justify-content: center;
+corner-shape: superellipse(1.6);
 }
 .RedCheck-info-widget{
-        right: 32px !important;
-    bottom: 32px !important;
+        right: 19px !important;
+    bottom: 19px !important;
     transition: right 0.3s ease;
-}.RedCheck-info-widget:hover{
-        right: 16px !important;
 }
 #searchBox {
+    font-family: "TikTok Sans", sans-serif;
     margin: 0;
-    width: 100%;
+    width: 60vw;
     height: 42px;
     font-size: 24px;
     padding:0px;
@@ -104,14 +95,17 @@ body::after{
     outline: none;
     border-radius: 100px;
     font-family: inherit;
+    color: #fff;
 }
-
+#searchBox:not(:placeholder-shown) {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
 .searchbtn {
     margin: 0;
     width: 55px;
     height: 44px;
     border: none;
-    background:#000;
+    background:#fff;
     border-radius: 100px;
     cursor: pointer;
     corner-shape: superellipse(1.6);
@@ -158,7 +152,7 @@ body::after{
 .app-search-buttons {
     position: fixed;
     z-index: 1;
-    bottom: 90px;
+    bottom: 74px;
     left: 0px;
     width:100vw;
     display: flex;
@@ -168,7 +162,7 @@ body::after{
 
 .search-btn {
     margin: 4px;
-    padding: 8px 16px;
+    padding: 8px 10px;
     background: var(--b);
     color: #000;
     font-weight: 600;
@@ -181,9 +175,13 @@ body::after{
     display: flex;
     align-items: center;
     gap: 5px;
-    padding-left: 12px;
     corner-shape: superellipse(1.6);
 }
+
+.search-btn span{
+    display:block
+}
+
 .search-btn{
      transition: transform 0.3s cubic-bezier(.26,0,0,1);
     transform: translate(0, 0px) scale(1); 
@@ -316,13 +314,15 @@ body::after{
 .main-shortcuts {
     box-sizing: border-box;
     padding: 32px;
-    padding-top: 40vh;
-    transform:translateY(20vh);
-    transition: padding 1.5s cubic-bezier(.49,.21,0,1), transform 1.5s cubic-bezier(.49,.21,0,1);
+    padding-top: 10px;
+    opacity:0;
+    transform:translateY(60px);
+    transition: padding 1s cubic-bezier(.2,.1,0,1),opacity 1s cubic-bezier(.2,.1,0,1), transform 1s cubic-bezier(.2,.1,0,1);
 }
 
 .main-shortcuts.show{
     padding: 3px;
+    opacity:1;
     transform:translateY(0px);
 
 }
@@ -377,7 +377,7 @@ body::after{
 .main-shortcut-item {
     display: flex;
     width: 64px;
-    height: 60px;
+    height: 52px;
     flex: 0 0 64px;
     align-items: center;
     justify-content: center;
@@ -390,8 +390,8 @@ body::after{
 }
 
 .main-shortcut-box {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     margin:4px;.main-shortcut-icon img
     box-sizing: border-box;
     border-radius: 40px;
@@ -867,11 +867,11 @@ body::after{
 <div id="clock"></div>
 
 <div class="search">
-    <input type="text" id="searchBox" data-i18n-placeholder="searchPlaceholder" placeholder="スクロールして一覧を表示" autocomplete="off" />
+    <input type="text" id="searchBox" autocomplete="off" />
     <button class="searchbtn" id="searchButton">
         
 <svg width="18" height="20" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8.64648 6.64645C8.84175 6.45118 9.15825 6.45118 9.35352 6.64645C9.54874 6.84171 9.54877 7.15823 9.35352 7.35348L5.85352 10.8535C5.65827 11.0487 5.34175 11.0487 5.14648 10.8535C4.95122 10.6582 4.95122 10.3417 5.14648 10.1464L8.64648 6.64645ZM5.14648 0.146447C5.34175 -0.0488155 5.65825 -0.0488155 5.85352 0.146447L7.71973 2.01168C8.25295 2.54491 8.68119 2.9727 8.96973 3.32711C9.24669 3.66735 9.48873 4.04834 9.47168 4.48238C9.45682 4.8581 9.30795 5.21601 9.05273 5.49215C8.75789 5.81109 8.31823 5.90932 7.88184 5.95406C7.42716 6.00067 6.82164 5.99996 6.06738 5.99996H0.5C0.22387 5.99996 2.03573e-05 5.77609 0 5.49996C0 5.22382 0.223858 4.99996 0.5 4.99996H6.06738C6.84453 4.99996 7.38799 4.99902 7.7793 4.95895C8.18878 4.91697 8.29253 4.84137 8.31836 4.81344C8.41208 4.71204 8.46723 4.58031 8.47266 4.44235C8.47399 4.40388 8.4532 4.27699 8.19434 3.95895C7.94598 3.65386 7.56144 3.26941 7.01172 2.71969L5.14648 0.853478C4.95123 0.658222 4.95124 0.34171 5.14648 0.146447Z" fill="white" style="fill:white;fill-opacity:1;"/>
+<path d="M8.64648 6.64645C8.84175 6.45118 9.15825 6.45118 9.35352 6.64645C9.54874 6.84171 9.54877 7.15823 9.35352 7.35348L5.85352 10.8535C5.65827 11.0487 5.34175 11.0487 5.14648 10.8535C4.95122 10.6582 4.95122 10.3417 5.14648 10.1464L8.64648 6.64645ZM5.14648 0.146447C5.34175 -0.0488155 5.65825 -0.0488155 5.85352 0.146447L7.71973 2.01168C8.25295 2.54491 8.68119 2.9727 8.96973 3.32711C9.24669 3.66735 9.48873 4.04834 9.47168 4.48238C9.45682 4.8581 9.30795 5.21601 9.05273 5.49215C8.75789 5.81109 8.31823 5.90932 7.88184 5.95406C7.42716 6.00067 6.82164 5.99996 6.06738 5.99996H0.5C0.22387 5.99996 2.03573e-05 5.77609 0 5.49996C0 5.22382 0.223858 4.99996 0.5 4.99996H6.06738C6.84453 4.99996 7.38799 4.99902 7.7793 4.95895C8.18878 4.91697 8.29253 4.84137 8.31836 4.81344C8.41208 4.71204 8.46723 4.58031 8.47266 4.44235C8.47399 4.40388 8.4532 4.27699 8.19434 3.95895C7.94598 3.65386 7.56144 3.26941 7.01172 2.71969L5.14648 0.853478C4.95123 0.658222 4.95124 0.34171 5.14648 0.146447Z" fill="black" style="fill:black;fill-opacity:1;"/>
 </svg>
 
 
@@ -1026,33 +1026,43 @@ body::after{
         tryLoadAfJs();
     });
 
-    /**
-     * 時計
+        /**
+     * 時計（検索ボックスのplaceholderに表示）
+     * 表示が変わるときだけ更新し、次の分の境界に合わせて予約する
      */
-    const updateClock = () => {
-        const now = new Date();
+    let lastClockText = "";
 
+    const formatClock = (now) => {
         const month = String(now.getMonth() + 1).padStart(2, "0");
         const day = String(now.getDate()).padStart(2, "0");
         const hours = String(now.getHours()).padStart(2, "0");
         const minutes = String(now.getMinutes()).padStart(2, "0");
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        return `${month}.${day} ${dayNames[now.getDay()]} ${hours}:${minutes}`;
+    };
 
-        const clockEl = document.getElementById("clock");
-
-        if (!clockEl) {
-            console.error(`${NS} Required element not found: #clock`);
+    const updateClock = () => {
+        const searchBox = document.getElementById("searchBox");
+        if (!searchBox) {
+            console.error(`${NS} Required element not found: #searchBox`);
             return;
         }
 
-        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const dayName = dayNames[now.getDay()];
+        const text = formatClock(new Date());
+        if (text === lastClockText) return;
 
-        clockEl.textContent = `${month}.${day} ${dayName} ${hours}:${minutes}`;
+        lastClockText = text;
+        searchBox.placeholder = text;
     };
 
-    updateClock();
-    setInterval(updateClock, 1000);
+    const scheduleClockUpdate = () => {
+        updateClock();
+        // 次の「分」の境界の少し後に再実行（毎秒の更新はしない）
+        const delay = 60000 - (Date.now() % 60000) + 20;
+        window.setTimeout(scheduleClockUpdate, delay);
+    };
 
+    scheduleClockUpdate();
     console.log(`${NS} Clock script initialized`);
 })();
 </script>
