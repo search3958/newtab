@@ -1,13 +1,12 @@
-const CACHE_NAME = 'newtab-cache-18'; // バージョンを更新
+const CACHE_NAME = 'newtab-cache-19'; // バージョンを更新
 const ASSETS = [
   '/',
   '/index.html',
-  '/v7/af.js',
+  '/v7.1/af.js',
   '/lsr/icons-7.zip',
   'https://search3958.github.io/check.js',
 ];
 
-// インストール: 指定したファイルをすべてキャッシュ
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -17,7 +16,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// アクティベート: 古いバージョンのキャッシュを削除
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -28,11 +26,9 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// フェッチ: ネットワークリクエストを横取り
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // キャッシュがあればそれを返しつつ、バックグラウンドで最新版を取得（Stale-While-Revalidate）
       const fetchPromise = fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const cacheCopy = networkResponse.clone();
@@ -42,7 +38,6 @@ self.addEventListener('fetch', (event) => {
         }
         return networkResponse;
       }).catch(() => {
-        // オフライン時など、ネットワーク失敗時は何もせず終了（cachedResponseがあればそれが返る）
       });
 
       return cachedResponse || fetchPromise;
