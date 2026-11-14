@@ -2,7 +2,7 @@
 "use strict";
 const DB_NAME = "WallpaperDB";
 const STORE = "images";
-const ICON_ZIP_URL = "./lsr/icons-7.zip?v=5";
+const ICON_ZIP_URL = "./lsr/icons-7.zip?v=7";
 const FALLBACK_LIGHT = "bgimg/samag3.webp";
 const FALLBACK_DARK = "bgimg/samag3_dark.webp";
 const HISTORY_KEY = "searchHistory";

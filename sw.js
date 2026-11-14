@@ -1,4 +1,4 @@
-const CACHE_NAME = 'newtab-cache-21'; // バージョンを更新
+const CACHE_NAME = 'newtab-cache-22'; // バージョンを更新
 const ASSETS = [
   '/',
   '/index.html',
