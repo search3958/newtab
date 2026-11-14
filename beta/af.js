@@ -1022,16 +1022,88 @@ const fetchGoogleSuggestions = async (query) => { const q = normalizeSuggestionT
 const buildMainSuggestionList = async (query) => { const q = normalizeSuggestionText(query); if (!q || q.startsWith("@")) { hideMainSuggestions("@ mode or empty query"); return; } const localItems = []; const appMatches = getMainAccessCandidates(q); for (const app of appMatches) localItems.push({ type: "app", label: app.name, value: app.name, url: app.url, icon: app.icon, meta: t("appOpen"), action: "open" }); const mathResult = evaluateMath(q); if (mathResult) localItems.push({ type: "math", label: mathResult, value: mathResult, meta: t("calculationResult"), action: "insert" }); if (localItems.length) renderMainSuggestions(localItems); else hideMainSuggestions("waiting for Google suggestions"); const googleSuggestions = await fetchGoogleSuggestions(q); const googleItems = googleSuggestions.filter(value => value.toLowerCase() !== q.toLowerCase()).filter(value => !localItems.some(item => item.label.toLowerCase() === value.toLowerCase())).slice(0, 7).map(value => ({ type: "google", label: value, value, meta: t("googleCandidate"), action: "insert" })); if (q !== normalizeSuggestionText(getEl("#searchBox")?.value || "")) { console.log("[MainSuggestion] Query changed before Google response; result ignored."); return; } renderMainSuggestions([...localItems, ...googleItems]); };
 const scheduleMainSuggestions = (query) => { const q = normalizeSuggestionText(query); if (mainSuggestionTimer) { clearTimeout(mainSuggestionTimer); mainSuggestionTimer = null; } if (googleSuggestionController) { googleSuggestionController.abort(); googleSuggestionController = null; } if (!q || q.startsWith("@")) { hideMainSuggestions(q.startsWith("@") ? "app-search active" : "empty query"); return; } const localItems = []; for (const app of getMainAccessCandidates(q)) localItems.push({ type: "app", label: app.name, value: app.name, url: app.url, icon: app.icon, meta: "アプリを開く", action: "open" }); const mathResult = evaluateMath(q); if (mathResult) localItems.push({ type: "math", label: mathResult, value: mathResult, meta: "計算結果", action: "insert" }); if (localItems.length) renderMainSuggestions(localItems); else hideMainSuggestions("no local candidate"); mainSuggestionTimer = setTimeout(() => { mainSuggestionTimer = null; buildMainSuggestionList(q).catch(error => console.error("[MainSuggestion] Build failed:", error)); }, GOOGLE_SUGGESTION_DELAY); console.log(`[MainSuggestion] Google request scheduled in ${GOOGLE_SUGGESTION_DELAY}ms: ${q}`); };
 const applyMainSuggestion = (index = 0, mode = "tab") => { const item = mainSuggestionItems[index]; const sb = getEl("#searchBox"); if (!item || !sb) { console.error("[MainSuggestion] Cannot apply candidate: item or searchBox missing."); return false; } if (mode === "enter" && item.action === "open" && item.url) { updateHistory(item.label); console.log(`[MainSuggestion] Opening app: ${item.label}`); window.location.href = item.url; return true; } sb.value = item.value || item.label || ""; sb.focus(); const end = sb.value.length; try { sb.setSelectionRange(end, end); } catch {} scheduleMainSuggestions(sb.value); console.log(`[MainSuggestion] Candidate applied (${mode}): ${sb.value}`); return true; };
-const showIntelBox = (text, url) => { const box = getEl("#intelBox"); const ans = getEl("#intelAnswer"); if (!box || !ans) { console.error("[Intel] Required element not found: #intelBox or #intelAnswer"); return; } ans.textContent = text || ""; ans.onclick = null; ans.classList.remove("hide"); if (url) { ans.style.cursor = "pointer"; ans.onclick = () => { console.log(`[Intel] Opening URL: ${url}`); window.location.href = url; }; } else ans.style.cursor = "default"; box.classList.add("visible"); console.log(`[Intel] Shown: ${text || ""}`); };
+const showIntelBox = (label, iconUrl, onActivate) => {
+  const box = getEl("#intelBox");
+  const ans = getEl("#intelAnswer");
+  if (!box || !ans) { console.error("[Intel] Required element not found: #intelBox or #intelAnswer"); return; }
+  ans.replaceChildren();
+  if (iconUrl) {
+    const img = document.createElement("img");
+    img.src = iconUrl;
+    img.alt = "";
+    img.style.cssText = "width:20px;height:20px;object-fit:contain;margin-right:6px;vertical-align:middle";
+    ans.appendChild(img);
+  }
+  ans.appendChild(document.createTextNode(label || ""));
+  ans.classList.remove("hide");
+  if (typeof onActivate === "function") {
+    ans.style.cursor = "pointer";
+    ans.onclick = (e) => { e.stopPropagation(); onActivate(); };
+  } else {
+    ans.style.cursor = "default";
+    ans.onclick = null;
+  }
+  box.classList.add("visible");
+  console.log(`[Intel] Shown: ${label || ""}`);
+};
 const hideIntelBox = () => { const box = getEl("#intelBox"); const ans = getEl("#intelAnswer"); if (box) box.classList.remove("visible"); if (ans) { ans.classList.add("hide"); ans.onclick = null; } };
 const searchApp = (text) => { if (!text) return null; const q = text.replace(RE_AT, '').toLowerCase().trim(); if (q.length < 1) return null; return APP_MAP.get(q) || null; };
 const resolveAppIconUrlCached = (iconName, iconMap) => { if (!iconName) return null; const key = `${iconName}_${iconMap.size}`; if (iconCache.has(key)) return iconCache.get(key); const url = resolveIconUrl(iconName, iconMap); if (url) iconCache.set(key, url); return url; };
-const updateIntelFromDropdown = (query) => { if (!query) { hideIntelBox(); return; } const match = APP_SEARCH_DATA.find(a => a.name.toLowerCase().includes(query.toLowerCase())); if (match) { const iconUrl = resolveAppIconUrlCached(match.icon, appSearchIconMap); const iconHtml = iconUrl ? `<img src="${iconUrl}" alt="${match.name}" style="width:20px;height:20px;object-fit:contain">` : ''; showIntelBox(`${iconHtml} ${match.name}`, match.url); } else hideIntelBox(); };
+const updateIntelFromDropdown = (query) => {
+  if (!query) { hideIntelBox(); return; }
+  const match = APP_SEARCH_DATA.find(a => a.name.toLowerCase().includes(query.toLowerCase()));
+  if (!match) { hideIntelBox(); return; }
+  const iconUrl = resolveAppIconUrlCached(match.icon, appSearchIconMap || new Map());
+  showIntelBox(match.name, iconUrl, () => completeAppName(match));
+};
 const showAppSearchDropdown = (query) => { const dropdown = getEl("#appSearchDropdown"); if (!dropdown) return; if (query === lastDropdownQuery) { updateIntelFromDropdown(query); return; } lastDropdownQuery = query; updateIntelFromDropdown(query); const filtered = query ? APP_SEARCH_DATA.filter(a => a.name.toLowerCase().includes(query.toLowerCase())) : APP_SEARCH_DATA; if (filtered.length === 0) dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#999;font-size:14px">該当するアプリが見つかりません</div>'; else dropdown.innerHTML = filtered.map(app => { const iconUrl = resolveAppIconUrlCached(app.icon, appSearchIconMap); const iconHtml = iconUrl ? `<div class="app-search-item-icon"><img src="${iconUrl}" alt="${app.name}"></div>` : `<div class="app-search-item-icon" style="background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">${app.name[0]}</div>`; return `<div class="app-search-item" data-url="${app.url}" data-name="${app.name}" data-placeholder="${app.placeholder || ''}">${iconHtml}<span class="app-search-item-name">${app.name}</span><span class="app-search-item-url">${app.url.replace(/=$/, "")}…</span></div>`; }).join(""); dropdown.classList.add("visible"); };
 const hideAppSearchDropdown = () => { const d = getEl("#appSearchDropdown"); if (d) d.classList.remove("visible"); };
-const performAppSearch = () => { const sb = getEl("#searchBox"); if (!sb) return; const val = sb.value.trim(); if (!val.startsWith("@")) return; const app = searchApp(val); if (app) { hideAppSearchDropdown(); hideIntelBox(); let searchUrl; if (app.name === "AliExpress") searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent("")); else if (app.placeholder) searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent("")); else searchUrl = app.url + encodeURIComponent(""); updateHistory(`@${app.name}`); window.location.href = searchUrl; } };
+const buildAppSearchUrl = (app, query) => {
+  const q = encodeURIComponent(query || "");
+  if (app.name === "AliExpress") return app.url.replace("wholesale-.html", `wholesale-${q}.html`);
+  if (app.url.endsWith("=")) return app.url + q;
+  return app.url;
+};
+
+const navigateAppSearch = (app, query = "") => {
+  if (!app) { console.error("[AppSearch] App not found."); return; }
+  hideAppSearchDropdown();
+  hideIntelBox();
+  updateHistory(query ? `@${app.name} ${query}` : `@${app.name}`);
+  const url = buildAppSearchUrl(app, query);
+  console.log(`[AppSearch] Navigating: ${url}`);
+  window.location.href = url;
+};
+const completeAppName = (app) => {
+  const sb = getEl("#searchBox");
+  if (!app || !sb) { console.error("[AppSearch] Complete failed: app or searchBox missing."); return; }
+  sb.value = `@${app.name} `;
+  sb.focus();
+  const end = sb.value.length;
+  try { sb.setSelectionRange(end, end); } catch {}
+  hideAppSearchDropdown();
+  hideIntelBox();
+  hideMainSuggestions("app candidate selected");
+  console.log(`[AppSearch] Completed: ${sb.value}`);
+};
+const parseAppQuery = (value) => {
+  const body = String(value || "").trim().replace(RE_AT, "");
+  const space = body.indexOf(" ");
+  if (space < 0) return { name: body, query: "" };
+  return { name: body.slice(0, space), query: body.slice(space + 1).trim() };
+};
+
+const performAppSearch = () => {
+  const sb = getEl("#searchBox");
+  if (!sb) return;
+  const { name, query } = parseAppQuery(sb.value);
+  if (!name) { console.log("[AppSearch] Enter ignored: app name is empty."); return; }
+  const app = searchApp(name)
+    || APP_SEARCH_DATA.find(a => a.name.toLowerCase().startsWith(name.toLowerCase()));
+  if (!app) { console.error(`[AppSearch] No app matched: ${name}`); return; }
+  navigateAppSearch(app, query);
+};
 const handleAppSearchClick = () => { const sb = getEl("#searchBox"); if (!sb) return; const val = sb.value; if (val === "") { sb.value = "@"; sb.focus(); showAppSearchDropdown(""); } else if (val === "@") { sb.value = ""; hideAppSearchDropdown(); hideIntelBox(); } else if (val.startsWith("@")) { const si = val.indexOf(" "); if (si > 0) sb.value = val.substring(0, si); else sb.value = ""; hideAppSearchDropdown(); hideIntelBox(); } else { sb.value = val + "@"; sb.focus(); showAppSearchDropdown(""); } };
-const selectFirstDropdownItem = () => { const dropdown = getEl("#appSearchDropdown"); if (!dropdown || !dropdown.classList.contains("visible")) return false; const first = dropdown.querySelector(".app-search-item"); if (!first) return false; const name = first.dataset.name; hideAppSearchDropdown(); hideIntelBox(); const app = APP_SEARCH_DATA.find(a => a.name === name); if (app) { showIntelBox(app.name, app.url); const sb = getEl("#searchBox"); if (sb) sb.focus(); let searchUrl; if (app.name === "AliExpress") searchUrl = app.url.replace("wholesale-", "wholesale-" + encodeURIComponent("")); else if (app.placeholder) searchUrl = app.url.replace(app.placeholder + "=", app.placeholder + "=" + encodeURIComponent("")); else searchUrl = app.url + encodeURIComponent(""); updateHistory(`@${name}`); window.location.href = searchUrl; } return true; };
 const filterAppDropdown = () => { const sb = getEl("#searchBox"); if (!sb) return; const val = sb.value; const ai = val.lastIndexOf("@"); if (ai >= 0) { const after = val.substring(ai + 1); if (!after.includes(" ")) showAppSearchDropdown(after); else hideAppSearchDropdown(); } else hideAppSearchDropdown(); };
 const performSearch = (query) => { const q = query.trim(); if (!q) return; updateHistory(q); let url = ""; switch (searchEngine) { case "google": url = `https://www.google.com/search?q=${encodeURIComponent(q)}`; break; case "bing": url = `https://www.bing.com/search?q=${encodeURIComponent(q)}`; break; case "yahoo": url = `https://search.yahoo.co.jp/search?p=${encodeURIComponent(q)}`; break; case "duckduckgo": url = `https://duckduckgo.com/?q=${encodeURIComponent(q)}`; break; case "nenara": url = `https://www.naenara.com.kp/main/search_first?sVal=${encodeURIComponent(q)}`; break; case "neighb": url = `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`; break; default: url = `https://www.google.com/search?q=${encodeURIComponent(q)}`; break; } window.location.href = url; };
 const showHistoryDialog = () => { const history = getHistory(); createNewtabDialog(t("searchHistory"), (content, dialog) => { if (!content || !dialog) { console.error("[History] Dialog content or dialog element missing."); return; } if (history.length === 0) { const empty = document.createElement("p"); empty.className = "dialog-empty"; empty.textContent = t("historyEmpty"); content.appendChild(empty); console.log("[History] Dialog opened with no history."); return; } const list = document.createElement("ul"); history.slice(-40).reverse().forEach((item) => { const query = typeof item === "string" ? item : item?.query; if (!query) { console.error("[History] Skipped invalid history item."); return; } const time = typeof item === "string" ? null : item?.time; const dateStr = time ? formatDateTime(new Date(time)) : ""; const li = document.createElement("li"); const queryText = document.createElement("span"); queryText.textContent = query; const timeText = document.createElement("span"); timeText.textContent = dateStr; timeText.style.color = "#999"; timeText.style.fontSize = "12px"; timeText.style.whiteSpace = "nowrap"; li.append(queryText, timeText); li.addEventListener("click", () => { closeNewtabDialog(dialog, "history item"); if (query.startsWith("http://") || query.startsWith("https://")) { console.log(`[History] Opening URL from history: ${query}`); window.location.href = query; } else { console.log(`[History] Searching history item: ${query}`); performSearch(query); } }); list.appendChild(li); }); content.appendChild(list); console.log(`[History] Dialog rendered: ${list.children.length} item(s).`); }); console.log("[History] Dialog requested."); };
@@ -2344,7 +2416,7 @@ const mainDropdown = getEl(`#${MAIN_SUGGESTION_ID}`);
 const isAtMode = searchBox.value.trimStart().startsWith("@");
 if (isAtMode) {
 if (e.key === "Tab") { e.preventDefault(); const atValue = searchBox.value.trim(); const appQuery = atValue.slice(1).trim(); const matches = APP_SEARCH_DATA.filter(app => app.name.toLowerCase().startsWith(appQuery.toLowerCase())); if (matches.length > 0) { searchBox.value = `@${matches[0].name} `; searchBox.focus(); hideAppSearchDropdown(); hideMainSuggestions("@ Tab completed"); console.log(`[AppSearch] Tab completed: ${searchBox.value}`); } else console.log("[AppSearch] Tab: no matching app."); return; }
-if (e.key === "Enter") { e.preventDefault(); hideMainSuggestions("@ Enter"); const value = searchBox.value.trim(); const si = value.indexOf(" "); if (si > 0) { const app = searchApp(value.slice(0, si)); if (app) { performAppSearch(); return; } } const app = searchApp(value); if (app) { performAppSearch(); return; } performSearch(value); return; }
+if (e.key === "Enter") { e.preventDefault(); hideMainSuggestions("@ Enter"); performAppSearch(); return; }
 if (e.key === "Escape") { e.preventDefault(); hideAppSearchDropdown(); hideMainSuggestions("Escape in @ mode"); hideIntelBox(); console.log("[AppSearch] Escape closed suggestions."); return; }
 return;
 }
@@ -2358,9 +2430,36 @@ searchBox.addEventListener("focus", () => { const trimmed = searchBox.value.trim
 searchBox.addEventListener("blur", () => { console.log("[Search] Blur: suggestions remain available."); });
 const dropdownEl = getEl("#appSearchDropdown");
 if (dropdownEl) dropdownEl.addEventListener("mousedown", (e) => e.preventDefault());
+if (dropdownEl) dropdownEl.addEventListener("click", (e) => {
+  const item = e.target.closest(".app-search-item");
+  if (!item || !dropdownEl.contains(item)) return;
+  const app = APP_SEARCH_DATA.find(a => a.name === item.dataset.name);
+  completeAppName(app);
+});
 else console.error("[Search] Required element not found: #appSearchDropdown");
 const mainDropdown = ensureMainSuggestionDropdown();
-if (mainDropdown) { mainDropdown.addEventListener("mousedown", (e) => e.preventDefault()); mainDropdown.addEventListener("click", (e) => { const button = e.target.closest(".app-search-item"); if (!button || !mainDropdown.contains(button)) return; const index = Number(button.dataset.index); if (!Number.isInteger(index)) { console.error("[MainSuggestion] Invalid candidate index."); return; } applyMainSuggestion(index, "click"); }); }
+if (mainDropdown) mainDropdown.addEventListener("click", (e) => {
+  const button = e.target.closest(".app-search-item");
+  if (!button || !mainDropdown.contains(button)) return;
+  const index = Number(button.dataset.index);
+  const item = mainSuggestionItems[index];
+  if (!Number.isInteger(index) || !item) { console.error("[MainSuggestion] Invalid candidate index."); return; }
+
+  if (item.type === "google") {
+    hideMainSuggestions("google candidate click");
+    console.log(`[MainSuggestion] Searching Google: ${item.value}`);
+    performSearch(item.value);
+    return;
+  }
+  if (item.type === "app" && item.url) {
+    hideMainSuggestions("app candidate click");
+    updateHistory(item.label);
+    console.log(`[MainSuggestion] Opening app: ${item.label}`);
+    window.location.href = item.url;
+    return;
+  }
+  applyMainSuggestion(index, "click"); // 計算結果は入力欄へ挿入
+});
 if (searchButton) searchButton.addEventListener("click", () => { const val = searchBox.value.trim(); if (!val) { console.log("[Search] Button ignored: empty query."); return; } if (val.startsWith("@")) performAppSearch(); else { const top = mainSuggestionItems[0]; if (top?.action === "open" && top.url) applyMainSuggestion(0, "enter"); else performSearch(val); } });
 if (clearHistoryBtn) clearHistoryBtn.addEventListener("click", showHistoryDialog);
 if (appSearchBtn) appSearchBtn.addEventListener("click", () => { hideMainSuggestions("manual app-search activation"); handleAppSearchClick(); console.log("[AppSearch] App-search button clicked."); });
