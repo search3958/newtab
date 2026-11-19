@@ -73,15 +73,15 @@ extensionsEmpty: "保存された拡張機能はありません",
 extensionDeleteConfirm: "「{name}」を削除します。\n\n実行しますか？",
 extensionsBrowse: "拡張機能とテーマを探す",
 data: "データ",
-resetSettings: "このデバイスのNewtab設定をリセット",
-resetAllDevices: "すべての端末からNewtab設定をリセット",
+resetSettings: "このデバイスのSaeTab設定をリセット",
+resetAllDevices: "すべての端末からSaeTab設定をリセット",
 deleteHistory: "検索履歴の削除",
 information: "情報",
 termsPrivacy: "利用規約 および 個人情報処理政策",
 aboutMe: "私について",
 language: "Language",
-resetConfirm: "このデバイスのNewtab設定をリセットします。\n\n壁紙のみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
-resetAllConfirm: "すべての端末のNewtab設定をリセットします。\nアカウントに保存された設定も削除されます。\n\n実行しますか？",
+resetConfirm: "このデバイスのSaeTab設定をリセットします。\n\n壁紙のみが初期状態に戻ります。\n検索履歴やショートカットなど、その他のデータは削除されません。\n\n実行しますか？",
+resetAllConfirm: "すべての端末のSaeTab設定をリセットします。\nアカウントに保存された設定も削除されます。\n\n実行しますか？",
 deleteHistoryConfirm: "検索履歴をすべて削除します。実行しますか？",
 categories: {
 "Sentaro": "Sentaro",
@@ -152,15 +152,15 @@ extensionsEmpty: "No saved extensions",
 extensionDeleteConfirm: "Delete \"{name}\"?\n\nContinue?",
 extensionsBrowse: "Browse extensions & themes",
 data: "Data",
-resetSettings: "Reset Newtab settings on this device",
-resetAllDevices: "Reset Newtab settings on all devices",
+resetSettings: "Reset SaeTab settings on this device",
+resetAllDevices: "Reset SaeTab settings on all devices",
 deleteHistory: "Delete search history",
 information: "Information",
 termsPrivacy: "Terms of Use & Privacy Policy",
 aboutMe: "About me",
 language: "Language",
-resetConfirm: "Reset Newtab settings on this device?\n\nOnly wallpaper settings will be restored to their defaults.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
-resetAllConfirm: "Reset Newtab settings on all devices?\nThe settings saved to your account will also be deleted.\n\nContinue?",
+resetConfirm: "Reset SaeTab settings on this device?\n\nOnly wallpaper settings will be restored to their defaults.\nSearch history, shortcuts, and other data will not be deleted.\n\nContinue?",
+resetAllConfirm: "Reset SaeTab settings on all devices?\nThe settings saved to your account will also be deleted.\n\nContinue?",
 deleteHistoryConfirm: "Delete all search history?\n\nContinue?",
 categories: {
 "Sentaro": "Sentaro",
@@ -220,13 +220,13 @@ saetab: "SaeTab 7.1 Beta",
 settingsDetails: "설정 방법 및 상세",
 simpleVersion: "간이 버전",
 data: "데이터",
-resetSettings: "Newtab 설정 초기화",
+resetSettings: "SaeTab 설정 초기화",
 deleteHistory: "검색 기록 삭제",
 information: "정보",
 termsPrivacy: "이용약관 및 개인정보 처리방침",
 aboutMe: "소개",
 language: "언어",
-resetConfirm: "이 기기의 Newtab 설정을 초기화할까요?\n\n배경화면 설정만 기본값으로 돌아갑니다.\n검색 기록, 바로가기 및 기타 데이터는 삭제되지 않습니다.\n\n계속하시겠습니까?",
+resetConfirm: "이 기기의 SaeTab 설정을 초기화할까요?\n\n배경화면 설정만 기본값으로 돌아갑니다.\n검색 기록, 바로가기 및 기타 데이터는 삭제되지 않습니다.\n\n계속하시겠습니까?",
 deleteHistoryConfirm: "모든 검색 기록을 삭제할까요?\n\n계속하시겠습니까?",
 categories: {
 "Sentaro": "Sentaro",
@@ -286,13 +286,13 @@ saetab: "SaeTab 7.1 Beta",
 settingsDetails: "설정 방법과 상세",
 simpleVersion: "간편판",
 data: "자료",
-resetSettings: "Newtab 설정 초기화",
+resetSettings: "SaeTab 설정 초기화",
 deleteHistory: "검색 기록 삭제",
 information: "정보",
 termsPrivacy: "리용규약 및 개인정보정책",
 aboutMe: "소개",
 language: "언어",
-resetConfirm: "이 기기의 Newtab 설정을 초기화하겠습니까?\n\n배경화면 설정만 기본 상태로 돌아갑니다.\n검색 기록, 지름길 및 기타 자료는 삭제되지 않습니다.\n\n계속하시겠습니까?",
+resetConfirm: "이 기기의 SaeTab 설정을 초기화하겠습니까?\n\n배경화면 설정만 기본 상태로 돌아갑니다.\n검색 기록, 지름길 및 기타 자료는 삭제되지 않습니다.\n\n계속하시겠습니까?",
 deleteHistoryConfirm: "검색 기록을 모두 삭제하겠습니까?\n\n계속하시겠습니까?",
 categories: {
 "Sentaro": "Sentaro",
@@ -352,13 +352,13 @@ saetab: "SaeTab 7.1 Beta",
 settingsDetails: "设置方法与详细信息",
 simpleVersion: "简易版",
 data: "数据",
-resetSettings: "重置 Newtab 设置",
+resetSettings: "重置 SaeTab 设置",
 deleteHistory: "删除搜索历史",
 information: "信息",
 termsPrivacy: "使用条款及隐私政策",
 aboutMe: "关于我",
 language: "语言",
-resetConfirm: "重置此设备上的 Newtab 设置？\n\n仅壁纸设置会恢复默认值。\n搜索历史、快捷方式和其他数据不会被删除。\n\n继续？",
+resetConfirm: "重置此设备上的 SaeTab 设置？\n\n仅壁纸设置会恢复默认值。\n搜索历史、快捷方式和其他数据不会被删除。\n\n继续？",
 deleteHistoryConfirm: "删除全部搜索历史？\n\n继续？",
 categories: {
 "Sentaro": "Sentaro",
@@ -418,13 +418,13 @@ saetab: "SaeTab 7.1 Beta",
 settingsDetails: "設定方式與詳細資訊",
 simpleVersion: "簡易版",
 data: "資料",
-resetSettings: "重設 Newtab 設定",
+resetSettings: "重設 SaeTab 設定",
 deleteHistory: "刪除搜尋紀錄",
 information: "資訊",
 termsPrivacy: "使用條款及隱私權政策",
 aboutMe: "關於我",
 language: "語言",
-resetConfirm: "要重設此裝置上的 Newtab 設定嗎？\n\n僅桌布設定會恢復預設值。\n搜尋紀錄、捷徑及其他資料不會被刪除。\n\n繼續？",
+resetConfirm: "要重設此裝置上的 SaeTab 設定嗎？\n\n僅桌布設定會恢復預設值。\n搜尋紀錄、捷徑及其他資料不會被刪除。\n\n繼續？",
 deleteHistoryConfirm: "要刪除全部搜尋紀錄嗎？\n\n繼續？",
 categories: {
 "Sentaro": "Sentaro",
@@ -484,13 +484,13 @@ saetab: "SaeTab 7.1 Beta",
 settingsDetails: "Настройки и подробности",
 simpleVersion: "Упрощённая версия",
 data: "Данные",
-resetSettings: "Сбросить настройки Newtab",
+resetSettings: "Сбросить настройки SaeTab",
 deleteHistory: "Удалить историю поиска",
 information: "Информация",
 termsPrivacy: "Условия использования и политика конфиденциальности",
 aboutMe: "Обо мне",
 language: "Язык",
-resetConfirm: "Сбросить настройки Newtab на этом устройстве?\n\nБудут восстановлены только настройки обоев.\nИстория поиска, ярлыки и другие данные не будут удалены.\n\nПродолжить?",
+resetConfirm: "Сбросить настройки SaeTab на этом устройстве?\n\nБудут восстановлены только настройки обоев.\nИстория поиска, ярлыки и другие данные не будут удалены.\n\nПродолжить?",
 deleteHistoryConfirm: "Удалить всю историю поиска?\n\nПродолжить?",
 categories: {
 "Sentaro": "Sentaro",
@@ -739,7 +739,7 @@ transaction.onabort = () => reject(transaction.error || new Error("Wallpaper res
 });
 db.close();
 if (document.body) { document.body.style.removeProperty("--wallpaper-light"); document.body.style.removeProperty("--wallpaper-dark"); }
-console.log("[Settings] Wallpaper reset: only Newtab wallpaper records were deleted.");
+console.log("[Settings] Wallpaper reset: only SaeTab wallpaper records were deleted.");
 return true;
 } catch (error) { console.error("[Settings] Wallpaper reset failed:", error); return false; }
 };
@@ -1168,7 +1168,7 @@ syncOnOpen().catch((error) => console.error("[Sync] Post-login sync failed:", er
 await showManagementDialog();
 };
 
-/* --- 検索履歴の同期（Newtab起動時のみ） --- */
+/* --- 検索履歴の同期（SaeTab起動時のみ） --- */
 const normalizeHistoryItem = (item) => {
 const query = typeof item === "string" ? item : item?.query;
 if (typeof query !== "string" || !query.trim()) return null;
@@ -1279,7 +1279,7 @@ settingsSyncChain = settingsSyncChain.then(() => runSettingsSync(reason)).catch(
 return settingsSyncChain;
 };
 
-/* --- Newtab起動時の同期 --- */
+/* --- SaeTab起動時の同期 --- */
 const syncOnOpen = async () => {
 if (!(await canSync())) return;
 await Promise.allSettled([syncSearchHistory("open"), syncSettings("open")]);
@@ -1301,7 +1301,7 @@ if (isSyncEnabled()) await syncOnOpen();
 /* --- リセット --- */
 const resetNewtabSettings = async (allDevices) => {
 const confirmed = window.confirm(t(allDevices ? "resetAllConfirm" : "resetConfirm"));
-if (!confirmed) { console.log("[Settings] Newtab settings reset cancelled."); return; }
+if (!confirmed) { console.log("[Settings] SaeTab settings reset cancelled."); return; }
 
 if (allDevices) {
 if (!(await canSync())) { console.error("[Sync] All-device reset requires sync."); return; }
@@ -1315,7 +1315,7 @@ resetLocalAppearance(Date.now());
 
 const wallpaperReset = await deleteOnlyWallpaperSettings();
 if (!allDevices) await syncSettings("device reset");
-console.log(`[Settings] Newtab reset completed: allDevices=${allDevices}, wallpaper=${wallpaperReset}.`);
+console.log(`[Settings] SaeTab reset completed: allDevices=${allDevices}, wallpaper=${wallpaperReset}.`);
 };
 
 /* --- 同期のオンオフ --- */
@@ -1357,7 +1357,7 @@ if (revision === syncToggleRevision) console.log("[Sync] Sync enabled; backgroun
 })().catch((error) => console.error("[Sync] Enabling sync failed:", error));
 };
 
-/* ===== 拡張機能（IndexedDB: Newtab7Extensions / scripts） ===== */
+/* ===== 拡張機能（IndexedDB: SaeTab7Extensions / scripts） ===== */
 let extensionDbPromise = null;
 const openExtensionDb = () => {
 if (extensionDbPromise) return extensionDbPromise;
@@ -2239,16 +2239,17 @@ const createShortcutAd = () => {
   wrapper.className = "main-shortcut-ad";
   wrapper.style.cssText = "width:100%;display:flex;justify-content:center;";
 
-  const ad = document.createElement("ins");
+const ad = document.createElement("ins");
   ad.className = "adsbygoogle";
-  ad.style.display = "inline-block";
-  ad.style.width = "728px";
-  ad.style.height = "90px";
+  ad.style.display = "block";
   ad.dataset.adClient = ADSENSE_CLIENT;
   ad.dataset.adSlot = ADSENSE_SLOT;
+  ad.dataset.adFormat = "horizontal";
+  ad.dataset.fullWidthResponsive = "true";
   wrapper.appendChild(ad);
   console.log(`[ShortcutAd] Ad slot created: ${ADSENSE_SLOT}`);
   return wrapper;
+
 };
 const requestShortcutAds = async (root) => {
 if (!root) { console.error("[ShortcutAd] Root element is missing."); return; }
